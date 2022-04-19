@@ -5,27 +5,31 @@
 - Educatief
 - Telefoon map scannen
 - Huis plaatsen
-- Recuirements mogen veranderen door het project heen - "Dennis"
+- Requirements mogen veranderen door het project heen - "Dennis"
 
 ## Must
 
 - [ ] Snel opschaalbaar 600-800 studenten tegelijk
-- [ ] Android / ios platform ->
-- [ ] Ruimte zichtbaar
+- [ ] Meerdere docenten tegelijk
+- [ ] In ruimte zichtbaar voor iedereen
 - [ ] Zelfde map geeft zelfde projectie
-- [ ] Voor docenten moet het makkelijk te begrijpen zijn (i.e de oudere docent)
+- [ ] Voor docenten/studenten moet het makkelijk te begrijpen zijn (i.e de oudere docent)
 - [ ] Alle tekst in het engels
 - [ ] Documentatie
-  - Alle libs
+- [ ] Beetje langzamere telefoons moeten ook kunnen werken
+
+  - Alle libs in de docs
   - Onderhoudbaar voor een volgend dev team
 
 ## Should have
 
-- [ ] rotatie / translatie in AR is live
-- [ ] beetje langzamere telefoons moeten ook kunnen werken
+- [ ] rotatie / translatie in AR is live (lijnen updaten niet)
 - [ ] huisjes op de 2d kaart of 3d app
+- [ ] Gamification
 
 ## Could have
+
+- [ ] Docent kan zijn scherm streamen/delen met de projector
 
 - [ ] docent -> kan projecteren naar stream op website
 - [ ] scan hoeft niet live te zijn
@@ -33,4 +37,4 @@
 
 ## Won't have
 
-- Geen dalen -> alleen een top
+- App kent geen dalen -> alles is een top tops
