@@ -3,6 +3,7 @@
 ## Opening
 
 Vergadering geopend om [TIJD]
+Vergadering gesloten om [TIJD]
 [NAAM] notuleert.
 
 ## Mededelingen
