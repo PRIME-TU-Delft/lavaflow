@@ -1,4 +1,4 @@
-# Kickoff notes
+# Kickoff notes (19/04/2022)
 
 
 # TODO
@@ -7,6 +7,7 @@
 	"Preferably" GitLab should be the main platform, not GitHub :(
 - [ ] First assignment is due in a few days (21/04/2022)
 - [ ] 2nd assignment (CoC) is 28/04
+- [ ] Ask TA about testing
 
 
 # Organization
