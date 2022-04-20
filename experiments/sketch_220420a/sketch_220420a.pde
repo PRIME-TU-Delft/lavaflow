@@ -6,9 +6,10 @@ ArrayList<ArrayList<LineSegment>> positions;
 int currentList;
 
 boolean currentlyDrawing;
+boolean drawingAllowed;
 
 void setup() {
-  size(800, 600, P2D);
+  size(1200, 800, P2D);
   pixelDensity(displayDensity());
   
   lastMouse = new PVector(mouseX, mouseY);
@@ -19,6 +20,7 @@ void setup() {
   currentList = 0;
   
   currentlyDrawing = false;
+  drawingAllowed = true;
   
 }
 
@@ -58,10 +60,30 @@ void mousePressed() {
     
     positions.add(new ArrayList<LineSegment>());
     currentList++;
-  } else {
+  } else if (drawingAllowed) {
     lastMouse.x = mouseX;
     lastMouse.y = mouseY;
     currentlyDrawing = true;
+  }
+  
+}
+
+void keyPressed() {
+  
+  if (key == ENTER) {
+    
+    if (currentlyDrawing) {
+      mousePressed();
+    }
+    
+    drawingAllowed = false;
+    
+    GradientCalc engine = new GradientCalc(positions);
+    
+    engine.drawGradients();
+    
+    noLoop();
+    
   }
   
 }
