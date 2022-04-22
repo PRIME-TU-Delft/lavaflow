@@ -10,11 +10,11 @@ Vergadering gesloten om [TIJD]
 
 - [MEDEDELING]
 
-### [BESPREEK PUNT 1]
+### [BESPREEK PUNT 1] - [optional PERSON WHO IS RESPONSIBLE]
 
-### [BESPREEK PUNT 2]
+### [BESPREEK PUNT 2] - [optional PERSON WHO IS RESPONSIBLE]
 
-### [BESPREEK PUNT 3]
+### [BESPREEK PUNT 3] - [optional PERSON WHO IS RESPONSIBLE]
 
 ### Tijdsplanning en milestones
 
