@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "outDir": "./lib",
+      "lib": ["es2015", "dom"],
+      "strict": true,
+      "esModuleInterop": true,
+      "rootDir": "./src",
+      "noImplicitUseStrict": true,
+      "alwaysStrict": false
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+  }
