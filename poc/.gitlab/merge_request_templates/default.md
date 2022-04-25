@@ -11,3 +11,4 @@ fix #(link to number of issue)
 Are there any bugs in the code
 
 /milestore %"Sprint [NAME]"
+/assign @Abel @jonasvanmarrew @svanderkris @rcmdur @phengst
