@@ -22,3 +22,4 @@ Deadline for assignment[#] is [DATE (dd-MM hh-mm)]
 - [ ] writing sections for Pauline
 
 /estimate 20h
+/milestone %"Sprint next"

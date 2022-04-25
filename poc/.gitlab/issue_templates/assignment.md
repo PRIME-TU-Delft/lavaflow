@@ -27,4 +27,4 @@ Deadline for assignment[#] is [DATE (dd-MM hh-mm)]
 
 /estimate 20h
 /label ~assignment
-/milestore %"Sprint next"
+/milestone %"Sprint next"
