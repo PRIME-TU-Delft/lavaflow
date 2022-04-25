@@ -6,7 +6,7 @@
 
 fix #(link to number of issue)
 
-## Reminder
+## Reminder for reviewers
 
 Are there any bugs in the code
 
