@@ -17,4 +17,4 @@
 - (or other references that inspired this feature)
 
 /label ~Feature ~Backlog
-/milestone %%"Sprint next"
+/milestone %"Sprint next"
