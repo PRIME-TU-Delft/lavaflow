@@ -25,6 +25,10 @@ Deadline for assignment[#] is [DATE (dd-MM hh-mm)]
 
 - [ ] writing sections for Pauline
 
+### @rcmdur
+
+- [ ] writing sections for Rens
+
 /estimate 20h
 /label ~assignment
 /milestone %"Sprint next"
