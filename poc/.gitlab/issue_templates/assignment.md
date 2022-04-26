@@ -1,9 +1,5 @@
 Deadline for assignment[#] is [DATE (dd-MM hh-mm)]
 
-## Linked issues
-
-- #(link to issue number)
-
 ## Tasks for each member
 
 - (fix title page)
@@ -30,5 +26,5 @@ Deadline for assignment[#] is [DATE (dd-MM hh-mm)]
 - [ ] writing sections for Rens
 
 /estimate 20h
-/label ~assignment
+/label ~assignment ~backlog
 /milestone %"Sprint next"
