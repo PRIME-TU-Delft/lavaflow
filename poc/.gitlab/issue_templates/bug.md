@@ -23,6 +23,6 @@ it's very hard to read otherwise.)
 
 (If you can, link to the line of code that might be responsible for the problem)
 
-/label ~bug
+/label ~bug ~backlog
 /due next monday
 /estimate 1h
