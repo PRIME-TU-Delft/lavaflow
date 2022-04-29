@@ -1,21 +1,13 @@
+use super::raster::Raster;
+
 #[derive(Debug)]
-
-
-
 pub struct Constructor {
-    rasterSize : i64,
-    contourMargin: i64,
-
-    xCells: i64,
-    yCells: i64 ,
-
-    xDimension : i64,
-    yDimenstion : i64,
-
+    rasterSize : u64,
+    contourMargin: u64,
 
     isSVC : Vec<Vec<bool>>,
-    //TODO: should be raster class
-    heights : Vec<Vec<f64>>
+
+    raster : Raster
 }
 
 trait helperFunctions{
