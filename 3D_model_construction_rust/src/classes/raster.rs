@@ -5,12 +5,12 @@
 #[derive(Debug)]
 pub struct Raster {
 
-    rows: u64,
-    columns: u64,
-    row_height: f64,
-    column_width: f64,
-    altitudes: Vec<Vec<f64>>
-
+    pub rows: u64,
+    pub columns: u64,
+    pub row_height: f64,
+    pub column_width: f64,
+    pub altitudes: Vec<Vec<f64>>
+    
 }
 
 
