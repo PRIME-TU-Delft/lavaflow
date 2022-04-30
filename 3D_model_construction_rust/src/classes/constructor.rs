@@ -21,9 +21,9 @@ trait HelperFunctions {
 }
 
 impl ModelConstructor {
-	fn construct_map(&mut self, raster: &Raster, contour_margin: i64) {
-		let x = raster.columns as usize;
-		let y = raster.rows as usize;
+	fn construct_map(&mut self, raster: &Raster, _contour_margin: i64) {
+		let x = raster.columns;
+		let y = raster.rows;
 		self.is_svc = vec![vec![false; x]; y];
 	}
 }

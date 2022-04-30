@@ -21,11 +21,11 @@ impl LevelCurve {
 	}
 
 	pub fn get_points(&self) -> &Vec<Point> {
-		return &self.points;
+		&self.points
 	}
 
 	pub fn find_closest_point_and_distance_on_level_curve(&self, a: &Point) -> (Option<&Point>, f64) {
-		if self.points.len() == 0 {
+		if self.points.is_empty() {
 			return (None, f64::INFINITY);
 		}
 
@@ -38,14 +38,14 @@ impl LevelCurve {
 		for p in &self.points {
 			let current_dist_sqr = Point::dist_sqr(p, a);
 
-			if (current_dist_sqr < min_dist_sqr) {
+			if current_dist_sqr < min_dist_sqr {
 				min_dist_sqr = current_dist_sqr;
 				min_dist_sqr_point = p;
 			}
 		}
 
 		// Return the smallest distance found
-		return (Some(min_dist_sqr_point), f64::sqrt(min_dist_sqr));
+		(Some(min_dist_sqr_point), f64::sqrt(min_dist_sqr))
 	}
 
 	pub fn find_closest_point_on_level_curve(&self, a: &Point) -> Option<&Point> {
@@ -86,13 +86,13 @@ impl LevelCurveMap {
 
 	// Retrieve the list of level curves
 	pub fn get_level_curves(&self) -> &Vec<LevelCurve> {
-		return &self.level_curves;
+		&self.level_curves
 	}
 
 	// Finding the closest point on any level curve that's stored in this map
 	pub fn find_closest_point_on_level_curve(&self, a: &Point) -> Option<&Point> {
 		// If this map doesn't contain any level-curves, return None
-		if self.level_curves.len() == 0 {
+		if self.level_curves.is_empty() {
 			return None;
 		}
 
@@ -109,6 +109,6 @@ impl LevelCurveMap {
 		}
 
 		// Return the point
-		return min_dist.0;
+		min_dist.0
 	}
 }

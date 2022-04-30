@@ -4,8 +4,8 @@
 
 #[derive(Debug)]
 pub struct Raster {
-	pub rows: u64,
-	pub columns: u64,
+	pub rows: usize,
+	pub columns: usize,
 	pub row_height: f64,
 	pub column_width: f64,
 	pub altitudes: Vec<Vec<f64>>
@@ -14,14 +14,14 @@ pub struct Raster {
 
 impl Raster {
 	// Constructor
-	pub fn new(width: f64, height: f64, rows: u64, columns: u64) -> Self {
+	pub fn new(width: f64, height: f64, rows: usize, columns: usize) -> Self {
 		// Initialize the 2d array of altitudes
 		let mut altitudes_init: Vec<Vec<f64>> = Vec::new();
 
 		// Set all the altitude values to zero
-		for i in 0..rows {
+		for _i in 0..rows {
 			let mut current_col: Vec<f64> = Vec::new();
-			for j in 0..columns {
+			for _j in 0..columns {
 				current_col.push(0.0);
 			}
 			altitudes_init.push(current_col);
@@ -36,11 +36,11 @@ impl Raster {
 		}
 	}
 
-	pub fn set(&mut self, row: u64, col: u64, val: f64) {
-		self.altitudes[(row as usize)][(col as usize)] = val;
+	pub fn set(&mut self, row: usize, col: usize, val: f64) {
+		self.altitudes[row][col] = val;
 	}
 
-	pub fn get(&self, row: u64, col: u64) -> f64 {
-		return self.altitudes[(row as usize)][(col as usize)];
+	pub fn get(&self, row: usize, col: usize) -> f64 {
+		self.altitudes[row][col]
 	}
 }
