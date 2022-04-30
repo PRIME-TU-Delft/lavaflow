@@ -18,7 +18,6 @@ impl Raster {
 		// Initialize the 2d array of altitudes
 		let mut altitudes_init: Vec<Vec<f64>> = Vec::new();
 
-
 		// Set all the altitude values to zero
 		for i in 0..rows {
 			let mut current_col: Vec<f64> = Vec::new();
@@ -27,7 +26,6 @@ impl Raster {
 			}
 			altitudes_init.push(current_col);
 		}
-
 
 		Self {
 			rows,
