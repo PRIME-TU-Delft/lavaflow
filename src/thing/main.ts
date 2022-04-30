@@ -1,7 +1,9 @@
-import init, { add_nums } from "wasm"
+import init, * as wasm from "wasm"
 
-// console.log(wasm);
 init().then(() => {
 	console.log('init wasm-pack');
-	alert(add_nums(1, 2));
+
+	let p1 = new wasm.Point(1, 2, 3);
+	let p2 = new wasm.Point(3, 2, 1);
+	console.log(`distance = ${p1.distance(p2)}`);
 });

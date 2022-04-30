@@ -1,4 +1,5 @@
 mod utils;
+mod yeet;
 
 use wasm_bindgen::prelude::*;
 
