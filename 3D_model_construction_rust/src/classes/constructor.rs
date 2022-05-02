@@ -2,6 +2,28 @@
 use super::{raster::Raster, level_curves::{LevelCurveMap, LevelCurve}};
 use super::point::Point;
 
+
+//
+// Additional functions
+//
+
+fn calcInverseWeightedAverage(values: Vec<f64>, weights: Vec<f64>) -> f64 {
+
+    if values.len() != weights.len() {
+        return 0.0;
+    }
+
+    let mut res: f64 = 0.0;
+    let mut sum_weight: f64 = 0.0;
+
+    for i in 0..values.len() {
+        res += values[i] * weights[i];
+        sum_weight += weights[i];
+    }
+
+    return res/sum_weight;
+}
+
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
 	contour_margin: u64,
