@@ -7,18 +7,14 @@ use super::point::Point;
 // Additional functions
 //
 
-fn calcInverseWeightedAverage(values: Vec<f64>, weights: Vec<f64>) -> f64 {
-
-    if values.len() != weights.len() {
-        return 0.0;
-    }
+fn calcInverseWeightedAverage(weighted_values: &Vec<(f64, f64)>) -> f64 {
 
     let mut res: f64 = 0.0;
     let mut sum_weight: f64 = 0.0;
 
-    for i in 0..values.len() {
-        res += values[i] * weights[i];
-        sum_weight += weights[i];
+    for i in 0..weighted_values.len() {
+        res += weighted_values[i].0 * weighted_values[i].1;
+        sum_weight += weighted_values[i].1;
     }
 
     res/sum_weight
@@ -94,6 +90,32 @@ impl<'a> ModelConstructor<'a> {
             }
         }
 
+    }
+
+    // Function: Calculate Height of NVCs
+    fn calc_heights_nvc(&mut self) {
+        for row in 0..self.raster.rows {
+            for col in 0..self.raster.columns {
+
+                if self.raster.get(row, col).is_none() {
+
+                    let mut neighbours: Vec<(f64, f64)> = Vec::new();
+
+                    neighbours.push(self.findSVCNorth(row, col));
+                    neighbours.push(self.findSVCNorthEast(row, col));
+                    neighbours.push(self.findSVCNorthWest(row, col));
+                    neighbours.push(self.findSVCSouth(row, col));
+                    neighbours.push(self.findSVCSouthEast(row, col));
+                    neighbours.push(self.findSVCSouthWest(row, col));
+                    neighbours.push(self.findSVCEast(row, col));
+                    neighbours.push(self.findSVCWest(row, col));
+
+                    self.raster.set(row, col, calcInverseWeightedAverage(&neighbours));
+
+                }
+
+            }
+        }
     }
 
     //
