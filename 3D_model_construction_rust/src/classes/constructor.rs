@@ -1,10 +1,11 @@
 use super::raster::Raster;
+use super::point::Point;
 
 #[derive(Debug)]
 pub struct ModelConstructor {
 	contour_margin: u64,
 	is_svc: Vec<Vec<bool>>,
-	raster: Raster
+	raster: &Raster,
 }
 
 
@@ -12,18 +13,48 @@ pub struct ModelConstructor {
 // Otherwise using a trait is unnecessary, you can just implement functions directly for a struct without using traits.
 // (Traits are only really meant for defining shared behavior. If you want a "contract" for a function that still has to be implemented, you can use the todo macro: https://doc.rust-lang.org/std/macro.todo.html)
 // - Julia
+
+
 trait HelperFunctions {
 	fn initialize();
 	fn check_svc(p: Vec<f64>, ix: i64, iy: i64) -> bool;
-	// fn getClostestCOntourPoint(p, Vec<f64>, );
+	// fn getClostestCOntourPoint(p, levelcurvemap, );
 	fn local_tin(p: Vec<f64>);
 	fn calc_heights_nvcs();
 }
 
 impl ModelConstructor {
+	//TODO add levelmap to function parameters
 	fn construct_map(&mut self, raster: &Raster, _contour_margin: i64) {
 		let x = raster.columns;
 		let y = raster.rows;
-		self.is_svc = vec![vec![false; x]; y];
+		self.raster = &raster;
+
+		//initialize();
+
+		for i in 0 .. x {
+			for j in 0 .. y{
+
+				//TODO z point is now "0" but doesnt really exist
+				let cellCentre : Point = Point{ x : (i + 0.5) * raster.row_height,
+												y: (j + 0.5) * raster.column_height,
+												z: 0.0 } ;
+				//bool isSVC = checksvc(cellCentre , levelmap);
+				//TODO remove line here once checkSVC is implemented
+				let isSVC : bool = false;
+				if(isSVC){
+					if(raster.altitudes[i][j].is_none()){
+						//local_tin(cellCentre)
+					}
+				}
+
+				
+
+			}
+			//calc_heights_nvc()
+			raster
+		}
+
+
 	}
 }

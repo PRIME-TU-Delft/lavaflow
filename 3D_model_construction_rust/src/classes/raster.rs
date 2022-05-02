@@ -8,7 +8,7 @@ pub struct Raster {
 	pub columns: usize,
 	pub row_height: f64,
 	pub column_width: f64,
-	pub altitudes: Vec<Vec<f64>>
+	pub altitudes: Vec<Vec<Option<f64>>>
 }
 
 
@@ -22,7 +22,7 @@ impl Raster {
 		for _i in 0..rows {
 			let mut current_col: Vec<f64> = Vec::new();
 			for _j in 0..columns {
-				current_col.push(0.0);
+				current_col.push(None());
 			}
 			altitudes_init.push(current_col);
 		}
@@ -37,10 +37,10 @@ impl Raster {
 	}
 
 	pub fn set(&mut self, row: usize, col: usize, val: f64) {
-		self.altitudes[row][col] = val;
+		self.altitudes[row][col] = Some(val);
 	}
 
-	pub fn get(&self, row: usize, col: usize) -> f64 {
-		self.altitudes[row][col]
+	pub fn get(&self, row: usize, col: usize) -> &Option<f64> {
+		&self.altitudes[row][col]
 	}
 }
