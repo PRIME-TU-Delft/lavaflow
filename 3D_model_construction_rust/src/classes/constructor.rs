@@ -30,7 +30,7 @@ fn calcDistanceBetweenCells(row0: usize, col0: usize, row1: usize, col1: usize) 
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
-	contour_margin: u64,
+	contour_margin: f64,
     level_curve_map: LevelCurveMap,
 	is_svc: Vec<Vec<bool>>,
 	raster: &'a mut Raster,
@@ -44,7 +44,7 @@ pub struct ModelConstructor<'a> {
 
 trait HelperFunctions {
 	fn initialize();
-	fn check_svc(p: Vec<f64>, ix: i64, iy: i64) -> bool;
+	fn check_svc( ix: usize, iy: usize) -> bool;
 	// fn getClostestCOntourPoint(p, levelcurvemap, );
 	fn local_tin(p: Vec<f64>);
 	fn calc_heights_nvcs();
@@ -63,15 +63,8 @@ impl<'a> ModelConstructor<'a> {
 
 		for i in 0 .. x {
 			for j in 0 .. y{
-
-				//TODO z point is now "0" but doesnt really exist
-				let cellCentre : Point = Point{ x : (i as f64 + 0.5) * self.raster.row_height,
-												y: (j as f64 +  0.5) * self.raster.column_width,
-												z: 0.0 } ;
-				//bool isSVC = checksvc(cellCentre , levelmap);
 				//TODO remove line here once checkSVC is implemented
-				let isSVC : bool = false;
-				if isSVC {
+				if self.check_svc( i, j) {
 					if self.raster.altitudes[i][j].is_none() {
 						//local_tin(cellCentre)
 					}
@@ -294,6 +287,44 @@ impl<'a> ModelConstructor<'a> {
         (0.0, 0.0)
 
     }
+
+	fn check_svc(&mut self, row: usize, col: usize) -> bool {
+
+		//TODO z point is now "0" but doesnt really exist
+		//define which points are corner and center of current cell 
+		let corner: Point = Point{ x : (row as f64 ) * self.raster.row_height,
+								   y: (col as f64 ) * self.raster.column_width,
+								   z: 0.0 } ;
+		let center: Point = Point{ x : (row as f64 ) + 0.5 * self.raster.row_height,
+								   y: (col as f64 ) + 0.5 * self.raster.column_width,
+								   z: 0.0 } ;
+
+		//find point on a contour line closest to center of cell
+		let optional : Option<&Point> = self.level_curve_map.find_closest_point_on_level_curve(&center);
+
+		match optional {
+			 Some(p) =>
+				//todo, check row_height etc is correct
+
+				//check closest point is outside of cell
+				if(p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width){
+					return false;
+				}
+				//check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line
+				else if (center.x - p.x  ).abs() < self.contour_margin  &&  (center.y - p.y  ).abs() < self.contour_margin {
+					self.is_svc[row][col] = true;
+					self.raster.altitudes[row][col] = Some(p.z);
+					true 
+				}
+				//if center of cell is not in distance [contour margin], its height must be interpolated
+				else {
+					self.is_svc[row][col] = true;
+					true
+				} , 
+
+			 None => false
+		}
+	}
 
 }
 
