@@ -1,5 +1,5 @@
-pub mod point;
-pub mod level_curves;
-pub mod raster;
-pub mod cardinalIntersection;
+pub mod cardinal_intersection;
 pub mod constructor;
+pub mod level_curves;
+pub mod point;
+pub mod raster;
