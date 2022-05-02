@@ -77,5 +77,197 @@ impl<'a> ModelConstructor<'a> {
 
     }
 
+    //
+    // A set of functions for finding the nearest SVC box in directions north (west, east) and south (west, east)
+    //
+
+    // Function: find SVC north
+    fn findSVCNorth(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let mut row = i;
+        let     col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            row -= 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
+    // Function: find SVC south
+    fn findSVCSouth(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let mut row = i;
+        let     col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            row += 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
+    // Function: find SVC west
+    fn findSVCWest(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let     row = i;
+        let mut col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            col -= 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
+    // Function: find SVC east
+    fn findSVCEast(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let     row = i;
+        let mut col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            col += 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
+    // Function: find SVC north west
+    fn findSVCNorthWest(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let mut row = i;
+        let mut col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            row -= 1;
+            col -= 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
+    // Function: find SVC north east
+    fn findSVCNorthEast(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let mut row = i;
+        let mut col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            row -= 1;
+            col += 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
+    // Function: find SVC south east
+    fn findSVCSouthEast(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let mut row = i;
+        let mut col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            row += 1;
+            col += 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
+    // Function: find SVC south west
+    fn findSVCSouthWest(&self, i: usize, j: usize) -> (usize, usize) {
+
+        let mut row = i;
+        let mut col = j;
+
+        while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+
+            // If this box is svc, return its position
+            if self.is_svc[row][col] {
+                return (row, col);
+            }
+
+            // Walk one step further
+            row += 1;
+            col -= 1;
+
+        }
+
+        // If no value can be found, return (0, 0)
+        (0, 0)
+
+    }
+
 }
 
