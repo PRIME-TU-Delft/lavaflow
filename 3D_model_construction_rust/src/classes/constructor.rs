@@ -21,7 +21,11 @@ fn calcInverseWeightedAverage(values: Vec<f64>, weights: Vec<f64>) -> f64 {
         sum_weight += weights[i];
     }
 
-    return res/sum_weight;
+    res/sum_weight
+}
+
+fn calcDistanceBetweenCells(row0: usize, col0: usize, row1: usize, col1: usize) -> f64 {
+    f64::sqrt((row1 as f64-row0 as f64).powi(2) + (col1 as f64-col0 as f64).powi(2))
 }
 
 #[derive(Debug)]
@@ -104,7 +108,7 @@ impl<'a> ModelConstructor<'a> {
     //
 
     // Function: find SVC north
-    fn findSVCNorth(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCNorth(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let     col = j;
@@ -113,7 +117,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -122,12 +126,12 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
     // Function: find SVC south
-    fn findSVCSouth(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCSouth(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let     col = j;
@@ -136,7 +140,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -145,12 +149,12 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
     // Function: find SVC west
-    fn findSVCWest(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCWest(&self, i: usize, j: usize) -> (f64, f64) {
 
         let     row = i;
         let mut col = j;
@@ -159,7 +163,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -168,12 +172,12 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
     // Function: find SVC east
-    fn findSVCEast(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCEast(&self, i: usize, j: usize) -> (f64, f64) {
 
         let     row = i;
         let mut col = j;
@@ -182,7 +186,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -191,12 +195,12 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
     // Function: find SVC north west
-    fn findSVCNorthWest(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCNorthWest(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -205,7 +209,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -215,12 +219,12 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
     // Function: find SVC north east
-    fn findSVCNorthEast(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCNorthEast(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -229,7 +233,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -239,12 +243,12 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
     // Function: find SVC south east
-    fn findSVCSouthEast(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCSouthEast(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -253,7 +257,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -263,12 +267,12 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
     // Function: find SVC south west
-    fn findSVCSouthWest(&self, i: usize, j: usize) -> (usize, usize) {
+    fn findSVCSouthWest(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -277,7 +281,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (row, col);
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
             }
 
             // Walk one step further
@@ -287,7 +291,7 @@ impl<'a> ModelConstructor<'a> {
         }
 
         // If no value can be found, return (0, 0)
-        (0, 0)
+        (0.0, 0.0)
 
     }
 
