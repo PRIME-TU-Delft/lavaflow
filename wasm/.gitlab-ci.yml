@@ -1,0 +1,51 @@
+image: rust:1.60
+
+
+# TODO: add a step that compiles for wasm target?
+# TODO: caching dependencies doesn't work for some reason??
+wasm-build:
+  script:
+    - cd wasm
+    - cargo build
+  # cache:
+  #   key: "$CI_COMMIT_REF_NAME"
+  #   policy: push
+  #   paths:
+  #     - wasm/target/
+  #     - /root/.cargo/registry/index/
+
+
+wasm-rustfmt:
+  script:
+    - cd wasm
+    - rustup component add rustfmt
+    - cargo fmt --check
+  allow_failure: true
+
+
+wasm-clippy:
+  # needs: [wasm-build]
+  script:
+    - cd wasm
+    - rustup component add clippy
+    - cargo clippy -- -D clippy::pedantic
+  # cache:
+  #   key: "$CI_COMMIT_REF_NAME"
+  #   policy: pull
+  #   paths:
+  #     - wasm/target/
+  #     - /root/.cargo/registry/index/
+  # allow_failure: true
+
+
+wasm-test:
+  # needs: [wasm-build]
+  script:
+    - cd wasm
+    - cargo test
+  # cache:
+  #   key: "$CI_COMMIT_REF_NAME"
+  #   policy: pull
+  #   paths:
+  #     - wasm/target/
+  #     - /root/.cargo/registry/index/
