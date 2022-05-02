@@ -2,10 +2,10 @@ use super::raster::Raster;
 use super::point::Point;
 
 #[derive(Debug)]
-pub struct ModelConstructor {
+pub struct ModelConstructor<'a> {
 	contour_margin: u64,
 	is_svc: Vec<Vec<bool>>,
-	raster: &Raster,
+	raster: &'a Raster,
 }
 
 
@@ -23,21 +23,21 @@ trait HelperFunctions {
 	fn calc_heights_nvcs();
 }
 
-impl ModelConstructor {
+impl<'a> ModelConstructor<'a> {
 	//TODO add levelmap to function parameters
-	fn construct_map(&mut self, raster: &Raster, _contour_margin: i64) {
+	fn construct_map(&mut self, raster: &'a Raster, _contour_margin: i64)  {
 		let x = raster.columns;
 		let y = raster.rows;
 		self.raster = &raster;
-
+		self.is_svc = vec![vec![false; x]; y];
 		//initialize();
 
 		for i in 0 .. x {
 			for j in 0 .. y{
 
 				//TODO z point is now "0" but doesnt really exist
-				let cellCentre : Point = Point{ x : (i + 0.5) * raster.row_height,
-												y: (j + 0.5) * raster.column_height,
+				let cellCentre : Point = Point{ x : (i as f64 + 0.5) * raster.row_height,
+												y: (j as f64 +  0.5) * raster.column_width,
 												z: 0.0 } ;
 				//bool isSVC = checksvc(cellCentre , levelmap);
 				//TODO remove line here once checkSVC is implemented
@@ -47,14 +47,11 @@ impl ModelConstructor {
 						//local_tin(cellCentre)
 					}
 				}
-
-				
-
-			}
-			//calc_heights_nvc()
-			raster
+			}		
 		}
-
+		//calc_heights_nvc()
 
 	}
+
+	
 }
