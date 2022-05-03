@@ -112,3 +112,101 @@ impl LevelCurveMap {
 		min_dist.0
 	}
 }
+
+
+
+//
+// Level Curve Tree
+//
+// The level curve tree is used to represent the information that was received from the OpenCV library.
+// This step is necessary, since it allows us to efficiently store all information that OpenCV outputs.
+// This includes information that could be required by other algorithms.
+//
+
+pub struct LevelCurveTree<'a> {
+	pixels: Vec<(u64, u64)>,
+	parent: Option<&'a LevelCurveTree<'a>>,
+	children: Vec<&'a LevelCurveTree<'a>>
+}
+
+
+impl<'a> LevelCurveTree<'a> {
+
+	/// Constructor
+	/// 
+	/// This constructor creates a completely empty level-curve-tree
+	pub fn new() -> Self {
+		Self {
+			pixels: Vec::new(),
+			parent: None,
+			children: Vec::new()
+		}
+	}
+
+	/// Dynamic constructor: Set parent
+	/// 
+	pub fn withParent(mut self, p: &'a LevelCurveTree<'a>) -> Self {
+		self.parent = Some(p);
+		self
+	}
+
+	/// Dynamic constructor: From OpenCV datastructure
+	pub fn fromOpenCV(mut self, pixels_per_curve: Vec<Vec<(u64, u64)>>, parent_per_node: &Vec<usize>) -> Self {
+
+		// 1. Transform the list of parents into a list of LevelCurveTrees
+		let mut trees: Vec<LevelCurveTree> = Vec::new();
+
+		for p in parent_per_node {
+			trees.push(LevelCurveTree::new());
+		}
+
+		// 2. Connect the right children to the right parent
+		for (i, mut t) in trees.iter().enumerate() {
+			// t.setParent(trees[parent_per_node[i]]);
+			// trees[parent_per_node[i]].addChildNode(t);
+		}
+
+		self
+	}
+
+	/// Method: Set the parent of this node
+	pub fn setParent(&mut self, p: &'a LevelCurveTree<'a>) {
+		self.parent = Some(p);
+	}
+
+	// Method: Remove the parent of this node
+	pub fn removeParent(&mut self) {
+		self.parent = None;
+	}
+
+	/// Method: Add point to this node in the tree
+	pub fn addPixel(&mut self, x: u64, y: u64) {
+		self.pixels.push((x, y));
+	}
+
+	/// Method: Check whether a certain point is in the set
+	/// 
+	pub fn containsPixel(&self, x: u64, y: u64) -> bool {
+		for p in &self.pixels {
+			if p.0 == x && p.1 == y {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/// Method: addChildNode
+	/// 
+	/// * 'c': The new child LevelCurveTree
+	pub fn addChildNode(&mut self, c: &'a LevelCurveTree<'a>) {
+		self.children.push(c);
+	}
+
+	/// Method: getChildren
+	pub fn getChildren(&self) -> &Vec<&'a LevelCurveTree<'a>> {
+		return &self.children;
+	}
+
+
+
+}
