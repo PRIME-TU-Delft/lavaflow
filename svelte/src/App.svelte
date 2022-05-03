@@ -1,43 +1,73 @@
-<script>
-  import { Router, Route, Link } from "svelte-navigator";
-  import Login from "./Login.svelte";
-  import PrivateRoute from "./PrivateRoute.svelte";
-  import { user } from "./stores";
+<header>
+  <div class="img" />
+  <div class="img backdrop" />
+  <div class="title">
+    <h1>PRIME</h1>
+    <h2>AR Lavaflow</h2>
+  </div>
+</header>
 
-  function handleLogout() {
-    $user = null;
+<main>
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus lacinia
+  condimentum gravida. Nullam in diam cursus elit fermentum varius. Nunc ac
+  ornare lorem, aliquam ornare elit. Maecenas in magna elementum, dapibus dui
+  sit amet, dictum dolor. Sed congue orci ut hendrerit vulputate. Maecenas sed
+  pulvinar augue, convallis lobortis lacus. Proin purus quam, dignissim sed arcu
+  id, ornare pellentesque nisi. Suspendisse ullamcorper magna a mauris laoreet,
+  sed sagittis massa posuere. Pellentesque semper mi ut lacus consequat
+  eleifend. Vivamus cursus venenatis nibh, pharetra commodo quam elementum et.
+  Etiam tempus mi eu ligula eleifend fringilla. Mauris neque odio, faucibus ut
+  felis et, maximus pulvinar tellus.
+</main>
+
+<style>
+  h1 {
+    margin: 0;
+    font-size: 2em;
   }
-</script>
 
-<Router>
-  <header>
-    <h1>History</h1>
+  h2 {
+    font-size: 1.5em;
+  }
+  header {
+    position: relative;
+    height: 20rem;
+    width: 100%;
+  }
 
-    <nav>
-      <Link to="/">Home</Link>
-      <Link to="about">About</Link>
-      <Link to="profile">Profile</Link>
-    </nav>
-  </header>
+  main {
+    display: block;
+    max-width: 30rem;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
 
-  <main>
-    <Route path="login">
-      <Login />
-    </Route>
+  .img {
+    position: absolute;
+    bottom: 0;
+    background: url(/volcano.jpg);
+    background-size: cover;
+    background-position: center bottom;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 40rem;
+    width: 40rem;
+    z-index: 0;
+    border-radius: 50%;
+  }
 
-    <Route path="/">
-      <h3>Home</h3>
-      <p>Home sweet home...</p>
-    </Route>
+  .backdrop {
+    background: rgba(220, 73, 73, 21%);
+    backdrop-filter: blur(1px) saturate(120%);
+  }
 
-    <Route path="about">
-      <h3>About</h3>
-      <p>That's what it's all about!</p>
-    </Route>
-
-    <PrivateRoute path="profile" let:location>
-      <h3>Welcome {$user.username}</h3>
-      <button on:click={handleLogout}>Logout</button>
-    </PrivateRoute>
-  </main>
-</Router>
+  .title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    font-size: 1.5em;
+  }
+</style>
