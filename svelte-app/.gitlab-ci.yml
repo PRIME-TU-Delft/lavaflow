@@ -8,6 +8,6 @@ pages:
     - npm run build
   artifacts:
     paths:
-      - public
+      - svelte-app/.svelte-kit/build
   only:
     - svelte-main
