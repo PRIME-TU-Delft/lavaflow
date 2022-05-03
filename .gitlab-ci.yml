@@ -1,2 +1,2 @@
 include:
-  - svelte-app/.gitlab-ci.yml
+  - svelte/.gitlab-ci.yml
