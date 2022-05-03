@@ -14,6 +14,19 @@ struct Vertex {
 }
 
 
+fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
+    let byte_length = vec.len() * mem::size_of::<T>();
+    let byte_capacity = vec.capacity() * mem::size_of::<T>();
+    let alloc = vec.into_boxed_slice();
+    let ptr = Box::<[T]>::into_raw(alloc).cast::<u8>();
+    let mut new_vec = unsafe { Vec::from_raw_parts(ptr, byte_length, byte_capacity) };
+    while new_vec.len() % 4 != 0 {
+        new_vec.push(0); // pad to multiple of four bytes
+    }
+    new_vec
+}
+
+
 #[wasm_bindgen]
 pub fn demo() -> String {
 	let triangle_vertices = vec![
@@ -31,13 +44,19 @@ pub fn demo() -> String {
 		},
 	];
 
-	let buffer_length = (triangle_vertices.len() * mem::size_of::<Vertex>()) as u32;
+	let triangle_vertices_len = triangle_vertices.len();
+
+	let bin_content = to_padded_byte_vector(triangle_vertices);
+	let mut bin_content_b64 = String::from("data:application/octet-stream;base64,");
+	bin_content_b64.push_str(&base64::encode(bin_content));
+
+	let buffer_length = (triangle_vertices_len * mem::size_of::<Vertex>()) as u32;
 	let buffer = json::Buffer {
 		byte_length: buffer_length,
 		extensions: Default::default(),
 		extras: Default::default(),
 		name: None,
-		uri: Some("buffer0.bin".into()),
+		uri: Some(bin_content_b64),
 	};
 	let buffer_view = json::buffer::View {
 		buffer: json::Index::new(0),
@@ -52,7 +71,7 @@ pub fn demo() -> String {
 	let positions = json::Accessor {
 		buffer_view: Some(json::Index::new(0)),
 		byte_offset: 0,
-		count: triangle_vertices.len() as u32,
+		count: triangle_vertices_len as u32,
 		component_type: Valid(json::accessor::GenericComponentType(
 			json::accessor::ComponentType::F32,
 		)),
@@ -68,7 +87,7 @@ pub fn demo() -> String {
 	let colors = json::Accessor {
 		buffer_view: Some(json::Index::new(0)),
 		byte_offset: (3 * mem::size_of::<f32>()) as u32,
-		count: triangle_vertices.len() as u32,
+		count: triangle_vertices_len as u32,
 		component_type: Valid(json::accessor::GenericComponentType(
 			json::accessor::ComponentType::F32,
 		)),
@@ -135,5 +154,5 @@ pub fn demo() -> String {
 		..Default::default()
 	};
 
-	json::serialize::to_string_pretty(&root).expect("fuck")
+	json::serialize::to_string_pretty(&root).expect("Serialization error")
 }
