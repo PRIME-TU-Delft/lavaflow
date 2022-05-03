@@ -1,5 +1,5 @@
 mod utils;
-mod yeet;
+mod obj_demo;
 
 use wasm_bindgen::prelude::*;
 
@@ -11,15 +11,15 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 extern {
-    fn alert(s: &str);
+	fn alert(s: &str);
 }
 
 #[wasm_bindgen]
 pub fn greet() {
-    alert("Hello, Rust wasm!");
+	alert("Hello, Rust wasm!");
 }
 
 #[wasm_bindgen]
 pub fn add_nums(a: i32, b: i32) -> i32 {
-    a + b
+	a + b
 }
