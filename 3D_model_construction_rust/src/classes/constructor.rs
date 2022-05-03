@@ -1,74 +1,52 @@
-
 use super::{raster::Raster, level_curves::{LevelCurveMap, LevelCurve}};
 use super::point::Point;
-
-
-//
-// Additional functions
-//
-
-fn calcInverseWeightedAverage(weighted_values: &Vec<(f64, f64)>) -> f64 {
-
-    let mut res: f64 = 0.0;
-    let mut sum_weight: f64 = 0.0;
-
-    for i in 0..weighted_values.len() {
-        res += weighted_values[i].0 * weighted_values[i].1;
-        sum_weight += weighted_values[i].1;
-    }
-
-    res/sum_weight
-}
-
-fn calcDistanceBetweenCells(row0: usize, col0: usize, row1: usize, col1: usize) -> f64 {
-    f64::sqrt((row1 as f64-row0 as f64).powi(2) + (col1 as f64-col0 as f64).powi(2))
-}
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
 	contour_margin: f64,
-    level_curve_map: LevelCurveMap,
+    level_curve_map: &'a LevelCurveMap,
 	is_svc: Vec<Vec<bool>>,
 	raster: &'a mut Raster,
 }
 
-// @Pauline are you planning to implement this trait for other structs as well?
-// Otherwise using a trait is unnecessary, you can just implement functions directly for a struct without using traits.
-// (Traits are only really meant for defining shared behavior. If you want a "contract" for a function that still has to be implemented, you can use the todo macro: https://doc.rust-lang.org/std/macro.todo.html)
-// - Julia
-
-
-trait HelperFunctions {
-	fn initialize();
-	fn check_svc( ix: usize, iy: usize) -> bool;
-	// fn getClostestCOntourPoint(p, levelcurvemap, );
-	fn local_tin(p: Vec<f64>);
-	fn calc_heights_nvcs();
+//TODO: implement once model is working
+fn local_tin(p: Vec<f64>) -> f64 {
+    0.0
 }
 
 impl<'a> ModelConstructor<'a> {
-	//TODO add levelmap to function parameters
-	fn construct_map(&mut self, raster: &'a mut Raster, _contour_margin: i64)  {
+	/// Using a given set of level curves, determines the heights for each cell in a given raster.
+    ///
+    /// # Arguments
+    ///
+    /// * `raster` - empty raster for which heights are to be calculated
+    /// * `contour_margin` - margin that defines when a point is considered 'on' a contour line NOTE: must be above max(raster height, column width) so long as local_tin() is not implemented
+    /// * `level_curve_map` - set of level curves used to determine heights of each point 
+    /// 
+    /// 
+	fn construct_map(&mut self, raster: &'a mut Raster, _contour_margin: i64, level_curve_map: &'a LevelCurveMap)  {
 		let x = raster.columns;
 		let y = raster.rows;
 		self.raster = raster;
 		self.is_svc = vec![vec![false; x]; y];
+        self.level_curve_map = level_curve_map;
 		
         // Set the edges of the raster to zero
         self.setRasterEdgesToZero();
 
 		for i in 0 .. x {
 			for j in 0 .. y{
-				//TODO remove line here once checkSVC is implemented
+
 				if self.check_svc( i, j) {
+                    //if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
 					if self.raster.altitudes[i][j].is_none() {
 						//local_tin(cellCentre)
 					}
 				}
 			}		
 		}
-		//calc_heights_nvc()
-
+        //calculate heights of all no value cells
+		self.calc_heights_nvc()
 	}
 
 
@@ -117,6 +95,44 @@ impl<'a> ModelConstructor<'a> {
             }
         }
     }
+
+    fn check_svc(&mut self, row: usize, col: usize) -> bool {
+
+		//TODO z point is now "0" but doesnt really exist
+		//define which points are corner and center of current cell 
+		let corner: Point = Point{ x : (row as f64 ) * self.raster.row_height,
+								   y: (col as f64 ) * self.raster.column_width,
+								   z: 0.0 } ;
+		let center: Point = Point{ x : (row as f64 ) + 0.5 * self.raster.row_height,
+								   y: (col as f64 ) + 0.5 * self.raster.column_width,
+								   z: 0.0 } ;
+
+		//find point on a contour line closest to center of cell
+		let optional : Option<&Point> = self.level_curve_map.find_closest_point_on_level_curve(&center);
+
+		match optional {
+			 Some(p) =>
+				//todo, check row_height etc is correct
+
+				//check closest point is outside of cell
+				if(p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width){
+					return false;
+				}
+				//check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line
+				else if (center.x - p.x  ).abs() < self.contour_margin  &&  (center.y - p.y  ).abs() < self.contour_margin {
+					self.is_svc[row][col] = true;
+					self.raster.altitudes[row][col] = Some(p.z);
+					true 
+				}
+				//if center of cell is not in distance [contour margin], its height must be interpolated
+				else {
+					self.is_svc[row][col] = true;
+					true
+				} , 
+
+			 None => false
+		}
+	}
 
     //
     // A set of functions for finding the nearest SVC box in directions north (west, east) and south (west, east)
@@ -310,43 +326,26 @@ impl<'a> ModelConstructor<'a> {
 
     }
 
-	fn check_svc(&mut self, row: usize, col: usize) -> bool {
+}
 
-		//TODO z point is now "0" but doesnt really exist
-		//define which points are corner and center of current cell 
-		let corner: Point = Point{ x : (row as f64 ) * self.raster.row_height,
-								   y: (col as f64 ) * self.raster.column_width,
-								   z: 0.0 } ;
-		let center: Point = Point{ x : (row as f64 ) + 0.5 * self.raster.row_height,
-								   y: (col as f64 ) + 0.5 * self.raster.column_width,
-								   z: 0.0 } ;
+//
+// Additional functions
+//
 
-		//find point on a contour line closest to center of cell
-		let optional : Option<&Point> = self.level_curve_map.find_closest_point_on_level_curve(&center);
+fn calcInverseWeightedAverage(weighted_values: &Vec<(f64, f64)>) -> f64 {
 
-		match optional {
-			 Some(p) =>
-				//todo, check row_height etc is correct
+    let mut res: f64 = 0.0;
+    let mut sum_weight: f64 = 0.0;
 
-				//check closest point is outside of cell
-				if(p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width){
-					return false;
-				}
-				//check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line
-				else if (center.x - p.x  ).abs() < self.contour_margin  &&  (center.y - p.y  ).abs() < self.contour_margin {
-					self.is_svc[row][col] = true;
-					self.raster.altitudes[row][col] = Some(p.z);
-					true 
-				}
-				//if center of cell is not in distance [contour margin], its height must be interpolated
-				else {
-					self.is_svc[row][col] = true;
-					true
-				} , 
+    for i in 0..weighted_values.len() {
+        res += weighted_values[i].0 * weighted_values[i].1;
+        sum_weight += weighted_values[i].1;
+    }
 
-			 None => false
-		}
-	}
+    res/sum_weight
+}
 
+fn calcDistanceBetweenCells(row0: usize, col0: usize, row1: usize, col1: usize) -> f64 {
+    f64::sqrt((row1 as f64-row0 as f64).powi(2) + (col1 as f64-col0 as f64).powi(2))
 }
 
