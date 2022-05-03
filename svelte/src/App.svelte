@@ -1,24 +1,46 @@
-<header>
-  <div class="img" />
-  <div class="img backdrop" />
-  <div class="title">
-    <h1>PRIME</h1>
-    <h2>AR Lavaflow</h2>
-  </div>
-</header>
+<script>
+  import NavigationButton from './NavigationButton.svelte';
+  import { Router, Route } from 'svelte-navigator';
+  import MapScanning from './MapScanning.svelte';
+</script>
 
-<main>
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus lacinia
-  condimentum gravida. Nullam in diam cursus elit fermentum varius. Nunc ac
-  ornare lorem, aliquam ornare elit. Maecenas in magna elementum, dapibus dui
-  sit amet, dictum dolor. Sed congue orci ut hendrerit vulputate. Maecenas sed
-  pulvinar augue, convallis lobortis lacus. Proin purus quam, dignissim sed arcu
-  id, ornare pellentesque nisi. Suspendisse ullamcorper magna a mauris laoreet,
-  sed sagittis massa posuere. Pellentesque semper mi ut lacus consequat
-  eleifend. Vivamus cursus venenatis nibh, pharetra commodo quam elementum et.
-  Etiam tempus mi eu ligula eleifend fringilla. Mauris neque odio, faucibus ut
-  felis et, maximus pulvinar tellus.
-</main>
+<Router primary={false}>
+  <Route path="/">
+    <header>
+      <div class="img" />
+      <div class="img backdrop" />
+      <div class="title">
+        <h1>PRIME</h1>
+        <h2>AR Lavaflow</h2>
+      </div>
+    </header>
+
+    <main>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus lacinia
+      condimentum gravida. Nullam in diam cursus elit fermentum varius. Nunc ac
+      ornare lorem, aliquam ornare elit. Maecenas in magna elementum, dapibus
+      dui sit amet, dictum dolor. Sed congue orci ut hendrerit vulputate.
+      Maecenas sed pulvinar augue, convallis lobortis lacus. Proin purus quam,
+      dignissim sed arcu id, ornare pellentesque nisi. Suspendisse ullamcorper
+      magna a mauris laoreet, sed sagittis massa posuere. Pellentesque semper mi
+      ut lacus consequat eleifend. Vivamus cursus venenatis nibh, pharetra
+      commodo quam elementum et. Etiam tempus mi eu ligula eleifend fringilla.
+      Mauris neque odio, faucibus ut felis et, maximus pulvinar tellus.
+
+      <NavigationButton large to="map-scanning">Start flowing</NavigationButton>
+      <NavigationButton large to="/" secondary={true}>
+        Teacher corner
+      </NavigationButton>
+    </main>
+  </Route>
+
+  <Route path="map-scanning"><MapScanning /></Route>
+  <Route path="map-scanned"><h1>'Ello</h1></Route>
+  <Route path="house-scanning" />
+  <Route path="house-scanned" />
+  <Route path="visualize-ar" />
+  <Route path="visualize-vr" />
+</Router>
 
 <style>
   h1 {
