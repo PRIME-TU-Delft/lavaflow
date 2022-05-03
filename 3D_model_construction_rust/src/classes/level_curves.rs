@@ -111,4 +111,48 @@ impl LevelCurveMap {
 		// Return the point
 		min_dist.0
 	}
+
+	/// transforms pixelStructure [TODO DEFINE PROPERLY] to levelCurveMap structure, while reducing amount of total points from pixelStructure
+    ///
+    /// # Arguments
+    ///
+    /// * `pixels` - structure containing info from scanning step
+    /// * `altitude_step` - increase in height per contour line
+    /// * `desired_dist` - minimum desired distance between points in final conout map
+    /// 
+    /// 
+	pub fn transform_to_LevelCurveMap(pixels : &Vec< (usize, Vec<Vec<(f64, f64)>> ) > ,  altitude_step: f64, desired_dist: f64 ) -> LevelCurveMap{
+		let mut ret: LevelCurveMap = LevelCurveMap::new(altitude_step);
+
+		for level in pixels {
+			let level_height = level.0 as f64 * altitude_step;
+
+			//for every curve in pixel structire, make a new Level curve 
+			for curve in &level.1 {
+
+				let mut level_curve: LevelCurve = LevelCurve::new(level_height);
+
+				level_curve.add_point(   Point { x: curve[0].0, y: curve[1].1, z: level_height }) ;
+
+				let mut last_point: &(f64, f64)  = &curve[0];
+				
+				//reduce amount of points in curve such that distance between points is at least desired_dist
+				for current_point in curve {
+					if(dist(last_point, current_point) >=  desired_dist){
+						level_curve.add_point( Point {x: current_point.0 , y: current_point.1 , z: level_height}  );
+						last_point = &current_point;
+					}
+				}
+				ret.add_level_curve(level_curve);	
+			}
+
+		}
+		ret
+	}
+}
+
+
+
+fn dist(a : &(f64, f64) , b: &(f64, f64)) -> f64 {
+	( (a.0 -b.0).powi(2) + (a.1 - b.1).powi(2) ).sqrt()
 }
