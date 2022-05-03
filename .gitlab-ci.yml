@@ -1,2 +1,12 @@
-include:
-  - svelte/.gitlab-ci.yml
+image: node:latest
+
+pages:
+  stage: deploy
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - public
+  only:
+    - svelte-main
