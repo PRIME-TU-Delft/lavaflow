@@ -10,4 +10,5 @@ pages:
     paths:
       - svelte-app/.svelte-kit/build
   only:
-    - svelte-main
+    - main
+    - dev
