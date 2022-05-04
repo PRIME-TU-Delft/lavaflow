@@ -30,13 +30,15 @@ impl LevelCurve {
 		}
 
 		// Get the distance to the first point in the list, as a starting point.
-		let mut min_dist_sqr: f64 = Point::dist_sqr(&self.points[0], a);
+		//let mut min_dist_sqr: f64 = Point::dist_sqr(&self.points[0], a);
+		let mut min_dist_sqr: f64 = Point::xy_dist_sqr(&self.points[0], a);
 		let mut min_dist_sqr_point: &Point = &self.points[0];
 
 		// Loop over every point in the list and find the smallest distance.
 		// You don't have to keep track of which point had this smallest distance.
 		for p in &self.points {
-			let current_dist_sqr = Point::dist_sqr(p, a);
+			//let current_dist_sqr = Point::dist_sqr(p, a);
+			let current_dist_sqr = Point::xy_dist_sqr(p, a);
 
 			if current_dist_sqr < min_dist_sqr {
 				min_dist_sqr = current_dist_sqr;
