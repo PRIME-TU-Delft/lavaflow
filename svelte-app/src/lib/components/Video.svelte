@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-
 	export let stream: MediaStream;
 	export let style: string = '';
 	export let loading: boolean = true;

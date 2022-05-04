@@ -74,6 +74,7 @@
 		height: calc(var(--vh) - 5rem);
 		max-height: 50rem;
 		border-radius: 1rem;
+		border: 1px solid #ccc;
 	}
 
 	header {

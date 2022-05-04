@@ -5,6 +5,7 @@
 	import Video from '$lib/components/Video.svelte';
 
 	import { mdiAlertCircleOutline } from '@mdi/js';
+	import { mdiBookOpenVariant } from '@mdi/js';
 </script>
 
 <VideoStream let:loading let:stream>
@@ -18,6 +19,7 @@
 		</Video>
 
 		<div slot="footer">
+			<Button secondary icon={mdiBookOpenVariant}>Read scan instructions</Button>
 			<Button icon={mdiAlertCircleOutline}>
 				<span>No keystones found</span>
 				<span slot="content">
