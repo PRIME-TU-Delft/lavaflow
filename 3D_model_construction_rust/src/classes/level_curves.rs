@@ -238,3 +238,64 @@ impl<'a> LevelCurveTree<'a> {
 	}
 
 }
+
+
+
+
+
+//
+// UNIT TESTS
+//
+
+#[cfg(test)]
+mod tests {
+
+	use super::LevelCurveTree;
+
+	//
+	// Unit tests for the LevelCurveTree class
+	//
+
+	fn construct_tree<'a>(pixels_per_curve: &'a mut Vec<Vec<(u64, u64)>>, parent_relations: &'a mut Vec<Option<usize>>) -> LevelCurveTree<'a> {
+
+		// We will create a level-curve with 4 layers
+		for i in 0..4 {
+			// Add a vector to the pixels_per_curve array and add arbitrary pixels
+			let mut pixels: Vec<(u64, u64)> = Vec::new();
+
+			for j in 0..10 {
+				pixels.push((j, 2*j));
+			}
+		}
+
+		// Add the parent-relations as follows:
+		/*					0
+							|
+							1
+						  /  \
+						 2    3
+		*/
+
+		parent_relations.push(None);		// index 0 has no parent
+		parent_relations.push(Some(0));		// index 1 has parent 0
+		parent_relations.push(Some(1));     // index 2 has parent 1
+		parent_relations.push(Some(1));		// index 3 has parent 1
+
+		// Pass these vectors to the constuctor
+		LevelCurveTree::from_open_cv(pixels_per_curve, parent_relations)
+	}
+
+	#[test]
+	fn level_curve_tree_constructor_right_own_index() {
+
+		// Construct the arrays, as one would receive them from OpenCV
+		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
+		let mut parent_relations: Vec<Option<usize>> = Vec::new();
+
+		let tree = construct_tree(&mut pixels_per_curve, &mut parent_relations);
+
+		assert_eq!(tree.own_index, 0);
+
+	}
+
+}
