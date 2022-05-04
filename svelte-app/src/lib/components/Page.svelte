@@ -1,14 +1,15 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+	import { mdiChevronLeft, mdiClose } from '@mdi/js';
+
 	import Button from '$lib/components/Button.svelte';
-	import { mdiChevronLeft } from '@mdi/js';
 	// @ts-ignore
 	import Icon from 'mdi-svelte';
 
 	export let title = '';
+	export let closeButton = false;
 
-	function goBack() {
-		history.back();
-	}
+	const dispatch = createEventDispatcher();
 </script>
 
 <div class="page">
@@ -20,10 +21,17 @@
 	<div class="foreground">
 		<header>
 			<slot name="headerButton">
-				<Button on:click={goBack}>
-					<Icon path={mdiChevronLeft} color="var(--text-color)" />
-					Back</Button
-				>
+				{#if closeButton}
+					<Button on:click={() => dispatch('close')}>
+						<Icon path={mdiClose} color="var(--text-color)" />
+						Close
+					</Button>
+				{:else}
+					<Button on:click={() => history.back()}>
+						<Icon path={mdiChevronLeft} color="var(--text-color)" />
+						Back
+					</Button>
+				{/if}
 			</slot>
 			<div class="title">
 				{title}
