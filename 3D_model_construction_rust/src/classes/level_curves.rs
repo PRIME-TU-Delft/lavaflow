@@ -1,8 +1,10 @@
+#![allow(dead_code)]
+
 //
 // Class: LevelCurves
 //
-
 use super::point::Point;
+
 
 #[derive(Debug)]
 pub struct LevelCurve {
@@ -124,89 +126,115 @@ impl LevelCurveMap {
 //
 
 pub struct LevelCurveTree<'a> {
-	pixels: Vec<(u64, u64)>,
-	parent: Option<&'a LevelCurveTree<'a>>,
-	children: Vec<&'a LevelCurveTree<'a>>
+	pixels_per_curve: &'a Vec<Vec<(u64, u64)>>,
+	parent_relations: &'a Vec<Option<usize>>,
+	own_index: usize
 }
-
 
 impl<'a> LevelCurveTree<'a> {
 
-	/// Constructor
-	/// 
-	/// This constructor creates a completely empty level-curve-tree
-	pub fn new() -> Self {
-		Self {
-			pixels: Vec::new(),
-			parent: None,
-			children: Vec::new()
-		}
-	}
 
-	/// Dynamic constructor: Set parent
-	/// 
-	pub fn withParent(mut self, p: &'a LevelCurveTree<'a>) -> Self {
-		self.parent = Some(p);
-		self
-	}
+	//
+	// CONSTRUCTORS
+	//
 
 	/// Dynamic constructor: From OpenCV datastructure
-	pub fn fromOpenCV(mut self, pixels_per_curve: Vec<Vec<(u64, u64)>>, parent_per_node: &Vec<usize>) -> Self {
+	pub fn from_open_cv(pixels_per_curve: &'a Vec<Vec<(u64, u64)>>, parent_relations: &'a Vec<Option<usize>>) -> Self {
+		let mut own_index = 0;
 
-		// 1. Transform the list of parents into a list of LevelCurveTrees
-		let mut trees: Vec<LevelCurveTree> = Vec::new();
-
-		for p in parent_per_node {
-			trees.push(LevelCurveTree::new());
+		// 1. Find the node that has no parent (this is the root of the tree)
+		for i in 0..parent_relations.len() {
+			if parent_relations[i] == None {
+				// We've found the root!
+				own_index = i;
+			}
 		}
 
-		// 2. Connect the right children to the right parent
-		for (i, mut t) in trees.iter().enumerate() {
-			// t.setParent(trees[parent_per_node[i]]);
-			// trees[parent_per_node[i]].addChildNode(t);
+		Self {
+			pixels_per_curve,
+			parent_relations,
+			own_index: own_index
+		}
+	}
+
+	/// Private Dynamic constructor: From existing tree, with different index
+	fn from_perspective_index(&'a self, index: usize) -> Self {
+		Self {
+			pixels_per_curve: self.pixels_per_curve,
+			parent_relations: self.parent_relations,
+			own_index: index
+		}
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+
+
+
+	//
+	// PUBLIC METHODS
+	//
+
+	/// Method: Get the parent of this node
+	pub fn get_parent(&'a mut self) -> Option<LevelCurveTree> {
+		if self.parent_relations[self.own_index] == None {
+			return None
 		}
 
-		self
+		let result: LevelCurveTree = self.from_perspective_index(self.parent_relations[self.own_index]?);
+
+		Some(result)
 	}
 
-	/// Method: Set the parent of this node
-	pub fn setParent(&mut self, p: &'a LevelCurveTree<'a>) {
-		self.parent = Some(p);
+	/// Method: isParentOf
+	/// Similar to: isChildOf
+	pub fn is_parent_of(&self, child: &LevelCurveTree) -> bool {
+		let parent = self.parent_relations[child.own_index];
+		match parent {
+			None => false,
+			Some(p) => p == self.own_index
+		}
 	}
 
-	// Method: Remove the parent of this node
-	pub fn removeParent(&mut self) {
-		self.parent = None;
+	/// Method: isChildOf
+	/// Similar to: isParentOf
+	pub fn is_child_of(&self, parent: &LevelCurveTree) -> bool {
+		let child = self.parent_relations[self.own_index];
+		match child {
+			None => false,
+			Some(c) => c == parent.own_index
+		}
 	}
 
-	/// Method: Add point to this node in the tree
-	pub fn addPixel(&mut self, x: u64, y: u64) {
-		self.pixels.push((x, y));
+	/// Method: getChildren
+	pub fn get_children(&'a mut self) -> Vec<LevelCurveTree> {
+
+		let mut result: Vec<LevelCurveTree> = Vec::new();
+
+		// Add all trees of whom this instance is the parent
+		for i in 0..self.parent_relations.len() {
+			if self.parent_relations[i] == Some(self.own_index) {
+				// The node at index i is a child of this instance
+				// Add it to the list
+				result.push(self.from_perspective_index(i));
+			}
+		}
+
+		result
+
 	}
 
 	/// Method: Check whether a certain point is in the set
-	/// 
-	pub fn containsPixel(&self, x: u64, y: u64) -> bool {
-		for p in &self.pixels {
+	///
+	pub fn contains_pixel(&self, x: u64, y: u64) -> bool {
+		for p in &self.pixels_per_curve[self.own_index] {
 			if p.0 == x && p.1 == y {
 				return true;
 			}
 		}
 		return false;
 	}
-
-	/// Method: addChildNode
-	/// 
-	/// * 'c': The new child LevelCurveTree
-	pub fn addChildNode(&mut self, c: &'a LevelCurveTree<'a>) {
-		self.children.push(c);
-	}
-
-	/// Method: getChildren
-	pub fn getChildren(&self) -> &Vec<&'a LevelCurveTree<'a>> {
-		return &self.children;
-	}
-
-
 
 }
