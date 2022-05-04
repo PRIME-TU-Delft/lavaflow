@@ -275,4 +275,13 @@ impl<'a> LevelCurveTree<'a> {
 		return false;
 	}
 
+	/// Method: Retrieve the first pixel in this level-curve
+	pub fn get_first_pixel(&self) -> Option<(u64, u64)> {
+		if self.pixels_per_curve[self.own_index].is_empty() {
+			return None;
+		}
+
+		Some(self.pixels_per_curve[self.own_index][0])
+	}
+
 }
