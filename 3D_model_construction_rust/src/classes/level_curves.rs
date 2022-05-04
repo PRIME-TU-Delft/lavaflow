@@ -1,9 +1,11 @@
 #![allow(dead_code)]
 
+use std::thread::current;
+
 //
 // Class: LevelCurves
 //
-use super::point::Point;
+use super::{point::Point, constructor};
 
 
 #[derive(Debug)]
@@ -113,45 +115,83 @@ impl LevelCurveMap {
 		// Return the point
 		min_dist.0
 	}
-
-	/// transforms pixelStructure [TODO DEFINE PROPERLY] to levelCurveMap structure, while reducing amount of total points from pixelStructure
+	///
+	/// transforms levelCurveTree to levelCurveMap structure, while reducing amount of total points from pixelStructure
     ///
     /// # Arguments
     ///
-    /// * `pixels` - structure containing info from scanning step
+    /// * `tree` - levelCurveTree datastructure containing information from scanning step
     /// * `altitude_step` - increase in height per contour line
     /// * `desired_dist` - minimum desired distance between points in final conout map
+    /// * `current_height` - to track height when traversing tree, initial call should start with 1
     /// 
-    /// 
-	pub fn transform_to_LevelCurveMap(pixels : &Vec< (usize, Vec<Vec<(f64, f64)>> ) > ,  altitude_step: f64, desired_dist: f64 ) -> LevelCurveMap{
+	pub fn transform_to_LevelCurveMap<'a>(&self, tree : &'a mut LevelCurveTree<'a> ,  altitude_step: f64, desired_dist: f64 , current_height : usize) -> LevelCurveMap {
+		
 		let mut ret: LevelCurveMap = LevelCurveMap::new(altitude_step);
 
-		for level in pixels {
-			let level_height = level.0 as f64 * altitude_step;
+		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f64);
 
-			//for every curve in pixel structire, make a new Level curve 
-			for curve in &level.1 {
+		//TODO: dont use unwrap
+		let first_pixel = tree.get_first_pixel().unwrap();
+		let mut last_saved = first_pixel;
+		let mut last_visited = first_pixel;
+		let mut current_pixel = first_pixel;
 
-				let mut level_curve: LevelCurve = LevelCurve::new(level_height);
+		//untill we rencounter the first pixel, search direct neightborhood (directly adjacent pixels) of current pixel for next pixel
+		//Assumption: there are no breaks in the line
+		//break for loop in line 165
 
-				level_curve.add_point(   Point { x: curve[0].0, y: curve[1].1, z: level_height }) ;
+		loop {
+			//Assumption: pixels have directly connected neighbors (diagonals do not count as adjacent)
+			//Assumption: line is exactly 1 pixel wide
+			//TODO; check if in actual input every pixel has adjacent pixel
+			let neighbors = vec![(current_pixel.0 - 1, current_pixel.1),
+												(current_pixel.0 + 1, current_pixel.1),
+												(current_pixel.0, current_pixel.1 - 1),
+												(current_pixel.0, current_pixel.1 + 1)];
+			for (x, y) in neighbors {
 
-				let mut last_point: &(f64, f64)  = &curve[0];
-				
-				//reduce amount of points in curve such that distance between points is at least desired_dist
-				for current_point in curve {
-					if(dist(last_point, current_point) >=  desired_dist){
-						level_curve.add_point( Point {x: current_point.0 , y: current_point.1 , z: level_height}  );
-						last_point = &current_point;
+					//TODO: check how this holds for corner cases
+					if (x , y) != current_pixel && ( x , y) != last_visited && tree.contains_pixel(x, y) {
+	
+						if tree.contains_pixel(x, y) {
+							//if dist to last saved and current pixel is desired length, save current pixel, else move on
+							if pixel_dist( &(x, y), &last_saved  ) >= desired_dist {
+
+								current_level_curve.add_point( Point{x: x as f64 , y: y as f64, z: current_level_curve.altitude} );
+								last_saved = (x, y);
+
+							}
+
+							last_visited = current_pixel;
+							current_pixel= (x, y);
+
+						}
+
 					}
 				}
-				ret.add_level_curve(level_curve);	
-			}
-
+				if(current_pixel == first_pixel){
+					break;
+				}
+			
 		}
+		
+		//for every child get levelcurvemap and add to ret
+
+		for mut child in tree.get_children(){
+			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1 );
+			for curve in childmap.level_curves {
+				ret.add_level_curve(curve);
+			}
+		}
+		 
 		ret
 	}
 }
+//TODO: find better method
+fn pixel_dist(a : &(u64, u64) , b: &(u64, u64)) -> f64 {
+		( (a.0 as f64 -b.0 as f64).powi(2) + (a.1 as f64 - b.1 as f64).powi(2) ).sqrt()
+}	
 
 
 
