@@ -35,5 +35,6 @@
   "dependencies": {
     "@mdi/js": "^6.6.96",
     "mdi-svelte": "^1.1.2"
-  }
+  },
+  "license": "MIT"
 }

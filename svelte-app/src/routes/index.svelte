@@ -21,7 +21,7 @@
 	pharetra commodo quam elementum et. Etiam tempus mi eu ligula eleifend fringilla. Mauris neque
 	odio, faucibus ut felis et, maximus pulvinar tellus.
 
-	<NavigationButton large to="scan/map/scanning">Start flowing</NavigationButton>
+	<NavigationButton large to="scan/mapscanning">Start flowing</NavigationButton>
 	<NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton>
 </main>
 

@@ -1,17 +1,29 @@
 <script lang="ts">
-	import NavigationButton from 'src/lib/components/NavigationButton.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import { mdiChevronLeft } from '@mdi/js';
+	// @ts-ignore
+	import Icon from 'mdi-svelte';
 
-	export let backUrl = '/';
 	export let title = '';
+
+	function goBack() {
+		history.back();
+	}
 </script>
 
 <div class="page">
-	<slot name="background" />
+	<div class="background">
+		<slot name="background" />
+		<div class="backdrop" />
+	</div>
 
 	<div class="foreground">
 		<header>
 			<slot name="headerButton">
-				<NavigationButton to={backUrl} back>Back</NavigationButton>
+				<Button on:click={goBack}>
+					<Icon path={mdiChevronLeft} color="var(--text-color)" />
+					Back</Button
+				>
 			</slot>
 			<div class="title">
 				{title}
@@ -36,6 +48,21 @@
 		align-items: center;
 		justify-items: center;
 		padding-block: 1.5rem 1rem;
+	}
+
+	.background,
+	.backdrop {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: var(--vh);
+		z-index: -1;
+	}
+	.backdrop {
+		backdrop-filter: blur(4rem);
+		-webkit-backdrop-filter: blur(4rem);
+		z-index: 1;
 	}
 
 	.foreground {

@@ -13,21 +13,23 @@
 	export let back = false;
 </script>
 
-<Button {disabled} {large} {secondary}>
-	<div class="button">
-		{#if back}
-			<Icon path={mdiChevronLeft} color="var(--text-color)" />
-		{/if}
+<a href={to}>
+	<Button {disabled} {large} {secondary}>
+		<div class="button">
+			{#if back}
+				<Icon path={mdiChevronLeft} color="var(--text-color)" />
+			{/if}
 
-		<div class="text">
-			<slot />
+			<div class="text">
+				<slot />
+			</div>
+
+			{#if !back}
+				<Icon path={mdiChevronRight} color="var(--text-color)" />
+			{/if}
 		</div>
-
-		{#if !back}
-			<Icon path={mdiChevronRight} color="var(--text-color)" />
-		{/if}
-	</div>
-</Button>
+	</Button>
+</a>
 
 <style>
 	.button {

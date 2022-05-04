@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
+	// @ts-ignore
 	import Icon from 'mdi-svelte';
 
 	export let disabled = false;
 	export let large = false;
 	export let secondary = false;
-	export let icon = false;
+	export let icon: string = '';
 </script>
 
 <button class:disabled class:large class:secondary on:click>
