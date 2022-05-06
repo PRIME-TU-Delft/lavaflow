@@ -1,4 +1,5 @@
 mod utils;
+mod model_construction;
 mod obj_demo;
 
 use wasm_bindgen::prelude::*;
@@ -13,4 +14,3 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 extern {
 	fn alert(s: &str);
 }
-
