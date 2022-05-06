@@ -498,7 +498,7 @@ mod tests {
 		let child1 = &children[0];
 
 		// Assert that the perspective of this child is correct
-		assert!(child1.get_current_perspective() == 1);
+		assert_eq!(child1.get_current_perspective(), 1);
 
 	}
 
