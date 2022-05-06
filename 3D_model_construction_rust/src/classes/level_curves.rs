@@ -438,7 +438,7 @@ mod tests {
 		let parent_unwrapped = tree.get_parent().unwrap();
 
 		// Assert the parent to have the right perspective index
-		assert!(parent_unwrapped.get_current_perspective() == 0);
+		assert_eq!(parent_unwrapped.get_current_perspective(), 0);
 
 	}
 
