@@ -70,12 +70,12 @@ impl LevelCurve {
 //
 
 #[derive(Debug)]
-pub struct LevelCurveMap {
+pub struct LevelCurveSet {
 	altitude_step: f64,
 	level_curves: Vec<LevelCurve>
 }
 
-impl LevelCurveMap {
+impl LevelCurveSet {
 	// Construct a new LevelCurveMap, by specifying the altitude per level
 	pub fn new(altitude_step: f64) -> Self {
 		Self {
@@ -126,9 +126,9 @@ impl LevelCurveMap {
     /// * `desired_dist` - minimum desired distance between points in final conout map
     /// * `current_height` - to track height when traversing tree, initial call should start with 1
     /// 
-	pub fn transform_to_LevelCurveMap<'a>(&self, tree : &'a mut LevelCurveTree<'a> ,  altitude_step: f64, desired_dist: f64 , current_height : usize) -> LevelCurveMap {
+	pub fn transform_to_LevelCurveMap<'a>(&self, tree : &'a mut LevelCurveTree<'a> ,  altitude_step: f64, desired_dist: f64 , current_height : usize) -> LevelCurveSet {
 		
-		let mut ret: LevelCurveMap = LevelCurveMap::new(altitude_step);
+		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f64);
 

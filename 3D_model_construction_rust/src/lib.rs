@@ -1,6 +1,6 @@
 mod classes;
 use classes::level_curve_tree::LevelCurveTree;
-use classes::level_curves::LevelCurveMap;
+use classes::level_curves::LevelCurveSet;
 use classes::raster::Raster;
 use classes::constructor::ModelConstructor;
 
@@ -22,7 +22,7 @@ use classes::constructor::ModelConstructor;
 pub fn generate_3d_model<'a>( tree : &'a mut LevelCurveTree<'a>,  contour_margin: f64, plane_length: f64, plane_width: f64, columns : usize, rows: usize, altitude_step : f64, desired_dist: f64) -> Vec<Vec<f64>> {
 
         //convert openCV tree to levelCurveMap (input for construction algorithm)
-        let level_curve_map = LevelCurveMap::new(altitude_step).transform_to_LevelCurveMap( tree, altitude_step, desired_dist, 0);
+        let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap( tree, altitude_step, desired_dist, 0);
 
         //create raster based on given params
         let mut raster = Raster::new(plane_width/columns as f64, plane_length/rows as f64 , rows, columns );
@@ -30,7 +30,7 @@ pub fn generate_3d_model<'a>( tree : &'a mut LevelCurveTree<'a>,  contour_margin
         //create new modelConstructor (module containing 3D-model construction algorithm)
         let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
         //get heights in raster
-        model_constructor.construct_map();
+        model_constructor.construct();
         let heights = raster.altitudes;
 
         //TODO: add conversion to GLTF

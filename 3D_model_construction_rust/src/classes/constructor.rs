@@ -1,10 +1,10 @@
-use super::{raster::Raster, level_curves::{LevelCurveMap, LevelCurve}};
+use super::{raster::Raster, level_curves::{LevelCurveSet, LevelCurve}};
 use super::point::Point;
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
 	contour_margin: f64,
-    level_curve_map: &'a LevelCurveMap,
+    level_curve_map: &'a LevelCurveSet,
 	is_svc: Vec<Vec<bool>>,
 	raster: &'a mut Raster,
 }
@@ -16,13 +16,13 @@ fn local_tin(p: Vec<f64>) -> f64 {
 
 impl<'a> ModelConstructor<'a> {
 
-    pub fn new( raster: &'a mut Raster, contour_margin: f64, level_curve_map: &'a LevelCurveMap ) -> ModelConstructor<'a> {
+    pub fn new( raster: &'a mut Raster, contour_margin: f64, level_curve_map: &'a LevelCurveSet ) -> ModelConstructor<'a> {
         let x = raster.columns;
 		let y = raster.rows;
         let is_svc = vec![vec![false; x]; y];
         ModelConstructor{ contour_margin , level_curve_map, is_svc , raster }
     }
-	/// Using a given set of level curves, determines the heights for each cell in a given raster.
+	/// Using a given set of level curves, determines the heights for each cell in a given raster. *See README for further implementation details*.
     ///
     /// # Arguments
     ///
@@ -31,12 +31,12 @@ impl<'a> ModelConstructor<'a> {
     /// * `level_curve_map` - set of level curves used to determine heights of each point 
     /// 
     /// 
-	pub fn construct_map(&mut self)  {
-;		let x = self.raster.columns;
+	pub fn construct(&mut self)  {
+		let x = self.raster.columns;
         let y = self.raster.rows;
 		
         // Set the edges of the raster to zero
-        self.setRasterEdgesToZero();
+        self.set_raster_edges_to_zero();
 
 		for i in 0 .. x {
 			for j in 0 .. y{
@@ -55,7 +55,7 @@ impl<'a> ModelConstructor<'a> {
 
 
     // Function: initialize
-    fn setRasterEdgesToZero(&mut self) {
+    fn set_raster_edges_to_zero(&mut self) {
 
         // Initialize all the outer-most raster values to zero
         // (According to requirement that the edges of the mountain must have level 0)
@@ -83,16 +83,16 @@ impl<'a> ModelConstructor<'a> {
 
                     let mut neighbours: Vec<(f64, f64)> = Vec::new();
 
-                    neighbours.push(self.findSVCNorth(row, col));
-                    neighbours.push(self.findSVCNorthEast(row, col));
-                    neighbours.push(self.findSVCNorthWest(row, col));
-                    neighbours.push(self.findSVCSouth(row, col));
-                    neighbours.push(self.findSVCSouthEast(row, col));
-                    neighbours.push(self.findSVCSouthWest(row, col));
-                    neighbours.push(self.findSVCEast(row, col));
-                    neighbours.push(self.findSVCWest(row, col));
+                    neighbours.push(self.find_svc_north(row, col));
+                    neighbours.push(self.find_svc_north_east(row, col));
+                    neighbours.push(self.find_svc_north_west(row, col));
+                    neighbours.push(self.find_svc_south(row, col));
+                    neighbours.push(self.find_svc_south_east(row, col));
+                    neighbours.push(self.find_svc_south_west(row, col));
+                    neighbours.push(self.find_svc_east(row, col));
+                    neighbours.push(self.find_svc_west(row, col));
 
-                    self.raster.set(row, col, calcInverseWeightedAverage(&neighbours));
+                    self.raster.set(row, col, calc_inverse_weighted_average(&neighbours));
 
                 }
 
@@ -143,7 +143,7 @@ impl<'a> ModelConstructor<'a> {
     //
 
     // Function: find SVC north
-    fn findSVCNorth(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_north(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let     col = j;
@@ -152,7 +152,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -166,7 +166,7 @@ impl<'a> ModelConstructor<'a> {
     }
 
     // Function: find SVC south
-    fn findSVCSouth(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_south(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let     col = j;
@@ -175,7 +175,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -189,7 +189,7 @@ impl<'a> ModelConstructor<'a> {
     }
 
     // Function: find SVC west
-    fn findSVCWest(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_west(&self, i: usize, j: usize) -> (f64, f64) {
 
         let     row = i;
         let mut col = j;
@@ -198,7 +198,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -212,7 +212,7 @@ impl<'a> ModelConstructor<'a> {
     }
 
     // Function: find SVC east
-    fn findSVCEast(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_east(&self, i: usize, j: usize) -> (f64, f64) {
 
         let     row = i;
         let mut col = j;
@@ -221,7 +221,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -235,7 +235,7 @@ impl<'a> ModelConstructor<'a> {
     }
 
     // Function: find SVC north west
-    fn findSVCNorthWest(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_north_west(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -244,7 +244,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -259,7 +259,7 @@ impl<'a> ModelConstructor<'a> {
     }
 
     // Function: find SVC north east
-    fn findSVCNorthEast(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_north_east(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -268,7 +268,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -283,7 +283,7 @@ impl<'a> ModelConstructor<'a> {
     }
 
     // Function: find SVC south east
-    fn findSVCSouthEast(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_south_east(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -292,7 +292,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -307,7 +307,7 @@ impl<'a> ModelConstructor<'a> {
     }
 
     // Function: find SVC south west
-    fn findSVCSouthWest(&self, i: usize, j: usize) -> (f64, f64) {
+    fn find_svc_south_west(&self, i: usize, j: usize) -> (f64, f64) {
 
         let mut row = i;
         let mut col = j;
@@ -316,7 +316,7 @@ impl<'a> ModelConstructor<'a> {
 
             // If this box is svc, return its position
             if self.is_svc[row][col] {
-                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calcDistanceBetweenCells(i, j, row, col));
+                return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
             }
 
             // Walk one step further
@@ -336,7 +336,7 @@ impl<'a> ModelConstructor<'a> {
 // Additional functions
 //
 
-fn calcInverseWeightedAverage(weighted_values: &Vec<(f64, f64)>) -> f64 {
+fn calc_inverse_weighted_average(weighted_values: &Vec<(f64, f64)>) -> f64 {
 
     let mut res: f64 = 0.0;
     let mut sum_weight: f64 = 0.0;
@@ -349,7 +349,7 @@ fn calcInverseWeightedAverage(weighted_values: &Vec<(f64, f64)>) -> f64 {
     res/sum_weight
 }
 
-fn calcDistanceBetweenCells(row0: usize, col0: usize, row1: usize, col1: usize) -> f64 {
+fn calc_distance_between_cells(row0: usize, col0: usize, row1: usize, col1: usize) -> f64 {
     f64::sqrt((row1 as f64-row0 as f64).powi(2) + (col1 as f64-col0 as f64).powi(2))
 }
 
