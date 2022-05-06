@@ -14,12 +14,3 @@ extern {
 	fn alert(s: &str);
 }
 
-#[wasm_bindgen]
-pub fn greet() {
-	alert("Hello, Rust wasm!");
-}
-
-#[wasm_bindgen]
-pub fn add_nums(a: i32, b: i32) -> i32 {
-	a + b
-}
