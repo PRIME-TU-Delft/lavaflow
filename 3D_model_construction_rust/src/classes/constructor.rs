@@ -15,6 +15,13 @@ fn local_tin(p: Vec<f64>) -> f64 {
 }
 
 impl<'a> ModelConstructor<'a> {
+
+    pub fn new( raster: &'a mut Raster, contour_margin: f64, level_curve_map: &'a LevelCurveMap ) -> ModelConstructor<'a> {
+        let x = raster.columns;
+		let y = raster.rows;
+        let is_svc = vec![vec![false; x]; y];
+        ModelConstructor{ contour_margin , level_curve_map, is_svc , raster }
+    }
 	/// Using a given set of level curves, determines the heights for each cell in a given raster.
     ///
     /// # Arguments
@@ -24,12 +31,9 @@ impl<'a> ModelConstructor<'a> {
     /// * `level_curve_map` - set of level curves used to determine heights of each point 
     /// 
     /// 
-	fn construct_map(&mut self, raster: &'a mut Raster, _contour_margin: i64, level_curve_map: &'a LevelCurveMap)  {
-		let x = raster.columns;
-		let y = raster.rows;
-		self.raster = raster;
-		self.is_svc = vec![vec![false; x]; y];
-        self.level_curve_map = level_curve_map;
+	pub fn construct_map(&mut self)  {
+;		let x = self.raster.columns;
+        let y = self.raster.rows;
 		
         // Set the edges of the raster to zero
         self.setRasterEdgesToZero();
