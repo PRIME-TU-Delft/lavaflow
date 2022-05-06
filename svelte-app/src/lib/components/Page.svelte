@@ -77,7 +77,7 @@
 		position: relative;
 		background: coral;
 		width: calc(100vw - 2rem);
-		max-width: 30rem;
+		max-width: 60rem;
 		height: calc(100vh - 5rem);
 		height: calc(var(--vh) - 5rem);
 		max-height: 50rem;
@@ -104,6 +104,7 @@
 		background: var(--secondary-color);
 		color: var(--text-color);
 		width: 100%;
+		max-width: 20rem;
 		padding: 0.75rem 1.1rem;
 
 		font-size: 1rem;
@@ -123,7 +124,10 @@
 	footer {
 		position: absolute;
 		width: calc(100% - 1rem);
-		left: 0.5rem;
+		max-width: 30rem;
+		margin: 0 auto;
+		left: 50%;
+		transform: translateX(-50%);
 		bottom: -1.5rem;
 	}
 </style>
