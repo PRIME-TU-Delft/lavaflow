@@ -1,5 +1,5 @@
 mod model_construction;
-mod obj_demo;
+mod gltf_conversion;
 mod utils;
 
 use wasm_bindgen::prelude::*;
