@@ -1,8 +1,8 @@
 mod classes;
-use classes::level_curves;
-use classes::level_curves::*;
-use classes::raster::*;
-use classes::constructor::*;
+use classes::level_curve_tree::LevelCurveTree;
+use classes::level_curves::LevelCurveMap;
+use classes::raster::Raster;
+use classes::constructor::ModelConstructor;
 
 	/// Supermethod that takes in an openCV tree and outputs an GTLF model. 
     ///
@@ -19,14 +19,10 @@ use classes::constructor::*;
     /// 
     ///
     /// 
-pub fn generate_3D_model(  contour_margin: f64, plane_length: f64, plane_width: f64, columns : usize, rows: usize, altitude_step : f64, desired_dist: f64) -> Vec<Vec<f64>> {
-
-        //TODO: add "tree : &'a mut LevelCurveTree<'a>" to param list once tree is merged to this branch
+pub fn generate_3d_model<'a>( tree : &'a mut LevelCurveTree<'a>,  contour_margin: f64, plane_length: f64, plane_width: f64, columns : usize, rows: usize, altitude_step : f64, desired_dist: f64) -> Vec<Vec<f64>> {
 
         //convert openCV tree to levelCurveMap (input for construction algorithm)
-        //TODO: replace declaration of level curve map with call to transform_...
-        //let level_curve_map = LevelCurveMap::transform_to_LevelCurveMap( tree, altitude_step, desired_dist, 0);
-        let level_curve_map = LevelCurveMap::new(altitude_step);
+        let level_curve_map = LevelCurveMap::new(altitude_step).transform_to_LevelCurveMap( tree, altitude_step, desired_dist, 0);
 
         //create raster based on given params
         let mut raster = Raster::new(plane_width/columns as f64, plane_length/rows as f64 , rows, columns );
