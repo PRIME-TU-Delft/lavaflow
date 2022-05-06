@@ -1,4 +1,3 @@
-
 //
 // Level Curve Tree
 //
@@ -15,12 +14,10 @@ pub struct LevelCurveTree<'a> {
 	// The perspective of a Tree instance specified 'which child this instance represents'.
 	// This information is required in order to be able to determine what the parent of this
 	// node is and what the children are, using the parent_relations array.
-	own_index: usize
+	own_index: usize,
 }
 
 impl<'a> LevelCurveTree<'a> {
-
-
 	//
 	// CONSTRUCTORS
 	//
@@ -40,7 +37,7 @@ impl<'a> LevelCurveTree<'a> {
 		Self {
 			pixels_per_curve,
 			parent_relations,
-			own_index: own_index
+			own_index,
 		}
 	}
 
@@ -49,16 +46,13 @@ impl<'a> LevelCurveTree<'a> {
 		Self {
 			pixels_per_curve: self.pixels_per_curve,
 			parent_relations: self.parent_relations,
-			own_index: index
+			own_index: index,
 		}
 	}
 
 	//
 	// PRIVATE METHODS
 	//
-
-
-
 
 	//
 	// PUBLIC METHODS
@@ -77,7 +71,7 @@ impl<'a> LevelCurveTree<'a> {
 	/// Method: Get the parent of this node
 	pub fn get_parent(&'a self) -> Option<LevelCurveTree> {
 		if self.parent_relations[self.own_index].is_none() {
-			return None
+			return None;
 		}
 
 		let result: LevelCurveTree = self.from_perspective_index(self.parent_relations[self.own_index]?);
@@ -91,7 +85,7 @@ impl<'a> LevelCurveTree<'a> {
 		let parent = self.parent_relations[child.own_index];
 		match parent {
 			None => false,
-			Some(p) => p == self.own_index
+			Some(p) => p == self.own_index,
 		}
 	}
 
@@ -101,13 +95,12 @@ impl<'a> LevelCurveTree<'a> {
 		let child = self.parent_relations[self.own_index];
 		match child {
 			None => false,
-			Some(c) => c == parent.own_index
+			Some(c) => c == parent.own_index,
 		}
 	}
 
 	/// Method: getChildren
 	pub fn get_children(&'a self) -> Vec<LevelCurveTree> {
-
 		let mut result: Vec<LevelCurveTree> = Vec::new();
 
 		// Add all trees of whom this instance is the parent
@@ -120,7 +113,6 @@ impl<'a> LevelCurveTree<'a> {
 		}
 
 		result
-
 	}
 
 	/// Method: Check whether a certain point is in the set
@@ -144,10 +136,6 @@ impl<'a> LevelCurveTree<'a> {
 	}
 }
 
-
-
-
-
 //
 // UNIT TESTS
 //
@@ -162,14 +150,13 @@ mod tests {
 	//
 
 	fn construct_tree<'a>(pixels_per_curve: &'a mut Vec<Vec<(u64, u64)>>, parent_relations: &'a mut Vec<Option<usize>>) -> LevelCurveTree<'a> {
-
 		// We will create a level-curve with 4 layers
 		for i in 0..4 {
 			// Add a vector to the pixels_per_curve array and add arbitrary pixels
 			let mut pixels: Vec<(u64, u64)> = Vec::new();
 
 			for j in 0..10 {
-				pixels.push((j, 2*j));
+				pixels.push((j, 2 * j));
 			}
 
 			pixels_per_curve.push(pixels);
@@ -183,10 +170,10 @@ mod tests {
 						 2    3
 		*/
 
-		parent_relations.push(None);		// index 0 has no parent
-		parent_relations.push(Some(0));		// index 1 has parent 0
-		parent_relations.push(Some(1));     // index 2 has parent 1
-		parent_relations.push(Some(1));		// index 3 has parent 1
+		parent_relations.push(None); // index 0 has no parent
+		parent_relations.push(Some(0)); // index 1 has parent 0
+		parent_relations.push(Some(1)); // index 2 has parent 1
+		parent_relations.push(Some(1)); // index 3 has parent 1
 
 		// Pass these vectors to the constuctor
 		LevelCurveTree::from_open_cv(pixels_per_curve, parent_relations)
@@ -194,7 +181,6 @@ mod tests {
 
 	#[test]
 	fn level_curve_tree_constructor_right_own_index() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -204,12 +190,10 @@ mod tests {
 
 		// Assert the root to be 0
 		assert_eq!(tree.own_index, 0);
-
 	}
 
 	#[test]
 	fn level_curve_tree_get_parent_of_root() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -219,13 +203,10 @@ mod tests {
 
 		// Assert the root to be 0
 		assert!(tree.get_parent().is_none());
-
 	}
-
 
 	#[test]
 	fn level_curve_tree_get_parent_of_nonroot() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -243,12 +224,10 @@ mod tests {
 
 		// Assert the parent to have the right perspective index
 		assert_eq!(parent_unwrapped.get_current_perspective(), 0);
-
 	}
 
 	#[test]
 	fn level_curve_tree_get_children_count_1() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -261,12 +240,10 @@ mod tests {
 
 		// Assert that the length of this vector is 1
 		assert_eq!(children.len(), 1);
-
 	}
 
 	#[test]
 	fn level_curve_tree_get_children_count_2() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -282,12 +259,10 @@ mod tests {
 
 		// Assert that the length of this vector is 1
 		assert_eq!(children.len(), 2);
-
 	}
 
 	#[test]
 	fn level_curve_tree_get_child() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -303,12 +278,10 @@ mod tests {
 
 		// Assert that the perspective of this child is correct
 		assert_eq!(child1.get_current_perspective(), 1);
-
 	}
 
 	#[test]
 	fn level_curve_tree_is_parent_of() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -324,12 +297,10 @@ mod tests {
 
 		// Assert that the perspective of this child is correct
 		assert!(tree.is_parent_of(child1));
-
 	}
 
 	#[test]
 	fn level_curve_tree_is_child_of() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -345,12 +316,10 @@ mod tests {
 
 		// Assert that the perspective of this child is correct
 		assert!(child1.is_child_of(&tree));
-
 	}
 
 	#[test]
 	fn level_curve_tree_contains_pixel_positive() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -360,12 +329,10 @@ mod tests {
 
 		// Assert that the tree contains the pixel (1, 2)
 		assert!(tree.contains_pixel(1, 2));
-
 	}
 
 	#[test]
 	fn level_curve_tree_contains_pixel_negative() {
-
 		// Construct the arrays, as one would receive them from OpenCV
 		let mut pixels_per_curve: Vec<Vec<(u64, u64)>> = Vec::new();
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
@@ -375,7 +342,5 @@ mod tests {
 
 		// Assert that the tree does not contain the pixel (2, 2)
 		assert!(!tree.contains_pixel(2, 2));
-
 	}
-
 }

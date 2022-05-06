@@ -5,7 +5,6 @@ use std::mem;
 
 use json::validation::Checked::Valid;
 
-
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 struct Vertex {
@@ -13,19 +12,17 @@ struct Vertex {
 	color: [f32; 3],
 }
 
-
 fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
-    let byte_length = vec.len() * mem::size_of::<T>();
-    let byte_capacity = vec.capacity() * mem::size_of::<T>();
-    let alloc = vec.into_boxed_slice();
-    let ptr = Box::<[T]>::into_raw(alloc).cast::<u8>();
-    let mut new_vec = unsafe { Vec::from_raw_parts(ptr, byte_length, byte_capacity) };
-    while new_vec.len() % 4 != 0 {
-        new_vec.push(0); // pad to multiple of four bytes
-    }
-    new_vec
+	let byte_length = vec.len() * mem::size_of::<T>();
+	let byte_capacity = vec.capacity() * mem::size_of::<T>();
+	let alloc = vec.into_boxed_slice();
+	let ptr = Box::<[T]>::into_raw(alloc).cast::<u8>();
+	let mut new_vec = unsafe { Vec::from_raw_parts(ptr, byte_length, byte_capacity) };
+	while new_vec.len() % 4 != 0 {
+		new_vec.push(0); // pad to multiple of four bytes
+	}
+	new_vec
 }
-
 
 #[wasm_bindgen]
 pub fn demo() -> String {
@@ -72,9 +69,7 @@ pub fn demo() -> String {
 		buffer_view: Some(json::Index::new(0)),
 		byte_offset: 0,
 		count: triangle_vertices_len as u32,
-		component_type: Valid(json::accessor::GenericComponentType(
-			json::accessor::ComponentType::F32,
-		)),
+		component_type: Valid(json::accessor::GenericComponentType(json::accessor::ComponentType::F32)),
 		extensions: Default::default(),
 		extras: Default::default(),
 		type_: Valid(json::accessor::Type::Vec3),
@@ -88,9 +83,7 @@ pub fn demo() -> String {
 		buffer_view: Some(json::Index::new(0)),
 		byte_offset: (3 * mem::size_of::<f32>()) as u32,
 		count: triangle_vertices_len as u32,
-		component_type: Valid(json::accessor::GenericComponentType(
-			json::accessor::ComponentType::F32,
-		)),
+		component_type: Valid(json::accessor::GenericComponentType(json::accessor::ComponentType::F32)),
 		extensions: Default::default(),
 		extras: Default::default(),
 		type_: Valid(json::accessor::Type::Vec3),

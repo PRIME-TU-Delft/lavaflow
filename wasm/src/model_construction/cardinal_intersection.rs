@@ -1,8 +1,6 @@
 //provides functions to find intersection in each cardinal direction
 
-
 use super::raster::Raster;
-
 
 //  TODO; rest of directions
 pub fn n(ix: usize, iy: usize, raster: &Raster, is_svc: &Vec<Vec<bool>>) -> (Option<f64>, usize) {

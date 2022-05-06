@@ -3,16 +3,14 @@
 //
 // Class: LevelCurves
 //
-use super::{point::Point, constructor};
 use super::level_curve_tree::LevelCurveTree;
-
+use super::{constructor, point::Point};
 
 #[derive(Debug)]
 pub struct LevelCurve {
 	altitude: f64,
-	points: Vec<Point>
+	points: Vec<Point>,
 }
-
 
 impl LevelCurve {
 	pub fn new(altitude: f64) -> Self {
@@ -62,7 +60,6 @@ impl LevelCurve {
 	}
 }
 
-
 //
 // Class: LevelCurveMap
 // This class gathers multiple level curves and provides functionality for working with
@@ -72,7 +69,7 @@ impl LevelCurve {
 #[derive(Debug)]
 pub struct LevelCurveSet {
 	altitude_step: f64,
-	level_curves: Vec<LevelCurve>
+	level_curves: Vec<LevelCurve>,
 }
 
 impl LevelCurveSet {
@@ -80,7 +77,7 @@ impl LevelCurveSet {
 	pub fn new(altitude_step: f64) -> Self {
 		Self {
 			altitude_step,
-			level_curves: Vec::new()
+			level_curves: Vec::new(),
 		}
 	}
 
@@ -118,16 +115,15 @@ impl LevelCurveSet {
 	}
 	///
 	/// transforms levelCurveTree to levelCurveMap structure, while reducing amount of total points from pixelStructure
-    ///
-    /// # Arguments
-    ///
-    /// * `tree` - levelCurveTree datastructure containing information from scanning step
-    /// * `altitude_step` - increase in height per contour line
-    /// * `desired_dist` - minimum desired distance between points in final conout map
-    /// * `current_height` - to track height when traversing tree, initial call should start with 1
-    /// 
-	pub fn transform_to_LevelCurveMap<'a>(&self, tree : &'a mut LevelCurveTree<'a> ,  altitude_step: f64, desired_dist: f64 , current_height : usize) -> LevelCurveSet {
-		
+	///
+	/// # Arguments
+	///
+	/// * `tree` - levelCurveTree datastructure containing information from scanning step
+	/// * `altitude_step` - increase in height per contour line
+	/// * `desired_dist` - minimum desired distance between points in final conout map
+	/// * `current_height` - to track height when traversing tree, initial call should start with 1
+	///
+	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f64, desired_dist: f64, current_height: usize) -> LevelCurveSet {
 		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f64);
@@ -146,53 +142,49 @@ impl LevelCurveSet {
 			//Assumption: pixels have directly connected neighbors (diagonals do not count as adjacent)
 			//Assumption: line is exactly 1 pixel wide
 			//TODO; check if in actual input every pixel has adjacent pixel
-			let neighbors = vec![(current_pixel.0 - 1, current_pixel.1),
-												(current_pixel.0 + 1, current_pixel.1),
-												(current_pixel.0, current_pixel.1 - 1),
-												(current_pixel.0, current_pixel.1 + 1)];
+			let neighbors = vec![
+				(current_pixel.0 - 1, current_pixel.1),
+				(current_pixel.0 + 1, current_pixel.1),
+				(current_pixel.0, current_pixel.1 - 1),
+				(current_pixel.0, current_pixel.1 + 1),
+			];
 			for (x, y) in neighbors {
-
-					//TODO: check how this holds for corner cases
-					if (x , y) != current_pixel && ( x , y) != last_visited && tree.contains_pixel(x, y) {
-	
-						if tree.contains_pixel(x, y) {
-							//if dist to last saved and current pixel is desired length, save current pixel, else move on
-							if pixel_dist( &(x, y), &last_saved  ) >= desired_dist {
-
-								current_level_curve.add_point( Point{x: x as f64 , y: y as f64, z: current_level_curve.altitude} );
-								last_saved = (x, y);
-
-							}
-
-							last_visited = current_pixel;
-							current_pixel= (x, y);
-
+				//TODO: check how this holds for corner cases
+				if (x, y) != current_pixel && (x, y) != last_visited && tree.contains_pixel(x, y) {
+					if tree.contains_pixel(x, y) {
+						//if dist to last saved and current pixel is desired length, save current pixel, else move on
+						if pixel_dist(&(x, y), &last_saved) >= desired_dist {
+							current_level_curve.add_point(Point {
+								x: x as f64,
+								y: y as f64,
+								z: current_level_curve.altitude,
+							});
+							last_saved = (x, y);
 						}
 
+						last_visited = current_pixel;
+						current_pixel = (x, y);
 					}
 				}
-				if(current_pixel == first_pixel){
-					break;
-				}
-			
+			}
+			if (current_pixel == first_pixel) {
+				break;
+			}
 		}
-		
+
 		//for every child get levelcurvemap and add to ret
 
-		for mut child in tree.get_children(){
-			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1 );
+		for mut child in tree.get_children() {
+			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);
 			for curve in childmap.level_curves {
 				ret.add_level_curve(curve);
 			}
 		}
-		 
+
 		ret
 	}
 }
 //TODO: find better method
-fn pixel_dist(a : &(u64, u64) , b: &(u64, u64)) -> f64 {
-		( (a.0 as f64 -b.0 as f64).powi(2) + (a.1 as f64 - b.1 as f64).powi(2) ).sqrt()
-}	
-
-
-
+fn pixel_dist(a: &(u64, u64), b: &(u64, u64)) -> f64 {
+	((a.0 as f64 - b.0 as f64).powi(2) + (a.1 as f64 - b.1 as f64).powi(2)).sqrt()
+}

@@ -4,21 +4,21 @@ use classes::level_curves::LevelCurveSet;
 use classes::raster::Raster;
 use classes::constructor::ModelConstructor;
 
-	/// Supermethod that takes in an openCV tree and outputs an GTLF model. 
+	/// Supermethod that takes in an openCV tree and outputs an GTLF model.
     ///
     /// # Arguments
     ///
     /// * `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
-    /// * `contour_margin` - Margin that defines when a point is considered 'on' a contour line, high value results in more staircase-like appearance, low value might lead to innacurate result. 
+    /// * `contour_margin` - Margin that defines when a point is considered 'on' a contour line, high value results in more staircase-like appearance, low value might lead to innacurate result.
     ///  NOTE: margin must be above max(raster height, column width) so long as local_tin() is not implemented
     /// * `plane_length`- y-axis measuremnt of the model to be generated
     /// * `plane_width` - x-axis measuremnt of the model to be generated
     /// * `columns` - desired number columns used for raster
     /// * `rows` - desired number rows used for raster
     /// * `altitude_step` - fixed increase in height per level curve
-    /// 
     ///
-    /// 
+    ///
+    ///
 pub fn generate_3d_model<'a>( tree : &'a mut LevelCurveTree<'a>,  contour_margin: f64, plane_length: f64, plane_width: f64, columns : usize, rows: usize, altitude_step : f64, desired_dist: f64) -> Vec<Vec<f64>> {
 
         //convert openCV tree to levelCurveMap (input for construction algorithm)
