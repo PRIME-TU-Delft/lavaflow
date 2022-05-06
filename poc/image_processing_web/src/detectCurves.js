@@ -12,7 +12,6 @@ function detectCurves(image) {
     let hierarchy = new cv.Mat()
     cv.findContours(thresholded, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE) // get contours out of the image
 
-    console.log(hierarchy)
     return [contours, hierarchy]
 }
 
