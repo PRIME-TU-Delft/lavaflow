@@ -206,6 +206,11 @@ fn pixel_dist(a : &(u64, u64) , b: &(u64, u64)) -> f64 {
 pub struct LevelCurveTree<'a> {
 	pixels_per_curve: &'a Vec<Vec<(u64, u64)>>,
 	parent_relations: &'a Vec<Option<usize>>,
+	// own_index refers to the own perspective of this tree. Since an internal
+	// datastructure is used that matches OpenCV, this perspective index is required.
+	// The perspective of a Tree instance specified 'which child this instance represents'.
+	// This information is required in order to be able to determine what the parent of this
+	// node is and what the children are, using the parent_relations array.
 	own_index: usize
 }
 
