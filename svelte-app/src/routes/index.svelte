@@ -6,7 +6,7 @@
 	<div class="img" />
 	<div class="img backdrop" />
 	<div class="title">
-		<h1>PRIME</h1>
+		<div class="logo" />
 		<h2>AR Lavaflow</h2>
 	</div>
 </header>
@@ -25,9 +25,10 @@
 </main>
 
 <style>
-	h1 {
-		margin: 0;
-		font-size: 2em;
+	.logo {
+		height: 6rem;
+		background: url(/primeLogo.svg) no-repeat;
+		background-size: cover;
 	}
 
 	h2 {
