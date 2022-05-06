@@ -272,7 +272,7 @@ impl<'a> LevelCurveTree<'a> {
 
 	/// Method: Get the parent of this node
 	pub fn get_parent(&'a self) -> Option<LevelCurveTree> {
-		if self.parent_relations[self.own_index] == None {
+		if self.parent_relations[self.own_index].is_none() {
 			return None
 		}
 
