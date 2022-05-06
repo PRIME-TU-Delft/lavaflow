@@ -9,7 +9,7 @@ pub struct ModelConstructor<'a> {
 	raster: &'a mut Raster,
 }
 
-//TODO: implement once model is working
+// TODO: implement once model is working
 fn local_tin(p: Vec<f64>) -> f64 {
 	todo!()
 }
@@ -45,14 +45,14 @@ impl<'a> ModelConstructor<'a> {
 		for i in 0..x {
 			for j in 0..y {
 				if self.check_svc(i, j) {
-					//if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
+					// if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
 					if self.raster.altitudes[i][j].is_none() {
-						//local_tin(cellCentre)
+						// local_tin(cellCentre)
 					}
 				}
 			}
 		}
-		//calculate heights of all no value cells
+		// calculate heights of all no value cells
 		self.calc_heights_nvc()
 	}
 
@@ -97,8 +97,8 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	fn check_svc(&mut self, row: usize, col: usize) -> bool {
-		//TODO z point is now "0" but doesnt really exist
-		//define which points are corner and center of current cell
+		// TODO z point is now "0" but doesnt really exist
+		// define which points are corner and center of current cell
 		let corner: Point = Point {
 			x: (row as f64) * self.raster.row_height,
 			y: (col as f64) * self.raster.column_width,
@@ -110,25 +110,25 @@ impl<'a> ModelConstructor<'a> {
 			z: 0.0,
 		};
 
-		//find point on a contour line closest to center of cell
+		// find point on a contour line closest to center of cell
 		let optional: Option<&Point> = self.level_curve_map.find_closest_point_on_level_curve(&center);
 
 		match optional {
 			Some(p) =>
-			//todo, check row_height etc is correct
+			// todo, check row_height etc is correct
 
-			//check closest point is outside of cell
+			// check closest point is outside of cell
 			{
 				if p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width {
 					false
 				}
-				//check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line
+				// check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line
 				else if (center.x - p.x).abs() < self.contour_margin && (center.y - p.y).abs() < self.contour_margin {
 					self.is_svc[row][col] = true;
 					self.raster.altitudes[row][col] = Some(p.z);
 					true
 				}
-				//if center of cell is not in distance [contour margin], its height must be interpolated
+				// if center of cell is not in distance [contour margin], its height must be interpolated
 				else {
 					self.is_svc[row][col] = true;
 					true

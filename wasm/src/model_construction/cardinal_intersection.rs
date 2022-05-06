@@ -1,4 +1,4 @@
-//provides functions to find intersection in each cardinal direction
+// provides functions to find intersection in each cardinal direction
 
 use super::raster::Raster;
 
