@@ -16,16 +16,12 @@
     </header>
 
     <main>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus lacinia
-      condimentum gravida. Nullam in diam cursus elit fermentum varius. Nunc ac
-      ornare lorem, aliquam ornare elit. Maecenas in magna elementum, dapibus
-      dui sit amet, dictum dolor. Sed congue orci ut hendrerit vulputate.
-      Maecenas sed pulvinar augue, convallis lobortis lacus. Proin purus quam,
-      dignissim sed arcu id, ornare pellentesque nisi. Suspendisse ullamcorper
-      magna a mauris laoreet, sed sagittis massa posuere. Pellentesque semper mi
-      ut lacus consequat eleifend. Vivamus cursus venenatis nibh, pharetra
-      commodo quam elementum et. Etiam tempus mi eu ligula eleifend fringilla.
-      Mauris neque odio, faucibus ut felis et, maximus pulvinar tellus.
+      When a volcano erupts, the lava produced is unstoppable. It moves so
+      slowly you can outrun it, but with the density of molten rock, and a
+      temperature of over 1000 degrees Celsius, it will destroy everything in
+      its path. This path being the steepest possible down a mountain. Your goal
+      is to draw a mountain on a piece of paper. Scan it and place targets on
+      the map where you predict the lava will reach.
 
       <NavigationButton large to="map-scanning">Start flowing</NavigationButton>
       <NavigationButton large to="/" secondary={true}>

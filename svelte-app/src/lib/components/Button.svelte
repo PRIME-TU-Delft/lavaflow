@@ -57,5 +57,6 @@
 
 	.secondary {
 		background: var(--secondary-color);
+		color: var(--text-color-secondary);
 	}
 </style>

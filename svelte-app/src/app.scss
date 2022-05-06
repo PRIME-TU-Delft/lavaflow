@@ -1,8 +1,9 @@
 /* Write your global styles here, in SCSS syntax. Variables and mixins from the src/variables.scss file are available here without importing */
 :root {
-	--primary-color: rgba(248, 173, 157, 90%);
-	--secondary-color: rgba(255, 227, 221, 90%);
+	--primary-color: rgb(225 95 85 / 90%);
+	--secondary-color: rgb(144 53 44 / 90%);
 	--text-color: rgba(94,14,14,100%);
+	--text-color-secondary: rgb(178 164 164);
 }
 
 * {
@@ -17,7 +18,8 @@ html, body {
 }
 
 body {
-	color: #333;
+	background: #1a1717;
+	color: white;
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;

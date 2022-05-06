@@ -3,6 +3,9 @@ export interface Instruction {
 	description: string;
 }
 
+/**
+ * List of requirements for the best experience with scanning the contour lines and houses
+ */
 export const instructions: Instruction[] = [
 	{
 		// TODO: add download link to template
