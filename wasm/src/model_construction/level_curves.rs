@@ -1,10 +1,8 @@
-#![allow(dead_code)]
-
 //
 // Class: LevelCurves
 //
 use super::level_curve_tree::LevelCurveTree;
-use super::{constructor, point::Point};
+use super::point::Point;
 
 #[derive(Debug)]
 pub struct LevelCurve {
@@ -123,6 +121,7 @@ impl LevelCurveSet {
 	/// * `desired_dist` - minimum desired distance between points in final conout map
 	/// * `current_height` - to track height when traversing tree, initial call should start with 1
 	///
+	#[allow(non_snake_case)]
 	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f64, desired_dist: f64, current_height: usize) -> LevelCurveSet {
 		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
@@ -151,23 +150,21 @@ impl LevelCurveSet {
 			for (x, y) in neighbors {
 				//TODO: check how this holds for corner cases
 				if (x, y) != current_pixel && (x, y) != last_visited && tree.contains_pixel(x, y) {
-					if tree.contains_pixel(x, y) {
-						//if dist to last saved and current pixel is desired length, save current pixel, else move on
-						if pixel_dist(&(x, y), &last_saved) >= desired_dist {
-							current_level_curve.add_point(Point {
-								x: x as f64,
-								y: y as f64,
-								z: current_level_curve.altitude,
-							});
-							last_saved = (x, y);
-						}
-
-						last_visited = current_pixel;
-						current_pixel = (x, y);
+					//if dist to last saved and current pixel is desired length, save current pixel, else move on
+					if pixel_dist(&(x, y), &last_saved) >= desired_dist {
+						current_level_curve.add_point(Point {
+							x: x as f64,
+							y: y as f64,
+							z: current_level_curve.altitude,
+						});
+						last_saved = (x, y);
 					}
+
+					last_visited = current_pixel;
+					current_pixel = (x, y);
 				}
 			}
-			if (current_pixel == first_pixel) {
+			if current_pixel == first_pixel {
 				break;
 			}
 		}

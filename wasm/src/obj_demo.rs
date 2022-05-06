@@ -1,5 +1,4 @@
 use gltf_json as json;
-use wasm_bindgen::prelude::wasm_bindgen;
 
 use std::mem;
 
@@ -7,7 +6,7 @@ use json::validation::Checked::Valid;
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
-struct Vertex {
+pub struct Vertex {
 	position: [f32; 3],
 	color: [f32; 3],
 }
@@ -24,23 +23,7 @@ fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
 	new_vec
 }
 
-#[wasm_bindgen]
-pub fn demo() -> String {
-	let triangle_vertices = vec![
-		Vertex {
-			position: [0.0, 0.5, 0.0],
-			color: [1.0, 0.0, 0.0],
-		},
-		Vertex {
-			position: [-0.5, -0.5, 0.0],
-			color: [0.0, 1.0, 0.0],
-		},
-		Vertex {
-			position: [0.5, -0.5, 0.0],
-			color: [0.0, 0.0, 1.0],
-		},
-	];
-
+pub fn generate_gltf(triangle_vertices: Vec<Vertex>) -> String {
 	let triangle_vertices_len = triangle_vertices.len();
 
 	let bin_content = to_padded_byte_vector(triangle_vertices);

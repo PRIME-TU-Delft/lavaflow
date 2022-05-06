@@ -27,10 +27,10 @@ impl<'a> LevelCurveTree<'a> {
 		let mut own_index = 0;
 
 		// 1. Find the node that has no parent (this is the root of the tree)
-		for i in 0..parent_relations.len() {
-			if parent_relations[i] == None {
+		for (index, relation) in parent_relations.iter().enumerate() {
+			if relation.is_none() {
 				// We've found the root!
-				own_index = i;
+				own_index = index;
 			}
 		}
 
@@ -42,7 +42,7 @@ impl<'a> LevelCurveTree<'a> {
 	}
 
 	/// Private Dynamic constructor: From existing tree, with different index
-	fn from_perspective_index(&'a self, index: usize) -> Self {
+	fn from_perspective_index(&self, index: usize) -> Self {
 		Self {
 			pixels_per_curve: self.pixels_per_curve,
 			parent_relations: self.parent_relations,
@@ -70,9 +70,7 @@ impl<'a> LevelCurveTree<'a> {
 
 	/// Method: Get the parent of this node
 	pub fn get_parent(&'a self) -> Option<LevelCurveTree> {
-		if self.parent_relations[self.own_index].is_none() {
-			return None;
-		}
+		self.parent_relations[self.own_index]?;
 
 		let result: LevelCurveTree = self.from_perspective_index(self.parent_relations[self.own_index]?);
 
@@ -123,7 +121,7 @@ impl<'a> LevelCurveTree<'a> {
 				return true;
 			}
 		}
-		return false;
+		false
 	}
 
 	/// Method: Retrieve the first pixel in this level-curve
@@ -135,6 +133,7 @@ impl<'a> LevelCurveTree<'a> {
 		Some(self.pixels_per_curve[self.own_index][0])
 	}
 }
+
 
 //
 // UNIT TESTS
@@ -151,7 +150,7 @@ mod tests {
 
 	fn construct_tree<'a>(pixels_per_curve: &'a mut Vec<Vec<(u64, u64)>>, parent_relations: &'a mut Vec<Option<usize>>) -> LevelCurveTree<'a> {
 		// We will create a level-curve with 4 layers
-		for i in 0..4 {
+		for _ in 0..4 {
 			// Add a vector to the pixels_per_curve array and add arbitrary pixels
 			let mut pixels: Vec<(u64, u64)> = Vec::new();
 
@@ -199,7 +198,7 @@ mod tests {
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
 
 		// Fill the arrays with information, as one would receive from OpenCV
-		let mut tree = construct_tree(&mut pixels_per_curve, &mut parent_relations);
+		let tree = construct_tree(&mut pixels_per_curve, &mut parent_relations);
 
 		// Assert the root to be 0
 		assert!(tree.get_parent().is_none());
@@ -218,7 +217,7 @@ mod tests {
 		tree.set_current_perspective(1);
 
 		// Assert the parent to be 'some'
-		assert!(!tree.get_parent().is_none());
+		assert!(tree.get_parent().is_some());
 
 		let parent_unwrapped = tree.get_parent().unwrap();
 
@@ -233,10 +232,10 @@ mod tests {
 		let mut parent_relations: Vec<Option<usize>> = Vec::new();
 
 		// Fill the arrays with information, as one would receive from OpenCV
-		let mut tree = construct_tree(&mut pixels_per_curve, &mut parent_relations);
+		let tree = construct_tree(&mut pixels_per_curve, &mut parent_relations);
 
 		// Get the list of children from this parent
-		let mut children = tree.get_children();
+		let children = tree.get_children();
 
 		// Assert that the length of this vector is 1
 		assert_eq!(children.len(), 1);
@@ -255,7 +254,7 @@ mod tests {
 		tree.set_current_perspective(1);
 
 		// Get the list of children from this parent
-		let mut children = tree.get_children();
+		let children = tree.get_children();
 
 		// Assert that the length of this vector is 1
 		assert_eq!(children.len(), 2);

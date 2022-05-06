@@ -28,7 +28,7 @@ wasm-clippy:
   script:
     - cd wasm
     - rustup component add clippy
-    - cargo clippy -- -D clippy::pedantic
+    - cargo clippy
   # cache:
   #   key: "$CI_COMMIT_REF_NAME"
   #   policy: pull

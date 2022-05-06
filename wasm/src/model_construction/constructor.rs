@@ -1,8 +1,5 @@
 use super::point::Point;
-use super::{
-	level_curves::{LevelCurve, LevelCurveSet},
-	raster::Raster,
-};
+use super::{level_curves::LevelCurveSet, raster::Raster};
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
@@ -14,7 +11,7 @@ pub struct ModelConstructor<'a> {
 
 //TODO: implement once model is working
 fn local_tin(p: Vec<f64>) -> f64 {
-	0.0
+	todo!()
 }
 
 impl<'a> ModelConstructor<'a> {
@@ -82,16 +79,16 @@ impl<'a> ModelConstructor<'a> {
 		for row in 0..self.raster.rows {
 			for col in 0..self.raster.columns {
 				if self.raster.get(row, col).is_none() {
-					let mut neighbours: Vec<(f64, f64)> = Vec::new();
-
-					neighbours.push(self.find_svc_north(row, col));
-					neighbours.push(self.find_svc_north_east(row, col));
-					neighbours.push(self.find_svc_north_west(row, col));
-					neighbours.push(self.find_svc_south(row, col));
-					neighbours.push(self.find_svc_south_east(row, col));
-					neighbours.push(self.find_svc_south_west(row, col));
-					neighbours.push(self.find_svc_east(row, col));
-					neighbours.push(self.find_svc_west(row, col));
+					let neighbours: Vec<(f64, f64)> = vec![
+						self.find_svc_north(row, col),
+						self.find_svc_north_east(row, col),
+						self.find_svc_north_west(row, col),
+						self.find_svc_south(row, col),
+						self.find_svc_south_east(row, col),
+						self.find_svc_south_west(row, col),
+						self.find_svc_east(row, col),
+						self.find_svc_west(row, col),
+					];
 
 					self.raster.set(row, col, calc_inverse_weighted_average(&neighbours));
 				}
@@ -122,8 +119,8 @@ impl<'a> ModelConstructor<'a> {
 
 			//check closest point is outside of cell
 			{
-				if (p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width) {
-					return false;
+				if p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width {
+					false
 				}
 				//check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line
 				else if (center.x - p.x).abs() < self.contour_margin && (center.y - p.y).abs() < self.contour_margin {
@@ -146,12 +143,14 @@ impl<'a> ModelConstructor<'a> {
 	// A set of functions for finding the nearest SVC box in directions north (west, east) and south (west, east)
 	//
 
+	// TODO: I *really* wanna refactor these 8 functions
+
 	// Function: find SVC north
 	fn find_svc_north(&self, i: usize, j: usize) -> (f64, f64) {
 		let mut row = i;
 		let col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -170,7 +169,7 @@ impl<'a> ModelConstructor<'a> {
 		let mut row = i;
 		let col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -189,7 +188,7 @@ impl<'a> ModelConstructor<'a> {
 		let row = i;
 		let mut col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -208,7 +207,7 @@ impl<'a> ModelConstructor<'a> {
 		let row = i;
 		let mut col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -227,7 +226,7 @@ impl<'a> ModelConstructor<'a> {
 		let mut row = i;
 		let mut col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -247,7 +246,7 @@ impl<'a> ModelConstructor<'a> {
 		let mut row = i;
 		let mut col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -267,7 +266,7 @@ impl<'a> ModelConstructor<'a> {
 		let mut row = i;
 		let mut col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -287,7 +286,7 @@ impl<'a> ModelConstructor<'a> {
 		let mut row = i;
 		let mut col = j;
 
-		while row < self.raster.rows && col < self.raster.columns && row >= 0 && col >= 0 {
+		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
 				return (self.raster.get(row, col).expect("SVC Without Value was Found"), calc_distance_between_cells(i, j, row, col));
@@ -307,13 +306,13 @@ impl<'a> ModelConstructor<'a> {
 // Additional functions
 //
 
-fn calc_inverse_weighted_average(weighted_values: &Vec<(f64, f64)>) -> f64 {
+fn calc_inverse_weighted_average(weighted_values: &[(f64, f64)]) -> f64 {
 	let mut res: f64 = 0.0;
 	let mut sum_weight: f64 = 0.0;
 
-	for i in 0..weighted_values.len() {
-		res += weighted_values[i].0 * weighted_values[i].1;
-		sum_weight += weighted_values[i].1;
+	for weighted_value in weighted_values {
+		res += weighted_value.0 * weighted_value.1;
+		sum_weight += weighted_value.1;
 	}
 
 	res / sum_weight
