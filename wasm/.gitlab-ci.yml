@@ -35,7 +35,7 @@ wasm-clippy:
   #   paths:
   #     - wasm/target/
   #     - /root/.cargo/registry/index/
-  # allow_failure: true
+  allow_failure: true
 
 
 wasm-test:
