@@ -477,7 +477,7 @@ mod tests {
 		let mut children = tree.get_children();
 
 		// Assert that the length of this vector is 1
-		assert!(children.len() == 2);
+		assert_eq!(children.len(), 2);
 
 	}
 
