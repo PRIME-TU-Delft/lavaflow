@@ -1,0 +1,16 @@
+{
+  "name": "image_processing_web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "author": "Jonas van Marrewijk",
+  "license": "MIT",
+  "dependencies": {
+    "@anpanman/opencv_ts": "^1.0.2",
+    "vite": "^2.9.7"
+  }
+}
