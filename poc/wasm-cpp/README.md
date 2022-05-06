@@ -1,0 +1,3 @@
+- `emcmake cmake .`
+- `emmake make`
+- `emcc libcore.a -o libcore.wasm`
