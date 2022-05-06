@@ -2,6 +2,8 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 </script>
 
+<div class="tudelftLogo" />
+
 <header>
 	<div class="img" />
 	<div class="img backdrop" />
@@ -24,20 +26,61 @@
 	<NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton>
 </main>
 
-<style>
-	.logo {
-		height: 6rem;
-		background: url(/primeLogo.svg) no-repeat;
-		background-size: cover;
+<style lang="scss">
+	.tudelftLogo {
+		position: fixed;
+		top: 1rem;
+		left: 1rem;
+		background: url(/TU_P5_white.png);
+		background-size: contain;
+		background-repeat: no-repeat;
+		height: 4rem;
+		width: 100%;
 	}
 
-	h2 {
-		font-size: 1.5em;
-	}
 	header {
 		position: relative;
 		height: 20rem;
 		width: 100%;
+
+		.logo {
+			height: 6rem;
+			background: url(/primeLogo.svg) no-repeat;
+			background-size: cover;
+		}
+
+		h2 {
+			font-size: 1.5em;
+		}
+
+		.img {
+			position: absolute;
+			bottom: 0;
+			background: url(/volcano.jpg);
+			background-size: cover;
+			background-position: center bottom;
+			left: 50%;
+			transform: translateX(-50%);
+			height: 40rem;
+			width: 40rem;
+			z-index: 0;
+			border-radius: 50%;
+		}
+
+		.backdrop {
+			background: rgba(220, 73, 73, 21%);
+			backdrop-filter: blur(1px) saturate(120%);
+		}
+
+		.title {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			color: white;
+			text-align: center;
+			font-size: 1.5em;
+		}
 	}
 
 	main {
@@ -45,35 +88,6 @@
 		max-width: 30rem;
 		margin: 1rem auto;
 		padding: 1rem;
-	}
-
-	.img {
-		position: absolute;
-		bottom: 0;
-		background: url(/volcano.jpg);
-		background-size: cover;
-		background-position: center bottom;
-		left: 50%;
-		transform: translateX(-50%);
-		height: 40rem;
-		width: 40rem;
-		z-index: 0;
-		border-radius: 50%;
-	}
-
-	.backdrop {
-		background: rgba(220, 73, 73, 21%);
-		backdrop-filter: blur(1px) saturate(120%);
-	}
-
-	.title {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		color: white;
-		text-align: center;
-		font-size: 1.5em;
 	}
 
 	.introduction {
