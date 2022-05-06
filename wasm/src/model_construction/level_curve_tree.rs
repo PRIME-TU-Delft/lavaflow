@@ -69,7 +69,7 @@ impl<'a> LevelCurveTree<'a> {
 	}
 
 	/// Method: Get the parent of this node
-	pub fn get_parent(&'a self) -> Option<LevelCurveTree> {
+	pub fn get_parent(&self) -> Option<LevelCurveTree> {
 		self.parent_relations[self.own_index]?;
 
 		let result: LevelCurveTree = self.from_perspective_index(self.parent_relations[self.own_index]?);
@@ -98,7 +98,7 @@ impl<'a> LevelCurveTree<'a> {
 	}
 
 	/// Method: getChildren
-	pub fn get_children(&'a self) -> Vec<LevelCurveTree> {
+	pub fn get_children(&self) -> Vec<LevelCurveTree> {
 		let mut result: Vec<LevelCurveTree> = Vec::new();
 
 		// Add all trees of whom this instance is the parent
@@ -117,7 +117,7 @@ impl<'a> LevelCurveTree<'a> {
 	///
 	pub fn contains_pixel(&self, x: u64, y: u64) -> bool {
 		for p in &self.pixels_per_curve[self.own_index] {
-			if p.0 == x && p.1 == y {
+			if p == &(x, y) {
 				return true;
 			}
 		}
@@ -126,11 +126,7 @@ impl<'a> LevelCurveTree<'a> {
 
 	/// Method: Retrieve the first pixel in this level-curve
 	pub fn get_first_pixel(&self) -> Option<(u64, u64)> {
-		if self.pixels_per_curve[self.own_index].is_empty() {
-			return None;
-		}
-
-		Some(self.pixels_per_curve[self.own_index][0])
+		self.pixels_per_curve.get(self.own_index).map(|v| v[0])
 	}
 }
 

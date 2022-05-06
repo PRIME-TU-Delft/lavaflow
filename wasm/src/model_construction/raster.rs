@@ -18,9 +18,9 @@ impl Raster {
 		let mut altitudes_init: Vec<Vec<Option<f64>>> = Vec::new();
 
 		// Set all the altitude values to zero
-		for _i in 0..rows {
+		for _ in 0..rows {
 			let mut current_col: Vec<Option<f64>> = Vec::new();
-			for _j in 0..columns {
+			for _ in 0..columns {
 				current_col.push(None);
 			}
 			altitudes_init.push(current_col);
