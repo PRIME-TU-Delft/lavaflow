@@ -1,8 +1,17 @@
 [package]
 name = "wasm"
 version = "0.1.0"
-authors = ["Julia van der Kris <s.vanderkris@student.tudelft.nl>"]
-edition = "2018"
+authors = [
+	"Abel de Bruijn <a.debruijn-3@student.tudelft.nl>",
+	"Jonas van Marrewijk <j.vanmarrewijk-2@student.tudelft.nl>",
+	"Julia van der Kris <julia@jlia.dev>",
+	"Rens Dur <r.c.m.dur@student.tudelft.nl>",
+	"Pauline Hengst <p.f.hengst@student.tudelft.nl>"
+]
+license = "MIT"
+description = "WebAssembly part of the LavaFlow webapp"
+repository = "https://gitlab.ewi.tudelft.nl/cse2000-software-project/2021-2022-q4/cluster-01/group1c/ar-for-education"
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -11,27 +20,27 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.63"
+wasm-bindgen = "0.2"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
 # all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
 # code size when deploying.
-console_error_panic_hook = { version = "0.1.6", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
 
 # `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
 # compared to the default allocator's ~10K. It is slower than the default
 # allocator, however.
 #
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
-wee_alloc = { version = "0.4.5", optional = true }
+wee_alloc = { version = "0.4", optional = true }
 
 gltf = "1.0"
 gltf-json = "1.0"
 base64 = "0.13"
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.13"
+wasm-bindgen-test = "0.3"
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.

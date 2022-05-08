@@ -6,7 +6,6 @@ use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::LevelCurveSet;
 use super::raster::Raster;
 
-
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
 pub struct OpenCVTree {
