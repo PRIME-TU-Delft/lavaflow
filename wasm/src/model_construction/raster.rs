@@ -6,20 +6,20 @@
 pub struct Raster {
 	pub rows: usize,
 	pub columns: usize,
-	pub row_height: f64,
-	pub column_width: f64,
-	pub altitudes: Vec<Vec<Option<f64>>>,
+	pub row_height: f32,
+	pub column_width: f32,
+	pub altitudes: Vec<Vec<Option<f32>>>,
 }
 
 impl Raster {
 	// Constructor
-	pub fn new(width: f64, height: f64, rows: usize, columns: usize) -> Self {
+	pub fn new(width: f32, height: f32, rows: usize, columns: usize) -> Self {
 		// Initialize the 2d array of altitudes
-		let mut altitudes_init: Vec<Vec<Option<f64>>> = Vec::new();
+		let mut altitudes_init: Vec<Vec<Option<f32>>> = Vec::new();
 
 		// Set all the altitude values to zero
 		for _ in 0..rows {
-			let mut current_col: Vec<Option<f64>> = Vec::new();
+			let mut current_col: Vec<Option<f32>> = Vec::new();
 			for _ in 0..columns {
 				current_col.push(None);
 			}
@@ -29,17 +29,17 @@ impl Raster {
 		Self {
 			rows,
 			columns,
-			row_height: height / (rows as f64),
-			column_width: width / (columns as f64),
+			row_height: height / (rows as f32),
+			column_width: width / (columns as f32),
 			altitudes: altitudes_init,
 		}
 	}
 
-	pub fn set(&mut self, row: usize, col: usize, val: f64) {
+	pub fn set(&mut self, row: usize, col: usize, val: f32) {
 		self.altitudes[row][col] = Some(val);
 	}
 
-	pub fn get(&self, row: usize, col: usize) -> &Option<f64> {
+	pub fn get(&self, row: usize, col: usize) -> &Option<f32> {
 		&self.altitudes[row][col]
 	}
 }

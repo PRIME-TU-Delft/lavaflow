@@ -77,8 +77,8 @@ impl<'a> LevelCurveTree<'a> {
 		Some(result)
 	}
 
-	/// Method: isParentOf
-	/// Similar to: isChildOf
+	/// Method: `is_parent_of`
+	/// Similar to: `is_child_of`
 	pub fn is_parent_of(&self, child: &LevelCurveTree) -> bool {
 		let parent = self.parent_relations[child.own_index];
 		match parent {
@@ -87,8 +87,8 @@ impl<'a> LevelCurveTree<'a> {
 		}
 	}
 
-	/// Method: isChildOf
-	/// Similar to: isParentOf
+	/// Method: `is_child_of`
+	/// Similar to: `is_parent_of`
 	pub fn is_child_of(&self, parent: &LevelCurveTree) -> bool {
 		let child = self.parent_relations[self.own_index];
 		match child {
@@ -97,7 +97,7 @@ impl<'a> LevelCurveTree<'a> {
 		}
 	}
 
-	/// Method: getChildren
+	/// Method: `get_children`
 	pub fn get_children(&self) -> Vec<LevelCurveTree> {
 		let mut result: Vec<LevelCurveTree> = Vec::new();
 
@@ -114,7 +114,6 @@ impl<'a> LevelCurveTree<'a> {
 	}
 
 	/// Method: Check whether a certain point is in the set
-	///
 	pub fn contains_pixel(&self, x: u64, y: u64) -> bool {
 		for p in &self.pixels_per_curve[self.own_index] {
 			if p == &(x, y) {

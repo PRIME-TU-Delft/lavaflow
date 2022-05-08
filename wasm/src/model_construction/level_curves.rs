@@ -6,12 +6,12 @@ use super::point::Point;
 
 #[derive(Debug)]
 pub struct LevelCurve {
-	altitude: f64,
+	altitude: f32,
 	points: Vec<Point>,
 }
 
 impl LevelCurve {
-	pub fn new(altitude: f64) -> Self {
+	pub fn new(altitude: f32) -> Self {
 		Self { altitude, points: Vec::new() }
 	}
 
@@ -23,14 +23,14 @@ impl LevelCurve {
 		&self.points
 	}
 
-	pub fn find_closest_point_and_distance_on_level_curve(&self, a: &Point) -> (Option<&Point>, f64) {
+	pub fn find_closest_point_and_distance_on_level_curve(&self, a: &Point) -> (Option<&Point>, f32) {
 		if self.points.is_empty() {
-			return (None, f64::INFINITY);
+			return (None, f32::INFINITY);
 		}
 
 		// Get the distance to the first point in the list, as a starting point.
-		// let mut min_dist_sqr: f64 = Point::dist_sqr(&self.points[0], a);
-		let mut min_dist_sqr: f64 = Point::xy_dist_sqr(&self.points[0], a);
+		// let mut min_dist_sqr: f32 = Point::dist_sqr(&self.points[0], a);
+		let mut min_dist_sqr: f32 = Point::xy_dist_sqr(&self.points[0], a);
 		let mut min_dist_sqr_point: &Point = &self.points[0];
 
 		// Loop over every point in the list and find the smallest distance.
@@ -46,14 +46,14 @@ impl LevelCurve {
 		}
 
 		// Return the smallest distance found
-		(Some(min_dist_sqr_point), f64::sqrt(min_dist_sqr))
+		(Some(min_dist_sqr_point), f32::sqrt(min_dist_sqr))
 	}
 
 	pub fn find_closest_point_on_level_curve(&self, a: &Point) -> Option<&Point> {
 		return self.find_closest_point_and_distance_on_level_curve(a).0;
 	}
 
-	pub fn dist_to_point(&self, a: &Point) -> f64 {
+	pub fn dist_to_point(&self, a: &Point) -> f32 {
 		return self.find_closest_point_and_distance_on_level_curve(a).1;
 	}
 }
@@ -66,13 +66,13 @@ impl LevelCurve {
 
 #[derive(Debug)]
 pub struct LevelCurveSet {
-	altitude_step: f64,
+	altitude_step: f32,
 	level_curves: Vec<LevelCurve>,
 }
 
 impl LevelCurveSet {
 	// Construct a new LevelCurveMap, by specifying the altitude per level
-	pub fn new(altitude_step: f64) -> Self {
+	pub fn new(altitude_step: f32) -> Self {
 		Self {
 			altitude_step,
 			level_curves: Vec::new(),
@@ -112,20 +112,20 @@ impl LevelCurveSet {
 		min_dist.0
 	}
 	///
-	/// transforms levelCurveTree to levelCurveMap structure, while reducing amount of total points from pixelStructure
+	/// transforms `levelCurveTree` to `levelCurveMap` structure, while reducing amount of total points from pixelStructure
 	///
 	/// # Arguments
 	///
-	/// * `tree` - levelCurveTree datastructure containing information from scanning step
+	/// * `tree` - `levelCurveTree` datastructure containing information from scanning step
 	/// * `altitude_step` - increase in height per contour line
 	/// * `desired_dist` - minimum desired distance between points in final conout map
 	/// * `current_height` - to track height when traversing tree, initial call should start with 1
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f64, desired_dist: f64, current_height: usize) -> LevelCurveSet {
+	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> LevelCurveSet {
 		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
-		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f64);
+		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
 
 		// TODO: dont use unwrap
 		let first_pixel = tree.get_first_pixel().unwrap();
@@ -153,8 +153,8 @@ impl LevelCurveSet {
 					// if dist to last saved and current pixel is desired length, save current pixel, else move on
 					if pixel_dist(&(x, y), &last_saved) >= desired_dist {
 						current_level_curve.add_point(Point {
-							x: x as f64,
-							y: y as f64,
+							x: x as f32,
+							y: y as f32,
 							z: current_level_curve.altitude,
 						});
 						last_saved = (x, y);
@@ -182,6 +182,6 @@ impl LevelCurveSet {
 	}
 }
 // TODO: find better method
-fn pixel_dist(a: &(u64, u64), b: &(u64, u64)) -> f64 {
-	((a.0 as f64 - b.0 as f64).powi(2) + (a.1 as f64 - b.1 as f64).powi(2)).sqrt()
+fn pixel_dist(a: &(u64, u64), b: &(u64, u64)) -> f32 {
+	((a.0 as f32 - b.0 as f32).powi(2) + (a.1 as f32 - b.1 as f32).powi(2)).sqrt()
 }

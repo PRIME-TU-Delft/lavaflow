@@ -3,19 +3,19 @@ use super::{level_curves::LevelCurveSet, raster::Raster};
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
-	contour_margin: f64,
+	contour_margin: f32,
 	level_curve_map: &'a LevelCurveSet,
 	is_svc: Vec<Vec<bool>>,
 	raster: &'a mut Raster,
 }
 
 // TODO: implement once model is working
-fn local_tin(p: Vec<f64>) -> f64 {
+fn local_tin(p: Vec<f32>) -> f32 {
 	todo!()
 }
 
 impl<'a> ModelConstructor<'a> {
-	pub fn new(raster: &'a mut Raster, contour_margin: f64, level_curve_map: &'a LevelCurveSet) -> ModelConstructor<'a> {
+	pub fn new(raster: &'a mut Raster, contour_margin: f32, level_curve_map: &'a LevelCurveSet) -> ModelConstructor<'a> {
 		let x = raster.columns;
 		let y = raster.rows;
 		let is_svc = vec![vec![false; x]; y];
@@ -31,7 +31,7 @@ impl<'a> ModelConstructor<'a> {
 	/// # Arguments
 	///
 	/// * `raster` - empty raster for which heights are to be calculated
-	/// * `contour_margin` - margin that defines when a point is considered 'on' a contour line NOTE: must be above max(raster height, column width) so long as local_tin() is not implemented
+	/// * `contour_margin` - margin that defines when a point is considered 'on' a contour line NOTE: must be above max(raster height, column width) so long as `local_tin`() is not implemented
 	/// * `level_curve_map` - set of level curves used to determine heights of each point
 	///
 	///
@@ -79,7 +79,7 @@ impl<'a> ModelConstructor<'a> {
 		for row in 0..self.raster.rows {
 			for col in 0..self.raster.columns {
 				if self.raster.get(row, col).is_none() {
-					let neighbours: Vec<(f64, f64)> = vec![
+					let neighbours: Vec<(f32, f32)> = vec![
 						self.find_svc_north(row, col),
 						self.find_svc_north_east(row, col),
 						self.find_svc_north_west(row, col),
@@ -100,13 +100,13 @@ impl<'a> ModelConstructor<'a> {
 		// TODO z point is now "0" but doesnt really exist
 		// define which points are corner and center of current cell
 		let corner: Point = Point {
-			x: (row as f64) * self.raster.row_height,
-			y: (col as f64) * self.raster.column_width,
+			x: (row as f32) * self.raster.row_height,
+			y: (col as f32) * self.raster.column_width,
 			z: 0.0,
 		};
 		let center: Point = Point {
-			x: (row as f64) + 0.5 * self.raster.row_height,
-			y: (col as f64) + 0.5 * self.raster.column_width,
+			x: (row as f32) + 0.5 * self.raster.row_height,
+			y: (col as f32) + 0.5 * self.raster.column_width,
 			z: 0.0,
 		};
 
@@ -146,7 +146,7 @@ impl<'a> ModelConstructor<'a> {
 	// TODO: I *really* wanna refactor these 8 functions
 
 	// Function: find SVC north
-	fn find_svc_north(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_north(&self, i: usize, j: usize) -> (f32, f32) {
 		let mut row = i;
 		let col = j;
 
@@ -165,7 +165,7 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	// Function: find SVC south
-	fn find_svc_south(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_south(&self, i: usize, j: usize) -> (f32, f32) {
 		let mut row = i;
 		let col = j;
 
@@ -184,7 +184,7 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	// Function: find SVC west
-	fn find_svc_west(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_west(&self, i: usize, j: usize) -> (f32, f32) {
 		let row = i;
 		let mut col = j;
 
@@ -203,7 +203,7 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	// Function: find SVC east
-	fn find_svc_east(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_east(&self, i: usize, j: usize) -> (f32, f32) {
 		let row = i;
 		let mut col = j;
 
@@ -222,7 +222,7 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	// Function: find SVC north west
-	fn find_svc_north_west(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_north_west(&self, i: usize, j: usize) -> (f32, f32) {
 		let mut row = i;
 		let mut col = j;
 
@@ -242,7 +242,7 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	// Function: find SVC north east
-	fn find_svc_north_east(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_north_east(&self, i: usize, j: usize) -> (f32, f32) {
 		let mut row = i;
 		let mut col = j;
 
@@ -262,7 +262,7 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	// Function: find SVC south east
-	fn find_svc_south_east(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_south_east(&self, i: usize, j: usize) -> (f32, f32) {
 		let mut row = i;
 		let mut col = j;
 
@@ -282,7 +282,7 @@ impl<'a> ModelConstructor<'a> {
 	}
 
 	// Function: find SVC south west
-	fn find_svc_south_west(&self, i: usize, j: usize) -> (f64, f64) {
+	fn find_svc_south_west(&self, i: usize, j: usize) -> (f32, f32) {
 		let mut row = i;
 		let mut col = j;
 
@@ -306,9 +306,9 @@ impl<'a> ModelConstructor<'a> {
 // Additional functions
 //
 
-fn calc_inverse_weighted_average(weighted_values: &[(f64, f64)]) -> f64 {
-	let mut res: f64 = 0.0;
-	let mut sum_weight: f64 = 0.0;
+fn calc_inverse_weighted_average(weighted_values: &[(f32, f32)]) -> f32 {
+	let mut res: f32 = 0.0;
+	let mut sum_weight: f32 = 0.0;
 
 	for weighted_value in weighted_values {
 		res += weighted_value.0 * weighted_value.1;
@@ -318,6 +318,6 @@ fn calc_inverse_weighted_average(weighted_values: &[(f64, f64)]) -> f64 {
 	res / sum_weight
 }
 
-fn calc_distance_between_cells(row0: usize, col0: usize, row1: usize, col1: usize) -> f64 {
-	f64::sqrt((row1 as f64 - row0 as f64).powi(2) + (col1 as f64 - col0 as f64).powi(2))
+fn calc_distance_between_cells(row0: usize, col0: usize, row1: usize, col1: usize) -> f32 {
+	f32::sqrt((row1 as f32 - row0 as f32).powi(2) + (col1 as f32 - col0 as f32).powi(2))
 }
