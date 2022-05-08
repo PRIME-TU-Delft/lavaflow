@@ -1,10 +1,27 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
+use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
 use super::level_curve_tree::LevelCurveTree;
-use super::constructor::ModelConstructor;
-use super::raster::Raster;
 use super::level_curves::LevelCurveSet;
+use super::raster::Raster;
+
+#[wasm_bindgen]
+pub struct OpenCVTree {
+	pixels_per_curve: Vec<Vec<(u64, u64)>>,
+	parent_relations: Vec<Option<usize>>,
+}
+
+#[wasm_bindgen]
+pub struct ModelGenerationSettings {
+	contour_margin: f32,
+	plane_length: f32,
+	plane_width: f32,
+	columns: usize,
+	rows: usize,
+	altitude_step: f32,
+	desired_dist: f32,
+}
 
 /// Supermethod that takes in an openCV tree and outputs an GTLF model.
 ///
@@ -22,16 +39,24 @@ use super::level_curves::LevelCurveSet;
 ///
 /// Ignoring clippy::too_many_arguments, since this will need to be called from in JS
 #[allow(clippy::too_many_arguments)]
-
-// Fuck, can't wasm_bindgen this because it uses a lifetime
-// #[wasm_bindgen]
-pub fn generate_3d_model<'a>( tree : &'a mut LevelCurveTree<'a>, contour_margin: f32, plane_length: f32, plane_width: f32, columns : usize, rows: usize, altitude_step : f32, desired_dist: f32) -> String {
+#[wasm_bindgen]
+pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> String {
+	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &open_cv_tree.parent_relations);
+	let ModelGenerationSettings {
+		contour_margin,
+		plane_length,
+		plane_width,
+		columns,
+		rows,
+		altitude_step,
+		desired_dist,
+	} = *settings;
 
 	// convert openCV tree to levelCurveMap (input for construction algorithm)
-	let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap( tree, altitude_step, desired_dist, 0);
+	let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0);
 
 	// create raster based on given params
-	let mut raster = Raster::new(plane_width/columns as f32, plane_length/rows as f32 , rows, columns );
+	let mut raster = Raster::new(plane_width / columns as f32, plane_length / rows as f32, rows, columns);
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
@@ -46,22 +71,26 @@ pub fn generate_3d_model<'a>( tree : &'a mut LevelCurveTree<'a>, contour_margin:
 	// every cell had 4 corners, becomes two triangles
 	let mut final_points: Vec<[f32; 3]> = Vec::new();
 	for x in 0..raster.rows {
-		for y in 0 ..raster.columns {
-		// triangle 1
-		//(0,0)
-		final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].unwrap()]);
-		//(0, 1)
-		final_points.push([columns as f32 * raster.column_width, ((rows - y) as f32 + 1.0) * raster.row_height, heights[x][y + 1].unwrap()]);
-		//(1, 1)
-		final_points.push([(columns as f32 + 1.0) * raster.column_width, ((rows - y) as f32 + 1.0) * raster.row_height, heights[x + 1][y + 1].unwrap()]);
+		for y in 0..raster.columns {
+			// triangle 1
+			//(0,0)
+			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].unwrap()]);
+			//(0, 1)
+			final_points.push([columns as f32 * raster.column_width, ((rows - y) as f32 + 1.0) * raster.row_height, heights[x][y + 1].unwrap()]);
+			//(1, 1)
+			final_points.push([
+				(columns as f32 + 1.0) * raster.column_width,
+				((rows - y) as f32 + 1.0) * raster.row_height,
+				heights[x + 1][y + 1].unwrap(),
+			]);
 
-		// triangle 2
-		//(0, 0)
-		final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].unwrap()]);
-		//(1, 0)
-		final_points.push([(columns as f32 + 1.0) * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x + 1][y].unwrap()]);
-		//(1, 1)
-		final_points.push([(columns as f32 + 1.0) * raster.column_width, ((rows - y) as f32 + 1.0) * raster.row_height, heights[x][y+ 1].unwrap()]);
+			// triangle 2
+			//(0, 0)
+			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].unwrap()]);
+			//(1, 0)
+			final_points.push([(columns as f32 + 1.0) * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x + 1][y].unwrap()]);
+			//(1, 1)
+			final_points.push([(columns as f32 + 1.0) * raster.column_width, ((rows - y) as f32 + 1.0) * raster.row_height, heights[x][y + 1].unwrap()]);
 		}
 	}
 

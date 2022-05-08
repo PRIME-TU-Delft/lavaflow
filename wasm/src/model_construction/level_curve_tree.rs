@@ -129,7 +129,6 @@ impl<'a> LevelCurveTree<'a> {
 	}
 }
 
-
 //
 // UNIT TESTS
 //
