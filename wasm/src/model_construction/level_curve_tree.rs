@@ -42,6 +42,8 @@ impl<'a> LevelCurveTree<'a> {
 	}
 
 	/// Private Dynamic constructor: From existing tree, with different index
+	// Note: not really according to Rust convention, though I guess it sorta makes sense in context? Might wanna change this later.
+	#[allow(clippy::wrong_self_convention)]
 	fn from_perspective_index(&self, index: usize) -> Self {
 		Self {
 			pixels_per_curve: self.pixels_per_curve,

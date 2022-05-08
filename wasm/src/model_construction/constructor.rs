@@ -10,7 +10,7 @@ pub struct ModelConstructor<'a> {
 }
 
 // TODO: implement once model is working
-fn local_tin(p: Vec<f32>) -> f32 {
+fn local_tin(_p: Vec<f32>) -> f32 {
 	todo!()
 }
 

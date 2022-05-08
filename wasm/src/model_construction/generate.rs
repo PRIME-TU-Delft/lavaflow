@@ -6,12 +6,22 @@ use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::LevelCurveSet;
 use super::raster::Raster;
 
+
+/// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
 pub struct OpenCVTree {
 	pixels_per_curve: Vec<Vec<(u64, u64)>>,
 	parent_relations: Vec<Option<usize>>,
 }
 
+/// Struct used to nicely package settings for the `generate_3d_model` function.
+/// - `contour_margin` - Margin that defines when a point is considered 'on' a contour line, high value results in more staircase-like appearance, low value might lead to innacurate result.
+/// NOTE: margin must be above max(raster height, column width) so long as local_tin() is not implemented
+/// - `plane_length`- y-axis measuremnt of the model to be generated
+/// - `plane_width` - x-axis measuremnt of the model to be generated
+/// - `columns` - desired number columns used for raster
+/// - `rows` - desired number rows used for raster
+/// - `altitude_step` - fixed increase in height per level curve
 #[wasm_bindgen]
 pub struct ModelGenerationSettings {
 	contour_margin: f32,
@@ -24,23 +34,10 @@ pub struct ModelGenerationSettings {
 }
 
 /// Supermethod that takes in an openCV tree and outputs an GTLF model.
-///
-/// # Arguments
-///
-/// * `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
-/// * `contour_margin` - Margin that defines when a point is considered 'on' a contour line, high value results in more staircase-like appearance, low value might lead to innacurate result.
-/// NOTE: margin must be above max(raster height, column width) so long as local_tin() is not implemented
-/// * `plane_length`- y-axis measuremnt of the model to be generated
-/// * `plane_width` - x-axis measuremnt of the model to be generated
-/// * `columns` - desired number columns used for raster
-/// * `rows` - desired number rows used for raster
-/// * `altitude_step` - fixed increase in height per level curve
-///
-///
-/// Ignoring clippy::too_many_arguments, since this will need to be called from in JS
-#[allow(clippy::too_many_arguments)]
+/// - `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
 #[wasm_bindgen]
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> String {
+	// Unpack function argument structs & build OpenCV tree struct
 	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &open_cv_tree.parent_relations);
 	let ModelGenerationSettings {
 		contour_margin,
