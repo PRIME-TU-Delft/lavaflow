@@ -206,16 +206,18 @@ impl LevelCurveSet {
 
 	///
 	/// Shifts all points in level curve set such that the set is aligned with the x and y axis.
-	///
+	/// Not exactly aligned, distance to keep from axis can be specified.
+	///  
 	/// # Arguments
 	///
 	/// * `min` - point with the minimal occurring x and y values
-	///
-	pub fn align_with_origin(&mut self, min: &Point ){
+	/// * `border_x` - distance to keep model from x axis 
+	/// * `border_y` - distance to keep model from x axis 
+	pub fn align_with_origin(&mut self, min: &Point, border_x : f32, border_y : f32 ){
 		for  curve in &mut self.level_curves{
 			for  p in &mut curve.points{
-				p.x =- min.x;
-				p.y =- min.y;
+				p.x = p.x - min.x + border_x;
+				p.y = p.y - min.y + border_y;
 			}
 		}
 	}
