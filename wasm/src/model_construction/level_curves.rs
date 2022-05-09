@@ -19,6 +19,12 @@ impl LevelCurve {
 		self.points.push(a);
 	}
 
+	pub fn add_all_points(&mut self, xs: Vec<Point>) {
+		for p in xs {
+			self.points.push(p);
+		}
+	}
+
 	pub fn get_points(&self) -> &Vec<Point> {
 		&self.points
 	}
