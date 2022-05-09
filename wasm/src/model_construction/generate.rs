@@ -49,14 +49,14 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let (min, max) = level_curve_map.get_bounding_points();
 
 	//to keep border of 10% of each axis around model
-	let border_x = 0.1 * (max.x - min.x) ;
-	let border_y = 0.1 * (max.y - min.y) ;
+	let border_x = 0.1 * (max.x - min.x);
+	let border_y = 0.1 * (max.y - min.y);
 
 	//ensure none of the level curve points have negative coordinates
 	level_curve_map.align_with_origin(&min, border_x, border_y);
 
 	//create raster based on level curve model and desired rows and columns
-	let mut raster = Raster::new((max.x - min.x) + border_x  , (max.y - min.y) + border_y, rows, columns );
+	let mut raster = Raster::new((max.x - min.x) + border_x, (max.y - min.y) + border_y, rows, columns);
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);

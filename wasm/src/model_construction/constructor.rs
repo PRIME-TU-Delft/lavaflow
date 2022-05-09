@@ -45,7 +45,6 @@ impl<'a> ModelConstructor<'a> {
 		for i in 0..x {
 			for j in 0..y {
 				if self.check_svc(i, j) {
-					
 					// if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
 					if self.raster.altitudes[i][j].is_none() {
 						// local_tin(cellCentre)
@@ -71,7 +70,6 @@ impl<'a> ModelConstructor<'a> {
 					// Set this box to an svc-box
 					self.is_svc[i][j] = true;
 				}
-				
 			}
 		}
 	}
@@ -118,7 +116,6 @@ impl<'a> ModelConstructor<'a> {
 
 		match optional {
 			Some(p) =>
-
 			// check closest point is outside of cell
 			{
 				if p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width {
