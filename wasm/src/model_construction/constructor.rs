@@ -45,6 +45,7 @@ impl<'a> ModelConstructor<'a> {
 		for i in 0..x {
 			for j in 0..y {
 				if self.check_svc(i, j) {
+					
 					// if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
 					if self.raster.altitudes[i][j].is_none() {
 						// local_tin(cellCentre)
@@ -70,14 +71,6 @@ impl<'a> ModelConstructor<'a> {
 					// Set this box to an svc-box
 					self.is_svc[i][j] = true;
 				}
-
-				//prints to check if raster is correct
-				println!("i = {i} , j = {j}, is edge : {}", self.raster.get(i, j).is_some() );
-				if self.raster.get(i, j).is_some() != self.is_svc[i][j] {
-					panic!("bad")
-				}
-
-
 				
 			}
 		}
@@ -125,28 +118,21 @@ impl<'a> ModelConstructor<'a> {
 
 		match optional {
 			Some(p) =>
-			// todo, check row_height etc is correct
 
 			// check closest point is outside of cell
 			{
 				if p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width {
-					println!("POINT : X = {row} , Y = {col} IS NOT SVC");
-					// println!("\t corner : x = {a} , y = {b} ", a = &corner.x , b = &corner.y);
-					// println!("\t center : x = {a} , y = {b} ", a = &center.x , b = &center.y);
-					// println!("\t      p : x = {a} , y = {b}, z =  {c}", a = &p.x , b = &p.y, c = &p.z);
 					false
 				}
 				// check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line
 				else if (center.x - p.x).abs() < self.contour_margin && (center.y - p.y).abs() < self.contour_margin {
 					self.is_svc[row][col] = true;
 					self.raster.altitudes[row][col] = Some(p.z);
-					println!("SETTING POINT : X = {row} , Y = {col}, TO {a}", a = p.z );
 					true
 				}
 				// if center of cell is not in distance [contour margin], its height must be interpolated
 				else {
 					self.is_svc[row][col] = true;
-					println!("POINT : X = {row} , Y = {col}, i svc but will be determined with TIN" );
 					true
 				}
 			}

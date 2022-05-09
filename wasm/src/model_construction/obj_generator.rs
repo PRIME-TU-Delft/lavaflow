@@ -8,12 +8,13 @@ use model_construction::constructor::ModelConstructor;
 
 use std::fs::File;
 use std::io::Write;
+///
+/// Makes an obj out of a hardcoded level curve map. Only for debugging purposes.
+///
+pub fn make_obj() {
 
-
-pub fn main() {
-
-    let row_no: usize = 30;
-    let col_no: usize = 30;
+    let row_no: usize = 20;
+    let col_no: usize = 20;
     let contour_margin = 1000.0;
     let file_name = "output.obj";
 
@@ -57,72 +58,65 @@ pub fn main() {
     level_curve_map.add_level_curve(level_curve_3);
     level_curve_map.add_level_curve(level_curve_4);
 
-    
-        //create raster based on given params
         
+
         //find max and min x and y in level curve model
         let max = level_curve_map.get_bounding_points().1;
-
+        
+        //create raster based on given params
         let mut raster = Raster::new(max.x, max.y, row_no, col_no );
 
-        //create new modelConstructor (module containing 3D-model construction algorithm)
+        //create new modelConstructor (maodule containing 3D-model construction algorithm)
         let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
 
         //determine heights
-        print!("starting construction");
         model_constructor.construct();
 
         //get heights from raster
         let heights = &raster.altitudes;
-   
-        // println!("{}", x);
+
            
-       let mut file = File::create(file_name).unwrap();
-       let mut verts: String = String::new();
-       let mut faces: String = String::new();
+        let mut file = File::create(file_name).unwrap();
+        let mut verts: String = String::new();
+        let mut faces: String = String::new();
         let columns = col_no;
         let rows = col_no;
 
+       // OBJ GENERATION
+       //VERTEX LINE:  v x y z
+       //FACE TRIANGLE: f [v1] [v2] [v3]
 
-       //v x y z
-       // f [list of indexes of vertices that are joined by face]
        let mut v = 1;
-   
+
        for x in 0..raster.rows - 1{
+
            for y in 0 ..raster.columns -1 {
                let a = columns  as f32 * raster.column_width;
-
-              // println!("{}", heights[x][y].unwrap() );
                //(0, 0)
-               verts.push_str (&format!("v {a}.0 {b}.0 {c}.0 \n", a = (x  as f32  ) * raster.column_width ,
-                                                                b = ((rows - y) as f32 ) * raster.row_height,
-                                                                c = heights[x][y].unwrap()));
-   
+               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x  as f32  ) * raster.column_width ,
+                                                                b = - ((rows - y) as f32 ) * raster.row_height,
+                                                                c = heights[x][y + 1].unwrap()));
                //(0, 1)
-               verts.push_str (&format!("v {a}.0 {b}.0 {c}.0 \n", a = (x as f32  ) * raster.column_width ,
-                                                                       b = ((rows - y) as f32 + 1.0) * raster.row_height,
-                                                                       c = heights[x][y + 1].unwrap()));
+               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32  ) * raster.column_width ,
+                                                                       b = - ((rows - y) as f32 + 1.0) * raster.row_height,
+                                                                       c = heights[x][y ].unwrap()));
                //(1, 0)
-               verts.push_str (&format!("v {a}.0 {b}.0 {c}.0 \n", a = (x as f32 + 1.0 ) * raster.column_width ,
-                                                                       b = ((rows - y) as f32) * raster.row_height,
-                                                                       c = heights[x + 1][y].unwrap()));
+               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32 + 1.0 ) * raster.column_width ,
+                                                                       b = - ((rows - y) as f32) * raster.row_height,
+                                                                       c = heights[x + 1][y + 1].unwrap()));
                //(1, 1)
-               verts.push_str (&format!("v {a}.0 {b}.0 {c}.0 \n", a =( x as f32 + 1.0 ) * raster.column_width ,
-                                                                           b = ((rows - y) as f32 + 1.0) * raster.row_height,
-                                                                           c = heights[x+ 1][y+ 1].unwrap()));
-   
+               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0  \n", a =( x as f32 + 1.0 ) * raster.column_width ,
+                                                                           b = - ((rows - y) as f32 + 1.0) * raster.row_height,
+                                                                           c = heights[x+ 1][y].unwrap())); 
+     
                //t1 : (0,0) , (0, 1), (1, 1)
-               faces.push_str (&format!("f {a} {b} {c} \n", a = v, b= v+1, c = v + 3 ));
+               faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 1, c = v + 3 ));
                //t2 : (0,0) , (1, 0), (1, 1)
-               faces.push_str (&format!("f {a} {b} {c} \n", a = v, b= v+2, c = v + 3 ));
+               faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 2, c = v + 3 ));  
    
                v = v + 4;
            } 
        }
-   
-       // for x in (1..10).step_by(2) {
-       //     println!("{}", x);
-       // }
    
        verts.push_str(&faces);
        file.write_all(verts.as_bytes());
