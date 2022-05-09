@@ -13,7 +13,7 @@ use super::raster::Raster;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct OpenCVTree {
 	pixels_per_curve: Vec<Vec<(u64, u64)>>,
-	parent_relations: Vec<Option<usize>>,
+	parent_relations: Vec<isize>,
 }
 
 #[wasm_bindgen]
@@ -73,7 +73,13 @@ impl ModelGenerationSettings {
 #[wasm_bindgen]
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> Result<String, JsValue> {
 	// Unpack function argument structs & build OpenCV tree struct
-	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &open_cv_tree.parent_relations);
+	let parent_relations = open_cv_tree.parent_relations.iter().map(|r| {
+		match r {
+			-1 => None,
+			_ => Some(*r as usize)
+		}
+	}).collect();
+	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &parent_relations);
 	let ModelGenerationSettings {
 		contour_margin,
 		plane_length,
