@@ -45,6 +45,7 @@ impl<'a> ModelConstructor<'a> {
 		for i in 0..x {
 			for j in 0..y {
 				if self.check_svc(i, j) {
+					
 					// if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
 					if self.raster.altitudes[i][j].is_none() {
 						// local_tin(cellCentre)
@@ -70,6 +71,7 @@ impl<'a> ModelConstructor<'a> {
 					// Set this box to an svc-box
 					self.is_svc[i][j] = true;
 				}
+				
 			}
 		}
 	}
@@ -98,6 +100,7 @@ impl<'a> ModelConstructor<'a> {
 
 	fn check_svc(&mut self, row: usize, col: usize) -> bool {
 		// TODO z point is now "0" but doesnt really exist
+
 		// define which points are corner and center of current cell
 		let corner: Point = Point {
 			x: (row as f32) * self.raster.row_height,
@@ -105,8 +108,8 @@ impl<'a> ModelConstructor<'a> {
 			z: 0.0,
 		};
 		let center: Point = Point {
-			x: (row as f32) + 0.5 * self.raster.row_height,
-			y: (col as f32) + 0.5 * self.raster.column_width,
+			x: ((row as f32) + 0.5) * self.raster.row_height,
+			y: ((col as f32) + 0.5) * self.raster.column_width,
 			z: 0.0,
 		};
 
@@ -115,7 +118,6 @@ impl<'a> ModelConstructor<'a> {
 
 		match optional {
 			Some(p) =>
-			// todo, check row_height etc is correct
 
 			// check closest point is outside of cell
 			{
