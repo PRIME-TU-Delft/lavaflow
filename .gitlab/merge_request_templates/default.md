@@ -10,5 +10,4 @@ fix #(link to number of issue)
 
 Are there any bugs in the code
 
-/milestone %"Sprint [NAME]"
 /assign @Abel @jonasvanmarrew @svanderkris @rcmdur @phengst

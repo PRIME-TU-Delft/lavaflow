@@ -1,0 +1,32 @@
+/* Write your global styles here, in SCSS syntax. Variables and mixins from the src/variables.scss file are available here without importing */
+:root {
+	--primary-color: rgb(225 95 85 / 90%);
+	--secondary-color: rgb(144 53 44 / 90%);
+	--text-color: rgba(94,14,14,100%);
+	--text-color-secondary: rgb(230 223 223);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow-x:hidden;
+}
+
+body {
+	background: #1a1717;
+	color: white;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+a {
+	color: var(--text-color);
+	text-decoration: none;
+}

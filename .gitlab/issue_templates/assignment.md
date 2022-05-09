@@ -26,5 +26,4 @@ Deadline for assignment[#] is [DATE (dd-MM hh-mm)]
 - [ ] writing sections for Rens
 
 /estimate 20h
-/label ~assignment ~backlog
-/milestone %"Sprint next"
+/label ~assignment ~backlog ~"Sprint::next"

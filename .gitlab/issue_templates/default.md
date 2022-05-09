@@ -16,5 +16,4 @@
 - (images)
 - (or other references that inspired this feature)
 
-/label ~Feature ~Backlog
-/milestone %%"Sprint next"
+/label ~Feature ~Backlog ~"Sprint::next"
