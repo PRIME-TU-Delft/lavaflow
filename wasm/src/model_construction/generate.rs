@@ -1,4 +1,6 @@
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::JsValue;
 
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
@@ -8,9 +10,22 @@ use super::raster::Raster;
 
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct OpenCVTree {
 	pixels_per_curve: Vec<Vec<(u64, u64)>>,
 	parent_relations: Vec<Option<usize>>,
+}
+
+#[wasm_bindgen]
+impl OpenCVTree {
+	#[wasm_bindgen(constructor)]
+	pub fn new(val: JsValue) -> Result<OpenCVTree, JsValue> {
+		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
+	}
+
+	pub fn debug(&self) -> String {
+		format!("{self:?}")
+	}
 }
 
 /// Struct used to nicely package settings for the `generate_3d_model` function.
@@ -22,20 +37,41 @@ pub struct OpenCVTree {
 /// - `rows` - desired number rows used for raster
 /// - `altitude_step` - fixed increase in height per level curve
 #[wasm_bindgen]
+#[derive(Debug)]
 pub struct ModelGenerationSettings {
-	contour_margin: f32,
-	plane_length: f32,
-	plane_width: f32,
-	columns: usize,
-	rows: usize,
-	altitude_step: f32,
-	desired_dist: f32,
+	pub contour_margin: f32,
+	pub plane_length: f32,
+	pub plane_width: f32,
+	pub columns: usize,
+	pub rows: usize,
+	pub altitude_step: f32,
+	pub desired_dist: f32,
+}
+
+#[wasm_bindgen]
+impl ModelGenerationSettings {
+	#[wasm_bindgen(constructor)]
+	pub fn new(contour_margin: f32, plane_length: f32, plane_width: f32, columns: usize, rows: usize, altitude_step: f32, desired_dist: f32) -> Self {
+		Self {
+			contour_margin,
+			plane_length,
+			plane_width,
+			columns,
+			rows,
+			altitude_step,
+			desired_dist,
+		}
+	}
+
+	pub fn debug(&self) -> String {
+		format!("{self:?}")
+	}
 }
 
 /// Supermethod that takes in an openCV tree and outputs an GTLF model.
 /// - `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
 #[wasm_bindgen]
-pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> String {
+pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> Result<String, JsValue> {
 	// Unpack function argument structs & build OpenCV tree struct
 	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &open_cv_tree.parent_relations);
 	let ModelGenerationSettings {
@@ -70,25 +106,37 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		for y in 0..raster.columns {
 			// triangle 1
 			//(0,0)
-			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].unwrap()]);
+			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].ok_or("Invalid input")?]);
 			//(0, 1)
-			final_points.push([columns as f32 * raster.column_width, ((rows - y) as f32 + 1.0) * raster.row_height, heights[x][y + 1].unwrap()]);
+			final_points.push([
+				columns as f32 * raster.column_width,
+				((rows - y) as f32 + 1.0) * raster.row_height,
+				heights[x][y + 1].ok_or("Invalid input")?,
+			]);
 			//(1, 1)
 			final_points.push([
 				(columns as f32 + 1.0) * raster.column_width,
 				((rows - y) as f32 + 1.0) * raster.row_height,
-				heights[x + 1][y + 1].unwrap(),
+				heights[x + 1][y + 1].ok_or("Invalid input")?,
 			]);
 
 			// triangle 2
 			//(0, 0)
-			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].unwrap()]);
+			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].ok_or("Invalid input")?]);
 			//(1, 0)
-			final_points.push([(columns as f32 + 1.0) * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x + 1][y].unwrap()]);
+			final_points.push([
+				(columns as f32 + 1.0) * raster.column_width,
+				(rows - y) as f32 * raster.row_height,
+				heights[x + 1][y].ok_or("Invalid input")?,
+			]);
 			//(1, 1)
-			final_points.push([(columns as f32 + 1.0) * raster.column_width, ((rows - y) as f32 + 1.0) * raster.row_height, heights[x][y + 1].unwrap()]);
+			final_points.push([
+				(columns as f32 + 1.0) * raster.column_width,
+				((rows - y) as f32 + 1.0) * raster.row_height,
+				heights[x][y + 1].ok_or("Invalid input")?,
+			]);
 		}
 	}
 
-	generate_gltf(final_points)
+	generate_gltf(final_points).map_err(JsValue::from)
 }
