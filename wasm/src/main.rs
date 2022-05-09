@@ -12,9 +12,10 @@ use std::io::Write;
 
 pub fn main() {
 
-    let raster_size = 30.0;
+    let raster_size = 850.0;
     let row_no: usize = 30;
     let col_no: usize = 30;
+    let contour_margin = 18000.0;
     let file_name = "output.obj";
 
 
@@ -57,13 +58,16 @@ pub fn main() {
     level_curve_map.add_level_curve(level_curve_3);
     level_curve_map.add_level_curve(level_curve_4);
 
-
+    
         //create raster based on given params
         
+        //find max and min x and y in level curve model
+        
+
         let mut raster = Raster::new(raster_size, raster_size, row_no, col_no );
 
         //create new modelConstructor (module containing 3D-model construction algorithm)
-        let mut model_constructor = ModelConstructor::new(&mut raster, 100.0, &level_curve_map);
+        let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
 
         //determine heights
         print!("starting construction");
@@ -79,6 +83,8 @@ pub fn main() {
        let mut faces: String = String::new();
         let columns = col_no;
         let rows = col_no;
+
+
        //v x y z
        // f [list of indexes of vertices that are joined by face]
        let mut v = 1;

@@ -115,8 +115,8 @@ impl<'a> ModelConstructor<'a> {
 			z: 0.0,
 		};
 		let center: Point = Point {
-			x: (row as f32) + 0.5 * self.raster.row_height,
-			y: (col as f32) + 0.5 * self.raster.column_width,
+			x: ((row as f32) + 0.5) * self.raster.row_height,
+			y: ((col as f32) + 0.5) * self.raster.column_width,
 			z: 0.0,
 		};
 
