@@ -209,9 +209,9 @@ impl LevelCurveSet {
 	///
 	/// # Arguments
 	///
-	/// * `min` - point with the minimul occurring x and y values
+	/// * `min` - point with the minimal occurring x and y values
 	///
-	pub fn align_with_origin(&mut self, min: Point ){
+	pub fn align_with_origin(&mut self, min: &Point ){
 		for  curve in &mut self.level_curves{
 			for  p in &mut curve.points{
 				p.x =- min.x;

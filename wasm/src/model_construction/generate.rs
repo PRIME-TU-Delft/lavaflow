@@ -43,13 +43,16 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	} = *settings;
 
 	// convert openCV tree to levelCurveMap (input for construction algorithm)
-	let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0);
+	let mut level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0);
 
-	//find maxum cooridinates in level curve model
-	let max = level_curve_map.get_bounding_points().1;
-    
-	//create raster based on level curve model and desired rows and columns
-	let mut raster = Raster::new(max.x, max.y, rows, columns );
+	//find maximum and minimum cooridinates in level curve set
+	let (max, min) = level_curve_map.get_bounding_points();
+
+	//ensure none of the points in level curve map have negative coordinates
+	level_curve_map.align_with_origin(&min);
+
+	//create raster based on level curve model and desired number of rows and columns
+	let mut raster = Raster::new(max.x - min.x  , max.y - min.x, rows, columns );
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
