@@ -103,18 +103,10 @@ impl LevelCurveSet {
 		let mut max = Point{x : 0.0, y: 0.0, z : 0.0};
 		for curve in &self.level_curves {
 			for point in &curve.points {
-				if(point.x < min.x){
-					min.x = point.x;
-				}
-				if(point.y < min.y){
-					min.y = point.y;
-				}
-				if(point.x > max.x){
-					max.x = point.x;
-				}
-				if(point.y > max.y){
-					max.y = point.y;
-				}
+				min.x = f32::min(min.x, point.x);
+				min.y = f32::min(min.y, point.y);
+				max.x = f32::max(max.x, point.x);
+				max.y = f32::max(max.y, point.y);
 			}
 		}
 		(min, max)
