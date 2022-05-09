@@ -66,6 +66,7 @@ pub fn main() {
         let mut model_constructor = ModelConstructor::new(&mut raster, 100.0, &level_curve_map);
 
         //determine heights
+        print!("starting construction");
         model_constructor.construct();
 
         //get heights from raster
@@ -86,7 +87,7 @@ pub fn main() {
            for y in 0 ..raster.columns -1 {
                let a = columns  as f32 * raster.column_width;
 
-               println!("{}", heights[x][y].unwrap() );
+              // println!("{}", heights[x][y].unwrap() );
                //(0, 0)
                verts.push_str (&format!("v {a}.0 {b}.0 {c}.0 \n", a = (x  as f32  ) * raster.column_width ,
                                                                 b = ((rows - y) as f32 ) * raster.row_height,

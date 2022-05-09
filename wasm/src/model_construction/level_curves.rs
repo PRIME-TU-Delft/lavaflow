@@ -20,7 +20,8 @@ impl LevelCurve {
 	}
 
 	pub fn add_all_points(&mut self, xs: Vec<Point>) {
-		for p in xs {
+		for mut p in xs {
+			p.z = self.altitude;
 			self.points.push(p);
 		}
 	}
