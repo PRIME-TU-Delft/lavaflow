@@ -1,9 +1,7 @@
-image: rust:1.60
-
-
 # TODO: add a step that compiles for wasm target?
 # TODO: caching dependencies doesn't work for some reason??
 wasm-build:
+  image: rust:1.60
   script:
     - cd wasm
     - cargo build
@@ -16,6 +14,7 @@ wasm-build:
 
 
 wasm-rustfmt:
+  image: rust:1.60
   script:
     - cd wasm
     - rustup component add rustfmt
@@ -24,6 +23,7 @@ wasm-rustfmt:
 
 
 wasm-clippy:
+  image: rust:1.60
   # needs: [wasm-build]
   script:
     - cd wasm
@@ -39,6 +39,7 @@ wasm-clippy:
 
 
 wasm-test:
+  image: rust:1.60
   # needs: [wasm-build]
   script:
     - wget -qO- https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-gnu.tgz | tar -xz -C /usr/bin
