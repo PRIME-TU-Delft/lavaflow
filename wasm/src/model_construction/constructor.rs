@@ -131,9 +131,9 @@ impl<'a> ModelConstructor<'a> {
 			{
 				if p.x < corner.x || p.x > corner.x + self.raster.row_height || p.y < corner.y || p.y > corner.y + self.raster.column_width {
 					println!("POINT : X = {row} , Y = {col} IS NOT SVC");
-					println!("\t corner : x = {a} , y = {b} ", a = &corner.x , b = &corner.y);
-					println!("\t center : x = {a} , y = {b} ", a = &center.x , b = &center.y);
-					println!("\t      p : x = {a} , y = {b}, z =  {c}", a = &p.x , b = &p.y, c = &p.z);
+					// println!("\t corner : x = {a} , y = {b} ", a = &corner.x , b = &corner.y);
+					// println!("\t center : x = {a} , y = {b} ", a = &center.x , b = &center.y);
+					// println!("\t      p : x = {a} , y = {b}, z =  {c}", a = &p.x , b = &p.y, c = &p.z);
 					false
 				}
 				// check if center of cell is within distance [contour margin] of closest contour point, if it is we consider it 'exactly' on the contour line

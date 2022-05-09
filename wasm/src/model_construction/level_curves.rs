@@ -96,6 +96,30 @@ impl LevelCurveSet {
 		&self.level_curves
 	}
 
+	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
+	// for the puropose of genererating a raster to cover whole area of levelcurves
+	pub fn get_bounding_points(&self) -> (Point, Point){
+		let mut min = Point{x : std::f32::MAX , y:std::f32::MAX, z : 0.0};
+		let mut max = Point{x : 0.0, y: 0.0, z : 0.0};
+		for curve in &self.level_curves {
+			for point in &curve.points {
+				if(point.x < min.x){
+					min.x = point.x;
+				}
+				if(point.y < min.y){
+					min.y = point.y;
+				}
+				if(point.x > max.x){
+					max.x = point.x;
+				}
+				if(point.y > max.y){
+					max.y = point.y;
+				}
+			}
+		}
+		(min, max)
+	}
+
 	// Finding the closest point on any level curve that's stored in this map
 	pub fn find_closest_point_on_level_curve(&self, a: &Point) -> Option<&Point> {
 		// If this map doesn't contain any level-curves, return None

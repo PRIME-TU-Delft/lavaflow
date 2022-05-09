@@ -12,10 +12,9 @@ use std::io::Write;
 
 pub fn main() {
 
-    let raster_size = 850.0;
     let row_no: usize = 30;
     let col_no: usize = 30;
-    let contour_margin = 18000.0;
+    let contour_margin = 1000.0;
     let file_name = "output.obj";
 
 
@@ -62,9 +61,9 @@ pub fn main() {
         //create raster based on given params
         
         //find max and min x and y in level curve model
-        
+        let max = level_curve_map.get_bounding_points().1;
 
-        let mut raster = Raster::new(raster_size, raster_size, row_no, col_no );
+        let mut raster = Raster::new(max.x, max.y, row_no, col_no );
 
         //create new modelConstructor (module containing 3D-model construction algorithm)
         let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
