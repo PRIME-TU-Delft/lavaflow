@@ -5,7 +5,7 @@ use crate::utils::log;
 
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
-use super::level_curve_tree::LevelCurveTree;
+// use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
 use super::raster::Raster;
@@ -69,25 +69,30 @@ impl ModelGenerationSettings {
 #[wasm_bindgen]
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> Result<String, JsValue> {
 
+	log!("The provided open_cv_tree: {:?}", open_cv_tree);
+	log!("The provided settings: {:?}", settings);
+
+	log!("Running generation algorithm");
+
 	crate::utils::set_panic_hook();
 
 	// Unpack function argument structs & build OpenCV tree struct
-	let parent_relations = open_cv_tree
-		.parent_relations
-		.iter()
-		.map(|r| match r {
-			-1 => None,
-			_ => Some(*r as usize),
-		})
-		.collect();
-	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &parent_relations);
-	let ModelGenerationSettings {
-		mut contour_margin,
-		mut columns,
-		mut rows,
-		mut altitude_step,
-		mut desired_dist,
-	} = *settings;
+	// let parent_relations = open_cv_tree
+	// 	.parent_relations
+	// 	.iter()
+	// 	.map(|r| match r {
+	// 		-1 => None,
+	// 		_ => Some(*r as usize),
+	// 	})
+	// 	.collect();
+	// let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &parent_relations);
+	// let ModelGenerationSettings {
+	// 	mut contour_margin,
+	// 	mut columns,
+	// 	mut rows,
+	// 	mut altitude_step,
+	// 	mut desired_dist,
+	// } = *settings;
 
 	// log!("The tree: {:?}", tree);
 
@@ -99,9 +104,9 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// DEBUGGING START
 	// 
 
-	rows = 30;
-    columns = 30;
-    contour_margin = 12.0;
+	let rows = 30;
+    let columns = 30;
+    let contour_margin = 12.0;
     //let file_name = "output.gltf";
 
 
@@ -192,7 +197,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	for x in 0..raster.columns - 1 {
 
 		for y in 0..raster.rows - 1 {
-			let a = raster.columns  as f32 * raster.column_width;
+			// let a = raster.columns  as f32 * raster.column_width;
 			//(0, 0)
 			// verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x  as f32  ) * raster.column_width ,
 			// 												 b = - ((rows - y) as f32 ) * raster.row_height,
