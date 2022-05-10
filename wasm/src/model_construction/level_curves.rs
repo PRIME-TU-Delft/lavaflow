@@ -1,5 +1,7 @@
 use miette::{miette, Result};
 
+use crate::utils::log;
+
 //
 // Class: LevelCurves
 //
@@ -122,6 +124,7 @@ impl LevelCurveSet {
 	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
 	// for the puropose of genererating a raster to cover whole area of levelcurves
 	pub fn get_bounding_points(&self) -> (Point, Point) {
+
 		let mut min = Point {
 			x: std::f32::MAX,
 			y: std::f32::MAX,
@@ -198,7 +201,7 @@ impl LevelCurveSet {
 			];
 			for (x, y) in neighbors {
 				// TODO: check how this holds for corner cases
-				if (x, y) != current_pixel && (x, y) != last_visited && tree.contains_pixel(x, y) {
+				if /*(x, y) != current_pixel &&*/ (x, y) != last_visited && tree.contains_pixel(x, y) {
 					// if dist to last saved and current pixel is desired length, save current pixel, else move on
 					if pixel_dist(&(x, y), &last_saved) >= desired_dist {
 						current_level_curve.add_point(Point {
@@ -208,9 +211,10 @@ impl LevelCurveSet {
 						});
 						last_saved = (x, y);
 					}
-
+				
 					last_visited = current_pixel;
 					current_pixel = (x, y);
+	
 				}
 			}
 			if current_pixel == first_pixel {
@@ -218,7 +222,13 @@ impl LevelCurveSet {
 			}
 		}
 
+		// Add this level curve to the result
+		ret.add_level_curve(current_level_curve);
+
 		// for every child get levelcurvemap and add to ret
+		if tree.get_children().is_empty() {
+			return Ok(ret);
+		}
 
 		for mut child in tree.get_children() {
 			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);

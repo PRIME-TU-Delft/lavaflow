@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
+use crate::utils::log;
 
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
@@ -66,6 +67,9 @@ impl ModelGenerationSettings {
 /// - `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
 #[wasm_bindgen]
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> Result<String, JsValue> {
+
+	crate::utils::set_panic_hook();
+
 	// Unpack function argument structs & build OpenCV tree struct
 	let parent_relations = open_cv_tree
 		.parent_relations
@@ -84,8 +88,12 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		desired_dist,
 	} = *settings;
 
+	log!("The tree: {:?}", tree);
+
 	// convert openCV tree to levelCurveMap (input for construction algorithm)
-	let mut level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0).map_err(|_| String::from("Could not transform LevelCurveMap"))?;
+	let mut level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 1).map_err(|_| String::from("Could not transform LevelCurveMap"))?;
+
+	log!("The level_curve_map: {:?}", level_curve_map);
 
 	//find maximum and minimum cooridinates in level curve model
 	let (min, max) = level_curve_map.get_bounding_points();
@@ -99,6 +107,8 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	//find maxum cooridinates in level curve model
 	let max = level_curve_map.get_bounding_points().1;
+
+	log!("The configured height is: {}", (max.y - min.y) + border_y);
 
 	//create raster based on level curve model and desired rows and columns
 	let mut raster = Raster::new((max.x - min.x) + border_x, (max.y - min.y) + border_y, rows, columns);
@@ -120,5 +130,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		}
 	}
 
-	generate_gltf(final_points).map_err(JsValue::from)
+	// generate_gltf(final_points).map_err(JsValue::from)
+	// Ok(format!("{:?}", final_points))
+	Ok(format!(""))
 }

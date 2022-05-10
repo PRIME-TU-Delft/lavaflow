@@ -6,6 +6,7 @@
 // This includes information that could be required by other algorithms.
 //
 
+#[derive(Debug)]
 pub struct LevelCurveTree<'a> {
 	pixels_per_curve: &'a Vec<Vec<(u64, u64)>>,
 	parent_relations: &'a Vec<Option<usize>>,
@@ -118,7 +119,7 @@ impl<'a> LevelCurveTree<'a> {
 	/// Method: Check whether a certain point is in the set
 	pub fn contains_pixel(&self, x: u64, y: u64) -> bool {
 		for p in &self.pixels_per_curve[self.own_index] {
-			if p == &(x, y) {
+			if p.0 == x && p.1 == y {
 				return true;
 			}
 		}
