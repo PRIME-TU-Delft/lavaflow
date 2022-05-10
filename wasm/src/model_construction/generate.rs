@@ -73,12 +73,14 @@ impl ModelGenerationSettings {
 #[wasm_bindgen]
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> Result<String, JsValue> {
 	// Unpack function argument structs & build OpenCV tree struct
-	let parent_relations = open_cv_tree.parent_relations.iter().map(|r| {
-		match r {
+	let parent_relations = open_cv_tree
+		.parent_relations
+		.iter()
+		.map(|r| match r {
 			-1 => None,
-			_ => Some(*r as usize)
-		}
-	}).collect();
+			_ => Some(*r as usize),
+		})
+		.collect();
 	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &parent_relations);
 	let ModelGenerationSettings {
 		contour_margin,
@@ -91,7 +93,9 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	} = *settings;
 
 	// convert openCV tree to levelCurveMap (input for construction algorithm)
-	let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0).map_err(|_| String::from("Could not transform LevelCurveMap"))?;
+	let level_curve_map = LevelCurveSet::new(altitude_step)
+		.transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0)
+		.map_err(|_| String::from("Could not transform LevelCurveMap"))?;
 
 	// create raster based on given params
 	let mut raster = Raster::new(plane_width / columns as f32, plane_length / rows as f32, rows, columns);

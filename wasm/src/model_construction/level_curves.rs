@@ -1,4 +1,4 @@
-use miette::{Result, miette};
+use miette::{miette, Result};
 
 //
 // Class: LevelCurves

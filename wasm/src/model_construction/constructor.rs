@@ -1,4 +1,4 @@
-use miette::{Result, miette};
+use miette::{miette, Result};
 
 use super::point::Point;
 use super::{level_curves::LevelCurveSet, raster::Raster};
@@ -156,7 +156,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_north"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_north"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
@@ -174,7 +177,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_south"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_south"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
@@ -192,7 +198,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_west"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_west"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
@@ -210,7 +219,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_east"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_east"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
@@ -228,7 +240,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_north_west"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_north_west"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
@@ -247,7 +262,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_north_east"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_north_east"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
@@ -266,7 +284,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_south_east"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_south_east"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
@@ -285,7 +306,10 @@ impl<'a> ModelConstructor<'a> {
 		while row < self.raster.rows && col < self.raster.columns {
 			// If this box is svc, return its position
 			if self.is_svc[row][col] {
-				return Ok((self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_south_west"))?, calc_distance_between_cells(i, j, row, col)));
+				return Ok((
+					self.raster.get(row, col).ok_or(miette!("Error trying to get a cell in find_svc_south_west"))?,
+					calc_distance_between_cells(i, j, row, col),
+				));
 			}
 
 			// Walk one step further
