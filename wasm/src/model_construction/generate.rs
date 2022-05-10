@@ -31,8 +31,6 @@ impl OpenCVTree {
 /// Struct used to nicely package settings for the `generate_3d_model` function.
 /// - `contour_margin` - Margin that defines when a point is considered 'on' a contour line, high value results in more staircase-like appearance, low value might lead to innacurate result.
 /// NOTE: margin must be above max(raster height, column width) so long as local_tin() is not implemented
-/// - `plane_length`- y-axis measuremnt of the model to be generated
-/// - `plane_width` - x-axis measuremnt of the model to be generated
 /// - `columns` - desired number columns used for raster
 /// - `rows` - desired number rows used for raster
 /// - `altitude_step` - fixed increase in height per level curve
@@ -40,8 +38,6 @@ impl OpenCVTree {
 #[derive(Debug)]
 pub struct ModelGenerationSettings {
 	pub contour_margin: f32,
-	pub plane_length: f32,
-	pub plane_width: f32,
 	pub columns: usize,
 	pub rows: usize,
 	pub altitude_step: f32,
@@ -51,11 +47,9 @@ pub struct ModelGenerationSettings {
 #[wasm_bindgen]
 impl ModelGenerationSettings {
 	#[wasm_bindgen(constructor)]
-	pub fn new(contour_margin: f32, plane_length: f32, plane_width: f32, columns: usize, rows: usize, altitude_step: f32, desired_dist: f32) -> Self {
+	pub fn new(contour_margin: f32, columns: usize, rows: usize, altitude_step: f32, desired_dist: f32) -> Self {
 		Self {
 			contour_margin,
-			plane_length,
-			plane_width,
 			columns,
 			rows,
 			altitude_step,
@@ -84,8 +78,6 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &parent_relations);
 	let ModelGenerationSettings {
 		contour_margin,
-		plane_length,
-		plane_width,
 		columns,
 		rows,
 		altitude_step,
@@ -97,8 +89,11 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		.transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0)
 		.map_err(|_| String::from("Could not transform LevelCurveMap"))?;
 
-	// create raster based on given params
-	let mut raster = Raster::new(plane_width / columns as f32, plane_length / rows as f32, rows, columns);
+	//find maxum cooridinates in level curve model
+	let max = level_curve_map.get_bounding_points().1;
+
+	//create raster based on level curve model and desired rows and columns
+	let mut raster = Raster::new(max.x, max.y, rows, columns );
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);

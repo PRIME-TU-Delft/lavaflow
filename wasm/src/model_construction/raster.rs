@@ -11,8 +11,17 @@ pub struct Raster {
 	pub altitudes: Vec<Vec<Option<f32>>>,
 }
 
+
 impl Raster {
-	// Constructor
+	
+	/// Construtor for a Raster
+	///
+	/// # Arguments
+	///
+	/// * `width` - total width of raster
+	/// * `height` - total height of raster
+	/// * `rows` - desired number of rows
+	/// * `columns` - desired number of columns
 	pub fn new(width: f32, height: f32, rows: usize, columns: usize) -> Self {
 		// Initialize the 2d array of altitudes
 		let mut altitudes_init: Vec<Vec<Option<f32>>> = Vec::new();
