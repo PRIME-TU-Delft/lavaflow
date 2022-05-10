@@ -1,38 +1,40 @@
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
-use mathrs::trigonometry::arccos;
-use std::cmp;
 
-pub struct LevelCurveSet {
-	altitude_step: f32,
-	level_curves: Vec<LevelCurve>,
-}
+// pub struct LevelCurveSet {
+// 	altitude_step: f32,
+// 	level_curves: Vec<LevelCurve>,
+// }
 
 
 
 // The Triangle struct is used for computations that are related to the triangulation step
-struct Triangle {
-    a: &Point,
-    b: &Point,
-    c: &Point
+struct Triangle<'a> {
+    pub a: &'a Point,
+    pub b: &'a Point,
+    pub c: &'a Point
 }
 
-impl Triangle {
+impl<'a> Triangle<'a> {
 
     /// Constructor
-    pub fn new(a: &Point, b: &Point, c: &Point) -> Self {
+    pub fn new(a: &'a Point, b: &'a Point, c: &'a Point) -> Self {
         Self {a, b, c}
     }
 
     /// Compute the interior angle at point a
     fn angle_at_a(&self) -> f32 {
 
-        let a_side = self.b.xy_dist(self.c);
-        let b_side = self.a.xy_dist(self.c);
-        let c_side = self.a.xy_dist(self.b);
+        // let a_side = self.b.xy_dist(self.c);
+        // let b_side = self.a.xy_dist(self.c);
+        // let c_side = self.a.xy_dist(self.b);
 
-        arccos(
-            (f64::powi(b_side, 2) + f64::powi(c_side, 2) - f64::powi(a_side, 2)) / 2*b_side*c_side
+        let a_side = Point::xy_dist(self.b, self.c);
+        let b_side = Point::xy_dist(self.a, self.c);
+        let c_side = Point::xy_dist(self.a, self.b);
+
+        f32::acos(
+            (f32::powi(b_side, 2) + f32::powi(c_side, 2) - f32::powi(a_side, 2)) / 2.0*b_side*c_side
         ) as f32
     }
 
@@ -40,7 +42,7 @@ impl Triangle {
     pub fn minimal_internal_angle(&self) -> f32 {
 
         // Compute angle at a
-        let a_angle = self.angle_at_a;
+        let a_angle = self.angle_at_a();
 
         // Compute angle at b
         let b_angle = Triangle::new(self.b, self.a, self.c).angle_at_a();
@@ -49,18 +51,32 @@ impl Triangle {
         let c_angle = Triangle::new(self.c, self.a, self.b).angle_at_a();
 
         // Return the minimal angle
-        cmp::min(cmp::min(a_angle, b_angle), c_angle)
+        f32::min(f32::min(a_angle, b_angle), c_angle)
     }
 
     /// Method: Does this tringle contain this point?
     pub fn contains_point(&self, p: &Point) -> bool {
-        /// TODO: Determine whether this point lies in this triangle
         
-        true
+        // To make this function more readable, we temporarily store self.a, self.b and self.c into a, b and c
+        let a = self.a;
+        let b = self.b;
+        let c = self.c;
+        
+        // Determine whether p lies in this triangle
+        let w1_upper = p.x*(c.y-a.y) - p.y*(c.x-a.x) - a.x*(c.y-a.y) + a.y*(c.x - a.x);
+        let w1_lower = (b.x-a.x)*(c.y-a.y) - (b.y-a.y)*(c.x-a.x);
+
+        let w1 = w1_upper / w1_lower;
+
+        let w2_upper = p.y - a.y - w1*(b.y-a.y);
+        let w2_lower = c.y - a.y;
+
+        let w2 = w2_upper / w2_lower;
+
+        // If w1 and w2 are both >= 0 and w1+w2 <= 1, then this point lies within the triangle. Otherwise not.
+        w1 >= 0.0 && w2 >= 0.0 && w1+w2 <= 1.0
+
     }
-
-
-
 
 }
 
@@ -82,7 +98,7 @@ impl LevelCurveSet {
         //
         // 1. Find the two closest levelcurves to this point
         //
-        let mut closest_two_levelcurves: (&LevelCurve, &LevelCurve) = (self.level_curves[0], self.level_curves[1]);
+        let mut closest_two_levelcurves: (&LevelCurve, &LevelCurve) = (&self.level_curves[0], &self.level_curves[1]);
         let mut closest_two_distances: (f32, f32) = (self.level_curves[0].dist_to_point(p), self.level_curves[1].dist_to_point(p));
 
         // Go over every level curve in this set
@@ -94,7 +110,7 @@ impl LevelCurveSet {
             // If this distance is smaller than both current level-curves, shift everything over
             if current_dist < closest_two_distances.0 && current_dist < closest_two_distances.1 {
                 closest_two_levelcurves.1 = closest_two_levelcurves.0;
-                closest_two_levelcurves.0 = self.level_curves[i];
+                closest_two_levelcurves.0 = &self.level_curves[i];
 
                 closest_two_distances.1 = closest_two_distances.0;
                 closest_two_distances.0 = current_dist;
@@ -102,7 +118,7 @@ impl LevelCurveSet {
 
             // Else, if the distance is greater than the first level curve but smaller than the second, insert the new one
             else if current_dist >= closest_two_distances.0 && current_dist < closest_two_distances.1 {
-                closest_two_levelcurves.1 = self.level_curves[i];
+                closest_two_levelcurves.1 = &self.level_curves[i];
 
                 closest_two_distances.1 = current_dist;
             }
@@ -124,7 +140,7 @@ impl LevelCurveSet {
         }
 
         // Create a vector of triangles (which are triples)
-        let mut triangles: Vec<(&Point, &Point, &Point)> = Vec::new();
+        let mut triangles: Vec<Triangle> = Vec::new();
 
         // Select a random point from the first closest curve and find the closest point on the other curve
         let mut point_a = 0;
@@ -154,27 +170,25 @@ impl LevelCurveSet {
             }
 
             // Compute minimal angle of triangle 1
-            let min_angle_t1 = Triangle::new(
+            let triangle_1 = Triangle::new(
                 closest_two_levelcurves.0.get_point(point_a).unwrap(),
                 closest_two_levelcurves.1.get_point(point_b).unwrap(),
                 closest_two_levelcurves.0.get_point(next_point_a).unwrap()
-            ).minimal_internal_angle();
+            );
+            let min_angle_t1 = triangle_1.minimal_internal_angle();
 
             // Compute minimal angle of triangle 2
-            let min_angle_t2 = Triangle::new(
+            let triangle_2 = Triangle::new(
                 closest_two_levelcurves.0.get_point(point_a).unwrap(),
                 closest_two_levelcurves.1.get_point(point_b).unwrap(),
                 closest_two_levelcurves.1.get_point(next_point_b).unwrap()
-            ).minimal_internal_angle();
+            );
+            let min_angle_t2 = triangle_2.minimal_internal_angle();
 
             // If the first triangle has a larger minimal interior angle, select that one
             if min_angle_t1 > min_angle_t2 {
                 // Select the first triangle
-                triangles.push((
-                    closest_two_levelcurves.0.get_point(point_a).unwrap(),
-                    closest_two_levelcurves.1.get_point(point_b).unwrap(),
-                    closest_two_levelcurves.0.get_point(next_point_a).unwrap()
-                ));
+                triangles.push(triangle_1);
 
                 // The point on the first level curve has now shifted one place further (A)
                 point_a = next_point_a;
@@ -184,11 +198,7 @@ impl LevelCurveSet {
             // Else, select the other one
             else {
                 // Select the second triangle
-                triangles.push((
-                    closest_two_levelcurves.0.get_point(point_a).unwrap(),
-                    closest_two_levelcurves.1.get_point(point_b).unwrap(),
-                    closest_two_levelcurves.1.get_point(next_point_b).unwrap()
-                ));
+                triangles.push(triangle_2);
 
                 // The point on the second level curve has now shifted one place further (B)
                 point_b = next_point_b;
@@ -206,13 +216,42 @@ impl LevelCurveSet {
         // 3. Determine the triangle that 'p' falls in
         //
 
+        // Check: If the list of triangles is empty, return 'p.z'
+        if triangles.is_empty() {
+            return p.z;
+        }
+
+        let mut triangle_around_p: &Triangle = &triangles[0];
+
+        for tri in &triangles {
+
+            if tri.contains_point(p) {
+                triangle_around_p = tri;
+                break;
+            }
+
+        }
+
 
         //
         // 4. Compute the interpolated value
         //
 
-        0.0
+        // Compute the distance from p to triangle.a
+        let dist_p_a = Point::xy_dist(p, triangle_around_p.a);
+        
+        // Compute the distance from p to triangle.b
+        let dist_p_b = Point::xy_dist(p, triangle_around_p.b);
 
+        // Compute the distance from p to triangle.c
+        let dist_p_c = Point::xy_dist(p, triangle_around_p.c);
+
+        // Compute the sum of these distances
+        let dist_sum = 1.0/dist_p_a + 1.0/dist_p_b + 1.0/dist_p_c;
+
+        // Compute the inverse weighted average over these distances and the z-values of the triangle-corners.
+        // Return this value
+        ((triangle_around_p.a.z / dist_p_a) + (triangle_around_p.b.z / dist_p_b) + (triangle_around_p.c.z / dist_p_c)) / dist_sum
     }
 
 

@@ -87,8 +87,8 @@ impl LevelCurve {
 
 #[derive(Debug)]
 pub struct LevelCurveSet {
-	altitude_step: f32,
-	level_curves: Vec<LevelCurve>,
+	pub altitude_step: f32,
+	pub level_curves: Vec<LevelCurve>,
 }
 
 impl LevelCurveSet {
