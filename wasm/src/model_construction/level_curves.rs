@@ -1,3 +1,5 @@
+use miette::{miette, Result};
+
 //
 // Class: LevelCurves
 //
@@ -122,13 +124,12 @@ impl LevelCurveSet {
 	/// * `current_height` - to track height when traversing tree, initial call should start with 1
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> LevelCurveSet {
+	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
 		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
 
-		// TODO: dont use unwrap
-		let first_pixel = tree.get_first_pixel().unwrap();
+		let first_pixel = tree.get_first_pixel().ok_or_else(|| miette!("Could not get first pixel"))?;
 		let mut last_saved = first_pixel;
 		let mut last_visited = first_pixel;
 		let mut current_pixel = first_pixel;
@@ -173,12 +174,12 @@ impl LevelCurveSet {
 
 		for mut child in tree.get_children() {
 			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);
-			for curve in childmap.level_curves {
+			for curve in childmap?.level_curves {
 				ret.add_level_curve(curve);
 			}
 		}
 
-		ret
+		Ok(ret)
 	}
 }
 // TODO: find better method
