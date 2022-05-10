@@ -98,9 +98,13 @@ impl LevelCurveSet {
 
 	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
 	// for the puropose of genererating a raster to cover whole area of levelcurves
-	pub fn get_bounding_points(&self) -> (Point, Point){
-		let mut min = Point{x : std::f32::MAX , y:std::f32::MAX, z : 0.0};
-		let mut max = Point{x : 0.0, y: 0.0, z : 0.0};
+	pub fn get_bounding_points(&self) -> (Point, Point) {
+		let mut min = Point {
+			x: std::f32::MAX,
+			y: std::f32::MAX,
+			z: 0.0,
+		};
+		let mut max = Point { x: 0.0, y: 0.0, z: 0.0 };
 		for curve in &self.level_curves {
 			for point in &curve.points {
 				min.x = f32::min(min.x, point.x);
@@ -203,7 +207,26 @@ impl LevelCurveSet {
 
 		ret
 	}
+
+	///
+	/// Shifts all points in level curve set such that the set is aligned with the x and y axis.
+	/// Not exactly aligned, distance to keep from axis can be specified.
+	///  
+	/// # Arguments
+	///
+	/// * `min` - point with the minimal occurring x and y values
+	/// * `border_x` - distance to keep model from x axis
+	/// * `border_y` - distance to keep model from x axis
+	pub fn align_with_origin(&mut self, min: &Point, border_x: f32, border_y: f32) {
+		for curve in &mut self.level_curves {
+			for p in &mut curve.points {
+				p.x = p.x - min.x + border_x;
+				p.y = p.y - min.y + border_y;
+			}
+		}
+	}
 }
+
 // TODO: find better method
 fn pixel_dist(a: &(u64, u64), b: &(u64, u64)) -> f32 {
 	((a.0 as f32 - b.0 as f32).powi(2) + (a.1 as f32 - b.1 as f32).powi(2)).sqrt()

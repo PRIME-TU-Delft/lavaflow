@@ -59,12 +59,17 @@ pub fn make_obj() {
     level_curve_map.add_level_curve(level_curve_4);
 
         
+        //find maximum and minimum cooridinates in level curve model
+        let (min, max) = level_curve_map.get_bounding_points();
 
-        //find max and min x and y in level curve model
-        let max = level_curve_map.get_bounding_points().1;
-        
-        //create raster based on given params
-        let mut raster = Raster::new(max.x, max.y, row_no, col_no );
+        //to keep border of 10% around model
+        let border_x = 0.1 * (max.x - min.x) ;
+        let border_y = 0.1 * (max.y - min.y) ;
+
+        level_curve_map.align_with_origin(&min, border_x, border_y);
+
+        //create raster based on level curve model and desired rows and columns
+        let mut raster = Raster::new((max.x - min.x) + border_x  , (max.y - min.y) + border_y, row_no, col_no );
 
         //create new modelConstructor (maodule containing 3D-model construction algorithm)
         let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
@@ -114,7 +119,7 @@ pub fn make_obj() {
                //t2 : (0,0) , (1, 0), (1, 1)
                faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 2, c = v + 3 ));  
    
-               v = v + 4;
+               v += 4;
            } 
        }
    
