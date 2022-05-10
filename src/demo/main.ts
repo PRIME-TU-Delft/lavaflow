@@ -10,7 +10,7 @@ init().then(() => {
 
 	let tree = new wasm.OpenCVTree({ "pixels_per_curve": hc_level_curves, "parent_relations": hc_parent_relations });
 
-	let settings = new wasm.ModelGenerationSettings(1, 2, 3, 4, 5, 6, 7);
+	let settings = new wasm.ModelGenerationSettings(5.0, 50, 50, 50.0, 10.0);
 
 	console.log(tree.debug());
 	console.log(settings.debug());
