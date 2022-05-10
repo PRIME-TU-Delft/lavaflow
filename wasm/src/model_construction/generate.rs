@@ -91,7 +91,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	} = *settings;
 
 	// convert openCV tree to levelCurveMap (input for construction algorithm)
-	let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0);
+	let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0).map_err(|_| String::from("Could not transform LevelCurveMap"))?;
 
 	// create raster based on given params
 	let mut raster = Raster::new(plane_width / columns as f32, plane_length / rows as f32, rows, columns);
@@ -100,7 +100,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
 
 	// determine heights
-	model_constructor.construct();
+	model_constructor.construct().map_err(|e| e.to_string())?;
 
 	// get heights from raster
 	let heights = &raster.altitudes;
