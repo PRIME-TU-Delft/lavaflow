@@ -138,9 +138,20 @@ impl LevelCurveSet {
         // We will now start computing the triangles
         loop {
 
-            // We will consider the following two points for a new triangle
-            let next_point_a = point_a + 1;
-            let next_point_b = point_b + 1;
+            // We will consider the following two points for a new triangle.
+            // Level curves are always closed (that's a requirement for this application), therefore
+            // the first point in the array comes right after the last point in the array.
+            let mut next_point_a = point_a + 1;
+            let mut next_point_b = point_b + 1;
+
+            // Following up on this: if the next_point_a or next_point_b first fall outside of the array,
+            // set them equal to zero (essentially closing the circle)
+            if next_point_a >= closest_two_levelcurves.0.get_points().len() {
+                next_point_a = 0;
+            }
+            if next_point_b >= closest_two_levelcurves.1.get_points().len() {
+                next_point_b = 0;
+            }
 
             // Compute minimal angle of triangle 1
             let min_angle_t1 = Triangle::new(
