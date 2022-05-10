@@ -102,45 +102,14 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// determine heights
 	model_constructor.construct();
 
-	// get heights from raster
-	let heights = &raster.altitudes;
-
 	// convert height raster to flat list of x,y,z points for GLTF format
 	// every cell had 4 corners, becomes two triangles
 	let mut final_points: Vec<[f32; 3]> = Vec::new();
-	for x in 0..raster.rows {
-		for y in 0..raster.columns {
-			// triangle 1
-			//(0,0)
-			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].ok_or("Invalid input")?]);
-			//(0, 1)
-			final_points.push([
-				columns as f32 * raster.column_width,
-				((rows - y) as f32 + 1.0) * raster.row_height,
-				heights[x][y + 1].ok_or("Invalid input")?,
-			]);
-			//(1, 1)
-			final_points.push([
-				(columns as f32 + 1.0) * raster.column_width,
-				((rows - y) as f32 + 1.0) * raster.row_height,
-				heights[x + 1][y + 1].ok_or("Invalid input")?,
-			]);
 
-			// triangle 2
-			//(0, 0)
-			final_points.push([columns as f32 * raster.column_width, (rows - y) as f32 * raster.row_height, heights[x][y].ok_or("Invalid input")?]);
-			//(1, 0)
-			final_points.push([
-				(columns as f32 + 1.0) * raster.column_width,
-				(rows - y) as f32 * raster.row_height,
-				heights[x + 1][y].ok_or("Invalid input")?,
-			]);
-			//(1, 1)
-			final_points.push([
-				(columns as f32 + 1.0) * raster.column_width,
-				((rows - y) as f32 + 1.0) * raster.row_height,
-				heights[x][y + 1].ok_or("Invalid input")?,
-			]);
+	for row in 1..raster.rows {
+		for col in 0..raster.columns {
+			final_points.push([((row-1) as f32)*raster.row_height, (col as f32)*raster.column_width, raster.altitudes[row][col].ok_or("Point not found")?]);
+			final_points.push([((row) as f32)*raster.row_height, (col as f32)*raster.column_width, raster.altitudes[row][col].ok_or("Point not found")?]);
 		}
 	}
 
