@@ -96,11 +96,49 @@ impl LevelCurveSet {
 		&self.level_curves
 	}
 
+	// Adds new level curve of one point that represents a peak
+	//	TODO: how to determine multiple peaks?? -> use parentage tree thing
+	//using centroid formula for polygons from wikipedia
+	pub fn add_peak(&mut self) {
+		//	let old_curve = self.level_curves.last().ok_or("level_curves.add_peak() : Original set has no curves to add to")?;
+		let top_curve = self.level_curves.last().unwrap();
+		let ps = &top_curve.points;
+
+		//calculate area
+		let mut a = 0.0;
+		for p in 0..ps.len() {
+			a += (ps[p].x * ps[p + 1].y) - (ps[p + 1].x * ps[p].y);
+		}
+		a = a / 2.0;
+
+		let mut x = 0.0;
+		let mut y = 0.0;
+		for p in 0..ps.len() {
+			let fact = (ps[p].x * ps[p + 1].y - ps[p + 1].x * ps[p].y);
+			x += (ps[p].x + ps[p + 1].x) * fact;
+			y += (ps[p].y + ps[p + 1].y) * fact;
+		}
+
+		y = y / (6.0 * a);
+		x = x / (6.0 * a);
+
+		let peak_height = top_curve.altitude + self.altitude_step;
+
+		self.add_level_curve(LevelCurve {
+			altitude: peak_height,
+			points: vec![Point { x, y, z: peak_height }],
+		});
+	}
+
 	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
 	// for the puropose of genererating a raster to cover whole area of levelcurves
-	pub fn get_bounding_points(&self) -> (Point, Point){
-		let mut min = Point{x : std::f32::MAX , y:std::f32::MAX, z : 0.0};
-		let mut max = Point{x : 0.0, y: 0.0, z : 0.0};
+	pub fn get_bounding_points(&self) -> (Point, Point) {
+		let mut min = Point {
+			x: std::f32::MAX,
+			y: std::f32::MAX,
+			z: 0.0,
+		};
+		let mut max = Point { x: 0.0, y: 0.0, z: 0.0 };
 		for curve in &self.level_curves {
 			for point in &curve.points {
 				min.x = f32::min(min.x, point.x);
