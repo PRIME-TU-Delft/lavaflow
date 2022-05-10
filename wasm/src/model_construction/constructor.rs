@@ -42,12 +42,17 @@ impl<'a> ModelConstructor<'a> {
 		// Set the edges of the raster to zero
 		self.set_raster_edges_to_zero();
 
-		for i in 0..x {
-			for j in 0..y {
-				if self.check_svc(i, j) {
+		for row in 0..x {
+			for col in 0..y {
+				if self.check_svc(row, col) {
 					// if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
-					if self.raster.altitudes[i][j].is_none() {
-						// local_tin(cellCentre)
+					if self.raster.altitudes[row][col].is_none() {
+						let center: Point = Point {
+							x: ((row as f32) + 0.5) * self.raster.row_height,
+							y: ((col as f32) + 0.5) * self.raster.column_width,
+							z: 0.0,
+						};
+						self.raster.altitudes[row][col] = Some(self.level_curve_map.local_tin_interpolate(&center));
 					}
 				}
 			}
@@ -310,8 +315,8 @@ fn calc_inverse_weighted_average(weighted_values: &[(f32, f32)]) -> f32 {
 	let mut sum_weight: f32 = 0.0;
 
 	for weighted_value in weighted_values {
-		res += weighted_value.0 * weighted_value.1;
-		sum_weight += weighted_value.1;
+		res += weighted_value.0 * 1.0 / weighted_value.1;
+		sum_weight += 1.0 / weighted_value.1;
 	}
 
 	res / sum_weight
