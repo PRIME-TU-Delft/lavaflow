@@ -1,6 +1,5 @@
 use super::point::Point;
 use super::{level_curves::LevelCurveSet, raster::Raster};
-use super::local_tin_interpolation::*;
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
