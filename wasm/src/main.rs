@@ -101,19 +101,19 @@ pub fn make_obj() {
            for y in 0 ..raster.columns -1 {
                let a = columns  as f32 * raster.column_width;
                //(0, 0)
-               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x  as f32  ) * raster.column_width ,
+               verts.push_str (&format!("v {a} {c} {b} \n", a = (x  as f32  ) * raster.column_width ,
                                                                 b = - ((rows - y) as f32 ) * raster.row_height,
                                                                 c = heights[x][y + 1].unwrap()));
                //(0, 1)
-               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32  ) * raster.column_width ,
+               verts.push_str (&format!("v {a} {c} {b} \n", a = (x as f32  ) * raster.column_width ,
                                                                        b = - ((rows - y) as f32 + 1.0) * raster.row_height,
                                                                        c = heights[x][y ].unwrap()));
                //(1, 0)
-               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32 + 1.0 ) * raster.column_width ,
+               verts.push_str (&format!("v {a} {c} {b} \n", a = (x as f32 + 1.0 ) * raster.column_width ,
                                                                        b = - ((rows - y) as f32) * raster.row_height,
                                                                        c = heights[x + 1][y + 1].unwrap()));
                //(1, 1)
-               verts.push_str (&format!("v {a}.0 {c}.0 {b}.0  \n", a =( x as f32 + 1.0 ) * raster.column_width ,
+               verts.push_str (&format!("v {a} {c} {b}  \n", a =( x as f32 + 1.0 ) * raster.column_width ,
                                                                            b = - ((rows - y) as f32 + 1.0) * raster.row_height,
                                                                            c = heights[x+ 1][y].unwrap())); 
      
