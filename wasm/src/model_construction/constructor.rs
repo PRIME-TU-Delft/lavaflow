@@ -44,14 +44,14 @@ impl<'a> ModelConstructor<'a> {
 		// Set the edges of the raster to zero
 		self.set_raster_edges_to_zero();
 
-		for row in 0..x {
-			for col in 0..y {
+		for row in 0..y {
+			for col in 0..x {
 				if self.check_svc(row, col) {
 					// if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
 					if self.raster.altitudes[row][col].is_none() {
 						let center: Point = Point {
-							x: ((row as f32) + 0.5) * self.raster.row_height,
-							y: ((col as f32) + 0.5) * self.raster.column_width,
+							x: ((col as f32) + 0.5) * self.raster.column_width,
+							y: ((row as f32) + 0.5) * self.raster.row_height,
 							z: 0.0,
 						};
 						self.raster.altitudes[row][col] = Some(self.level_curve_map.local_tin_interpolate(&center));
@@ -109,13 +109,13 @@ impl<'a> ModelConstructor<'a> {
 
 		// define which points are corner and center of current cell
 		let corner: Point = Point {
-			x: (row as f32) * self.raster.row_height,
-			y: (col as f32) * self.raster.column_width,
+			x: (col as f32) * self.raster.column_width,
+			y: (row as f32) * self.raster.row_height,
 			z: 0.0,
 		};
 		let center: Point = Point {
-			x: ((row as f32) + 0.5) * self.raster.row_height,
-			y: ((col as f32) + 0.5) * self.raster.column_width,
+			x: ((col as f32) + 0.5) * self.raster.column_width,
+			y: ((row as f32) + 0.5) * self.raster.row_height,
 			z: 0.0,
 		};
 

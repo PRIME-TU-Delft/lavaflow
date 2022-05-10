@@ -89,7 +89,7 @@ pub fn generate_gltf(triangle_vertices: Vec<[f32; 3]>) -> Result<String, String>
 		extras: Default::default(),
 		indices: None,
 		material: None,
-		mode: Valid(json::mesh::Mode::TriangleStrip),
+		mode: Valid(json::mesh::Mode::Triangles),
 		targets: None,
 	};
 
