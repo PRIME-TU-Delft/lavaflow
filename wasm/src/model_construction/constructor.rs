@@ -1,5 +1,6 @@
 use super::point::Point;
 use super::{level_curves::LevelCurveSet, raster::Raster};
+use super::local_tin_interpolation::*;
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
@@ -42,13 +43,18 @@ impl<'a> ModelConstructor<'a> {
 		// Set the edges of the raster to zero
 		self.set_raster_edges_to_zero();
 
-		for i in 0..x {
-			for j in 0..y {
-				if self.check_svc(i, j) {
+		for row in 0..x {
+			for col in 0..y {
+				if self.check_svc(row, col) {
 					
 					// if a point is an svc but height is not yet known it has to be interpolated using local triangulated irregular network
-					if self.raster.altitudes[i][j].is_none() {
-						// local_tin(cellCentre)
+					if self.raster.altitudes[row][col].is_none() {
+						let center: Point = Point {
+							x: ((row as f32) + 0.5) * self.raster.row_height,
+							y: ((col as f32) + 0.5) * self.raster.column_width,
+							z: 0.0,
+						};
+						self.raster.altitudes[row][col] = Some(self.level_curve_map.local_tin_interpolate(&center));
 					}
 				}
 			}
