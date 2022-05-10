@@ -42,7 +42,7 @@
 
     <script>
       let visible = 1
-      let DEBUG = false
+      let DEBUG = false; // toggle in console to see print messages
 
       function print(msg) {
         if (DEBUG) {
@@ -50,12 +50,12 @@
         }
       }
     
+      // Check if the dom is loaded
       window.addEventListener('load', () => {
-        const markers = [0,1,2,3].map(x => document.querySelector('#marker' + x))
-        const found = markers.map(x => false)
+        const markers = [0,1,2,3].map(x => document.querySelector('#marker' + x)) // array of markers
+        const found = markers.map(x => false) 
 
-        console.log(markers)        
-      
+        // check if marker is visible
         markers.forEach((marker, index) => {
           marker.addEventListener('markerFound', event => found[index] = true)
           marker.addEventListener('markerLost', event => found[index] = false)
@@ -63,7 +63,9 @@
           marker.flushToDOM()
         })
 
+
         function setPlaneVisible() {
+          // set plane visible if index visible
           markers.forEach((marker, index) => {
             const plane = marker.querySelector('a-plane')
             plane.object3D.visible = (index == visible)
@@ -76,13 +78,14 @@
           if (visible > 0 && found[visible]) return
 
           visible = -1
-          // else try to find next marker
+          // else try to find largest visible marker
           for (i = 0; i < found.length; i++) {
             if (found[i]) {
               visible = i;
             }
           }
 
+          // set correct plane visible
           setPlaneVisible()
           print(visible)
         }, 200)      
