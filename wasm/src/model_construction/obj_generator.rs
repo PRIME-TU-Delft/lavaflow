@@ -112,7 +112,7 @@ pub fn make_obj() {
                //t1 : (0,0) , (0, 1), (1, 1)
                faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 1, c = v + 3 ));
                //t2 : (0,0) , (1, 0), (1, 1)
-               faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 2, c = v + 3 ));  
+               faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 3, c = v + 2 ));  
    
                v = v + 4;
            } 

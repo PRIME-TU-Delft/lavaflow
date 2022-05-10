@@ -319,8 +319,8 @@ fn calc_inverse_weighted_average(weighted_values: &[(f32, f32)]) -> f32 {
 	let mut sum_weight: f32 = 0.0;
 
 	for weighted_value in weighted_values {
-		res += weighted_value.0 * weighted_value.1;
-		sum_weight += weighted_value.1;
+		res += weighted_value.0 * 1.0/weighted_value.1;
+		sum_weight += 1.0/weighted_value.1;
 	}
 
 	res / sum_weight
