@@ -19,6 +19,13 @@ impl LevelCurve {
 		self.points.push(a);
 	}
 
+	pub fn add_all_points(&mut self, xs: Vec<Point>) {
+		for mut p in xs {
+			p.z = self.altitude;
+			self.points.push(p);
+		}
+	}
+
 	pub fn get_point(&self, index: usize) -> Option<&Point> {
 		if index < self.points.len() {
 			return Some(&self.points[index]);
@@ -108,6 +115,22 @@ impl LevelCurveSet {
 	// Retrieve the list of level curves
 	pub fn get_level_curves(&self) -> &Vec<LevelCurve> {
 		&self.level_curves
+	}
+
+	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
+	// for the puropose of genererating a raster to cover whole area of levelcurves
+	pub fn get_bounding_points(&self) -> (Point, Point){
+		let mut min = Point{x : std::f32::MAX , y:std::f32::MAX, z : 0.0};
+		let mut max = Point{x : 0.0, y: 0.0, z : 0.0};
+		for curve in &self.level_curves {
+			for point in &curve.points {
+				min.x = f32::min(min.x, point.x);
+				min.y = f32::min(min.y, point.y);
+				max.x = f32::max(max.x, point.x);
+				max.y = f32::max(max.y, point.y);
+			}
+		}
+		(min, max)
 	}
 
 	// Finding the closest point on any level curve that's stored in this map
