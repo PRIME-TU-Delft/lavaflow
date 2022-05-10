@@ -47,9 +47,9 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	//find maxum cooridinates in level curve model
 	let max = level_curve_map.get_bounding_points().1;
-    
+
 	//create raster based on level curve model and desired rows and columns
-	let mut raster = Raster::new(max.x, max.y, rows, columns );
+	let mut raster = Raster::new(max.x, max.y, rows, columns);
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);

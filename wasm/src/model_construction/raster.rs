@@ -11,9 +11,7 @@ pub struct Raster {
 	pub altitudes: Vec<Vec<Option<f32>>>,
 }
 
-
 impl Raster {
-	
 	/// Construtor for a Raster
 	///
 	/// # Arguments
