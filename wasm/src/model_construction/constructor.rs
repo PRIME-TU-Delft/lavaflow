@@ -54,7 +54,7 @@ impl<'a> ModelConstructor<'a> {
 							y: ((row as f32) + 0.5) * self.raster.row_height,
 							z: 0.0,
 						};
-						self.raster.altitudes[row][col] = Some(self.level_curve_map.local_tin_interpolate(&center));
+						self.raster.altitudes[row][col] = Some(self.level_curve_map.local_tin_interpolate(&center)?);
 					}
 				}
 			}

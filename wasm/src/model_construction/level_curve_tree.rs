@@ -216,7 +216,7 @@ mod tests {
 		// Assert the parent to be 'some'
 		assert!(tree.get_parent().is_some());
 
-		let parent_unwrapped = tree.get_parent().ok_or("Error when attempting to extract LevelCurveTree.parent from option.")?;
+		let parent_unwrapped = tree.get_parent().unwrap();
 
 		// Assert the parent to have the right perspective index
 		assert_eq!(parent_unwrapped.get_current_perspective(), 0);
