@@ -47,7 +47,8 @@ init().then(() => {
 		"data:text/plain;base64," + btoa(gltf),  // Data URI with the GLTF file's content
 		// called when the resource is loaded
 		function ( gltf ) {
-			gltf.scene.scale.set(0.1, 0.1, 0.1);
+			gltf.scene.scale.set(0.1, 0.1, 0.1);  // Scale the model
+			gltf.scene.children[0].material.side = 1;  // "Invert" the mode sides
 			scene.add( gltf.scene );
 	
 			gltf.animations; // Array<THREE.AnimationClip>
