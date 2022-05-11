@@ -52,32 +52,35 @@ fn raster_to_faces(raster: &mut Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Face>
 // implemented using : https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
 //TODO modify implementation such that sharp values are not modified
 //TODO dont copy input lists
-fn catmull_clark(f: &Vec<Face>, v: &Vec<Vertex>) {
+fn catmull_clark(f: &Vec<Face>, v: &Vec<Vertex>) -> Result<(), String> {
 	// 1. for each face, a face point is created which is the average of all the points of the face.
 	// each entry in the returned list is a vertex.
 
-	let face_points = get_face_points(f, v);
+	let face_points = get_face_points(v, f);
 
 	// get list of edges with 1 or 2 adjacent faces
 	// [pointnum_1, pointnum_2, facenum_1, facenum_2, center] or
 	// [pointnum_1, pointnum_2, facenum_1, None, center]
 
-	let edges_faces = get_edges_faces(v, f);
+	let edges = get_edges_faces(v, f);
 
-	// // get edge points, a list of points
-	// let edge_points = get_edge_points(v, edges_faces, face_points);
+	// get edge points, a list of points
+	let edge_points = get_edge_points(v, &edges?, &face_points?);
 
-	// // the average of the face points of the faces the point belongs to (avg_face_points)
-	// let avg_face_points = get_avg_face_points(v, f, face_points);
+	// per point: the average of the face points of the faces the point belongs to (avg_face_points)
+	let avg_face_points = get_average_face_points(v, f, &face_points?);
 
-	// // the average of the centers of edges the point belongs to (avg_mid_edges)
-	// let avg_mid_edges = get_avg_mid_edges(v, edges_faces) ;
+	//per point:  the average of the centers of edges the point belongs to (avg_mid_edges)
+	let avg_mid_edges = get_average_edges(v, &edges?);
 
-	// // how many faces a point belongs to
-	// let points_faces = get_points_faces(v, f);
+	// how many faces a point belongs to
+	let points_faces = get_faces_per_point(v, f);
 
-	// let new_points = get_new_points(v, points_faces, avg_face_points, avg_mid_edges)
+	//find out new locations of exisitng points in mesh
+	//TODO sharp points should not ever move in y direction
+	let new_points = get_new_points(v, &points_faces, &avg_face_points, &avg_mid_edges);
 
+	Ok(())
 	// // add face points to new_points
 
 	// let face_point_nums = [];
@@ -141,8 +144,37 @@ fn center_point(p1: &Vertex, p2: &Vertex) -> Vertex {
 	}
 }
 
+//TODO what do if p is sharp
+fn add(p1: &Vertex, p2: &Vertex) -> Vertex {
+	Vertex {
+		x: (p1.x + p2.x),
+		y: (p1.y + p2.y),
+		z: (p1.z + p2.z),
+		is_sharp: false,
+	}
+}
+
+fn average_of_points(xs: Vec<Vertex>) -> Vertex {
+	let n = xs.len() as f32;
+	let mut agr = Vertex {
+		x: 0.0,
+		y: 0.0,
+		z: 0.0,
+		is_sharp: false,
+	};
+	for x in xs {
+		agr = add(&agr, &x);
+	}
+	Vertex {
+		x: agr.x / n,
+		y: agr.y / n,
+		z: agr.z / n,
+		is_sharp: false,
+	}
+}
+
 //for all faces find middle point on face
-fn get_face_points(f: &Vec<Face>, v: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
+fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String> {
 	let mut face_points: Vec<Vertex> = Vec::new();
 
 	// per face averace points
@@ -164,6 +196,9 @@ fn get_face_points(f: &Vec<Face>, v: &Vec<Vertex>) -> Result<Vec<Vertex>, String
 			z: z / 4.0,
 			is_sharp: false,
 		});
+	}
+	if (f.len() != face_points.len()) {
+		return Err(String::from("number face points generated does not match number of faces"));
 	}
 
 	Ok(face_points)
@@ -267,4 +302,110 @@ fn get_edges_faces(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Edge>, String> 
 	}
 
 	Ok(merged_edges)
+}
+
+//For each edge, add an edge point.
+//Set each edge point to be the average of the two neighbouring face points (AF) and the midpoint of the edge (ME)
+// = (AF + ME)/ 2
+fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
+	let mut edge_points: Vec<Vertex> = Vec::new();
+
+	for edge in edges {
+		let f1 = face_points.get(edge.f1).ok_or("get edge points: no face point")?;
+		let f2 = match edge.f2 {
+			Some(x) => face_points.get(edge.f2.unwrap()).ok_or("get edge points: no face point")?,
+			None => f1,
+		};
+
+		let AF = add(f1, f2);
+		let ME = &edge.center;
+		//TODO what if sharp
+		edge_points.push(Vertex {
+			x: (AF.x + ME.x) / 2.0,
+			y: (AF.y + ME.y) / 2.0,
+			z: (AF.z + ME.z) / 2.0,
+			is_sharp: false,
+		});
+	}
+
+	Ok(edge_points)
+}
+
+//For each original point (P), take the average (F) of all n (recently created) face points for faces touching P
+fn get_average_face_points(vs: &Vec<Vertex>, fs: &Vec<Face>, face_points: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
+	let mut averages: Vec<Vertex> = Vec::new();
+
+	//for each vertex
+	for i in 0..vs.len() {
+		let mut adjacents: Vec<Vertex> = Vec::new();
+
+		//for each face
+		for j in 0..fs.len() {
+			let f = fs.get(j).ok_or("get average face points : could not find face")?;
+			//if face is adjacent
+			if f.points.contains(&i) {
+				//add face point to list
+				let fp = face_points.get(j).ok_or("get average face points : could not find face point")?.clone();
+				adjacents.push(fp);
+			}
+		}
+		//ret average
+		averages.push(average_of_points(adjacents));
+	}
+
+	Ok(averages)
+}
+
+//For each original point (P), the average (R) of all n edge midpoints for original edges touching P, where each edge midpoint is the average of its two endpoint vertices
+fn get_average_edges(vs: &Vec<Vertex>, es: &Vec<Edge>) -> Result<Vec<Vertex>, String> {
+	let mut averages: Vec<Vertex> = Vec::new();
+
+	//for each vertex
+	for p in 0..vs.len() {
+		let mut adjacents: Vec<Vertex> = Vec::new();
+
+		//for each edge
+		for e in es {
+			//if egde is adjacent
+			if e.p1 == p || e.p2 == p {
+				//add center of edge to list
+				adjacents.push(e.center.clone());
+			}
+		}
+		//ret average
+		averages.push(average_of_points(adjacents));
+	}
+	Ok(averages)
+}
+
+fn get_faces_per_point(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<usize>, String> {
+	let mut faces_per_point = vec![0; vs.len()];
+
+	for f in fs {
+		for v in &f.points {
+			faces_per_point[*v] += 1;
+		}
+	}
+	Ok(faces_per_point)
+}
+
+//Move each original point to the new vertex point (F + 2R + (n-3)*v)/n
+//v				//n								//F							//R
+fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<Vertex>, avg_mid_edges: &Vec<Vertex>) -> Result<(), String> {
+	let mut new_vertices: Vec<Vertex> = Vec::new();
+
+	for i in 0..vs.len() {
+		let v = vs.get(i).ok_or("get average face points : could not find face")?;
+		let n = f_per_v.get(i).ok_or("get average face points : could not find face")?;
+		let F = avg_face_points.get(i).ok_or("get average face points : could not find face")?;
+		let R = avg_mid_edges.get(i).ok_or("get average face points : could not find face")?;
+
+		let x = (v.x * (*n as f32 - 3.0) + (2.0 * R.x) + F.x);
+		let y = (v.y * (*n as f32 - 3.0) + (2.0 * R.y) + F.y);
+		let z = (v.y * (*n as f32 - 3.0) + (2.0 * R.y) + F.y);
+
+		new_vertices.push(Vertex { x, y, z, is_sharp: false })
+	}
+
+	Ok(())
 }
