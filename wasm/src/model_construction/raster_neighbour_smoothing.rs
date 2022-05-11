@@ -28,8 +28,25 @@ impl RasterNeighbourSmoothing {
 
     }
 
+    fn neighbour_is_svc(model_constructor: &mut ModelConstructor, row: usize, col: usize, alt_row: isize, alt_col: isize) -> bool {
 
-    pub fn apply(model_constructor: &mut ModelConstructor, strength: f32, coverage: usize) -> Result<()> {
+        let row_n = row as isize + alt_row;
+        let col_n = col as isize + alt_col;
+
+        // If the considered neighbour falls outside of the raster, return altitude 0.0
+        if row_n < 0 || col_n < 0 || row_n as usize >= model_constructor.raster.rows || col_n as usize >= model_constructor.raster.columns {
+            return false;
+        }
+
+        // Else, find the neighbour and return its altitude value
+        else {
+            return model_constructor.is_svc[row_n as usize][col_n as usize];
+        }
+
+    }
+
+
+    pub fn apply(model_constructor: &mut ModelConstructor, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
 
         let mut new_altitudes: Vec<Vec<Option<f32>>> = Vec::new();
 
@@ -49,15 +66,19 @@ impl RasterNeighbourSmoothing {
                 // 1. If this cell is an svc-cell, skip this cell.
                 if model_constructor.is_svc[row][col] {
                     new_altitudes[row][col] = Some(model_constructor.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?);
-                    continue;
+                    
+                    if !allow_svc_change {
+                        continue;
+                    }
+                    
                 }
 
                 // 2. This cell is not svc. Select the specified amount of neighbors
                 let mut neighbour_altitudes: Vec<f32> = Vec::new();
 
                 // Loop over all the neighbours that fall within the rectangle of coverage x coverage
-                for alt_row in -((coverage as isize) / 2)..((coverage as isize) / 2) {
-                    for alt_col in -((coverage as isize) / 2)..((coverage as isize) / 2) {
+                for alt_row in -(coverage as isize)..(coverage as isize) {
+                    for alt_col in -(coverage as isize)..(coverage as isize) {
                         // If both alt_row and alt_col are zero, don't include the altitude. (This is the current point we're considering)
                         if alt_row == 0 && alt_col == 0 {
                             continue;
@@ -65,6 +86,12 @@ impl RasterNeighbourSmoothing {
 
                         // Compute the altitude of this particular neighbour and add it to the vector
                         neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
+
+                        if RasterNeighbourSmoothing::neighbour_is_svc(model_constructor, row, col, alt_row, alt_col) {
+                            for i in 0..svc_weight-1 {
+                                neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
+                            }
+                        }
 
                     }
                 }

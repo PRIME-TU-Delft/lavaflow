@@ -69,7 +69,7 @@ impl ModelGenerationSettings {
 /// Supermethod that takes in an openCV tree and outputs an GTLF model.
 /// - `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
 #[wasm_bindgen]
-pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings) -> Result<String, JsValue> {
+pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, repetitions: usize, strength: f32, coverage: usize, svc_weight: usize) -> Result<String, JsValue> {
 
 	log!("The provided open_cv_tree: {:?}", open_cv_tree);
 	log!("The provided settings: {:?}", settings);
@@ -106,17 +106,17 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// DEBUGGING START
 	// 
 
-	let rows = 30;
-    let columns = 30;
-    let contour_margin = 12.0;
+	let rows = 150;
+    let columns = 150;
+    let contour_margin = 5.0;
     //let file_name = "output.gltf";
 
 
-    let mut level_curve_0: LevelCurve = LevelCurve::new(50.0);
-    let mut level_curve_1: LevelCurve = LevelCurve::new(100.0);
-    let mut level_curve_2: LevelCurve = LevelCurve::new(150.0);
-    let mut level_curve_3: LevelCurve = LevelCurve::new(200.0);
-    let mut level_curve_4: LevelCurve = LevelCurve::new(250.0);
+    let mut level_curve_0: LevelCurve = LevelCurve::new(100.0);
+    let mut level_curve_1: LevelCurve = LevelCurve::new(200.0);
+    let mut level_curve_2: LevelCurve = LevelCurve::new(300.0);
+    let mut level_curve_3: LevelCurve = LevelCurve::new(400.0);
+    let mut level_curve_4: LevelCurve = LevelCurve::new(500.0);
 
     // Add all points to level curve 0
     level_curve_0.add_all_points(
@@ -143,8 +143,17 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
         vec![Point{x:789.0,y:569.0,z:0.0}, Point{x:780.0,y:563.0,z:0.0}, Point{x:770.0,y:561.0,z:0.0}, Point{x:758.0,y:561.0,z:0.0}, Point{x:746.0,y:562.0,z:0.0}, Point{x:737.0,y:568.0,z:0.0}, Point{x:736.0,y:579.0,z:0.0}, Point{x:744.0,y:588.0,z:0.0}, Point{x:754.0,y:593.0,z:0.0}, Point{x:765.0,y:597.0,z:0.0}, Point{x:776.0,y:599.0,z:0.0}, Point{x:786.0,y:598.0,z:0.0}, Point{x:793.0,y:590.0,z:0.0}, Point{x:798.0,y:580.0,z:0.0}]
     );
 
+	// Increase the resolution for the level-curves
+	for i in 0..7 {
+		level_curve_0.increase_point_resolution();
+		level_curve_1.increase_point_resolution();
+		level_curve_2.increase_point_resolution();
+		level_curve_3.increase_point_resolution();
+		level_curve_4.increase_point_resolution();
+	}
 
-    let mut level_curve_map: LevelCurveSet = LevelCurveSet::new(50.0);
+
+    let mut level_curve_map: LevelCurveSet = LevelCurveSet::new(100.0);
     level_curve_map.add_level_curve(level_curve_0);
     level_curve_map.add_level_curve(level_curve_1);
     level_curve_map.add_level_curve(level_curve_2);
@@ -184,7 +193,34 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	model_constructor.construct().map_err(|e| e.to_string())?;
 
 	// Apply smoothing
-	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 2).map_err(|e| e.to_string())?;
+	// for i in 0..repetitions {
+	// 	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.6, 5, 50, false).map_err(|e| e.to_string())?;
+	// 	RasterNeighbourSmoothing::apply(&mut model_constructor, strength, coverage, svc_weight, false).map_err(|e| e.to_string())?;
+	// }
+
+	// We will perform a smoothing step 5 times
+	// for i in 0..repetitions {
+
+	// 	// Strength: inverse with the coverage
+	// 	// Coverage: increase
+	// 	// Svc weight: 50
+	// 	for cov in 1..coverage {
+	// 		RasterNeighbourSmoothing::apply(&mut model_constructor, 1.0/(cov as f32), cov, svc_weight, false).map_err(|e| e.to_string())?;
+	// 	}
+
+	// }
+
+	for i in 0..repetitions {
+
+		for i in 0..repetitions {
+			RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 2, 50, false).map_err(|e| e.to_string())?;
+		}
+
+		// for i in 0..repetitions {
+		// 	RasterNeighbourSmoothing::apply(&mut model_constructor, strength, coverage, svc_weight, false).map_err(|e| e.to_string())?;
+		// }
+
+	}
 
 	// convert height raster to flat list of x,y,z points for GLTF format
 	// every cell had 4 corners, becomes two triangles
@@ -197,11 +233,11 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// 	}
 	// }
 
-	let heights = &raster.altitudes;
+	let heights = &model_constructor.raster.altitudes;
 
-	for x in 0..raster.columns - 1 {
+	for x in 0..model_constructor.raster.columns - 1 {
 
-		for y in 0..raster.rows - 1 {
+		for y in 0..model_constructor.raster.rows - 1 {
 			// let a = raster.columns  as f32 * raster.column_width;
 			//(0, 0)
 			// verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x  as f32  ) * raster.column_width ,
@@ -252,27 +288,27 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 			// ];
 
 			let tri00 = [
-				(x as f32) * raster.column_width,
+				(x as f32) * model_constructor.raster.column_width,
 				heights[y][x].ok_or("Error when reading altitude-levels for trangle corner (0, 0).")?,
-				(y as f32) * raster.row_height
+				(y as f32) * model_constructor.raster.row_height
 			];
 
 			let tri10 = [
-				(x as f32) * raster.column_width,
+				(x as f32) * model_constructor.raster.column_width,
 				heights[y+1][x].ok_or("Error when reading altitude-levels for triangle corner (1, 0).")?,
-				(y as f32 + 1.0) * raster.row_height
+				(y as f32 + 1.0) * model_constructor.raster.row_height
 			];
 
 			let tri01 = [
-				(x as f32 + 1.0) * raster.column_width,
+				(x as f32 + 1.0) * model_constructor.raster.column_width,
 				heights[y][x+1].ok_or("Error when reading altitude-levels for triangle corner (0, 1).")?,
-				(y as f32) * raster.row_height
+				(y as f32) * model_constructor.raster.row_height
 			];
 
 			let tri11 = [
-				(x as f32 + 1.0) * raster.column_width,
+				(x as f32 + 1.0) * model_constructor.raster.column_width,
 				heights[y + 1][x + 1].ok_or("Error when reading altitude-levels for triangle corner (1, 1).")?,
-				(y as f32 + 1.0) * raster.row_height
+				(y as f32 + 1.0) * model_constructor.raster.row_height
 			];
 
 			// Add the first triangle
@@ -291,6 +327,25 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 		} 
 	}
+
+
+	// Add triangles for the level-curves
+	for curve in &model_constructor.level_curve_map.level_curves {
+
+		for i in 0..curve.points.len()-1 {
+
+			let p1 = &curve.points[i];
+			let p2 = &curve.points[i+1];
+
+			final_points.push(([p1.x, p1.z, p1.y-5.0], [1., 0., 0.]));
+			final_points.push(([p2.x, p2.z, p2.y+5.0], [1., 0., 0.]));
+			final_points.push(([p1.x, p1.z, p1.y+5.0], [1., 0., 0.]));
+
+		}
+
+	}
+
+
 
 	generate_gltf(final_points).map_err(JsValue::from)
 	//Ok(format!("{:?}", final_points))

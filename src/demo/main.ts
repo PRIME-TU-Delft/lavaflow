@@ -15,11 +15,16 @@ init().then(() => {
 
 	let settings = new wasm.ModelGenerationSettings(5.0, 50, 50, 50.0, 1.0);
 
-	//console.log(tree.debug());
-	//console.log(settings.debug());
+	console.log(tree.debug());
+	console.log(settings.debug());
 
-	let gltf = wasm.generate_3d_model(tree, settings);
-	//console.log(gltf);
+	let repetitions = 3;
+	let strength = 0.1;
+	let coverage = 8;
+	let svc_weight = 50;
+
+	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength, coverage, svc_weight);
+	console.log(gltf);
 
 	// View the GLTF in the browser
 	const scene = new THREE.Scene();
@@ -27,6 +32,7 @@ init().then(() => {
 	const renderer = new THREE.WebGLRenderer();
 	const controls = new OrbitControls( camera, renderer.domElement );
 
+	renderer.setFaceCulling(false);
 	renderer.setClearColor( 0xaaaaaa, 1 );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -50,29 +56,29 @@ init().then(() => {
 			gltf.scene.scale.set(0.1, 0.1, 0.1);  // Scale the model
 			gltf.scene.children[0].material.side = 1;  // "Invert" the mode sides
 			scene.add( gltf.scene );
-	
+
 			gltf.animations; // Array<THREE.AnimationClip>
 			gltf.scene; // THREE.Group
 			gltf.scenes; // Array<THREE.Group>
 			gltf.cameras; // Array<THREE.Camera>
 			gltf.asset; // Object
-	
+
 		},
 		// called while loading is progressing
 		function ( xhr ) {
-	
+
 			console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 			console.log("xhr.total = " + xhr.total);
-			
-	
+
+
 		},
 		// called when loading has errors
 		function ( error ) {
-	
+
 			console.log( 'An error happened' );
-	
+
 		}
-		
+
 	);
 
 

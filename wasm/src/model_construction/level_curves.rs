@@ -11,7 +11,7 @@ use super::point::Point;
 #[derive(Debug)]
 pub struct LevelCurve {
 	altitude: f32,
-	points: Vec<Point>,
+	pub points: Vec<Point>,
 }
 
 impl LevelCurve {
@@ -87,6 +87,36 @@ impl LevelCurve {
 
 	pub fn dist_to_point(&self, a: &Point) -> f32 {
 		return self.find_closest_point_and_distance_on_level_curve(a).1;
+	}
+
+	pub fn increase_point_resolution(&mut self) {
+
+		for i in (0..self.points.len()-1).rev() {
+
+			let p1 = &self.points[i];
+			let p2 = &self.points[i+1];
+
+			let p3 = Point{
+				x: (p1.x + p2.x) / 2.0,
+				y: (p1.y + p2.y) / 2.0,
+				z: p1.z
+			};
+
+			self.points.insert(i+1, p3);
+			
+		}
+
+		let p1 = &self.points[0];
+		let p2 = &self.points[self.points.len() - 1];
+
+		let p3 = Point{
+			x: (p1.x + p2.x) / 2.0,
+			y: (p1.y + p2.y) / 2.0,
+			z: p1.z
+		};
+
+		self.points.insert(self.points.len(), p3);
+
 	}
 }
 
