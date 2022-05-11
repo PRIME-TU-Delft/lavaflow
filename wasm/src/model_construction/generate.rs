@@ -43,8 +43,11 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	} = *settings;
 
 	// convert openCV tree to levelCurveMap (input for construction algorithm)
-	let level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0);
-
+	let mut level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 0);
+	
+	// find and add peak to top of mountain
+	level_curve_map.add_peak();
+	
 	//find maxum cooridinates in level curve model
 	let max = level_curve_map.get_bounding_points().1;
     
