@@ -100,19 +100,19 @@ pub fn make_obj() {
                //(0, 0)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x  as f32  ) * raster.column_width ,
                                                                 b = - ((rows - y) as f32 ) * raster.row_height,
-                                                                c = heights[x][y + 1].ok_or("Error when adding vertex to OBJ file.")?));
+                                                                c = heights[x][y + 1].ok_or("Error when adding vertex to OBJ file for vertex (0, 0).")?));
                //(0, 1)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32  ) * raster.column_width ,
                                                                        b = - ((rows - y) as f32 + 1.0) * raster.row_height,
-                                                                       c = heights[x][y ].ok_or("Error when adding vertex to OBJ file.")?));
+                                                                       c = heights[x][y ].ok_or("Error when adding vertex to OBJ file for vertex (0, 1).")?));
                //(1, 0)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32 + 1.0 ) * raster.column_width ,
                                                                        b = - ((rows - y) as f32) * raster.row_height,
-                                                                       c = heights[x + 1][y + 1].ok_or("Error when adding vertex to OBJ file.")?));
+                                                                       c = heights[x + 1][y + 1].ok_or("Error when adding vertex to OBJ file for vertex (1, 0).")?));
                //(1, 1)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0  \n", a =( x as f32 + 1.0 ) * raster.column_width ,
                                                                            b = - ((rows - y) as f32 + 1.0) * raster.row_height,
-                                                                           c = heights[x+ 1][y].ok_or("Error when adding vertex to OBJ file.")?)); 
+                                                                           c = heights[x+ 1][y].ok_or("Error when adding vertex to OBJ file for vertex (1, 1).")?)); 
      
                //t1 : (0,0) , (0, 1), (1, 1)
                faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 1, c = v + 3 ));

@@ -248,25 +248,25 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 			let tri00 = [
 				(x as f32) * raster.column_width,
-				- heights[y][x].ok_or("Error when reading altitude-levels.")?,
+				- heights[y][x].ok_or("Error when reading altitude-levels for trangle corner (0, 0).")?,
 				(y as f32) * raster.row_height
 			];
 
 			let tri10 = [
 				(x as f32) * raster.column_width,
-				- heights[y+1][x].ok_or("Error when reading altitude-levels.")?,
+				- heights[y+1][x].ok_or("Error when reading altitude-levels for triangle corner (1, 0).")?,
 				(y as f32 + 1.0) * raster.row_height
 			];
 
 			let tri01 = [
 				(x as f32 + 1.0) * raster.column_width,
-				- heights[y][x+1].ok_or("Error when reading altitude-levels.")?,
+				- heights[y][x+1].ok_or("Error when reading altitude-levels for triangle corner (0, 1).")?,
 				(y as f32) * raster.row_height
 			];
 
 			let tri11 = [
 				(x as f32 + 1.0) * raster.column_width,
-				- heights[y + 1][x + 1].ok_or("Error when reading altitude-levels.")?,
+				- heights[y + 1][x + 1].ok_or("Error when reading altitude-levels for triangle corner (1, 1).")?,
 				(y as f32 + 1.0) * raster.row_height
 			];
 
