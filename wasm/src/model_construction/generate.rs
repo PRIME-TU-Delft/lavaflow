@@ -10,6 +10,8 @@ use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
 use super::raster::Raster;
 
+use super::raster_neighbour_smoothing::RasterNeighbourSmoothing;
+
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize, Debug)]
@@ -181,6 +183,9 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// determine heights
 	model_constructor.construct().map_err(|e| e.to_string())?;
 
+	// Apply smoothing
+	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 2).map_err(|e| e.to_string())?;
+
 	// convert height raster to flat list of x,y,z points for GLTF format
 	// every cell had 4 corners, becomes two triangles
 	let mut final_points: Vec<[f32; 3]> = Vec::new();
@@ -248,25 +253,25 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 			let tri00 = [
 				(x as f32) * raster.column_width,
-				- heights[y][x].ok_or("Error when reading altitude-levels for trangle corner (0, 0).")?,
+				heights[y][x].ok_or("Error when reading altitude-levels for trangle corner (0, 0).")?,
 				(y as f32) * raster.row_height
 			];
 
 			let tri10 = [
 				(x as f32) * raster.column_width,
-				- heights[y+1][x].ok_or("Error when reading altitude-levels for triangle corner (1, 0).")?,
+				heights[y+1][x].ok_or("Error when reading altitude-levels for triangle corner (1, 0).")?,
 				(y as f32 + 1.0) * raster.row_height
 			];
 
 			let tri01 = [
 				(x as f32 + 1.0) * raster.column_width,
-				- heights[y][x+1].ok_or("Error when reading altitude-levels for triangle corner (0, 1).")?,
+				heights[y][x+1].ok_or("Error when reading altitude-levels for triangle corner (0, 1).")?,
 				(y as f32) * raster.row_height
 			];
 
 			let tri11 = [
 				(x as f32 + 1.0) * raster.column_width,
-				- heights[y + 1][x + 1].ok_or("Error when reading altitude-levels for triangle corner (1, 1).")?,
+				heights[y + 1][x + 1].ok_or("Error when reading altitude-levels for triangle corner (1, 1).")?,
 				(y as f32 + 1.0) * raster.row_height
 			];
 
