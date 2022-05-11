@@ -188,7 +188,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	// convert height raster to flat list of x,y,z points for GLTF format
 	// every cell had 4 corners, becomes two triangles
-	let mut final_points: Vec<[f32; 3]> = Vec::new();
+	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 
 	// for row in 1..raster.rows {
 	// 	for col in 0..raster.columns {
@@ -276,18 +276,18 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 			];
 
 			// Add the first triangle
-			final_points.push(tri00);
+			final_points.push((tri00, [1., 1., 1.]));
 
-			final_points.push(tri01);
+			final_points.push((tri01, [1., 1., 1.]));
 
-			final_points.push(tri11);
+			final_points.push((tri11, [1., 1., 1.]));
 
 			// Add the second triangle
-			final_points.push(tri00);
+			final_points.push((tri00, [1., 1., 1.]));
 
-			final_points.push(tri11);
+			final_points.push((tri11, [1., 1., 1.]));
 
-			final_points.push(tri10);
+			final_points.push((tri10, [1., 1., 1.]));
 
 		} 
 	}
