@@ -201,19 +201,19 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 			//(0, 0)
 			// verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x  as f32  ) * raster.column_width ,
 			// 												 b = - ((rows - y) as f32 ) * raster.row_height,
-			// 												 c = heights[x][y + 1].unwrap()));
+			// 												 c = heights[x][y + 1].ok_or("Error when reading altitude-levels.")?));
 			// //(0, 1)
 			// verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32  ) * raster.column_width ,
 			// 														b = - ((rows - y) as f32 + 1.0) * raster.row_height,
-			// 														c = heights[x][y ].unwrap()));
+			// 														c = heights[x][y ].ok_or("Error when reading altitude-levels.")?));
 			// //(1, 0)
 			// verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32 + 1.0 ) * raster.column_width ,
 			// 														b = - ((rows - y) as f32) * raster.row_height,
-			// 														c = heights[x + 1][y + 1].unwrap()));
+			// 														c = heights[x + 1][y + 1].ok_or("Error when reading altitude-levels.")?));
 			// //(1, 1)
 			// verts.push_str (&format!("v {a}.0 {c}.0 {b}.0  \n", a =( x as f32 + 1.0 ) * raster.column_width ,
 			// 															b = - ((rows - y) as f32 + 1.0) * raster.row_height,
-			// 															c = heights[x+ 1][y].unwrap())); 
+			// 															c = heights[x+ 1][y].ok_or("Error when reading altitude-levels.")?)); 
   
 			//t1 : (0,0) , (0, 1), (1, 1)
 			// faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 1, c = v + 3 ));
@@ -225,48 +225,48 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 			// let tri00 = [
 			// 	(x  as f32  ) * raster.column_width ,
 			// 	- ((rows - y) as f32 ) * raster.row_height,
-			// 	heights[x][y + 1].unwrap()
+			// 	heights[x][y + 1].ok_or("Error when reading altitude-levels.")?
 			// ];
 
 			// let tri01 = [
 			// 	(x as f32  ) * raster.column_width ,
 			// 	- ((rows - y) as f32 + 1.0) * raster.row_height,
-			// 	heights[x][y ].unwrap()
+			// 	heights[x][y ].ok_or("Error when reading altitude-levels.")?
 			// ];
 
 			// let tri10 = [
 			// 	(x as f32 + 1.0 ) * raster.column_width ,
 			// 	- ((rows - y) as f32) * raster.row_height,
-			// 	heights[x + 1][y + 1].unwrap()
+			// 	heights[x + 1][y + 1].ok_or("Error when reading altitude-levels.")?
 			// ];
 
 			// let tri11 = [
 			// 	( x as f32 + 1.0 ) * raster.column_width ,
 			// 	- ((rows - y) as f32 + 1.0) * raster.row_height,
-			// 	heights[x+ 1][y].unwrap()
+			// 	heights[x+ 1][y].ok_or("Error when reading altitude-levels.")?
 			// ];
 
 			let tri00 = [
 				(x as f32) * raster.column_width,
-				- heights[y][x].unwrap(),
+				- heights[y][x].ok_or("Error when reading altitude-levels.")?,
 				(y as f32) * raster.row_height
 			];
 
 			let tri10 = [
 				(x as f32) * raster.column_width,
-				- heights[y+1][x].unwrap(),
+				- heights[y+1][x].ok_or("Error when reading altitude-levels.")?,
 				(y as f32 + 1.0) * raster.row_height
 			];
 
 			let tri01 = [
 				(x as f32 + 1.0) * raster.column_width,
-				- heights[y][x+1].unwrap(),
+				- heights[y][x+1].ok_or("Error when reading altitude-levels.")?,
 				(y as f32) * raster.row_height
 			];
 
 			let tri11 = [
 				(x as f32 + 1.0) * raster.column_width,
-				- heights[y + 1][x + 1].unwrap(),
+				- heights[y + 1][x + 1].ok_or("Error when reading altitude-levels.")?,
 				(y as f32 + 1.0) * raster.row_height
 			];
 

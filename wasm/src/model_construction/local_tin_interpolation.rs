@@ -131,9 +131,10 @@ impl LevelCurveSet {
 		let mut point_a = 0;
 		let mut point_b = closest_two_levelcurves
 			.1
-			.find_closest_point_with_index_on_level_curve(closest_two_levelcurves.0.get_point(0).unwrap())
+			.find_closest_point_with_index_on_level_curve(closest_two_levelcurves.0.get_point(0)
+			.ok_or("Error when extracting point from level-curve.")?)
 			.0
-			.unwrap();
+			.ok_or("Error when extracting point-index from level-curve.")?;
 
 		// Store both points for later reference
 		let initial_points: (usize, usize) = (point_a, point_b);
@@ -157,17 +158,17 @@ impl LevelCurveSet {
 
 			// Compute minimal angle of triangle 1
 			let triangle_1 = Triangle::new(
-				closest_two_levelcurves.0.get_point(point_a).unwrap(),
-				closest_two_levelcurves.1.get_point(point_b).unwrap(),
-				closest_two_levelcurves.0.get_point(next_point_a).unwrap(),
+				closest_two_levelcurves.0.get_point(point_a).ok_or("Error when extracting point from level-curve.")?,
+				closest_two_levelcurves.1.get_point(point_b).ok_or("Error when extracting point from level-curve.")?,
+				closest_two_levelcurves.0.get_point(next_point_a).ok_or("Error when extracting point from level-curve.")?,
 			);
 			let min_angle_t1 = triangle_1.minimal_internal_angle();
 
 			// Compute minimal angle of triangle 2
 			let triangle_2 = Triangle::new(
-				closest_two_levelcurves.0.get_point(point_a).unwrap(),
-				closest_two_levelcurves.1.get_point(point_b).unwrap(),
-				closest_two_levelcurves.1.get_point(next_point_b).unwrap(),
+				closest_two_levelcurves.0.get_point(point_a).ok_or("Error when extracting point from level-curve.")?,
+				closest_two_levelcurves.1.get_point(point_b).ok_or("Error when extracting point from level-curve.")?,
+				closest_two_levelcurves.1.get_point(next_point_b).ok_or("Error when extracting point from level-curve.")?,
 			);
 			let min_angle_t2 = triangle_2.minimal_internal_angle();
 

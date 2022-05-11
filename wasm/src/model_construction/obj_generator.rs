@@ -81,7 +81,7 @@ pub fn make_obj() {
         let heights = &raster.altitudes;
 
            
-        let mut file = File::create(file_name).unwrap();
+        let mut file = File::create(file_name).ok_or("Error when trying to create file.")?;
         let mut verts: String = String::new();
         let mut faces: String = String::new();
         let columns = col_no;
@@ -100,19 +100,19 @@ pub fn make_obj() {
                //(0, 0)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x  as f32  ) * raster.column_width ,
                                                                 b = - ((rows - y) as f32 ) * raster.row_height,
-                                                                c = heights[x][y + 1].unwrap()));
+                                                                c = heights[x][y + 1].ok_or("Error when adding vertex to OBJ file.")?));
                //(0, 1)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32  ) * raster.column_width ,
                                                                        b = - ((rows - y) as f32 + 1.0) * raster.row_height,
-                                                                       c = heights[x][y ].unwrap()));
+                                                                       c = heights[x][y ].ok_or("Error when adding vertex to OBJ file.")?));
                //(1, 0)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0 \n", a = (x as f32 + 1.0 ) * raster.column_width ,
                                                                        b = - ((rows - y) as f32) * raster.row_height,
-                                                                       c = heights[x + 1][y + 1].unwrap()));
+                                                                       c = heights[x + 1][y + 1].ok_or("Error when adding vertex to OBJ file.")?));
                //(1, 1)
                verts.push_str (&format!("v {a}.0 {c}.0 {b}.0  \n", a =( x as f32 + 1.0 ) * raster.column_width ,
                                                                            b = - ((rows - y) as f32 + 1.0) * raster.row_height,
-                                                                           c = heights[x+ 1][y].unwrap())); 
+                                                                           c = heights[x+ 1][y].ok_or("Error when adding vertex to OBJ file.")?)); 
      
                //t1 : (0,0) , (0, 1), (1, 1)
                faces.push_str (&format!("f {a} {c} {b} \n", a = v, b= v + 1, c = v + 3 ));
