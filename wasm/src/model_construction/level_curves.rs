@@ -96,12 +96,23 @@ impl LevelCurveSet {
 		&self.level_curves
 	}
 
-	// Adds new level curve of one point that represents a peak
+	// Adds new level curve of a single point that represents a peak.
 	//	TODO: how to determine multiple peaks?? -> use parentage tree thing
-	//using centroid formula for polygons from wikipedia
+	// Location of peak is determined using centroid formula for polygons from wikipedia
+	// Height of peak = 1/2 alitude_step above top level curve.
 	pub fn add_peak(&mut self) {
 		//	let old_curve = self.level_curves.last().ok_or("level_curves.add_peak() : Original set has no curves to add to")?;
-		let top_curve = self.level_curves.last().unwrap();
+		
+		//find top level curve
+		let mut max_curve_height = 0.0;
+		let mut top_curve: &LevelCurve = &LevelCurve::new(0.0);
+		for curve in &self.level_curves{
+			if(curve.altitude> max_curve_height){
+				max_curve_height = curve.altitude;
+				top_curve = &curve;
+			}
+		}; 
+
 		let ps = &top_curve.points;
 
 		//calculate area
@@ -122,7 +133,7 @@ impl LevelCurveSet {
 		y = y / (6.0 * a);
 		x = x / (6.0 * a);
 
-		let peak_height = top_curve.altitude + self.altitude_step;
+		let peak_height = top_curve.altitude + 0.5 * self.altitude_step;
 
 		self.add_level_curve(LevelCurve {
 			altitude: peak_height,
