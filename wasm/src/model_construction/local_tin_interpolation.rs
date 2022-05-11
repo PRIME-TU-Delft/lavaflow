@@ -1,5 +1,6 @@
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
+use miette::{Result, miette};
 
 // pub struct LevelCurveSet {
 // 	altitude_step: f32,
@@ -77,10 +78,10 @@ impl LevelCurveSet {
 	/// # Arguments
 	/// * 'self': The LevelCurveSet instance to apply this method to
 	/// * 'p':    The Point to interpolate
-	pub fn local_tin_interpolate(&self, p: &Point) -> f32 {
+	pub fn local_tin_interpolate(&self, p: &Point) -> Result<f32> {
 		// If this set contains less than two level-curves, interpolation is not possible. Return 'p.z'
 		if self.level_curves.is_empty() {
-			return p.z;
+			return Ok(p.z);
 		}
 
 		//
@@ -121,7 +122,7 @@ impl LevelCurveSet {
 
 		// Additional checking constraint: if one of these level-curves has no points, return 'p.z'
 		if points_closest_0.is_empty() || points_closest_1.is_empty() {
-			return p.z;
+			return Ok(p.z);
 		}
 
 		// Create a vector of triangles (which are triples)
@@ -131,9 +132,10 @@ impl LevelCurveSet {
 		let mut point_a = 0;
 		let mut point_b = closest_two_levelcurves
 			.1
-			.find_closest_point_with_index_on_level_curve(closest_two_levelcurves.0.get_point(0).unwrap())
+			.find_closest_point_with_index_on_level_curve(closest_two_levelcurves.0.get_point(0)
+			.ok_or_else(|| miette!("Error when extracting point from level-curve."))?)
 			.0
-			.unwrap();
+			.ok_or_else(|| miette!("Error when extracting point-index from level-curve."))?;
 
 		// Store both points for later reference
 		let initial_points: (usize, usize) = (point_a, point_b);
@@ -157,17 +159,17 @@ impl LevelCurveSet {
 
 			// Compute minimal angle of triangle 1
 			let triangle_1 = Triangle::new(
-				closest_two_levelcurves.0.get_point(point_a).unwrap(),
-				closest_two_levelcurves.1.get_point(point_b).unwrap(),
-				closest_two_levelcurves.0.get_point(next_point_a).unwrap(),
+				closest_two_levelcurves.0.get_point(point_a).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
+				closest_two_levelcurves.1.get_point(point_b).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
+				closest_two_levelcurves.0.get_point(next_point_a).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
 			);
 			let min_angle_t1 = triangle_1.minimal_internal_angle();
 
 			// Compute minimal angle of triangle 2
 			let triangle_2 = Triangle::new(
-				closest_two_levelcurves.0.get_point(point_a).unwrap(),
-				closest_two_levelcurves.1.get_point(point_b).unwrap(),
-				closest_two_levelcurves.1.get_point(next_point_b).unwrap(),
+				closest_two_levelcurves.0.get_point(point_a).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
+				closest_two_levelcurves.1.get_point(point_b).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
+				closest_two_levelcurves.1.get_point(next_point_b).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
 			);
 			let min_angle_t2 = triangle_2.minimal_internal_angle();
 
@@ -200,7 +202,7 @@ impl LevelCurveSet {
 
 		// Check: If the list of triangles is empty, return 'p.z'
 		if triangles.is_empty() {
-			return p.z;
+			return Ok(p.z);
 		}
 
 		let mut triangle_around_p: &Triangle = &triangles[0];
@@ -230,6 +232,6 @@ impl LevelCurveSet {
 
 		// Compute the inverse weighted average over these distances and the z-values of the triangle-corners.
 		// Return this value
-		((triangle_around_p.a.z / dist_p_a) + (triangle_around_p.b.z / dist_p_b) + (triangle_around_p.c.z / dist_p_c)) / dist_sum
+		Ok(((triangle_around_p.a.z / dist_p_a) + (triangle_around_p.b.z / dist_p_b) + (triangle_around_p.c.z / dist_p_c)) / dist_sum)
 	}
 }

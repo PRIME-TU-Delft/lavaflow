@@ -1,3 +1,7 @@
+use miette::{miette, Result};
+
+// use crate::utils::log;
+
 //
 // Class: LevelCurves
 //
@@ -120,6 +124,7 @@ impl LevelCurveSet {
 	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
 	// for the puropose of genererating a raster to cover whole area of levelcurves
 	pub fn get_bounding_points(&self) -> (Point, Point) {
+
 		let mut min = Point {
 			x: std::f32::MAX,
 			y: std::f32::MAX,
@@ -170,13 +175,12 @@ impl LevelCurveSet {
 	/// * `current_height` - to track height when traversing tree, initial call should start with 1
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> LevelCurveSet {
+	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
 		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
 
-		// TODO: dont use unwrap
-		let first_pixel = tree.get_first_pixel().unwrap();
+		let first_pixel = tree.get_first_pixel().ok_or_else(|| miette!("Could not get first pixel"))?;
 		let mut last_saved = first_pixel;
 		let mut last_visited = first_pixel;
 		let mut current_pixel = first_pixel;
@@ -197,7 +201,7 @@ impl LevelCurveSet {
 			];
 			for (x, y) in neighbors {
 				// TODO: check how this holds for corner cases
-				if (x, y) != current_pixel && (x, y) != last_visited && tree.contains_pixel(x, y) {
+				if /*(x, y) != current_pixel &&*/ (x, y) != last_visited && tree.contains_pixel(x, y) {
 					// if dist to last saved and current pixel is desired length, save current pixel, else move on
 					if pixel_dist(&(x, y), &last_saved) >= desired_dist {
 						current_level_curve.add_point(Point {
@@ -207,9 +211,10 @@ impl LevelCurveSet {
 						});
 						last_saved = (x, y);
 					}
-
+				
 					last_visited = current_pixel;
 					current_pixel = (x, y);
+	
 				}
 			}
 			if current_pixel == first_pixel {
@@ -217,16 +222,22 @@ impl LevelCurveSet {
 			}
 		}
 
+		// Add this level curve to the result
+		ret.add_level_curve(current_level_curve);
+
 		// for every child get levelcurvemap and add to ret
+		if tree.get_children().is_empty() {
+			return Ok(ret);
+		}
 
 		for mut child in tree.get_children() {
 			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);
-			for curve in childmap.level_curves {
+			for curve in childmap?.level_curves {
 				ret.add_level_curve(curve);
 			}
 		}
 
-		ret
+		Ok(ret)
 	}
 
 	///
