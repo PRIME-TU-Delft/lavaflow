@@ -22,21 +22,25 @@
 	</div>
 </div>
 <script type="text/javascript">
+async function onOpenCvReady() {
+	cv = await cv;
+	document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+
 	let imgElement = document.getElementById('imageSrc');
 	let inputElement = document.getElementById('fileInput');
 	inputElement.addEventListener('change', (e) => {
-	imgElement.src = URL.createObjectURL(e.target.files[0]);
-}, false);
-imgElement.onload = function() {
-	let mat = cv.imread(imgElement);
-	result = drawCurves(mat)
-	cv.imshow('canvasOutput', result);
-	mat.delete();
-};
-function onOpenCvReady() {
-	document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+		imgElement.src = URL.createObjectURL(e.target.files[0]);
+	}, false);
+	imgElement.onload = function() {
+		let mat = cv.imread(imgElement);
+		// replace values in this array with correct pixel coordinates for the image
+		result = removePerspective(mat, [2522, 2876, 1401, 724, 187, 1461, 783, 3669])
+		cv.imshow('canvasOutput', result);
+		mat.delete();
+	};
 }
 </script>
-<script async src="opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+<script src="https://unpkg.com/@juliavdkris/opencv-wasm@4.5.7/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+<script src="removePerspective"></script>
 </body>
 </html>
