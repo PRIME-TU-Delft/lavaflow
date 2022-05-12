@@ -34,7 +34,7 @@
     // Run on every frame
     p5.draw = function () {
       p5.background(255);
-      for (i = 0; i < points.length; i++) {
+      for (let i = 0; i < points.length; i++) {
         points[i].update(p5); // update position
         points[i].draw(p5); // redraw
         drawLine(p5, points[i], points[(i + 1) % points.length]); // draw line between points
@@ -43,12 +43,12 @@
 
     // When global mouse is pressed
     p5.mousePressed = function () {
-      for (i = 0; i < points.length; i++) points[i].pressed(p5);
+      for (let i = 0; i < points.length; i++) points[i].pressed(p5);
     };
 
     // When global mouse is released
     p5.mouseReleased = function () {
-      for (i = 0; i < points.length; i++) points[i].released(p5);
+      for (let i = 0; i < points.length; i++) points[i].released(p5);
     };
   };
 </script>
