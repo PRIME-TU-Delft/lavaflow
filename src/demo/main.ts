@@ -21,12 +21,12 @@ init().then(() => {
 	let repetitions = 2;
 	let strength_positive = 0.7;
 	let strength_negative = 0.7;
-	let coverage = 8;
-	let svc_weight = 50;
+	let coverage = 4;
+	let svc_weight = 100;
 
-	let rows = 60;
-	let columns = 60;
-	let contour_margin = 20.0;
+	let rows = 30;
+	let columns = 30;
+	let contour_margin = 50.0;
 
 	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin);
 	console.log(gltf);

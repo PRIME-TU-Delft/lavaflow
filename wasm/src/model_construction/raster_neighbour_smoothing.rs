@@ -291,18 +291,27 @@ impl RasterNeighbourSmoothing {
                     // Else, the distance is larger than both current level curves, skip this one
                 }
 
-                // If the altitude of both level curves is higher than the altitude of this point, skip this point
-                if closest_two_levelcurves.0.altitude >= model_constructor.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?
-                    && closest_two_levelcurves.1.altitude >= model_constructor.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))? {
-                    new_altitudes[row][col] = Some(model_constructor.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?);
-                    continue;
-                }
+                // Go over every level curve in this set
+                for i in 2..model_constructor.level_curve_map.level_curves.len() {
+                    // Compute the distance from this level curve to this point
+                    let current_dist = model_constructor.level_curve_map.level_curves[i].furthest_dist_to_point(&point_at_row_col);
 
-                // If the altitude of both level curves is lower than the altitude of this point, skip this point
-                if closest_two_levelcurves.0.altitude <= model_constructor.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?
-                    && closest_two_levelcurves.1.altitude <= model_constructor.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))? {
-                    new_altitudes[row][col] = Some(model_constructor.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?);
-                    continue;
+                    // If this distance is smaller than both current level-curves, shift everything over
+                    if current_dist < closest_two_distances.0 && current_dist < closest_two_distances.1 {
+                        closest_two_levelcurves.1 = closest_two_levelcurves.0;
+                        closest_two_levelcurves.0 = &model_constructor.level_curve_map.level_curves[i];
+
+                        closest_two_distances.1 = closest_two_distances.0;
+                        closest_two_distances.0 = current_dist;
+                    }
+                    // Else, if the distance is greater than the first level curve but smaller than the second, insert the new one
+                    else if current_dist >= closest_two_distances.0 && current_dist < closest_two_distances.1 {
+                        closest_two_levelcurves.1 = &model_constructor.level_curve_map.level_curves[i];
+
+                        closest_two_distances.1 = current_dist;
+                    }
+
+                    // Else, the distance is larger than both current level curves, skip this one
                 }
 
                 // Compute the distance between these two level-curves

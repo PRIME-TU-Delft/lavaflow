@@ -326,7 +326,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	for i in 0..5 {
-		RasterNeighbourSmoothing::smooth_staircase_effect(&mut model_constructor, strength_positive, strength_negative, coverage, svc_weight, false).map_err(|e| e.to_string())?;
+		RasterNeighbourSmoothing::smooth_staircase_effect_without_border(&mut model_constructor, strength_positive, strength_negative, coverage, svc_weight, false).map_err(|e| e.to_string())?;
 	}
 
 	// convert height raster to flat list of x,y,z points for GLTF format
