@@ -53,8 +53,6 @@
   };
 </script>
 
-<h1>Hello</h1>
-
 <P5 {sketch} />
 
 <style>
