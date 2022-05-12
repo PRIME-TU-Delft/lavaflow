@@ -1,21 +1,24 @@
-use std::{collections::HashMap, usize};
+use std::{cmp::Ordering, collections::HashMap, usize};
 
-use super::{point::Point, raster::Raster};
+use super::{
+	point::Point,
+	raster::{self, Raster},
+};
 
 /// a face is a square of references to points
 /// should only ever have 4 points
 /// TODO: remove pub
 pub struct Face {
-	points: Vec<usize>,
+	pub points: Vec<usize>,
 }
 
 //TODO: remove pub
 #[derive(Clone)]
 pub struct Vertex {
-	x: f32,
-	y: f32,
-	z: f32,
-	is_sharp: bool,
+	pub x: f32,
+	pub y: f32,
+	pub z: f32,
+	pub is_sharp: bool,
 }
 
 //TODO: remove pub
@@ -33,44 +36,86 @@ pub struct Edge {
 ///
 pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &mut Raster) -> Result<(Vec<Vertex>, Vec<Face>), String> {
 	// transform raster to list of faces and vertices
-	let (mut v, mut f) = raster_to_faces(raster, is_sharp);
+	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp);
 
 	// call catmull clark i times
 	for i in 0..iterations {
-		(v, f) = catmull_clark(&f, &v)?;
+		(vs, fs) = catmull_clark(&fs, &vs)?;
+		println!("surface subdivision iteration {i} done!");
 	}
 
-	Ok((v, f))
-
-
+	Ok((vs, fs))
 }
 
 //TODO IMPLEMENT
 fn raster_to_faces(raster: &mut Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
 	let mut points = Vec::new();
-	let mut faces  = Vec::new();
-	
-	points.push(Vertex{ x: 0.0, y: 0.0, z: 0.0, is_sharp: false });
-	points.push(Vertex{ x: 0.0, y: 5.0, z: 0.0, is_sharp: false });
-	points.push(Vertex{ x: 5.0, y: 0.0, z: 0.0, is_sharp: false });
-	points.push(Vertex{ x: 5.0, y: 5.0, z: 0.0, is_sharp: false });
+	let mut faces = Vec::new();
 
-	points.push(Vertex{ x: 0.0, y: 0.0, z: 5.0, is_sharp: false });
-	points.push(Vertex{ x: 0.0, y: 5.0, z: 5.0, is_sharp: false });
-	points.push(Vertex{ x: 5.0, y: 0.0, z: 5.0, is_sharp: false });
-	points.push(Vertex{ x: 5.0, y: 5.0, z: 5.0, is_sharp: false });
+	points.push(Vertex {
+		x: 0.0,
+		y: 0.0,
+		z: 0.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 0.0,
+		y: 5.0,
+		z: 0.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 0.0,
+		z: 0.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 5.0,
+		z: 0.0,
+		is_sharp: false,
+	});
 
-	faces.push(Face{points: vec![ 0, 1, 2, 3 ]});
-	faces.push(Face{points: vec![ 0,1,4,5 ]});
-	faces.push(Face{points: vec![ 0,2,4,3 ]});
-	faces.push(Face{points: vec![ 1,3,5,7 ]}); 
-	faces.push(Face{points: vec![ 2,3,6,7 ]});
-	faces.push(Face{points: vec![ 4,5,6,7 ]});
+	points.push(Vertex {
+		x: 0.0,
+		y: 0.0,
+		z: 5.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 0.0,
+		y: 5.0,
+		z: 5.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 0.0,
+		z: 5.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 5.0,
+		z: 5.0,
+		is_sharp: false,
+	});
 
-	(points,faces)
+	faces.push(Face { points: vec![0, 1, 3, 2] });
+	faces.push(Face { points: vec![0, 1, 5, 4] });
+	faces.push(Face { points: vec![0, 2, 6, 4] });
+	faces.push(Face { points: vec![1, 3, 7, 5] });
+	faces.push(Face { points: vec![2, 3, 7, 6] });
+	faces.push(Face { points: vec![4, 5, 7, 6] });
+
+
+
+	(points, faces)
 }
 
 // implemented using : https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
+//   			and : https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
 //TODO modify implementation such that sharp values are not modified
 //TODO dont copy input lists
 fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<Face>), String> {
@@ -129,11 +174,16 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 	for edge in edges {
 		let edge_point = edge_points.get(edgenum).ok_or("catmull clark: edge does not exist at index")?.clone();
 		new_points.push(edge_point);
-		edge_index_map.insert((edge.p1, edge.p2), next_index);
+		edge_index_map.insert(smallest_first(edge.p1, edge.p2), next_index);
 		next_index += 1;
 		edgenum += 1;
 	}
-
+	// println!("MAP");
+	// for e in &edge_index_map{
+	// 	println!("edge ({a} , {b})", a = e.0.0, b = e.0.1)
+		
+	// }
+	//println!("smallest first test : {a} {b}", a = smallest_first(2, 0).0 , b = smallest_first(2, 0).1);
 	//
 	//  GENERATE FACES USING NEW POINTS
 	//
@@ -151,10 +201,10 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 			let c = *f.points.get(2).unwrap();
 			let d = *f.points.get(3).unwrap();
 			let face_point_abcd = face_point_index[facenum];
-			let edge_point_ab = *edge_index_map.get(&smallest_first(a, b)).ok_or("catmull : egde index ab not found in map")?;
-			let edge_point_da = *edge_index_map.get(&smallest_first(d, a)).ok_or("catmull : egde index ab not found in map")?;
-			let edge_point_bc = *edge_index_map.get(&smallest_first(b, c)).ok_or("catmull : egde index ab not found in map")?;
-			let edge_point_cd = *edge_index_map.get(&smallest_first(c, d)).ok_or("catmull : egde index ab not found in map")?;
+			let edge_point_ab = *edge_index_map.get(&smallest_first(a, b)).ok_or(format!("catmull : egde ab not found in map: {a} , {b}"))?;
+			let edge_point_da = *edge_index_map.get(&smallest_first(d, a)).ok_or(format!("catmull : da de ab not found in map: {d} , {a}"))?;
+			let edge_point_bc = *edge_index_map.get(&smallest_first(b, c)).ok_or("catmull : egde index bc not found in map")?;
+			let edge_point_cd = *edge_index_map.get(&smallest_first(c, d)).ok_or("catmull : egde index cd not found in map")?;
 
 			new_faces.push(Face {
 				points: vec![a, edge_point_ab, face_point_abcd, edge_point_da],
@@ -220,12 +270,30 @@ fn average_of_points(xs: Vec<Vertex>) -> Vertex {
 		is_sharp: false,
 	}
 }
+fn average_of_points_b(xs: Vec<&Vertex>) -> Vertex {
+	let n = xs.len() as f32;
+	let mut agr = Vertex {
+		x: 0.0,
+		y: 0.0,
+		z: 0.0,
+		is_sharp: false,
+	};
+	for x in xs {
+		agr = add(&agr, &x);
+	}
+	Vertex {
+		x: agr.x / n,
+		y: agr.y / n,
+		z: agr.z / n,
+		is_sharp: false,
+	}
+}
 
 fn smallest_first(p1: usize, p2: usize) -> (usize, usize) {
 	if (p1 <= p2) {
 		(p1, p2)
 	} else {
-		(p2, p2)
+		(p2, p1)
 	}
 }
 
@@ -261,56 +329,51 @@ fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String
 }
 
 //gets all edges of faces -> for each edge the adjacent faces and center of edge
-fn get_edges_faces(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Edge>, String> {
+fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String> {
 	// will have [pointnum_1, pointnum_2, facenum]
 
 	let mut edges: Vec<Edge> = Vec::new();
 
 	// get edges from each face
 
-	for facenum in 0..f.len() {
-		let face = f.get(facenum).ok_or("get_edges_faces: vertex at index does not exist")?;
-		let num_points = f.len();
-		// loop over index into face
-		for pointindex in 0..num_points {
-			// if not last point then edge is curr point and next point
-			let mut other_index = pointindex + 1;
-			if !pointindex < (num_points - 1) {
-				other_index = 0;
-			}
+	for facenum in 0..fs.len() {
+		let f = fs.get(facenum).ok_or(format!("get_edges_faces: vertex at index does not exist at {facenum}, f.len = {} ", fs.len()))?;
+		let num_points = f.points.len();
+		// hardcoded tuples of face corners that make edges
+		let es = vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])];
+		
+		for (i1, i2) in es{
+				
 
-			//fins indexes of points in face
-			let i1 = *face.points.get(pointindex).ok_or("get_edges_faces: vertex at index does not exist")?;
-			let i2 = *face.points.get(other_index).ok_or("get_edges_faces: vertex at index does not exist")?;
+				let p1 = vs.get(i1).ok_or("get_edges_faces: vertex at index does not exist")?;
+				let p2 = vs.get(i2).ok_or("get_edges_faces: vertex at index does not exist")?;
+				
 
-			//find points using verts
-			let p1 = v.get(i1).ok_or("get_edges_faces: vertex at index does not exist")?;
-			let p2 = v.get(i2).ok_or("get_edges_faces: vertex at index does not exist")?;
-
-			// order points in edge by lowest point number
-			if (i1 < i2) {
-				edges.push(Edge {
-					p1: i1,
-					p2: i2,
-					f1: facenum,
-					f2: None,
-					center: center_point(p1, p2),
-				});
-			} else {
-				edges.push(Edge {
-					p1: i1,
-					p2: i2,
-					f1: facenum,
-					f2: None,
-					center: center_point(p1, p2),
-				});
+				// order points in edge by lowest point number
+				// and define center of edges
+				if (i1 < i2) {
+					edges.push(Edge {
+						p1: i1,
+						p2: i2,
+						f1: facenum,
+						f2: None,
+						center: center_point(p1, p2),
+					});
+				} else {
+					edges.push(Edge {
+						p1: i2,
+						p2: i1,
+						f1: facenum,
+						f2: None,
+						center: center_point(p1, p2),
+					});
+				}
 			}
 		}
-	}
 
-	//TODO : figure out sort in rust
-	// sort edges by pointnum_1, pointnum_2, facenum, for merge step
-	//edges =  edges.sort_by(|a, b| a.p1.cmp(a.p2));
+
+	//sort edges by pointnum_1, pointnum_2, facenum, for merge step
+	edges.sort_by_key(|a|( a.p1, a.p2, a.f1) );
 
 	//if two faces share an edge it is currently in edges list twice so
 	// merge edges with 2 adjacent faces
@@ -358,6 +421,13 @@ fn get_edges_faces(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Edge>, String> 
 		}
 	}
 
+	// println!("final edges");
+	// for e in &merged_edges{
+	// 	println !("e : ({e1},{e2}), face num : {e3}" , e1 =e.p1,
+	// 	e2 = e.p2,
+	// 	e3 = e.f1)
+	// }
+
 	Ok(merged_edges)
 }
 
@@ -378,9 +448,9 @@ fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>
 		let ME = &edge.center;
 		//TODO what if sharp
 		edge_points.push(Vertex {
-			x: (AF.x + ME.x) / 2.0,
-			y: (AF.y + ME.y) / 2.0,
-			z: (AF.z + ME.z) / 2.0,
+			x: (AF.x + ME.x) / 3.0,
+			y: (AF.y + ME.y) / 3.0,
+			z: (AF.z + ME.z) / 3.0,
 			is_sharp: false,
 		});
 	}
@@ -454,13 +524,13 @@ fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<
 
 	for i in 0..vs.len() {
 		let v = vs.get(i).ok_or("get average face points : could not find face")?;
-		let n = f_per_v.get(i).ok_or("get average face points : could not find face")?;
+		let n = *f_per_v.get(i).ok_or("get average face points : could not find face")? as f32;
 		let F = avg_face_points.get(i).ok_or("get average face points : could not find face")?;
 		let R = avg_mid_edges.get(i).ok_or("get average face points : could not find face")?;
 
-		let x = ((v.x * (*n as f32 - 3.0)) + (2.0 * R.x) + F.x);
-		let y = ((v.y * (*n as f32 - 3.0)) + (2.0 * R.y) + F.y);
-		let z = ((v.y * (*n as f32 - 3.0)) + (2.0 * R.y) + F.y);
+		let x = ((v.x * (n  - 3.0)) + (2.0 * R.x) + F.x) / n;
+		let y = ((v.y * (n  - 3.0)) + (2.0 * R.y) + F.y) / n;
+		let z = ((v.z * (n  - 3.0)) + (2.0 * R.z) + F.z) / n;
 
 		new_vertices.push(Vertex { x, y, z, is_sharp: false })
 	}
