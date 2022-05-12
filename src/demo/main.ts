@@ -18,12 +18,17 @@ init().then(() => {
 	console.log(tree.debug());
 	console.log(settings.debug());
 
-	let repetitions = 3;
-	let strength = 0.1;
+	let repetitions = 2;
+	let strength_positive = 0.7;
+	let strength_negative = 0.7;
 	let coverage = 8;
 	let svc_weight = 50;
 
-	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength, coverage, svc_weight);
+	let rows = 60;
+	let columns = 60;
+	let contour_margin = 20.0;
+
+	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin);
 	console.log(gltf);
 
 	// View the GLTF in the browser
@@ -33,7 +38,7 @@ init().then(() => {
 	const controls = new OrbitControls( camera, renderer.domElement );
 
 	renderer.setFaceCulling(false);
-	renderer.setClearColor( 0xaaaaaa, 1 );
+	renderer.setClearColor( 0xbbbfc9, 1 );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
@@ -48,6 +53,15 @@ init().then(() => {
 	controls.update();
 
 
+
+	const light = new THREE.PointLight( 0xffffff, 1, 0 );
+	light.position.set( 100, 150, 100 );
+	scene.add( light );
+
+	const light2 = new THREE.AmbientLight( 0x999999, 1 ); // soft white light
+	scene.add( light2 );
+
+
 	let loader = new GLTFLoader();
 	loader.load(
 		"data:text/plain;base64," + btoa(gltf),  // Data URI with the GLTF file's content
@@ -55,6 +69,24 @@ init().then(() => {
 		function ( gltf ) {
 			gltf.scene.scale.set(0.1, 0.1, 0.1);  // Scale the model
 			gltf.scene.children[0].material.side = THREE.DoubleSide;  // "Invert" the mode sides
+
+			gltf.scene.traverse( child => {
+
+				if ( child.isMesh ) child.material.flatShading = THREE.SmoothShading;
+				if ( child.material ) child.material.metalness = 0.5;
+			
+			} );
+
+			gltf.scene.traverse( function ( node ) {
+
+				if ( node.isMesh || node.isLight ) node.castShadow = true;
+				if ( node.isMesh || node.isLight ) node.receiveShadow = true;
+
+			} );
+
+			gltf.scene.position.x = -60;
+			gltf.scene.position.z = -50;
+
 			scene.add( gltf.scene );
 
 			gltf.animations; // Array<THREE.AnimationClip>
@@ -80,6 +112,8 @@ init().then(() => {
 		}
 
 	);
+
+	renderer.shadowMap.enabled = true
 
 
 	function animate() {

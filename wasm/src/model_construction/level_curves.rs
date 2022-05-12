@@ -10,7 +10,7 @@ use super::point::Point;
 
 #[derive(Debug)]
 pub struct LevelCurve {
-	altitude: f32,
+	pub altitude: f32,
 	pub points: Vec<Point>,
 }
 
