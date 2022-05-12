@@ -4,20 +4,23 @@ use super::{point::Point, raster::Raster};
 
 /// a face is a square of references to points
 /// should only ever have 4 points
-struct Face {
+/// TODO: remove pub
+pub struct Face {
 	points: Vec<usize>,
 }
 
+//TODO: remove pub
 #[derive(Clone)]
-struct Vertex {
+pub struct Vertex {
 	x: f32,
 	y: f32,
 	z: f32,
 	is_sharp: bool,
 }
 
+//TODO: remove pub
 #[derive(Clone)]
-struct Edge {
+pub struct Edge {
 	p1: usize,
 	p2: usize,
 	f1: usize,
@@ -28,27 +31,43 @@ struct Edge {
 ///
 /// TODO: figure out input and return in relation to GLTF : list(triangle(point, point, point))
 ///
-pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &mut Raster) {
+pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &mut Raster) -> Result<(Vec<Vertex>, Vec<Face>), String> {
 	// transform raster to list of faces and vertices
-	let (mut f, mut v) = raster_to_faces(raster, is_sharp);
+	let (mut v, mut f) = raster_to_faces(raster, is_sharp);
 
 	// call catmull clark i times
 	for i in 0..iterations {
-		catmull_clark(&f, &v);
+		(v, f) = catmull_clark(&f, &v)?;
 	}
+
+	Ok((v, f))
+
+
 }
 
 //TODO IMPLEMENT
-fn raster_to_faces(raster: &mut Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Face>, Vec<Vertex>) {
-	(
-		vec![],
-		vec![Vertex {
-			x: 0.0,
-			y: 1.0,
-			z: 2.0,
-			is_sharp: false,
-		}],
-	)
+fn raster_to_faces(raster: &mut Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
+	let mut points = Vec::new();
+	let mut faces  = Vec::new();
+	
+	points.push(Vertex{ x: 0.0, y: 0.0, z: 0.0, is_sharp: false });
+	points.push(Vertex{ x: 0.0, y: 5.0, z: 0.0, is_sharp: false });
+	points.push(Vertex{ x: 5.0, y: 0.0, z: 0.0, is_sharp: false });
+	points.push(Vertex{ x: 5.0, y: 5.0, z: 0.0, is_sharp: false });
+
+	points.push(Vertex{ x: 0.0, y: 0.0, z: 5.0, is_sharp: false });
+	points.push(Vertex{ x: 0.0, y: 5.0, z: 5.0, is_sharp: false });
+	points.push(Vertex{ x: 5.0, y: 0.0, z: 5.0, is_sharp: false });
+	points.push(Vertex{ x: 5.0, y: 5.0, z: 5.0, is_sharp: false });
+
+	faces.push(Face{points: vec![ 0, 1, 2, 3 ]});
+	faces.push(Face{points: vec![ 0,1,4,5 ]});
+	faces.push(Face{points: vec![ 0,2,4,3 ]});
+	faces.push(Face{points: vec![ 1,3,5,7 ]}); 
+	faces.push(Face{points: vec![ 2,3,6,7 ]});
+	faces.push(Face{points: vec![ 4,5,6,7 ]});
+
+	(points,faces)
 }
 
 // implemented using : https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
