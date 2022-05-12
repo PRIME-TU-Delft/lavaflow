@@ -247,17 +247,17 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	// Increase the resolution for the level-curves
-	for i in 0..4 {
-		level_curve_0.increase_point_resolution();
-		level_curve_1.increase_point_resolution();
-		level_curve_2.increase_point_resolution();
-		level_curve_3.increase_point_resolution();
-		level_curve_4.increase_point_resolution();
-		level_curve_5.increase_point_resolution();
-		level_curve_6.increase_point_resolution();
-		level_curve_7.increase_point_resolution();
-		level_curve_8.increase_point_resolution();
-	}
+	// for i in 0..0 {
+	// 	level_curve_0.increase_point_resolution();
+	// 	level_curve_1.increase_point_resolution();
+	// 	level_curve_2.increase_point_resolution();
+	// 	level_curve_3.increase_point_resolution();
+	// 	level_curve_4.increase_point_resolution();
+	// 	level_curve_5.increase_point_resolution();
+	// 	level_curve_6.increase_point_resolution();
+	// 	level_curve_7.increase_point_resolution();
+	// 	level_curve_8.increase_point_resolution();
+	// }
 
 
     let mut level_curve_map: LevelCurveSet = LevelCurveSet::new(100.0);
@@ -323,11 +323,15 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	// }
 
+	
+	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
 
+	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 5, 1, false).map_err(|e| e.to_string())?;
+	
 
-	for i in 0..5 {
-		RasterNeighbourSmoothing::smooth_staircase_effect_without_border(&mut model_constructor, strength_positive, strength_negative, coverage, svc_weight, false).map_err(|e| e.to_string())?;
-	}
+	// for i in 0..5 {
+	// 	RasterNeighbourSmoothing::smooth_staircase_effect_without_border(&mut model_constructor, strength_positive, strength_negative, coverage, svc_weight, false).map_err(|e| e.to_string())?;
+	// }
 
 	// convert height raster to flat list of x,y,z points for GLTF format
 	// every cell had 4 corners, becomes two triangles
