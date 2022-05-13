@@ -567,12 +567,8 @@ pub fn make_obj(vs: &Vec<Vertex>, fs: &Vec<Face>) -> String {
 		verts.push_str(&format!("v {a} {c} {b} \n", a = v.x, b = v.y, c = v.z));
 	}
 	for f in fs {
-		println!("face");
-		for p in &f.points{
-			println!("{p}");
-		}
-		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[0] + 1, b = f.points[2] + 1, c = f.points[3] + 1));
-		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[0] + 1, b = f.points[1] + 1, c = f.points[3] + 1));
+		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[0] + 1, b = f.points[1] + 1, c = f.points[2] + 1));
+		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[3] + 1, b = f.points[2] + 1, c = f.points[0] + 1));
 	}
 
 	verts.push_str(&faces);
