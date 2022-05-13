@@ -6,7 +6,7 @@ pub struct ModelConstructor<'a> {
 	contour_margin: f32,
 	level_curve_map: &'a LevelCurveSet,
 	pub is_svc: Vec<Vec<bool>>,
-	raster: &'a mut Raster,
+	pub raster: &'a mut Raster,
 }
 
 // TODO: implement once model is working

@@ -65,11 +65,29 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 	let columns = raster.columns;
 	let heights = &raster.altitudes;
 
+	//todo remove hardcoded heights
+	// let mut heights = vec![vec![Some(0.0); columns]; rows];
+	// for i in 3 ..(rows-4) {
+	// 	for j in 3..columns-4{
+	// 		heights[i][j] = Some(20.0);
+	// 	}
+	// }
+	// for i in 7 ..(rows- 8) {
+	// 	for j in 7..columns-8{
+	// 		heights[i][j] = Some(30.0);
+	// 	}
+	// }
+	// for i in 10 ..(rows-11) {
+	// 	for j in 10..columns-11{
+	// 		heights[i][j] = Some(40.0);
+	// 	}
+	// }
+
 	let mut next_index = 0;
 
 	//TODO : think about how iteration over rows makes checking for duplicates in vs easier
-	for x in 0..raster.columns {
-		for y in 0..raster.columns {
+	for x in 0..raster.columns -1 {
+		for y in 0..raster.columns -1 {
 			//indexes of face vertices
 			let mut ps = Vec::new();
 
@@ -78,29 +96,29 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 			let a = Vertex {
 				x: (x as f32 * raster.column_width),
 				y: ((rows - y) as f32 * raster.row_height),
-				z: heights[x][y].unwrap(),
-				is_sharp: is_sharp[x][y],
+				z: heights[x][y + 1].unwrap(),
+				is_sharp: is_sharp[x][y + 1],
 			};
 			//0,1
 			let b = Vertex {
 				x: (x as f32 * raster.column_width),
 				y: ((rows - y + 1) as f32) * raster.row_height,
-				z: heights[x][y + 1].unwrap(),
-				is_sharp: is_sharp[x][y + 1],
+				z: heights[x][y ].unwrap(),
+				is_sharp: is_sharp[x][y ],
 			};
 			//1, 0
 			let c = Vertex {
 				x: ((x + 1) as f32 * raster.column_width),
 				y: ((rows - y) as f32) * raster.row_height,
-				z: heights[x + 1][y].unwrap(),
-				is_sharp: is_sharp[x + 1][y],
+				z: heights[x + 1][y + 1].unwrap(),
+				is_sharp: is_sharp[x + 1][y + 1],
 			};
 			//1,1
 			let d = Vertex {
 				x: ((x + 1) as f32 * raster.column_width),
 				y: ((rows - y + 1) as f32) * raster.row_height,
-				z: heights[x + 1][y + 1].unwrap(),
-				is_sharp: is_sharp[x + 1][y + 1],
+				z: heights[x + 1][y].unwrap(),
+				is_sharp: is_sharp[x + 1][y],
 			};
 
 			//check if they are already added before adding, if it exists, get index
@@ -116,8 +134,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 						.position(|x| x == &a)
 						.unwrap(),
 				);
-			}
-			{
+			} else {
 				ps.push(next_index);
 				vs.push(a);
 				next_index += 1;
@@ -132,8 +149,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 						.position(|x| x == &b)
 						.unwrap(),
 				);
-			}
-			{
+			} else {
 				ps.push(next_index);
 				vs.push(b);
 				next_index += 1;
@@ -147,14 +163,13 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 						.position(|x| x == &d)
 						.unwrap(),
 				);
-			}
-			{
+			} else {
 				ps.push(next_index);
 				vs.push(d);
 				next_index += 1;
 			}
 			//(0 , 1)
-			if vs.contains(&c){
+			if vs.contains(&c) {
 				//if point already in list store index to it
 				ps.push(
 					vs.iter()
@@ -162,14 +177,13 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 						.position(|x| x == &c)
 						.unwrap(),
 				);
-			}
-			{
+			} else {
 				ps.push(next_index);
 				vs.push(c);
 				next_index += 1;
 			}
-
 			//add face
+
 			fs.push(Face { points: ps });
 		}
 	}
