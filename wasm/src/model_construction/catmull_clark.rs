@@ -44,6 +44,7 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster:
 	//
 	let obj = make_obj(&vs, &fs);
 	make_file(format!("input.obj"), obj);
+	println!("input file done");
 
 	// call catmull clark i times
 	for i in 0..iterations {
