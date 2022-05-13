@@ -1,3 +1,5 @@
+use std::thread::current;
+
 use crate::utils::log;
 
 use super::constructor::ModelConstructor;
@@ -9,7 +11,7 @@ use miette::{Result, miette};
 
 
 pub struct Smoother<'a> {
-    raster: &'a Raster,
+    raster: &'a mut Raster,
     is_svc: &'a Vec<Vec<bool>>,
     point_indices_per_layer: Vec<Vec<(usize, usize)>>
 }
@@ -23,22 +25,88 @@ impl<'a> Smoother<'a> {
         let mut point_indices_per_layer: Vec<Vec<(usize, usize)>> = Vec::new();
 
         // Initialize the list, by pushing empty lists for every level curve
-        for _lc in &model_constructor.level_curve_map.level_curves {
+        for _lc in 0..model_constructor.level_curve_map.level_curves.len()+1 {
             point_indices_per_layer.push(Vec::new());
         }
 
-        // 1. Triangulate all the level-curves.
-        let mut triangles_per_level_curve: Vec<Vec<(&Point, &Point, &Point)>> = Vec::new();
+        // Create a vector of all pixels that have not yet been assigned a place
+        let mut unassigned_points: Vec<(usize, usize)> = Vec::new();
+        for row in 0..model_constructor.raster.rows {
+            for col in 0..model_constructor.raster.columns {
+                unassigned_points.push((row, col));
+            }
+        }
 
-        for lc in &model_constructor.level_curve_map.level_curves {
-            triangles_per_level_curve.push(Smoother::triangulate_level_curve(lc)?);
+        // 1. Triangulate all the level-curves.
+        let mut triangles_per_level_curve: Vec<(usize, Vec<(&Point, &Point, &Point)>)> = Vec::new();
+
+        // for lc in &model_constructor.level_curve_map.level_curves {
+        //     triangles_per_level_curve.push(Smoother::triangulate_level_curve(lc)?);
+        // }
+
+        let mut current_altitude: f32 = -10.0;
+        let mut current_lc: usize = 0;
+
+        for (i, lc) in model_constructor.level_curve_map.level_curves.iter().enumerate() {
+            if lc.altitude > current_altitude {
+                current_altitude = lc.altitude;
+                current_lc = i;
+            }
+        }
+
+        let mut drawn_lcs: Vec<usize> = Vec::new();
+
+        loop {
+            triangles_per_level_curve.push((current_lc, Smoother::triangulate_level_curve(&model_constructor.level_curve_map.level_curves[current_lc])?));
+
+            drawn_lcs.push(current_lc);
+
+            current_altitude = -10.0;
+
+            let mut found_new = false;
+
+            for (i, lc) in model_constructor.level_curve_map.level_curves.iter().enumerate() {
+                if lc.altitude > current_altitude && !drawn_lcs.contains(&i) {
+                    current_altitude = lc.altitude;
+                    current_lc = i;
+                    found_new = true;
+                }
+            }
+
+            if !found_new {
+                break;
+            }
         }
 
         // 2. For every point in the raster, assign it to the right layer, according to this triangulation.
-        
+        // Loop over all the level curves
+        for (i, triangle_set) in triangles_per_level_curve.iter().enumerate() {
+            // Loop over all unassigned points
+            for j in (0..unassigned_points.len()).rev() {
+                let row = unassigned_points[j].0;
+                let col = unassigned_points[j].1;
 
-        // 3. Points that have not yet been assigned fall outside all level-curves, meaning they are in the lowest
+                let raster_pixel = model_constructor.raster.get_pixel(row, col);
+
+                let p = Point{
+                    x: raster_pixel.0,
+                    y: raster_pixel.1,
+                    z: 0.0
+                };
+
+                // If this point is in this level-curve, assign this point to the level-curve
+                if Smoother::point_in_triangle_set(&triangle_set.1, &p) {
+                    point_indices_per_layer[triangle_set.0+1].push((row, col));
+                    unassigned_points.remove(j);
+                }
+            }
+        }
+
+        // 4. Points that have not yet been assigned fall outside all level-curves, meaning they are in the lowest
         //    level of the mountain (the bottom of the mountain). This should be layer 0.
+        for (row, col) in unassigned_points {
+            point_indices_per_layer[0].push((row, col));
+        }
 
         Ok(Self {
             raster: model_constructor.raster,
@@ -46,6 +114,19 @@ impl<'a> Smoother<'a> {
             point_indices_per_layer: point_indices_per_layer
         })
 
+    }
+
+    pub fn layers(&self) -> usize {
+        self.point_indices_per_layer.len()
+    }
+
+    /// Method: get all (row, col) indices of points in a certain layer
+    pub fn get_point_indices_in_level(&self, level: usize) -> Result<&Vec<(usize, usize)>> {
+        if level < self.point_indices_per_layer.len() {
+            return Ok(&self.point_indices_per_layer[level]);
+        }
+
+        Err(miette!("Requested points of non-existing layer."))
     }
 
 
@@ -57,6 +138,11 @@ impl<'a> Smoother<'a> {
     /// # Returns:
     /// * A triple of Points, representing a triangle
     pub fn triangulate_level_curve(level_curve: &LevelCurve) -> Result<Vec<(&Point, &Point, &Point)>> {
+
+        // Prebase: If this level-curve contains less than three points, throw an exception
+        if level_curve.points.len() < 3 {
+            return Err(miette!("Level Curve contains less than three points."));
+        }
 
         let mut result: Vec<(&Point, &Point, &Point)> = Vec::new();
 
@@ -168,6 +254,188 @@ impl<'a> Smoother<'a> {
 
         // Return the resulting vector
         Ok(result)
+
+    }
+
+
+    /// Method: check if a point falls within a set of triangles
+    fn point_in_triangle_set(triangle_set: &Vec<(&Point, &Point, &Point)>, p: &Point) -> bool {
+
+        // Loop over all the triangles
+        for i in 0..triangle_set.len() {
+
+            let a = triangle_set[i].0;
+            let b = triangle_set[i].1;
+            let c = triangle_set[i].2;
+
+            // Create a triangle from these three points
+            let tri = Triangle::new(a, b, c);
+
+            // If this triangle contains the point, set 'result' to true and break out of the loop
+            if tri.contains_point(p) {
+                return true;
+            }
+
+        }
+
+        false
+
+    }
+
+
+
+    //
+    // SMOOTHING ALGORITHMS
+    //
+
+    fn get_neighbour_altitude(&self, row: usize, col: usize, alt_row: isize, alt_col: isize) -> Result<f32> {
+
+        let row_n = row as isize + alt_row;
+        let col_n = col as isize + alt_col;
+
+        // If the considered neighbour falls outside of the raster, return altitude 0.0
+        if row_n < 0 || col_n < 0 || row_n as usize >= self.raster.rows || col_n as usize >= self.raster.columns {
+            return Ok(0.0);
+        }
+
+        // Else, find the neighbour and return its altitude value
+        else {
+            return Ok(self.raster.altitudes[row_n as usize][col_n as usize].ok_or_else(|| miette!("Altitude not present."))?);
+        }
+
+    }
+
+    fn neighbour_is_svc(&self, row: usize, col: usize, alt_row: isize, alt_col: isize) -> bool {
+
+        let row_n = row as isize + alt_row;
+        let col_n = col as isize + alt_col;
+
+        // If the considered neighbour falls outside of the raster, return altitude 0.0
+        if row_n < 0 || col_n < 0 || row_n as usize >= self.raster.rows || col_n as usize >= self.raster.columns {
+            return false;
+        }
+
+        // Else, find the neighbour and return its altitude value
+        else {
+            return self.is_svc[row_n as usize][col_n as usize];
+        }
+
+    }
+
+    fn neighbour_belongs_to_layer(&self, layer: usize, row: usize, col: usize, alt_row: isize, alt_col: isize) -> bool {
+
+        // If the specified layer doesn't exist, return error
+        if layer >= self.point_indices_per_layer.len() {
+            return false;
+        }
+
+        let row_n = row as isize + alt_row;
+        let col_n = col as isize + alt_col;
+
+        // If the considered neighbour falls outside of the raster, return altitude 0.0
+        if row_n < 0 || col_n < 0 || row_n as usize >= self.raster.rows || col_n as usize >= self.raster.columns {
+            return false;
+        }
+
+        // Else, determine whether this neighbour is part of the specified layer.
+        else {
+            return self.point_indices_per_layer[layer].contains(&(row_n as usize, col_n as usize));
+        }
+
+    }
+
+    pub fn apply_smooth_to_layer(&mut self, layer: usize, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
+
+        // If the specified layer doesn't exist, return error
+        if layer >= self.point_indices_per_layer.len() {
+            return Err(miette!("Specified layer does not exist."));
+        }
+
+        // Iterate over all (row, col) pairs
+        for row in 0..self.raster.rows {
+            for col in 0..self.raster.columns {
+
+                // Skip this pair if it isn't part of this layer
+                if !self.point_indices_per_layer[layer].contains(&(row, col)) {
+                    continue;
+                }
+
+                // This point is part of the layer
+
+                if self.is_svc[row][col] {
+                    if !allow_svc_change {
+                        continue;
+                    }
+                }
+                
+                // 1. Discover the neighbours
+                let mut neighbour_altitudes: Vec<f32> = Vec::new();
+
+                for alt_row in -(coverage as isize)..(coverage as isize) {
+                    for alt_col in -(coverage as isize)..(coverage as isize) {
+
+                        // Skip if this neighbour is of another layer
+                        if !self.neighbour_belongs_to_layer(layer, row, col, alt_row, alt_col) {
+                            continue;
+                        }
+
+                        // Compute the altitude of this particular neighbour and add it to the vector
+                        neighbour_altitudes.push(self.get_neighbour_altitude(row, col, alt_row, alt_col)?);
+
+                        if self.neighbour_is_svc(row, col, alt_row, alt_col) {
+                            for i in 0..svc_weight-1 {
+                                neighbour_altitudes.push(self.get_neighbour_altitude(row, col, alt_row, alt_col)?);
+                            }
+                        }
+
+                    }
+                }
+
+                // 2. Compute the average of the altitudes of the neighbours.
+                let mut average_neighbour_altitude: f32 = 0.0;
+                for neighbour in &neighbour_altitudes {
+                    average_neighbour_altitude += neighbour;
+                }
+                average_neighbour_altitude /= neighbour_altitudes.len() as f32;
+
+                // 3. Compute the difference between this average altitude and the current altitude for this point
+                let mut deviation = average_neighbour_altitude - self.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?;
+
+                // 4. Apply the provided strength factor to this deviation and add the deviation once to the new altitude
+                deviation *= strength;
+
+                self.raster.altitudes[row][col] = Some(self.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))? + deviation);
+                
+            }
+        }
+
+        Ok(())
+
+    }
+
+
+    pub fn set_altitude_to_zero_for_layer(&mut self, layer: usize) -> Result<()> {
+
+        // If the specified layer doesn't exist, return error
+        if layer >= self.point_indices_per_layer.len() {
+            return Err(miette!("Specified layer does not exist."));
+        }
+
+        // Iterate over all (row, col) pairs
+        for row in 0..self.raster.rows {
+            for col in 0..self.raster.columns {
+
+                // Skip this pair if it isn't part of this layer
+                if !self.point_indices_per_layer[layer].contains(&(row, col)) {
+                    continue;
+                }
+
+                self.raster.altitudes[row][col] = Some(0.0);
+
+            }
+        }
+
+        Ok(())
 
     }
 

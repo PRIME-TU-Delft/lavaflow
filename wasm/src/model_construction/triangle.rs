@@ -1,6 +1,7 @@
 use super::point::Point;
 
 // The Triangle struct is used for computations that are related to the triangulation step
+#[derive(Debug)]
 pub struct Triangle<'a> {
 	pub a: &'a Point,
 	pub b: &'a Point,

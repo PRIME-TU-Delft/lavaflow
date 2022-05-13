@@ -18,14 +18,14 @@ init().then(() => {
 	//console.log(tree.debug());
 	//console.log(settings.debug());
 
-	let repetitions = 2;
+	let repetitions = 9;
 	let strength_positive = 0.7;
 	let strength_negative = 0.7;
 	let coverage = 4;
 	let svc_weight = 100;
 
-	let rows = 50;
-	let columns = 50;
+	let rows = 150;
+	let columns = 150;
 	let contour_margin = 10.0;
 
 	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin);
