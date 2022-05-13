@@ -80,6 +80,8 @@
 
 	{#if gltf}
 		<h1>GLTF is loaded</h1>
-		<VisualizeGLTF {gltf} />
+		{#key gltf}
+			<VisualizeGLTF {gltf} />
+		{/key}
 	{/if}
 {/await}

@@ -12,12 +12,19 @@
 	export let description: string = '';
 </script>
 
-<h3>{name}</h3>
-{#if description}
-	<p>{description}</p>
-{/if}
-{#each options as option}
-	<Input label={option.name} bind:value={option.value} />
-{/each}
+<div class="optionsList">
+	<h3>{name}</h3>
+	{#if description}
+		<p>{description}</p>
+	{/if}
+	{#each options as option}
+		<Input label={option.name} bind:value={option.value} />
+	{/each}
+</div>
 
-<slot {options} />
+<style>
+	.optionsList {
+		width: 40rem;
+		margin: 0 auto;
+	}
+</style>
