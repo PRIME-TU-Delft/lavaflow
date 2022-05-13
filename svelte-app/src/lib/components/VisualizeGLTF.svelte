@@ -2,22 +2,21 @@
 	import * as THREE from 'three';
 	import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+	import { onMount } from 'svelte';
 
 	export let gltf: string;
-
-	const scene = new THREE.Scene();
-	const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+	let dom: HTMLElement;
+	let scene = new THREE.Scene();
+	const camera = new THREE.PerspectiveCamera(75, 1, 0.001, 1000);
 	const renderer = new THREE.WebGLRenderer();
 	const controls = new OrbitControls(camera, renderer.domElement);
 
-	renderer.setFaceCulling(false);
-	renderer.setClearColor(0xbbbfc9, 1);
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.shadowMap.enabled = true;
-	document.body.appendChild(renderer.domElement); // TODO fix this with svelte magic
-
-	const geometry = new THREE.BoxGeometry();
-	const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+	onMount(() => {
+		renderer.setClearColor(0xbbbfc9, 1);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.shadowMap.enabled = true;
+		dom.appendChild(renderer.domElement);
+	});
 
 	camera.position.y = 150;
 	camera.position.x = 100;
@@ -74,7 +73,7 @@
 		);
 	}
 
-	$: gltf && loadGLTF();
+	$: gltf && dom && loadGLTF();
 
 	function animate() {
 		requestAnimationFrame(animate);
@@ -83,3 +82,14 @@
 	}
 	animate();
 </script>
+
+<div class="canvas" bind:this={dom} />
+
+<style>
+	:global(.canvas canvas) {
+		width: calc(95vmin - 3rem) !important;
+		height: calc(95vmin - 3rem) !important;
+		border-radius: 1.5rem;
+		margin: 1rem auto;
+	}
+</style>
