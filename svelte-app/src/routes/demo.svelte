@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Temporal } from '@js-temporal/polyfill';
 	import init, * as wasm from 'wasm';
 	import { hc_level_curves, hc_parent_relations } from '$lib/data/hardCoded';
 	import Button from '$lib/components/Button.svelte';
@@ -16,14 +17,16 @@
 
 	let rows = 30;
 	let columns = 30;
-	let contour_margin = 50.0;
+	let contour_margin = 10.0;
 
-	let loadingGLTF = true;
+	let loadingGLTF = false;
+
+	const getStringSize = (s: string) => new Blob([s]).size;
 
 	function regenerateGLTF() {
 		loadingGLTF = true;
-		console.log('regenerate gltf');
-		console.time('generate_gltf');
+
+		const startTime = Temporal.Now.instant();
 		gltf = wasm.generate_3d_model(
 			tree,
 			settings,
@@ -36,7 +39,11 @@
 			columns,
 			contour_margin
 		);
-		console.timeEnd('generate_gltf');
+		const endTime = Temporal.Now.instant();
+
+		console.log(getStringSize(gltf));
+
+		alert(startTime.until(endTime).toString());
 
 		loadingGLTF = false;
 	}
@@ -57,7 +64,7 @@
 {:then test}
 	<h1>DEMO TIME | loading gltf: {loadingGLTF}</h1>
 	{#if settings && tree}
-		<Button on:click={regenerateGLTF}>Regenerate GLTF</Button>
+		<Button disabled={loadingGLTF} on:click={regenerateGLTF}>Regenerate GLTF</Button>
 	{/if}
 
 	{#if gltf}

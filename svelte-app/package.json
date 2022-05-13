@@ -34,6 +34,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@js-temporal/polyfill": "^0.4.1",
 		"@mdi/js": "^6.6.96",
 		"@types/three": "^0.140.0",
 		"mdi-svelte": "^1.1.2",
