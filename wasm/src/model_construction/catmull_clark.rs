@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashMap, usize};
+use std::{cmp::Ordering, collections::HashMap, usize, fs::File, io::Write};
 
 use super::{
 	point::Point,
@@ -36,11 +36,15 @@ pub struct Edge {
 ///
 pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &mut Raster) -> Result<(Vec<Vertex>, Vec<Face>), String> {
 	// transform raster to list of faces and vertices
-	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp);
+	let (mut vs, mut fs) = gen_box();
+	let obj = make_obj(&vs ,&fs);
+	make_file(format!("box_input.obj"), obj);
 
 	// call catmull clark i times
 	for i in 0..iterations {
 		(vs, fs) = catmull_clark(&fs, &vs)?;
+		let obj = make_obj(&vs ,&fs);
+		make_file(format!("box_iteration_{i}.obj"), obj);
 		println!("surface subdivision iteration {i} done!");
 	}
 
@@ -48,71 +52,9 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster:
 }
 
 //TODO IMPLEMENT
-fn raster_to_faces(raster: &mut Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
-	let mut points = Vec::new();
-	let mut faces = Vec::new();
-
-	points.push(Vertex {
-		x: 0.0,
-		y: 0.0,
-		z: 0.0,
-		is_sharp: false,
-	});
-	points.push(Vertex {
-		x: 0.0,
-		y: 5.0,
-		z: 0.0,
-		is_sharp: false,
-	});
-	points.push(Vertex {
-		x: 5.0,
-		y: 0.0,
-		z: 0.0,
-		is_sharp: false,
-	});
-	points.push(Vertex {
-		x: 5.0,
-		y: 5.0,
-		z: 0.0,
-		is_sharp: false,
-	});
-
-	points.push(Vertex {
-		x: 0.0,
-		y: 0.0,
-		z: 5.0,
-		is_sharp: false,
-	});
-	points.push(Vertex {
-		x: 0.0,
-		y: 5.0,
-		z: 5.0,
-		is_sharp: false,
-	});
-	points.push(Vertex {
-		x: 5.0,
-		y: 0.0,
-		z: 5.0,
-		is_sharp: false,
-	});
-	points.push(Vertex {
-		x: 5.0,
-		y: 5.0,
-		z: 5.0,
-		is_sharp: false,
-	});
-
-	faces.push(Face { points: vec![0, 1, 3, 2] });
-	faces.push(Face { points: vec![0, 1, 5, 4] });
-	faces.push(Face { points: vec![0, 2, 6, 4] });
-	faces.push(Face { points: vec![1, 3, 7, 5] });
-	faces.push(Face { points: vec![2, 3, 7, 6] });
-	faces.push(Face { points: vec![4, 5, 7, 6] });
-
-
-
-	(points, faces)
-}
+// fn raster_to_faces(raster: &mut Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
+	
+// }
 
 // implemented using : https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
 //   			and : https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
@@ -536,4 +478,103 @@ fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<
 	}
 
 	Ok(new_vertices)
+}
+
+
+
+
+
+
+//
+// FILE MAKING STUFF
+//
+
+pub fn make_file(name : String, contents: String ) {
+	let file_name = String::from(name);
+	let mut file = File::create(file_name).unwrap();
+	file.write_all(contents.as_bytes());
+}
+
+fn gen_box() -> ( Vec<Vertex>, Vec<Face>) {
+	let mut points = Vec::new();
+	let mut faces = Vec::new();
+
+	points.push(Vertex {
+		x: 0.0,
+		y: 0.0,
+		z: 0.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 0.0,
+		y: 5.0,
+		z: 0.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 0.0,
+		z: 0.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 5.0,
+		z: 0.0,
+		is_sharp: false,
+	});
+
+	points.push(Vertex {
+		x: 0.0,
+		y: 0.0,
+		z: 5.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 0.0,
+		y: 5.0,
+		z: 5.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 0.0,
+		z: 5.0,
+		is_sharp: false,
+	});
+	points.push(Vertex {
+		x: 5.0,
+		y: 5.0,
+		z: 5.0,
+		is_sharp: false,
+	});
+
+	faces.push(Face { points: vec![0, 1, 3, 2] });
+	faces.push(Face { points: vec![0, 1, 5, 4] });
+	faces.push(Face { points: vec![0, 2, 6, 4] });
+	faces.push(Face { points: vec![1, 3, 7, 5] });
+	faces.push(Face { points: vec![2, 3, 7, 6] });
+	faces.push(Face { points: vec![4, 5, 7, 6] });
+
+	(points, faces)
+}
+
+pub fn make_obj(vs: &Vec<Vertex>, fs: &Vec<Face>) -> String {
+	let mut verts: String = String::new();
+	let mut faces: String = String::new();
+
+	for v in vs {
+		verts.push_str(&format!("v {a} {c} {b} \n", a = v.x, b = v.y, c = v.z));
+	}
+	for f in fs {
+		println!("face");
+		for p in &f.points{
+			println!("{p}");
+		}
+		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[0] + 1, b = f.points[2] + 1, c = f.points[3] + 1));
+		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[0] + 1, b = f.points[1] + 1, c = f.points[3] + 1));
+	}
+
+	verts.push_str(&faces);
+	verts
 }
