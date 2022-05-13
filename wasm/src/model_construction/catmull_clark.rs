@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashMap, usize, fs::File, io::Write};
+use std::{cmp::Ordering, collections::HashMap, fs::File, io::Write, usize};
 
 use super::{
 	point::Point,
@@ -13,7 +13,7 @@ pub struct Face {
 }
 
 //TODO: remove pub
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Vertex {
 	pub x: f32,
 	pub y: f32,
@@ -34,17 +34,22 @@ pub struct Edge {
 ///
 /// TODO: figure out input and return in relation to GLTF : list(triangle(point, point, point))
 ///
-pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &mut Raster) -> Result<(Vec<Vertex>, Vec<Face>), String> {
-	// transform raster to list of faces and vertices
-	let (mut vs, mut fs) = gen_box();
-	let obj = make_obj(&vs ,&fs);
-	make_file(format!("box_input.obj"), obj);
+pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &Raster) -> Result<(Vec<Vertex>, Vec<Face>), String> {
+	//input is cube
+	//let (mut vs, mut fs) = gen_box();
+
+	//input from raster : transform raster to list of faces and vertices
+	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp);
+
+	//
+	let obj = make_obj(&vs, &fs);
+	make_file(format!("input.obj"), obj);
 
 	// call catmull clark i times
 	for i in 0..iterations {
 		(vs, fs) = catmull_clark(&fs, &vs)?;
-		let obj = make_obj(&vs ,&fs);
-		make_file(format!("box_iteration_{i}.obj"), obj);
+		let obj = make_obj(&vs, &fs);
+		make_file(format!("div_iteration_{i}.obj"), obj);
 		println!("surface subdivision iteration {i} done!");
 	}
 
@@ -52,9 +57,124 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster:
 }
 
 //TODO IMPLEMENT
-// fn raster_to_faces(raster: &mut Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
-	
-// }
+fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
+	let mut vs = Vec::new();
+	let mut fs = Vec::new();
+
+	let rows = raster.rows;
+	let columns = raster.columns;
+	let heights = &raster.altitudes;
+
+	let mut next_index = 0;
+
+	//TODO : think about how iteration over rows makes checking for duplicates in vs easier
+	for x in 0..raster.columns {
+		for y in 0..raster.columns {
+			//indexes of face vertices
+			let mut ps = Vec::new();
+
+			// calc corner vertices
+			//0,0
+			let a = Vertex {
+				x: (x as f32 * raster.column_width),
+				y: ((rows - y) as f32 * raster.row_height),
+				z: heights[x][y].unwrap(),
+				is_sharp: is_sharp[x][y],
+			};
+			//0,1
+			let b = Vertex {
+				x: (x as f32 * raster.column_width),
+				y: ((rows - y + 1) as f32) * raster.row_height,
+				z: heights[x][y + 1].unwrap(),
+				is_sharp: is_sharp[x][y + 1],
+			};
+			//1, 0
+			let c = Vertex {
+				x: ((x + 1) as f32 * raster.column_width),
+				y: ((rows - y) as f32) * raster.row_height,
+				z: heights[x + 1][y].unwrap(),
+				is_sharp: is_sharp[x + 1][y],
+			};
+			//1,1
+			let d = Vertex {
+				x: ((x + 1) as f32 * raster.column_width),
+				y: ((rows - y + 1) as f32) * raster.row_height,
+				z: heights[x + 1][y + 1].unwrap(),
+				is_sharp: is_sharp[x + 1][y + 1],
+			};
+
+			//check if they are already added before adding, if it exists, get index
+
+			//ORDERING IMPORTANT DO NOT CHANGE! : (0,0),(0,1),(1,1),(1,0) (has coincide with an order of edges)
+			//TODO: code duplication
+			//(0,0)
+			if vs.contains(&a) {
+				//if point already in list store index to it
+				ps.push(
+					vs.iter()
+						//TODO: do &'s here not break comparison??
+						.position(|x| x == &a)
+						.unwrap(),
+				);
+			}
+			{
+				ps.push(next_index);
+				vs.push(a);
+				next_index += 1;
+			}
+
+			//(0,1)
+			if vs.contains(&b) {
+				//if point already in list store index to it
+				ps.push(
+					vs.iter()
+						//TODO: do &'s here not break comparison??
+						.position(|x| x == &b)
+						.unwrap(),
+				);
+			}
+			{
+				ps.push(next_index);
+				vs.push(b);
+				next_index += 1;
+			}
+			//(1,1)
+			if vs.contains(&d) {
+				//if point already in list store index to it
+				ps.push(
+					vs.iter()
+						//TODO: do &'s here not break comparison??
+						.position(|x| x == &d)
+						.unwrap(),
+				);
+			}
+			{
+				ps.push(next_index);
+				vs.push(d);
+				next_index += 1;
+			}
+			//(0 , 1)
+			if vs.contains(&c){
+				//if point already in list store index to it
+				ps.push(
+					vs.iter()
+						//TODO: do &'s here not break comparison??
+						.position(|x| x == &c)
+						.unwrap(),
+				);
+			}
+			{
+				ps.push(next_index);
+				vs.push(c);
+				next_index += 1;
+			}
+
+			//add face
+			fs.push(Face { points: ps });
+		}
+	}
+	(vs, fs)
+}
 
 // implemented using : https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
 //   			and : https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
@@ -123,7 +243,7 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 	// println!("MAP");
 	// for e in &edge_index_map{
 	// 	println!("edge ({a} , {b})", a = e.0.0, b = e.0.1)
-		
+
 	// }
 	//println!("smallest first test : {a} {b}", a = smallest_first(2, 0).0 , b = smallest_first(2, 0).1);
 	//
@@ -283,39 +403,35 @@ fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String
 		let num_points = f.points.len();
 		// hardcoded tuples of face corners that make edges
 		let es = vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])];
-		
-		for (i1, i2) in es{
-				
 
-				let p1 = vs.get(i1).ok_or("get_edges_faces: vertex at index does not exist")?;
-				let p2 = vs.get(i2).ok_or("get_edges_faces: vertex at index does not exist")?;
-				
+		for (i1, i2) in es {
+			let p1 = vs.get(i1).ok_or("get_edges_faces: vertex at index does not exist")?;
+			let p2 = vs.get(i2).ok_or("get_edges_faces: vertex at index does not exist")?;
 
-				// order points in edge by lowest point number
-				// and define center of edges
-				if (i1 < i2) {
-					edges.push(Edge {
-						p1: i1,
-						p2: i2,
-						f1: facenum,
-						f2: None,
-						center: center_point(p1, p2),
-					});
-				} else {
-					edges.push(Edge {
-						p1: i2,
-						p2: i1,
-						f1: facenum,
-						f2: None,
-						center: center_point(p1, p2),
-					});
-				}
+			// order points in edge by lowest point number
+			// and define center of edges
+			if (i1 < i2) {
+				edges.push(Edge {
+					p1: i1,
+					p2: i2,
+					f1: facenum,
+					f2: None,
+					center: center_point(p1, p2),
+				});
+			} else {
+				edges.push(Edge {
+					p1: i2,
+					p2: i1,
+					f1: facenum,
+					f2: None,
+					center: center_point(p1, p2),
+				});
 			}
 		}
-
+	}
 
 	//sort edges by pointnum_1, pointnum_2, facenum, for merge step
-	edges.sort_by_key(|a|( a.p1, a.p2, a.f1) );
+	edges.sort_by_key(|a| (a.p1, a.p2, a.f1));
 
 	//if two faces share an edge it is currently in edges list twice so
 	// merge edges with 2 adjacent faces
@@ -470,9 +586,9 @@ fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<
 		let F = avg_face_points.get(i).ok_or("get average face points : could not find face")?;
 		let R = avg_mid_edges.get(i).ok_or("get average face points : could not find face")?;
 
-		let x = ((v.x * (n  - 3.0)) + (2.0 * R.x) + F.x) / n;
-		let y = ((v.y * (n  - 3.0)) + (2.0 * R.y) + F.y) / n;
-		let z = ((v.z * (n  - 3.0)) + (2.0 * R.z) + F.z) / n;
+		let x = ((v.x * (n - 3.0)) + (2.0 * R.x) + F.x) / n;
+		let y = ((v.y * (n - 3.0)) + (2.0 * R.y) + F.y) / n;
+		let z = ((v.z * (n - 3.0)) + (2.0 * R.z) + F.z) / n;
 
 		new_vertices.push(Vertex { x, y, z, is_sharp: false })
 	}
@@ -480,83 +596,78 @@ fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<
 	Ok(new_vertices)
 }
 
-
-
-
-
-
 //
 // FILE MAKING STUFF
 //
 
-pub fn make_file(name : String, contents: String ) {
+pub fn make_file(name: String, contents: String) {
 	let file_name = String::from(name);
 	let mut file = File::create(file_name).unwrap();
 	file.write_all(contents.as_bytes());
 }
 
-fn gen_box() -> ( Vec<Vertex>, Vec<Face>) {
-	let mut points = Vec::new();
-	let mut faces = Vec::new();
+fn gen_box() -> (Vec<Vertex>, Vec<Face>) {
+	let mut vs = Vec::new();
+	let mut fs = Vec::new();
 
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 0.0,
 		y: 0.0,
 		z: 0.0,
 		is_sharp: false,
 	});
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 0.0,
 		y: 5.0,
 		z: 0.0,
 		is_sharp: false,
 	});
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 5.0,
 		y: 0.0,
 		z: 0.0,
 		is_sharp: false,
 	});
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 5.0,
 		y: 5.0,
 		z: 0.0,
 		is_sharp: false,
 	});
 
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 0.0,
 		y: 0.0,
 		z: 5.0,
 		is_sharp: false,
 	});
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 0.0,
 		y: 5.0,
 		z: 5.0,
 		is_sharp: false,
 	});
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 5.0,
 		y: 0.0,
 		z: 5.0,
 		is_sharp: false,
 	});
-	points.push(Vertex {
+	vs.push(Vertex {
 		x: 5.0,
 		y: 5.0,
 		z: 5.0,
 		is_sharp: false,
 	});
 
-	faces.push(Face { points: vec![0, 1, 3, 2] });
-	faces.push(Face { points: vec![0, 1, 5, 4] });
-	faces.push(Face { points: vec![0, 2, 6, 4] });
-	faces.push(Face { points: vec![1, 3, 7, 5] });
-	faces.push(Face { points: vec![2, 3, 7, 6] });
-	faces.push(Face { points: vec![4, 5, 7, 6] });
+	fs.push(Face { points: vec![0, 1, 3, 2] });
+	fs.push(Face { points: vec![0, 1, 5, 4] });
+	fs.push(Face { points: vec![0, 2, 6, 4] });
+	fs.push(Face { points: vec![1, 3, 7, 5] });
+	fs.push(Face { points: vec![2, 3, 7, 6] });
+	fs.push(Face { points: vec![4, 5, 7, 6] });
 
-	(points, faces)
+	(vs, fs)
 }
 
 pub fn make_obj(vs: &Vec<Vertex>, fs: &Vec<Face>) -> String {
