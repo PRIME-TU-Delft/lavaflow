@@ -11,6 +11,7 @@ use super::point::Point;
 use super::raster::Raster;
 
 use super::raster_neighbour_smoothing::RasterNeighbourSmoothing;
+use super::smoother::Smoother;
 
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
@@ -71,10 +72,10 @@ impl ModelGenerationSettings {
 #[wasm_bindgen]
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, repetitions: usize, strength_positive: f32, strength_negative: f32, coverage: usize, svc_weight: usize, rows: usize, columns: usize, contour_margin: f32) -> Result<String, JsValue> {
 
-	log!("The provided open_cv_tree: {:?}", open_cv_tree);
-	log!("The provided settings: {:?}", settings);
+	// log!("The provided open_cv_tree: {:?}", open_cv_tree);
+	// log!("The provided settings: {:?}", settings);
 
-	log!("Running generation algorithm");
+	// log!("Running generation algorithm");
 
 	crate::utils::set_panic_hook();
 
@@ -324,10 +325,13 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// }
 
 	
-	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
+	// RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
 
-	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 5, 1, false).map_err(|e| e.to_string())?;
+	// RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 5, 1, false).map_err(|e| e.to_string())?;
+
+	let triangulated = Smoother::triangulate_level_curve(&model_constructor.level_curve_map.level_curves[0]).map_err(|e| e.to_string())?;
 	
+	log!("The result after triangulating: {:?}", triangulated);
 
 	// for i in 0..5 {
 	// 	RasterNeighbourSmoothing::smooth_staircase_effect_without_border(&mut model_constructor, strength_positive, strength_negative, coverage, svc_weight, false).map_err(|e| e.to_string())?;
