@@ -78,6 +78,8 @@
 		<Button disabled={loadingGLTF} on:click={() => regenerateGLTF()}>Regenerate GLTF</Button>
 	{/if}
 
+	<!-- <VisualizeGLTF {gltf} /> -->
+
 	{#if gltf}
 		<h1>GLTF is loaded</h1>
 		{#key gltf}
