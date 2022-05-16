@@ -6,8 +6,7 @@
 	export let gltf: string;
 	let model: HTMLElement;
 
-	let modelPos = 0;
-	let modelScale = 1;
+	let modelPos = -2;
 
 	onMount(() => {
 		if (!gltf) return;
@@ -22,38 +21,20 @@
 	AFRAME.registerComponent('model-relative-opacity', {
 		schema: { opacityFactor: { default: 0.5 } },
 		init: function () {
-			this.nodeMap = {};
-			this.prepareMap.bind(this);
 			this.traverseMesh.bind(this);
 
-			this.el.addEventListener('model-loaded', (e) => {
-				this.prepareMap();
-				this.update();
+			this.el.addEventListener('model-loaded', () => {
+				this.traverseMesh();
 			});
 		},
-		prepareMap: function () {
-			this.traverseMesh((node) => {
-				this.nodeMap[node.uuid] = node.material.opacity;
-			});
-		},
-		update: function () {
-			this.traverseMesh((node) => {
-				node.material.opacity = this.nodeMap[node.uuid] * this.data.opacityFactor;
-				node.material.transparent = node.material.opacity < 1.0;
-				node.material.needsUpdate = true;
-			});
-		},
-		traverseMesh: function (func) {
-			var mesh = this.el.getObject3D('mesh');
+		traverseMesh: function () {
+			const mesh = this.el.getObject3D('mesh');
 			console.log('mesh', mesh);
 
 			if (!mesh) return;
 
 			mesh.traverse((node) => {
-				if (node.isMesh) {
-					console.log(node.material);
-					node.material.side = 1;
-				}
+				if (node.isMesh) node.material.side = 2;
 			});
 		}
 	});
@@ -63,15 +44,14 @@
 	});
 </script>
 
-<Input label="scale" bind:value={modelScale} />
-<Input label="modelx" bind:value={modelPos} />
+<Input label="move y" bind:value={modelPos} />
 
 <a-scene embedded renderer="colorManagement: true">
 	<a-light position="0 2 -1.9" intensity="2" type="point" />
 
 	<a-entity
 		model-relative-opacity
-		position="-10 -2 -20"
+		position="-10 {modelPos} -20"
 		scale="0.01 0.01 0.01"
 		bind:this={model}
 		id="model"
