@@ -63,14 +63,17 @@ const sketch = (p5) => {
 		let imgURL = URL.createObjectURL(e.target.files[0]);
 		imgElement.src = imgURL;
 		img = p5.loadImage(imgURL);
+		p5.resizeCanvas(img.width, img.height);
+
 	}, false);
 	imgElement.onload = function () {
 		let mat = cv.imread(imgElement);
 		// replace values in this array with correct pixel coordinates for the image
-		result = removePerspective(mat, [2522, 2876, 1401, 724, 187, 1461, 783, 3669])
+		let result = removePerspective(mat, [2522, 2876, 1401, 724, 187, 1461, 783, 3669])
 		cv.imshow('canvasOutput', result);
 		mat.delete();
 	};
+
 }
 
 new p5(sketch, document.getElementById("sketch"));

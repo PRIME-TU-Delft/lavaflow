@@ -1,3 +1,4 @@
+import cv from "opencv-ts";
 
 
 // this function binarizes the input, then uses cv.findContours to find edges in the image
