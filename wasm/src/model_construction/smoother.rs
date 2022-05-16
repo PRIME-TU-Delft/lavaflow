@@ -13,7 +13,9 @@ use miette::{Result, miette};
 pub struct Smoother<'a> {
     raster: &'a mut Raster,
     is_svc: &'a Vec<Vec<bool>>,
-    point_indices_per_layer: Vec<Vec<(usize, usize)>>
+    point_indices_per_layer: Vec<Vec<(usize, usize)>>,
+    layer_is_top: Vec<bool>,
+    altitude_of_top: Vec<f32>
 }
 
 
@@ -23,10 +25,14 @@ impl<'a> Smoother<'a> {
 
         // Construct the list of point-indices per layer
         let mut point_indices_per_layer: Vec<Vec<(usize, usize)>> = Vec::new();
+        let mut layer_is_top: Vec<bool> = Vec::new();
+        let mut altitude_of_top: Vec<f32> = Vec::new();
 
         // Initialize the list, by pushing empty lists for every level curve
         for _lc in 0..model_constructor.level_curve_map.level_curves.len()+1 {
             point_indices_per_layer.push(Vec::new());
+            layer_is_top.push(false);
+            altitude_of_top.push(0.0);
         }
 
         // Create a vector of all pixels that have not yet been assigned a place
@@ -38,7 +44,7 @@ impl<'a> Smoother<'a> {
         }
 
         // 1. Triangulate all the level-curves.
-        let mut triangles_per_level_curve: Vec<(usize, Vec<(&Point, &Point, &Point)>)> = Vec::new();
+        let mut triangles_per_level_curve: Vec<(usize, Vec<(&Point, &Point, &Point)>, bool, f32)> = Vec::new();
 
         // for lc in &model_constructor.level_curve_map.level_curves {
         //     triangles_per_level_curve.push(Smoother::triangulate_level_curve(lc)?);
@@ -57,7 +63,13 @@ impl<'a> Smoother<'a> {
         let mut drawn_lcs: Vec<usize> = Vec::new();
 
         loop {
-            triangles_per_level_curve.push((current_lc, Smoother::triangulate_level_curve(&model_constructor.level_curve_map.level_curves[current_lc])?));
+            triangles_per_level_curve.push((
+                current_lc,
+                Smoother::triangulate_level_curve(&model_constructor.level_curve_map.level_curves[current_lc])?,
+                model_constructor.level_curve_map.level_curves[current_lc].is_mountain_top,
+                model_constructor.level_curve_map.level_curves[current_lc].altitude
+            ));
+
 
             drawn_lcs.push(current_lc);
 
@@ -97,6 +109,8 @@ impl<'a> Smoother<'a> {
                 // If this point is in this level-curve, assign this point to the level-curve
                 if Smoother::point_in_triangle_set(&triangle_set.1, &p) {
                     point_indices_per_layer[triangle_set.0+1].push((row, col));
+                    layer_is_top[triangle_set.0+1] = triangle_set.2;
+                    altitude_of_top[triangle_set.0+1] = triangle_set.3;
                     unassigned_points.remove(j);
                 }
             }
@@ -111,7 +125,9 @@ impl<'a> Smoother<'a> {
         Ok(Self {
             raster: model_constructor.raster,
             is_svc: &model_constructor.is_svc,
-            point_indices_per_layer: point_indices_per_layer
+            point_indices_per_layer: point_indices_per_layer,
+            layer_is_top,
+            altitude_of_top
         })
 
     }
@@ -413,8 +429,32 @@ impl<'a> Smoother<'a> {
 
     }
 
+    pub fn apply_smooth_to_mountain_tops(&mut self, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
 
-    pub fn set_altitude_to_zero_for_layer(&mut self, layer: usize) -> Result<()> {
+        for i in 0..self.layer_is_top.len() {
+            if self.layer_is_top[i] {
+                self.apply_smooth_to_layer(i, strength, coverage, svc_weight, allow_svc_change)?;
+            }
+        }
+
+        Ok(())
+
+    }
+
+    pub fn increase_altitude_for_mountain_tops(&mut self, amount: f32) -> Result<()> {
+
+        for i in 0..self.layer_is_top.len() {
+            if self.layer_is_top[i] {
+                self.set_altitude_for_layer(i, self.altitude_of_top[i] + amount)?;
+            }
+        }
+
+        Ok(())
+
+    }
+
+
+    pub fn set_altitude_for_layer(&mut self, layer: usize, altitude: f32) -> Result<()> {
 
         // If the specified layer doesn't exist, return error
         if layer >= self.point_indices_per_layer.len() {
@@ -430,7 +470,7 @@ impl<'a> Smoother<'a> {
                     continue;
                 }
 
-                self.raster.altitudes[row][col] = Some(0.0);
+                self.raster.altitudes[row][col] = Some(altitude);
 
             }
         }

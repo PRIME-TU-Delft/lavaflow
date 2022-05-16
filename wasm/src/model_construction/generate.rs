@@ -216,6 +216,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	let mut level_curve_6: LevelCurve = LevelCurve::new(250.0);
+	level_curve_6.is_mountain_top = true;
 
 	// Add all the points to level curve 6
 	level_curve_6.add_all_points(
@@ -232,6 +233,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	let mut level_curve_8: LevelCurve = LevelCurve::new(350.0);
+	level_curve_8.is_mountain_top = true;
 
 	// Add all the points to level curve 8
 	level_curve_8.add_all_points(
@@ -309,7 +311,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// Apply smoothing
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
-	
+	smoother.increase_altitude_for_mountain_tops(1000.0).map_err(|e| e.to_string())?;
 
 	
 	// RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
