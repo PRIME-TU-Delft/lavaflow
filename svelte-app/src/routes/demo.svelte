@@ -21,6 +21,7 @@
 	let gltf: string;
 
 	let loadingGLTF = false;
+	let timeTaken = '0';
 
 	function regenerateGLTF() {
 		loadingGLTF = true;
@@ -51,7 +52,7 @@
 			10
 		);
 		const endTime = Temporal.Now.instant();
-		alert(startTime.until(endTime).toString());
+		timeTaken = startTime.until(endTime).toString();
 	}
 
 	async function initWasm() {
@@ -64,26 +65,23 @@
 	}
 </script>
 
-<!-- SETTINGS -->
-<OptionsList name="Settings" bind:options={settings_options} />
+{#if !gltf}
+	<!-- SETTINGS -->
+	<OptionsList name="Settings" bind:options={settings_options} />
 
-<!-- OPTIONS -->
-<OptionsList name="Options" bind:options={smooth_options} />
+	<!-- OPTIONS -->
+	<OptionsList name="Options" bind:options={smooth_options} />
+{/if}
 
 {#await initWasm()}
 	<h1>WAITING ON WASM</h1>
 {:then}
-	<h1>DEMO TIME | loading gltf: {loadingGLTF}</h1>
-	{#if tree}
-		<Button disabled={loadingGLTF} on:click={() => regenerateGLTF()}>Regenerate GLTF</Button>
-	{/if}
-
-	<!-- <VisualizeGLTF {gltf} /> -->
-
 	{#if gltf}
 		<h1>GLTF is loaded</h1>
 		{#key gltf}
 			<VisualizeGLTF {gltf} />
 		{/key}
+	{:else if tree}
+		<Button disabled={loadingGLTF} on:click={() => regenerateGLTF()}>Regenerate GLTF</Button>
 	{/if}
 {/await}
