@@ -1,4 +1,6 @@
+use super::gltf_conversion::generate_gltf;
 use std::{cmp::Ordering, collections::HashMap, fs::File, io::Write, usize};
+use wasm_bindgen::JsValue;
 
 use super::{
 	point::Point,
@@ -13,12 +15,18 @@ pub struct Face {
 }
 
 //TODO: remove pub
+
+//Vertex: When a vertex is tagged as "sharp", it simply does not move during the smoothing process. However,
+//if a non-sharp vertex is connected to two or more sharp edges, its behavior changes. If a vertex is connected to two sharp edges,
+//its smoothed position is (0.75 * original) + (0.125 * edge_1_endpoint) + (0.125 * edge_2_endpoint). If it is connected to three or
+//more sharp edges, it is treated as a "sharp" vertex.
 #[derive(Clone, PartialEq)]
 pub struct Vertex {
 	pub x: f32,
 	pub y: f32,
 	pub z: f32,
 	pub is_sharp: bool,
+	pub half_sharp: bool,
 }
 
 //TODO: remove pub
@@ -41,23 +49,34 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster:
 	//input from raster : transform raster to list of faces and vertices
 	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp);
 
-	//
-	let obj = make_obj(&vs, &fs);
-	make_file(format!("input.obj"), obj);
-	println!("input file done");
+	// // save input obj
+	// let obj = make_obj(&vs, &fs);
+	// make_file(format!("input.obj"), obj);
+	// println!("input file done");
+
+	// //save input gltf
+	// let inp = make_gltf(&vs, &fs);
+	// make_file(format!("input.gltf"), inp?);
+	// println!("input file done");
 
 	// call catmull clark i times
 	for i in 0..iterations {
 		(vs, fs) = catmull_clark(&fs, &vs)?;
-		let obj = make_obj(&vs, &fs);
-		make_file(format!("div_iteration_{i}.obj"), obj);
+
+		// //save obj
+		// let obj = make_obj(&vs, &fs);
+		// make_file(format!("div_iteration_{i}.obj"), obj);
+
+		// //save gltf
+		// let gltf = make_gltf(&vs, &fs);
+		// make_file(format!("div_iteration_{i}.gltf"), gltf?);
+
 		println!("surface subdivision iteration {i} done!");
 	}
 
 	Ok((vs, fs))
 }
 
-//TODO IMPLEMENT
 fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
 	let mut vs = Vec::new();
 	let mut fs = Vec::new();
@@ -66,29 +85,11 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 	let columns = raster.columns;
 	let heights = &raster.altitudes;
 
-	//todo remove hardcoded heights
-	// let mut heights = vec![vec![Some(0.0); columns]; rows];
-	// for i in 3 ..(rows-4) {
-	// 	for j in 3..columns-4{
-	// 		heights[i][j] = Some(20.0);
-	// 	}
-	// }
-	// for i in 7 ..(rows- 8) {
-	// 	for j in 7..columns-8{
-	// 		heights[i][j] = Some(30.0);
-	// 	}
-	// }
-	// for i in 10 ..(rows-11) {
-	// 	for j in 10..columns-11{
-	// 		heights[i][j] = Some(40.0);
-	// 	}
-	// }
-
 	let mut next_index = 0;
 
 	//TODO : think about how iteration over rows makes checking for duplicates in vs easier
-	for x in 0..raster.columns -1 {
-		for y in 0..raster.columns -1 {
+	for x in 0..raster.columns - 1 {
+		for y in 0..raster.rows - 1 {
 			//indexes of face vertices
 			let mut ps = Vec::new();
 
@@ -96,30 +97,34 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 			//0,0
 			let a = Vertex {
 				x: (x as f32 * raster.column_width),
-				y: ((rows - y) as f32 * raster.row_height),
-				z: heights[x][y + 1].unwrap(),
-				is_sharp: is_sharp[x][y + 1],
+				y: (( y) as f32 * raster.row_height),
+				z: heights[x][y].unwrap(),
+				is_sharp: is_sharp[x][y ],
+				half_sharp: false,
 			};
 			//0,1
 			let b = Vertex {
 				x: (x as f32 * raster.column_width),
-				y: ((rows - y + 1) as f32) * raster.row_height,
-				z: heights[x][y ].unwrap(),
-				is_sharp: is_sharp[x][y ],
+				y: (( y + 1) as f32) * raster.row_height,
+				z: heights[x][y + 1].unwrap(),
+				is_sharp: is_sharp[x][y + 1],
+				half_sharp: false,
 			};
 			//1, 0
 			let c = Vertex {
 				x: ((x + 1) as f32 * raster.column_width),
-				y: ((rows - y) as f32) * raster.row_height,
-				z: heights[x + 1][y + 1].unwrap(),
-				is_sharp: is_sharp[x + 1][y + 1],
+				y: (( y) as f32) * raster.row_height,
+				z: heights[x + 1][y].unwrap(),
+				is_sharp: is_sharp[x + 1][y ],
+				half_sharp: false,
 			};
 			//1,1
 			let d = Vertex {
 				x: ((x + 1) as f32 * raster.column_width),
-				y: ((rows - y + 1) as f32) * raster.row_height,
-				z: heights[x + 1][y].unwrap(),
-				is_sharp: is_sharp[x + 1][y],
+				y: (( y + 1) as f32) * raster.row_height,
+				z: heights[x + 1][y + 1].unwrap(),
+				is_sharp: is_sharp[x + 1][y + 1],
+				half_sharp: false,
 			};
 
 			//check if they are already added before adding, if it exists, get index
@@ -194,7 +199,6 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 // implemented using : https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
 //   			and : https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
 //TODO modify implementation such that sharp values are not modified
-//TODO dont copy input lists
 fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<Face>), String> {
 	//
 	// FINDING ALL NEW POINTS
@@ -223,7 +227,7 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 	let points_faces = get_faces_per_point(vs, fs)?;
 
 	//find out new locations of exisitng points in mesh
-	//TODO sharp points should not ever move in y direction
+	//sharp points never move in y direction
 	let mut new_points = get_new_points(vs, &points_faces, &avg_face_points, &avg_mid_edges)?;
 
 	//
@@ -316,6 +320,7 @@ fn center_point(p1: &Vertex, p2: &Vertex) -> Vertex {
 		y: (p1.y + p2.y) / 2.0,
 		z: (p1.z + p2.z) / 2.0,
 		is_sharp: false,
+		half_sharp: false,
 	}
 }
 
@@ -326,6 +331,7 @@ fn add(p1: &Vertex, p2: &Vertex) -> Vertex {
 		y: (p1.y + p2.y),
 		z: (p1.z + p2.z),
 		is_sharp: false,
+		half_sharp: false,
 	}
 }
 
@@ -336,6 +342,7 @@ fn average_of_points(xs: Vec<Vertex>) -> Vertex {
 		y: 0.0,
 		z: 0.0,
 		is_sharp: false,
+		half_sharp: false,
 	};
 	for x in xs {
 		agr = add(&agr, &x);
@@ -345,6 +352,7 @@ fn average_of_points(xs: Vec<Vertex>) -> Vertex {
 		y: agr.y / n,
 		z: agr.z / n,
 		is_sharp: false,
+		half_sharp: false,
 	}
 }
 fn average_of_points_b(xs: Vec<&Vertex>) -> Vertex {
@@ -354,6 +362,7 @@ fn average_of_points_b(xs: Vec<&Vertex>) -> Vertex {
 		y: 0.0,
 		z: 0.0,
 		is_sharp: false,
+		half_sharp: false,
 	};
 	for x in xs {
 		agr = add(&agr, &x);
@@ -363,6 +372,7 @@ fn average_of_points_b(xs: Vec<&Vertex>) -> Vertex {
 		y: agr.y / n,
 		z: agr.z / n,
 		is_sharp: false,
+		half_sharp: false,
 	}
 }
 
@@ -396,6 +406,7 @@ fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String
 			y: y / 4.0,
 			z: z / 4.0,
 			is_sharp: false,
+			half_sharp: false,
 		});
 	}
 	if (f.len() != face_points.len()) {
@@ -507,6 +518,7 @@ fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String
 //For each edge, add an edge point.
 //Set each edge point to be the average of the two neighbouring face points (AF) and the midpoint of the edge (ME)
 // = (AF + ME)/ 2
+//Handling sharpif center between two sharp points , mark sharp
 fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
 	let mut edge_points: Vec<Vertex> = Vec::new();
 
@@ -519,12 +531,14 @@ fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>
 
 		let AF = add(f1, f2);
 		let ME = &edge.center;
-		//TODO what if sharp
 		edge_points.push(Vertex {
 			x: (AF.x + ME.x) / 3.0,
-			y: (AF.y + ME.y) / 3.0,
+			//TODO: adjust y here if sharp?
+			y: if f1.is_sharp && f2.is_sharp { ME.y } else { (AF.y + ME.y) / 3.0 },
+			//y: (AF.y + ME.y) / 3.0,
 			z: (AF.z + ME.z) / 3.0,
-			is_sharp: false,
+			is_sharp: f1.is_sharp && f2.is_sharp,
+			half_sharp: false,
 		});
 	}
 
@@ -589,23 +603,38 @@ fn get_faces_per_point(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<usize>, S
 	Ok(faces_per_point)
 }
 
-//TODO SHARP EDGES
 //Move each original point to the new vertex point (F + 2R + (n-3)*v)/n
+
+//Sharp Vertex: When a vertex is tagged as "sharp", it simply does not move during the smoothing process. However,
+//if a non-sharp vertex is connected to two or more sharp edges, its behavior changes. If a vertex is connected to two sharp edges,
+//its smoothed position is (0.75 * original) + (0.125 * edge_1_endpoint) + (0.125 * edge_2_endpoint). If it is connected to three or
+//more sharp edges, it is treated as a "sharp" vertex.
+
 //v				//n								//F							//R
 fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<Vertex>, avg_mid_edges: &Vec<Vertex>) -> Result<(Vec<Vertex>), String> {
 	let mut new_vertices: Vec<Vertex> = Vec::new();
 
 	for i in 0..vs.len() {
 		let v = vs.get(i).ok_or("get average face points : could not find face")?;
+
 		let n = *f_per_v.get(i).ok_or("get average face points : could not find face")? as f32;
 		let F = avg_face_points.get(i).ok_or("get average face points : could not find face")?;
 		let R = avg_mid_edges.get(i).ok_or("get average face points : could not find face")?;
 
 		let x = ((v.x * (n - 3.0)) + (2.0 * R.x) + F.x) / n;
-		let y = ((v.y * (n - 3.0)) + (2.0 * R.y) + F.y) / n;
+
+		//if v is sharp it should not ever move in y direction
+		let y = if v.is_sharp { v.y } else { ((v.y * (n - 3.0)) + (2.0 * R.y) + F.y) / n };
+
 		let z = ((v.z * (n - 3.0)) + (2.0 * R.z) + F.z) / n;
 
-		new_vertices.push(Vertex { x, y, z, is_sharp: false })
+		new_vertices.push(Vertex {
+			x,
+			y,
+			z,
+			is_sharp: false,
+			half_sharp: false,
+		})
 	}
 
 	Ok(new_vertices)
@@ -615,11 +644,11 @@ fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<
 // FILE MAKING STUFF
 //
 
-pub fn make_file(name: String, contents: String) {
-	let file_name = String::from(name);
-	let mut file = File::create(file_name).unwrap();
-	file.write_all(contents.as_bytes());
-}
+// pub fn make_file(name: String, contents: String) {
+// 	let file_name = String::from(name);
+// 	let mut file = File::create(file_name).unwrap();
+// 	file.write_all(contents.as_bytes());
+// }
 
 fn gen_box() -> (Vec<Vertex>, Vec<Face>) {
 	let mut vs = Vec::new();
@@ -630,24 +659,28 @@ fn gen_box() -> (Vec<Vertex>, Vec<Face>) {
 		y: 0.0,
 		z: 0.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 	vs.push(Vertex {
 		x: 0.0,
 		y: 5.0,
 		z: 0.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 	vs.push(Vertex {
 		x: 5.0,
 		y: 0.0,
 		z: 0.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 	vs.push(Vertex {
 		x: 5.0,
 		y: 5.0,
 		z: 0.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 
 	vs.push(Vertex {
@@ -655,24 +688,28 @@ fn gen_box() -> (Vec<Vertex>, Vec<Face>) {
 		y: 0.0,
 		z: 5.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 	vs.push(Vertex {
 		x: 0.0,
 		y: 5.0,
 		z: 5.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 	vs.push(Vertex {
 		x: 5.0,
 		y: 0.0,
 		z: 5.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 	vs.push(Vertex {
 		x: 5.0,
 		y: 5.0,
 		z: 5.0,
 		is_sharp: false,
+		half_sharp: false,
 	});
 
 	fs.push(Face { points: vec![0, 1, 3, 2] });
@@ -699,4 +736,39 @@ pub fn make_obj(vs: &Vec<Vertex>, fs: &Vec<Face>) -> String {
 
 	verts.push_str(&faces);
 	verts
+}
+
+pub fn make_gltf(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<String, String> {
+	let mut final_points = Vec::new();
+
+	for f in fs {
+		let p0 = vs.get(f.points[0]).unwrap();
+		let p1 = vs.get(f.points[1]).unwrap();
+		let p2 = vs.get(f.points[2]).unwrap();
+		let p3 = vs.get(f.points[3]).unwrap();
+
+		let tri00 = [p0.x, p0.y, p0.z];
+
+		let tri10 = [p3.x, p3.y, p3.z];
+
+		let tri01 = [p1.x, p1.y, p1.z];
+
+		let tri11 = [p2.x, p2.y, p2.z];
+
+		// Add the first triangle
+		final_points.push((tri00, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+
+		final_points.push((tri01, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+
+		final_points.push((tri11, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+
+		// Add the second triangle
+		final_points.push((tri00, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+
+		final_points.push((tri11, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+
+		final_points.push((tri10, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+	}
+
+	generate_gltf(final_points)
 }
