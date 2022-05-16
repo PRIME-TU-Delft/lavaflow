@@ -228,14 +228,12 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 //	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 5, 1, false).map_err(|e| e.to_string())?;
 
-
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 	let raster = model_constructor.raster;
-
 	let mut is_sharp  = &model_constructor.is_svc;
 //	let vs:  Vec<Vertex> = Vec::new();
 //	let fs: Vec<Face> = Vec::new();
-	let (vs, fs) = catmull_clark_super(0, is_sharp, raster).expect("catumull broke");
+	let (vs, fs) = catmull_clark_super(2, is_sharp, raster).expect("catumull broke");
 	if(vs.len() <= 0 ) {
 		return Err(JsValue::from("VS EMPTY"));
 	}
@@ -248,10 +246,10 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		let p2 = vs.get(f.points[2]).unwrap();
 		let p3 = vs.get(f.points[3]).unwrap();
 
-		let tri00 = [p0.x, p0.z, p0.y];
-		let tri10 = [p3.x, p3.z, p3.y];
-		let tri01 = [p1.x, p1.z, p1.y];
-		let tri11 = [p2.x, p2.z, p2.y];
+		let tri00 = [p0.y, p0.z, p0.x];
+		let tri10 = [p3.y, p3.z, p3.x];
+		let tri01 = [p1.y, p1.z, p1.x];
+		let tri11 = [p2.y, p2.z, p2.x];
 
 		// Add the first triangle
 		final_points.push((tri00, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));

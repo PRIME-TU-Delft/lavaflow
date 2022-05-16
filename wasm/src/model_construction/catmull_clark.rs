@@ -81,13 +81,12 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 	let mut vs = Vec::new();
 	let mut fs = Vec::new();
 
-	let rows = raster.rows;
-	let columns = raster.columns;
 	let heights = &raster.altitudes;
 
 	let mut next_index = 0;
 
 	//TODO : think about how iteration over rows makes checking for duplicates in vs easier
+	//TODO REFACTOR : SHOULD BE X = X* COLUMN WIDTH, Y = Y*ROW HEIGHT -> GIVES WRONG VISUAL RESULT (refactoring must happen in eithor constuctor.rs or in raster.rs)
 	for x in 0..raster.columns - 1 {
 		for y in 0..raster.rows - 1 {
 			//indexes of face vertices
@@ -96,32 +95,32 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 			// calc corner vertices
 			//0,0
 			let a = Vertex {
-				x: (x as f32 * raster.column_width),
-				y: (( y) as f32 * raster.row_height),
+				x: (x as f32 * raster.row_height),
+				y: (( y) as f32 * raster.column_width),
 				z: heights[x][y].unwrap(),
 				is_sharp: is_sharp[x][y ],
 				half_sharp: false,
 			};
 			//0,1
 			let b = Vertex {
-				x: (x as f32 * raster.column_width),
-				y: (( y + 1) as f32) * raster.row_height,
+				x: (x as f32 * raster.row_height),
+				y: (( y + 1) as f32) * raster.column_width,
 				z: heights[x][y + 1].unwrap(),
 				is_sharp: is_sharp[x][y + 1],
 				half_sharp: false,
 			};
 			//1, 0
 			let c = Vertex {
-				x: ((x + 1) as f32 * raster.column_width),
-				y: (( y) as f32) * raster.row_height,
+				x: ((x + 1) as f32 * raster.row_height),
+				y: (( y) as f32) * raster.column_width,
 				z: heights[x + 1][y].unwrap(),
 				is_sharp: is_sharp[x + 1][y ],
 				half_sharp: false,
 			};
 			//1,1
 			let d = Vertex {
-				x: ((x + 1) as f32 * raster.column_width),
-				y: (( y + 1) as f32) * raster.row_height,
+				x: ((x + 1) as f32 * raster.row_height),
+				y: (( y + 1) as f32) * raster.column_width,
 				z: heights[x + 1][y + 1].unwrap(),
 				is_sharp: is_sharp[x + 1][y + 1],
 				half_sharp: false,
