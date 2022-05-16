@@ -441,11 +441,11 @@ impl<'a> Smoother<'a> {
 
     }
 
-    pub fn increase_altitude_for_mountain_tops(&mut self, amount: f32) -> Result<()> {
+    pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32) -> Result<()> {
 
         for i in 0..self.layer_is_top.len() {
             if self.layer_is_top[i] {
-                self.set_altitude_for_layer(i, self.altitude_of_top[i] + amount)?;
+                self.set_altitude_for_layer(i, self.altitude_of_top[i] * (1.0 + percentage_of_altitude_step))?;
             }
         }
 

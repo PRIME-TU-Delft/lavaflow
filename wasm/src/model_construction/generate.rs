@@ -311,7 +311,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// Apply smoothing
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
-	smoother.increase_altitude_for_mountain_tops(1000.0).map_err(|e| e.to_string())?;
+	smoother.increase_altitude_for_mountain_tops(30.0).map_err(|e| e.to_string())?;
 
 	
 	// RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
