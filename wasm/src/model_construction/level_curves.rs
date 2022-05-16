@@ -1,3 +1,7 @@
+use miette::{miette, Result};
+
+// use crate::utils::log;
+
 //
 // Class: LevelCurves
 //
@@ -6,13 +10,14 @@ use super::point::Point;
 
 #[derive(Debug)]
 pub struct LevelCurve {
-	altitude: f32,
-	points: Vec<Point>,
+	pub altitude: f32,
+	pub points: Vec<Point>,
+	pub is_mountain_top: bool
 }
 
 impl LevelCurve {
 	pub fn new(altitude: f32) -> Self {
-		Self { altitude, points: Vec::new() }
+		Self { altitude, points: Vec::new(), is_mountain_top: false }
 	}
 
 	pub fn add_point(&mut self, a: Point) {
@@ -81,8 +86,71 @@ impl LevelCurve {
 		return self.find_closest_point_and_distance_on_level_curve(a).0;
 	}
 
+	pub fn find_furthest_point_and_distance_on_level_curve(&self, a: &Point) -> (Option<&Point>, f32) {
+
+		if self.points.is_empty() {
+			return (None, f32::INFINITY);
+		}
+
+		// Get the distance to the first point in the list, as a starting point.
+		let mut max_dist_sqr: f32 = Point::xy_dist_sqr(&self.points[0], a);
+		let mut max_dist_sqr_point: &Point = &self.points[0];
+
+		// Loop over every point in the list and find the smallest distance.
+		// You don't have to keep track of which point had this smallest distance.
+		for i in 0..self.points.len() {
+			let p = &self.points[i];
+
+			// let current_dist_sqr = Point::dist_sqr(p, a);
+			let current_dist_sqr = Point::xy_dist_sqr(p, a);
+
+			if current_dist_sqr > max_dist_sqr {
+				max_dist_sqr = current_dist_sqr;
+				max_dist_sqr_point = p;
+			}
+		}
+
+		// Return the smallest distance found
+		(Some(max_dist_sqr_point), f32::sqrt(max_dist_sqr))
+
+	}
+
 	pub fn dist_to_point(&self, a: &Point) -> f32 {
 		return self.find_closest_point_and_distance_on_level_curve(a).1;
+	}
+
+	pub fn furthest_dist_to_point(&self, a: &Point) -> f32 {
+		return self.find_furthest_point_and_distance_on_level_curve(a).1;
+	}
+
+	pub fn increase_point_resolution(&mut self) {
+
+		for i in (0..self.points.len()-1).rev() {
+
+			let p1 = &self.points[i];
+			let p2 = &self.points[i+1];
+
+			let p3 = Point{
+				x: (p1.x + p2.x) / 2.0,
+				y: (p1.y + p2.y) / 2.0,
+				z: p1.z
+			};
+
+			self.points.insert(i+1, p3);
+			
+		}
+
+		let p1 = &self.points[0];
+		let p2 = &self.points[self.points.len() - 1];
+
+		let p3 = Point{
+			x: (p1.x + p2.x) / 2.0,
+			y: (p1.y + p2.y) / 2.0,
+			z: p1.z
+		};
+
+		self.points.insert(self.points.len(), p3);
+
 	}
 }
 
@@ -120,6 +188,7 @@ impl LevelCurveSet {
 	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
 	// for the puropose of genererating a raster to cover whole area of levelcurves
 	pub fn get_bounding_points(&self) -> (Point, Point) {
+
 		let mut min = Point {
 			x: std::f32::MAX,
 			y: std::f32::MAX,
@@ -170,13 +239,12 @@ impl LevelCurveSet {
 	/// * `current_height` - to track height when traversing tree, initial call should start with 1
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> LevelCurveSet {
+	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
 		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
 
-		// TODO: dont use unwrap
-		let first_pixel = tree.get_first_pixel().unwrap();
+		let first_pixel = tree.get_first_pixel().ok_or_else(|| miette!("Could not get first pixel"))?;
 		let mut last_saved = first_pixel;
 		let mut last_visited = first_pixel;
 		let mut current_pixel = first_pixel;
@@ -197,7 +265,7 @@ impl LevelCurveSet {
 			];
 			for (x, y) in neighbors {
 				// TODO: check how this holds for corner cases
-				if (x, y) != current_pixel && (x, y) != last_visited && tree.contains_pixel(x, y) {
+				if /*(x, y) != current_pixel &&*/ (x, y) != last_visited && tree.contains_pixel(x, y) {
 					// if dist to last saved and current pixel is desired length, save current pixel, else move on
 					if pixel_dist(&(x, y), &last_saved) >= desired_dist {
 						current_level_curve.add_point(Point {
@@ -207,9 +275,10 @@ impl LevelCurveSet {
 						});
 						last_saved = (x, y);
 					}
-
+				
 					last_visited = current_pixel;
 					current_pixel = (x, y);
+	
 				}
 			}
 			if current_pixel == first_pixel {
@@ -217,16 +286,22 @@ impl LevelCurveSet {
 			}
 		}
 
+		// Add this level curve to the result
+		ret.add_level_curve(current_level_curve);
+
 		// for every child get levelcurvemap and add to ret
+		if tree.get_children().is_empty() {
+			return Ok(ret);
+		}
 
 		for mut child in tree.get_children() {
 			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);
-			for curve in childmap.level_curves {
+			for curve in childmap?.level_curves {
 				ret.add_level_curve(curve);
 			}
 		}
 
-		ret
+		Ok(ret)
 	}
 
 	///

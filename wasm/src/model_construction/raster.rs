@@ -49,4 +49,11 @@ impl Raster {
 	pub fn get(&self, row: usize, col: usize) -> &Option<f32> {
 		&self.altitudes[row][col]
 	}
+
+	pub fn get_pixel(&self, row: usize, col: usize) -> (f32, f32) {
+		(
+			(col as f32) * self.column_width,
+			(row as f32) * self.row_height
+		)
+	}
 }
