@@ -24,8 +24,8 @@ init().then(() => {
 	let coverage = 4;
 	let svc_weight = 100;
 
-	let rows = 50;
-	let columns = 50;
+	let rows = 20;
+	let columns = 40;
 	let contour_margin = 10.0;
 
 	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin);

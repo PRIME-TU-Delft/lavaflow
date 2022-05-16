@@ -246,24 +246,28 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		let p2 = vs.get(f.points[2]).unwrap();
 		let p3 = vs.get(f.points[3]).unwrap();
 
-		let tri00 = [p0.y, p0.z, p0.x];
-		let tri10 = [p3.y, p3.z, p3.x];
-		let tri01 = [p1.y, p1.z, p1.x];
-		let tri11 = [p2.y, p2.z, p2.x];
+		let tri00 = ([p0.y, p0.z, p0.x], if (p0.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] } );
+		let tri10 = ([p3.y, p3.z, p3.x], if (p3.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri01 = ([p1.y, p1.z, p1.x], if (p1.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri11 = ([p2.y, p2.z, p2.x], if (p2.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+
+		//rgb green = 0, 153, 51
+		//rgb orange = 255, 153, 51
 
 		// Add the first triangle
-		final_points.push((tri00, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
 
-		final_points.push((tri01, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+		final_points.push(tri00);
 
-		final_points.push((tri11, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+		final_points.push(tri01);
+
+		final_points.push(tri11);
 
 		// Add the second triangle
-		final_points.push((tri00, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+		final_points.push(tri00);
 
-		final_points.push((tri11, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+		final_points.push(tri11);
 
-		final_points.push((tri10, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
+		final_points.push(tri10);
 	}
 
 	// Add triangles for the level-curves

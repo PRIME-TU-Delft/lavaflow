@@ -87,8 +87,9 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 
 	//TODO : think about how iteration over rows makes checking for duplicates in vs easier
 	//TODO REFACTOR : SHOULD BE X = X* COLUMN WIDTH, Y = Y*ROW HEIGHT -> GIVES WRONG VISUAL RESULT (refactoring must happen in eithor constuctor.rs or in raster.rs)
-	for x in 0..raster.columns - 1 {
-		for y in 0..raster.rows - 1 {
+	//todo rows and columns in for loop must also be swapped when raster problem is fixed
+	for x in 0..raster.rows - 1 {
+		for y in 0..raster.columns- 1 {
 			//indexes of face vertices
 			let mut ps = Vec::new();
 
@@ -312,14 +313,15 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 /// HELPER METHODS
 ///
 
-//TODO what do if p is sharp
+//if both are sharp, center is sharp
+//if either, center is half sharp
 fn center_point(p1: &Vertex, p2: &Vertex) -> Vertex {
 	Vertex {
 		x: (p1.x + p2.x) / 2.0,
 		y: (p1.y + p2.y) / 2.0,
 		z: (p1.z + p2.z) / 2.0,
-		is_sharp: false,
-		half_sharp: false,
+		is_sharp: p1.is_sharp && p2.is_sharp,
+		half_sharp: p1.is_sharp || p2.is_sharp,
 	}
 }
 
@@ -517,12 +519,13 @@ fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String
 //For each edge, add an edge point.
 //Set each edge point to be the average of the two neighbouring face points (AF) and the midpoint of the edge (ME)
 // = (AF + ME)/ 2
-//Handling sharpif center between two sharp points , mark sharp
+//Handling sharp : if ME is sharp, so is corresponding edge point. it does not move in y dir if ME is sharp
 fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
 	let mut edge_points: Vec<Vertex> = Vec::new();
 
 	for edge in edges {
 		let f1 = face_points.get(edge.f1).ok_or("get edge points: no face point")?;
+		//catch error if edge has no second face
 		let f2 = match edge.f2 {
 			Some(x) => face_points.get(edge.f2.unwrap()).ok_or("get edge points: no face point")?,
 			None => f1,
@@ -532,12 +535,12 @@ fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>
 		let ME = &edge.center;
 		edge_points.push(Vertex {
 			x: (AF.x + ME.x) / 3.0,
-			//TODO: adjust y here if sharp?
-			y: if f1.is_sharp && f2.is_sharp { ME.y } else { (AF.y + ME.y) / 3.0 },
-			//y: (AF.y + ME.y) / 3.0,
-			z: (AF.z + ME.z) / 3.0,
-			is_sharp: f1.is_sharp && f2.is_sharp,
-			half_sharp: false,
+			y: (AF.y + ME.y) / 3.0 ,
+			//if sharp, z less impacted
+			z: if ME.is_sharp { (AF.z + (ME.z * 3.0)) / 5.0  } else { (AF.z + ME.z) / 3.0 },
+			//if ME is sharp, so is corresponding edge point.
+			is_sharp: ME.is_sharp,
+			half_sharp: ME.half_sharp,
 		});
 	}
 
@@ -622,10 +625,10 @@ fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<
 
 		let x = ((v.x * (n - 3.0)) + (2.0 * R.x) + F.x) / n;
 
-		//if v is sharp it should not ever move in y direction
-		let y = if v.is_sharp { v.y } else { ((v.y * (n - 3.0)) + (2.0 * R.y) + F.y) / n };
-
-		let z = ((v.z * (n - 3.0)) + (2.0 * R.z) + F.z) / n;
+		let y = ((v.y * (n - 3.0)) + (2.0 * R.y) + F.y) / n;
+		//if v is sharp it should move alot less in z direction
+		let z = if v.is_sharp { ((v.z * (n)) + (2.0 * R.z) + F.z) / (n + 3.0)} else { ((v.z * (n - 3.0)) + (2.0 * R.z) + F.z) / n };
+		//let z = ((v.z * (n - 3.0)) + (2.0 * R.z) + F.z) / n;
 
 		new_vertices.push(Vertex {
 			x,
