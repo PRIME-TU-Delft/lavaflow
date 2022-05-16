@@ -3,7 +3,7 @@
 // points is an array of eight elements, which are the x and y coordinates of four points
 // these points are, in order: the top left corner, the top right corner, the bottom right corner and the bottom left corner
 // in short, the points are in clockwise order
-function removePerspective(image, points) {
+export function removePerspective(image, points) {
     // the height and width of the output image
     outputHeight = 550
     outputWidth = 1000
