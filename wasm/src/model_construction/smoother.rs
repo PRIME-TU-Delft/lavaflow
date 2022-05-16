@@ -15,7 +15,8 @@ pub struct Smoother<'a> {
     is_svc: &'a Vec<Vec<bool>>,
     point_indices_per_layer: Vec<Vec<(usize, usize)>>,
     layer_is_top: Vec<bool>,
-    altitude_of_top: Vec<f32>
+    altitude_of_layer: Vec<f32>,
+    altitude_groups: Vec<Vec<usize>>
 }
 
 
@@ -26,13 +27,13 @@ impl<'a> Smoother<'a> {
         // Construct the list of point-indices per layer
         let mut point_indices_per_layer: Vec<Vec<(usize, usize)>> = Vec::new();
         let mut layer_is_top: Vec<bool> = Vec::new();
-        let mut altitude_of_top: Vec<f32> = Vec::new();
+        let mut altitude_of_layer: Vec<f32> = Vec::new();
 
         // Initialize the list, by pushing empty lists for every level curve
         for _lc in 0..model_constructor.level_curve_map.level_curves.len()+1 {
             point_indices_per_layer.push(Vec::new());
             layer_is_top.push(false);
-            altitude_of_top.push(0.0);
+            altitude_of_layer.push(0.0);
         }
 
         // Create a vector of all pixels that have not yet been assigned a place
@@ -110,7 +111,7 @@ impl<'a> Smoother<'a> {
                 if Smoother::point_in_triangle_set(&triangle_set.1, &p) {
                     point_indices_per_layer[triangle_set.0+1].push((row, col));
                     layer_is_top[triangle_set.0+1] = triangle_set.2;
-                    altitude_of_top[triangle_set.0+1] = triangle_set.3;
+                    altitude_of_layer[triangle_set.0+1] = triangle_set.3;
                     unassigned_points.remove(j);
                 }
             }
@@ -122,12 +123,42 @@ impl<'a> Smoother<'a> {
             point_indices_per_layer[0].push((row, col));
         }
 
+
+        // 5. Now that we've defined all the points that lie in a certain layer, we will group layers, based on their altitude.
+        let mut altitude_groups: Vec<Vec<usize>> = Vec::new();
+
+        // Compute the max altitude of this mountain
+        let mut max_altitude = 0.0;
+
+        for &a in &altitude_of_layer {
+            if a > max_altitude {
+                max_altitude = a;
+            }
+        }
+
+        // Initialize the array of altitude-groups, by computing how many layers we will have
+        for _i in 0..(f32::round(max_altitude / model_constructor.level_curve_map.altitude_step) as usize) {
+            altitude_groups.push(Vec::new());
+        }
+
+        // For every level-curve, assign it to the right group, according to its altitude.
+        // Important: tops of this mountain will NEVER be assigned to a group.
+        for (i, a) in altitude_of_layer.iter().enumerate() {
+            // If this level is a top, skip
+            if layer_is_top[i] {
+                continue;
+            }
+
+            altitude_groups[f32::round(a / model_constructor.level_curve_map.altitude_step) as usize].push(i);
+        }
+
         Ok(Self {
             raster: model_constructor.raster,
             is_svc: &model_constructor.is_svc,
             point_indices_per_layer: point_indices_per_layer,
             layer_is_top,
-            altitude_of_top
+            altitude_of_layer,
+            altitude_groups
         })
 
     }
@@ -299,6 +330,9 @@ impl<'a> Smoother<'a> {
     }
 
 
+    pub fn number_of_altitude_groups(&self) -> usize {
+        self.altitude_groups.len()
+    }
 
     //
     // SMOOTHING ALGORITHMS
@@ -429,30 +463,6 @@ impl<'a> Smoother<'a> {
 
     }
 
-    pub fn apply_smooth_to_mountain_tops(&mut self, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
-
-        for i in 0..self.layer_is_top.len() {
-            if self.layer_is_top[i] {
-                self.apply_smooth_to_layer(i, strength, coverage, svc_weight, allow_svc_change)?;
-            }
-        }
-
-        Ok(())
-
-    }
-
-    pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32) -> Result<()> {
-
-        for i in 0..self.layer_is_top.len() {
-            if self.layer_is_top[i] {
-                self.set_altitude_for_layer(i, self.altitude_of_top[i] * (1.0 + percentage_of_altitude_step))?;
-            }
-        }
-
-        Ok(())
-
-    }
-
 
     pub fn set_altitude_for_layer(&mut self, layer: usize, altitude: f32) -> Result<()> {
 
@@ -472,6 +482,54 @@ impl<'a> Smoother<'a> {
 
                 self.raster.altitudes[row][col] = Some(altitude);
 
+            }
+        }
+
+        Ok(())
+
+    }
+
+
+    pub fn apply_smooth_to_altitude_group(&mut self, altitude_group: usize, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
+
+        // Apply the specified smooth to every layer that falls in this group
+        for i in 0..self.altitude_groups[altitude_group].len() {
+            self.apply_smooth_to_layer(self.altitude_groups[altitude_group][i], strength, coverage, svc_weight, allow_svc_change)?;
+        }
+
+        Ok(())
+
+    }
+
+    pub fn increase_altitude_for_altitude_group(&mut self, altitude_group: usize, percentage_of_altitude_step: f32) -> Result<()> {
+
+        // Apply the specified altitude increase to every layer that falls in this group
+        for i in 0..self.altitude_groups[altitude_group].len() {
+            self.set_altitude_for_layer(self.altitude_groups[altitude_group][i], self.altitude_of_layer[self.altitude_groups[altitude_group][i]]  * (1.0 + percentage_of_altitude_step))?;
+        }
+            
+        Ok(())
+
+    }
+
+
+    pub fn apply_smooth_to_mountain_tops(&mut self, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
+
+        for i in 0..self.layer_is_top.len() {
+            if self.layer_is_top[i] {
+                self.apply_smooth_to_layer(i, strength, coverage, svc_weight, allow_svc_change)?;
+            }
+        }
+
+        Ok(())
+
+    }
+
+    pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32) -> Result<()> {
+
+        for i in 0..self.layer_is_top.len() {
+            if self.layer_is_top[i] {
+                self.set_altitude_for_layer(i, self.altitude_of_layer[i] * (1.0 + percentage_of_altitude_step))?;
             }
         }
 
