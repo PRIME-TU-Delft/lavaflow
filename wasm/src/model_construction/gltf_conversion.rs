@@ -23,8 +23,8 @@ fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
 	new_vec
 }
 
-pub fn generate_gltf(triangle_vertices: Vec<[f32; 3]>) -> Result<String, String> {
-	let triangle_vertices: Vec<Vertex> = triangle_vertices.iter().map(|v| Vertex { position: *v, color: [1., 1., 1.] }).collect();
+pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<String, String> {
+	let triangle_vertices: Vec<Vertex> = triangle_vertices.iter().map(|v| Vertex { position: v.0, color: v.1 }).collect();
 	let triangle_vertices_len = triangle_vertices.len();
 
 	let bin_content = to_padded_byte_vector(triangle_vertices);

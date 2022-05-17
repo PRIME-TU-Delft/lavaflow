@@ -10,13 +10,14 @@ use super::point::Point;
 
 #[derive(Debug)]
 pub struct LevelCurve {
-	altitude: f32,
-	points: Vec<Point>,
+	pub altitude: f32,
+	pub points: Vec<Point>,
+	pub is_mountain_top: bool
 }
 
 impl LevelCurve {
 	pub fn new(altitude: f32) -> Self {
-		Self { altitude, points: Vec::new() }
+		Self { altitude, points: Vec::new(), is_mountain_top: false }
 	}
 
 	pub fn add_point(&mut self, a: Point) {
@@ -85,8 +86,71 @@ impl LevelCurve {
 		return self.find_closest_point_and_distance_on_level_curve(a).0;
 	}
 
+	pub fn find_furthest_point_and_distance_on_level_curve(&self, a: &Point) -> (Option<&Point>, f32) {
+
+		if self.points.is_empty() {
+			return (None, f32::INFINITY);
+		}
+
+		// Get the distance to the first point in the list, as a starting point.
+		let mut max_dist_sqr: f32 = Point::xy_dist_sqr(&self.points[0], a);
+		let mut max_dist_sqr_point: &Point = &self.points[0];
+
+		// Loop over every point in the list and find the smallest distance.
+		// You don't have to keep track of which point had this smallest distance.
+		for i in 0..self.points.len() {
+			let p = &self.points[i];
+
+			// let current_dist_sqr = Point::dist_sqr(p, a);
+			let current_dist_sqr = Point::xy_dist_sqr(p, a);
+
+			if current_dist_sqr > max_dist_sqr {
+				max_dist_sqr = current_dist_sqr;
+				max_dist_sqr_point = p;
+			}
+		}
+
+		// Return the smallest distance found
+		(Some(max_dist_sqr_point), f32::sqrt(max_dist_sqr))
+
+	}
+
 	pub fn dist_to_point(&self, a: &Point) -> f32 {
 		return self.find_closest_point_and_distance_on_level_curve(a).1;
+	}
+
+	pub fn furthest_dist_to_point(&self, a: &Point) -> f32 {
+		return self.find_furthest_point_and_distance_on_level_curve(a).1;
+	}
+
+	pub fn increase_point_resolution(&mut self) {
+
+		for i in (0..self.points.len()-1).rev() {
+
+			let p1 = &self.points[i];
+			let p2 = &self.points[i+1];
+
+			let p3 = Point{
+				x: (p1.x + p2.x) / 2.0,
+				y: (p1.y + p2.y) / 2.0,
+				z: p1.z
+			};
+
+			self.points.insert(i+1, p3);
+			
+		}
+
+		let p1 = &self.points[0];
+		let p2 = &self.points[self.points.len() - 1];
+
+		let p3 = Point{
+			x: (p1.x + p2.x) / 2.0,
+			y: (p1.y + p2.y) / 2.0,
+			z: p1.z
+		};
+
+		self.points.insert(self.points.len(), p3);
+
 	}
 }
 

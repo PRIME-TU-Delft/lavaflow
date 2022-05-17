@@ -6,8 +6,8 @@ use super::{level_curves::LevelCurveSet, raster::Raster};
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
 	contour_margin: f32,
-	level_curve_map: &'a LevelCurveSet,
-	is_svc: Vec<Vec<bool>>,
+	pub level_curve_map: &'a LevelCurveSet,
+	pub is_svc: Vec<Vec<bool>>,
 	pub raster: &'a mut Raster,
 }
 

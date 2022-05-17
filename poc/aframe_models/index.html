@@ -3,38 +3,28 @@
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   </head>
   <body>
+    <a-scene renderer="colorManagement: true">
+      <a-light position="0 2 -1.9" intensity="10" type="point"></a-light>
+      <a-entity
+        material="side: double"
+        id="entity"
+        position="0 2 -2"
+      ></a-entity>
+    </a-scene>
     <button style="position: fixed; z-index: 100000; top: 1rem; right: 1rem">
       hello
     </button>
 
-    <a-scene>
-      <a-assets>
-        <a-asset-item id="output" src="output.obj"></a-asset-item>
-        <!-- <a-asset-item id="bruh" src="bruh.gltf"></a-asset-item> -->
-        <a-asset-item id="duck" src="duck.gltf"></a-asset-item>
-        <a-asset-item id="tree-mtl" src="tree.mtl"></a-asset-item>
-      </a-assets>
+    <script>
+      const gltfString = `{"accessors":[{"bufferView":0,"byteOffset":0,"count":3,"componentType":5126,"extras":{},"type":"VEC3","min":[-0.5,-0.5,0.0],"max":[0.5,0.5,0.0]},{"bufferView":0,"byteOffset":12,"count":3,"componentType":5126,"extras":{},"type":"VEC3"}],"asset":{"extras":{},"version":"2.0"},"buffers":[{"byteLength":72,"uri":"data:application/octet-stream;base64,AAAAAAAAAD8AAAAAAACAPwAAAAAAAAAAAAAAvwAAAL8AAAAAAAAAAAAAgD8AAAAAAAAAPwAAAL8AAAAAAAAAAAAAAAAAAIA/","extras":{}}],"bufferViews":[{"buffer":0,"byteLength":72,"byteStride":24,"target":34962,"extras":{}}],"extras":{},"meshes":[{"extras":{},"primitives":[{"attributes":{"POSITION":0,"COLOR_0":1},"extras":{}}]}],"nodes":[{"extras":{},"mesh":0}],"scenes":[{"extras":{},"nodes":[0]}]}`;
 
-      <a-entity gltf-model="#duck" position="0 0 -5"></a-entity>
-      <!-- <a-entity gltf-model="#bruh" position="0 2 -5"></a-entity> -->
-      <a-obj-model
-        src="#output"
-        mtl="#tree-mtl"
-        scale="0.1 0.1 0.1"
-        position="0 0 -5"
-      ></a-obj-model>
-      <a-plane
-        color="#CCC"
-        rotation="-90 0 0"
-        position="0 -0.1 0"
-        height="2000"
-        width="2000"
-      ></a-plane>
+      const gltfBlob = new Blob([gltfString], {
+        type: 'text/plain',
+      }); // convert string to blob
+      const gltfUrl = URL.createObjectURL(gltfBlob); // blob to URL
 
-      <a-entity camera look-controls position="200 200 -200">
-        <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-        <button>ello</button>
-      </a-entity>
-    </a-scene>
+      const entity = document.querySelector('#entity');
+      entity.setAttribute('gltf-model', `url(${gltfUrl})`);
+    </script>
   </body>
 </html>
