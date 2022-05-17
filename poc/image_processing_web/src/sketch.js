@@ -10,7 +10,7 @@ import cv from "opencv-ts";
 let points = [];
 
 let img;
-let imgElement = document.getElementById('imageSrc');
+let opencvDummyImg = document.getElementById('imageSrc');
 let inputElement = document.getElementById('fileInput');
 
 
@@ -19,10 +19,10 @@ const sketch = (p5) => {
 		p5.createCanvas(400, 400);
 
 		const size = 120; // size of draggble surface
-		points.push(new Draggable(75, 50, size));
-		points.push(new Draggable(50, 300, size));
+		points.push(new Draggable(25, 25, size));
+		points.push(new Draggable(25, 300, size));
 		points.push(new Draggable(300, 300, size));
-		points.push(new Draggable(225, 50, size));
+		points.push(new Draggable(300, 25, size));
 	};
 
 	/**
@@ -60,21 +60,34 @@ const sketch = (p5) => {
 
 	// Trigger: a file has been selected
 	inputElement.addEventListener('change', (e) => {
+		// Create an invisible dummy image for OpenCV to load the file from
 		let imgURL = URL.createObjectURL(e.target.files[0]);
-		imgElement.src = imgURL;
+		opencvDummyImg.src = imgURL;
+
+		// Load the uploaded image into p5 and show it on the canvas
 		img = p5.loadImage(imgURL, i => {
 			p5.resizeCanvas(i.width, i.height);
 		});
+		document.getElementById("perspective-button").style.display = 'block';  // Unhide button
 	}, false);
 
-	// Trigger: the dummy img element in the page (used by OpenCV to load an image from) is ready -> we can load the image and do OpenCV stuff
-	imgElement.onload = function () {
-		let mat = cv.imread(imgElement);
-		// replace values in this array with correct pixel coordinates for the image
-		let result = removePerspective(mat, [2522, 2876, 1401, 724, 187, 1461, 783, 3669])
+
+	// Trigger: user has set the perspective markers and clicked the "warp perspective!" button
+	document.getElementById("perspective-button").addEventListener('click', () => {
+		let mat = cv.imread(opencvDummyImg);
+
+		// Fetch the marker coordinates of the draggable buttons
+		let markerCoords = [];
+		for (let p of points) {
+			markerCoords.push(p.x - p.offsetX);
+			markerCoords.push(p.y - p.offsetY);
+		}
+
+		// Apply the perspective transformation using the selected marker coords
+		let result = removePerspective(mat, markerCoords)
 		cv.imshow('canvasOutput', result);
 		mat.delete();
-	};
+	});
 
 }
 
