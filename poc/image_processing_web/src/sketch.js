@@ -58,14 +58,16 @@ const sketch = (p5) => {
 	};
 
 
-	// A file has been selected
+	// Trigger: a file has been selected
 	inputElement.addEventListener('change', (e) => {
 		let imgURL = URL.createObjectURL(e.target.files[0]);
 		imgElement.src = imgURL;
-		img = p5.loadImage(imgURL);
-		p5.resizeCanvas(img.width, img.height);
-
+		img = p5.loadImage(imgURL, i => {
+			p5.resizeCanvas(i.width, i.height);
+		});
 	}, false);
+
+	// Trigger: the dummy img element in the page (used by OpenCV to load an image from) is ready -> we can load the image and do OpenCV stuff
 	imgElement.onload = function () {
 		let mat = cv.imread(imgElement);
 		// replace values in this array with correct pixel coordinates for the image
