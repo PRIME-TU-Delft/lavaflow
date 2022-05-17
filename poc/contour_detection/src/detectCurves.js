@@ -22,23 +22,42 @@ export function detectCurves(image) {
  * @param img OpenCV image object
  */
 export function getCurves(img) {
-    const [contours, hierarchy] = detectCurves(image);  // get contours and hierarchy from the detectContours function
+    const [contours, hierarchy] = detectCurves(img);  // get contours and hierarchy from the detectContours function
 
     let contours_array = [];
-    let hierarchy_array = hierarchy.data32S;
+    let hierarchy_array = [];
 
     // Loop through contours (OpenCV 2D array), and convert it to a JavaScript array
     for (let i = 0; i < contours.size(); i++) {
         contours_array.push(contours.get(i).data32S);
     }
 
+    // Get every 4th element of the hierarchy array (4th element is the parent node)
+    for (let i = 3; i < hierarchy.data32S.length; i += 4) {
+        hierarchy_array.push(hierarchy.data32S[i]);
+    }
+
     return [contours_array, hierarchy_array];
+}
+
+
+function getLevels(hierarchy_array) {
+    let levels = [];
+    for (let parent of hierarchy_array) {
+        if (parent == -1) {
+            levels.push(0);
+        }
+        else {
+            levels.push(levels[parent] + 1);
+        }
+    }
+    return levels;
 }
 
 
 // this function is used for debugging, it draws the curves detected by the detectCurves function
 export function drawCurves(image) {
-    const [contours, hierarchy] = getCurves(image);  // get contours and hierarchy from the detectContours function
+    const [contours, hierarchy] = detectCurves(image);  // get contours and hierarchy from the detectContours function
 
     let contourColor = new cv.Scalar(255, 0, 0, 255);  // this is the color yellow, which will be used to draw the contours
 
