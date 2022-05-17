@@ -11,7 +11,7 @@ use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
 use super::raster::Raster;
 
-use super::raster_neighbour_smoothing::RasterNeighbourSmoothing;
+use super::smoother::Smoother;
 
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
@@ -72,10 +72,10 @@ impl ModelGenerationSettings {
 #[wasm_bindgen]
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, repetitions: usize, strength_positive: f32, strength_negative: f32, coverage: usize, svc_weight: usize, rows: usize, columns: usize, contour_margin: f32) -> Result<String, JsValue> {
 
-	log!("The provided open_cv_tree: {:?}", open_cv_tree);
-	log!("The provided settings: {:?}", settings);
+	// log!("The provided open_cv_tree: {:?}", open_cv_tree);
+	// log!("The provided settings: {:?}", settings);
 
-	log!("Running generation algorithm");
+	// log!("Running generation algorithm");
 
 	crate::utils::set_panic_hook();
 
@@ -133,6 +133,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	let mut level_curve_6: LevelCurve = LevelCurve::new(250.0);
+	level_curve_6.is_mountain_top = true;
 
 	// Add all the points to level curve 6
 	level_curve_6.add_all_points(
@@ -149,33 +150,12 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	let mut level_curve_8: LevelCurve = LevelCurve::new(350.0);
+	level_curve_8.is_mountain_top = true;
 
 	// Add all the points to level curve 8
 	level_curve_8.add_all_points(
 		vec![Point{x:484.625,y:367.0625,z:0.0}, Point{x:483.25,y:366.125,z:0.0}, Point{x:481.875,y:365.1875,z:0.0}, Point{x:480.5,y:364.25,z:0.0}, Point{x:479.125,y:363.3125,z:0.0}, Point{x:477.75,y:362.375,z:0.0}, Point{x:476.375,y:361.4375,z:0.0}, Point{x:475.0,y:360.5,z:0.0}, Point{x:473.625,y:359.5625,z:0.0}, Point{x:472.25,y:358.625,z:0.0}, Point{x:470.875,y:357.6875,z:0.0}, Point{x:469.5,y:356.75,z:0.0}, Point{x:468.125,y:355.8125,z:0.0}, Point{x:466.75,y:354.875,z:0.0}, Point{x:465.375,y:353.9375,z:0.0}, Point{x:464.0,y:353.0,z:0.0}, Point{x:462.0,y:353.0,z:0.0}, Point{x:460.0,y:353.0,z:0.0}, Point{x:458.0,y:353.0,z:0.0}, Point{x:456.0,y:353.0,z:0.0}, Point{x:454.0,y:353.0,z:0.0}, Point{x:452.0,y:353.0,z:0.0}, Point{x:450.0,y:353.0,z:0.0}, Point{x:448.0,y:353.0,z:0.0}, Point{x:446.0,y:353.0,z:0.0}, Point{x:444.0,y:353.0,z:0.0}, Point{x:442.0,y:353.0,z:0.0}, Point{x:440.0,y:353.0,z:0.0}, Point{x:438.0,y:353.0,z:0.0}, Point{x:436.0,y:353.0,z:0.0}, Point{x:434.0,y:353.0,z:0.0}, Point{x:432.0,y:353.0,z:0.0}, Point{x:431.625,y:355.0,z:0.0}, Point{x:431.25,y:357.0,z:0.0}, Point{x:430.875,y:359.0,z:0.0}, Point{x:430.5,y:361.0,z:0.0}, Point{x:430.125,y:363.0,z:0.0}, Point{x:429.75,y:365.0,z:0.0}, Point{x:429.375,y:367.0,z:0.0}, Point{x:429.0,y:369.0,z:0.0}, Point{x:428.625,y:371.0,z:0.0}, Point{x:428.25,y:373.0,z:0.0}, Point{x:427.875,y:375.0,z:0.0}, Point{x:427.5,y:377.0,z:0.0}, Point{x:427.125,y:379.0,z:0.0}, Point{x:426.75,y:381.0,z:0.0}, Point{x:426.375,y:383.0,z:0.0}, Point{x:426.0,y:385.0,z:0.0}, Point{x:427.4375,y:386.25,z:0.0}, Point{x:428.875,y:387.5,z:0.0}, Point{x:430.3125,y:388.75,z:0.0}, Point{x:431.75,y:390.0,z:0.0}, Point{x:433.1875,y:391.25,z:0.0}, Point{x:434.625,y:392.5,z:0.0}, Point{x:436.0625,y:393.75,z:0.0}, Point{x:437.5,y:395.0,z:0.0}, Point{x:438.9375,y:396.25,z:0.0}, Point{x:440.375,y:397.5,z:0.0}, Point{x:441.8125,y:398.75,z:0.0}, Point{x:443.25,y:400.0,z:0.0}, Point{x:444.6875,y:401.25,z:0.0}, Point{x:446.125,y:402.5,z:0.0}, Point{x:447.5625,y:403.75,z:0.0}, Point{x:449.0,y:405.0,z:0.0}, Point{x:450.8125,y:404.5,z:0.0}, Point{x:452.625,y:404.0,z:0.0}, Point{x:454.4375,y:403.5,z:0.0}, Point{x:456.25,y:403.0,z:0.0}, Point{x:458.0625,y:402.5,z:0.0}, Point{x:459.875,y:402.0,z:0.0}, Point{x:461.6875,y:401.5,z:0.0}, Point{x:463.5,y:401.0,z:0.0}, Point{x:465.3125,y:400.5,z:0.0}, Point{x:467.125,y:400.0,z:0.0}, Point{x:468.9375,y:399.5,z:0.0}, Point{x:470.75,y:399.0,z:0.0}, Point{x:472.5625,y:398.5,z:0.0}, Point{x:474.375,y:398.0,z:0.0}, Point{x:476.1875,y:397.5,z:0.0}, Point{x:478.0,y:397.0,z:0.0}, Point{x:478.5,y:395.1875,z:0.0}, Point{x:479.0,y:393.375,z:0.0}, Point{x:479.5,y:391.5625,z:0.0}, Point{x:480.0,y:389.75,z:0.0}, Point{x:480.5,y:387.9375,z:0.0}, Point{x:481.0,y:386.125,z:0.0}, Point{x:481.5,y:384.3125,z:0.0}, Point{x:482.0,y:382.5,z:0.0}, Point{x:482.5,y:380.6875,z:0.0}, Point{x:483.0,y:378.875,z:0.0}, Point{x:483.5,y:377.0625,z:0.0}, Point{x:484.0,y:375.25,z:0.0}, Point{x:484.5,y:373.4375,z:0.0}, Point{x:485.0,y:371.625,z:0.0}, Point{x:485.5,y:369.8125,z:0.0}, Point{x:486.0,y:368.0,z:0.0}]
 	);
-
-
-
-
-	// let rows = 120;
-    // let columns = 120;
-    // let contour_margin = 10.0;
-
-
-
-	// Increase the resolution for the level-curves
-	// for i in 0..0 {
-	// 	level_curve_0.increase_point_resolution();
-	// 	level_curve_1.increase_point_resolution();
-	// 	level_curve_2.increase_point_resolution();
-	// 	level_curve_3.increase_point_resolution();
-	// 	level_curve_4.increase_point_resolution();
-	// 	level_curve_5.increase_point_resolution();
-	// 	level_curve_6.increase_point_resolution();
-	// 	level_curve_7.increase_point_resolution();
-	// 	level_curve_8.increase_point_resolution();
-	// }
 
 
     let mut level_curve_map: LevelCurveSet = LevelCurveSet::new(100.0);
@@ -223,11 +203,13 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// determine heights
 	model_constructor.construct().map_err(|e| e.to_string())?;
 
-	//RENS STUFF
-//	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 7, 1, false).map_err(|e| e.to_string())?;
+	// Apply smoothing
+	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
-//	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 7, 1, false).map_err(|e| e.to_string())?;
+	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
 
+	// convert height raster to flat list of x,y,z points for GLTF format
+	// every cell had 4 corners, becomes two triangles
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 
 	let (vs, fs) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");

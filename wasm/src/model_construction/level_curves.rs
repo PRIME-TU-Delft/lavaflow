@@ -12,11 +12,12 @@ use super::point::Point;
 pub struct LevelCurve {
 	pub altitude: f32,
 	pub points: Vec<Point>,
+	pub is_mountain_top: bool
 }
 
 impl LevelCurve {
 	pub fn new(altitude: f32) -> Self {
-		Self { altitude, points: Vec::new() }
+		Self { altitude, points: Vec::new(), is_mountain_top: false }
 	}
 
 	pub fn add_point(&mut self, a: Point) {

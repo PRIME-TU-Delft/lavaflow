@@ -9,27 +9,34 @@ let hc_level_curves = [[[798, 101], [789, 92], [777, 84], [753, 71], [743, 67], 
 let hc_parent_relations = [-1, 0, 1, 2, 3]
 
 init().then(() => {
-	console.log('init wasm-pack');
+	//console.log('init wasm-pack');
 
 	let tree = new wasm.OpenCVTree({ "pixels_per_curve": hc_level_curves, "parent_relations": hc_parent_relations });
 
 	let settings = new wasm.ModelGenerationSettings(5.0, 50, 50, 50.0, 1.0);
 
-	console.log(tree.debug());
-	console.log(settings.debug());
+	//console.log(tree.debug());
+	//console.log(settings.debug());
 
-	let repetitions = 2;
+	let repetitions = 9;
 	let strength_positive = 0.7;
 	let strength_negative = 0.7;
 	let coverage = 4;
 	let svc_weight = 100;
 
-	let rows = 20;
-	let columns = 40;
-	let contour_margin = 10.0;
+	let rows = 60;
+	let columns = 60;
+	let contour_margin = 15.0;
+
+	// Measure the performance
+	let start = performance.now();
 
 	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin);
-	console.log(gltf);
+	//console.log(gltf);
+
+	let end = performance.now();
+
+	console.log("Time needed for rendering: " + (end - start) + "ms");
 
 	// View the GLTF in the browser
 	const scene = new THREE.Scene();

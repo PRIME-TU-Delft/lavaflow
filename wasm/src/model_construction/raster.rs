@@ -1,7 +1,6 @@
-//
-// Class: Raster
-//
-
+/// # Struct: Raster
+/// This struct is used for keeping track of the altitude levels of rows and columns.
+/// It is required as input for many other structs, because all construction and smoothing algorithms depend on it.
 #[derive(Debug)]
 pub struct Raster {
 	pub rows: usize,
@@ -42,11 +41,27 @@ impl Raster {
 		}
 	}
 
+	/// ## Instance Method
+	/// Set the altitude of a certain row and column
 	pub fn set(&mut self, row: usize, col: usize, val: f32) {
 		self.altitudes[row][col] = Some(val);
 	}
 
+	/// ## Instance Method
+	/// Get the altitude of a certain row and column
 	pub fn get(&self, row: usize, col: usize) -> &Option<f32> {
 		&self.altitudes[row][col]
+	}
+
+	/// # Instance Method
+	/// Get the pixels (x, y) for a given row and column.
+	/// 
+	/// What is meant by this: the raster has a certain pixel-width and pixel-height, as well as a number of
+	/// rows and columns. This function maps the row-column to pixel-positions.
+	pub fn get_pixel(&self, row: usize, col: usize) -> (f32, f32) {
+		(
+			(col as f32) * self.column_width,
+			(row as f32) * self.row_height
+		)
 	}
 }
