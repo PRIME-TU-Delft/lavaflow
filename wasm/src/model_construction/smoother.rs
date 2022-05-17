@@ -6,6 +6,11 @@ use super::triangle::Triangle;
 use miette::{Result, miette};
 
 
+
+/// # Struct: Smoother
+/// The Smoother is a struct that allows for applying mountain-smoothing in a much more controlled manner.
+/// For example, it enables smoothing per altitude-group of level-curves. Developers can detach specific parts of
+/// the mountain, such as the mountain tops, and smooth them, separately using specific paremeters.
 pub struct Smoother<'a> {
     raster: &'a mut Raster,
     is_svc: &'a Vec<Vec<bool>>,
@@ -19,14 +24,24 @@ pub struct Smoother<'a> {
 
 impl<'a> Smoother<'a> {
 
+    /// ## Constructor
+    /// Create a new `Smoother` instance.
+    /// 
+    /// **Usage**: Initialize a `ModelConstructor` instance and apply its mountain-construction algorithm to the level-curves.
+    /// After this is completed, create a `Smoother` instance and use it to run specialised smoothing.
+    /// 
+    /// ### Parameters
+    /// - `model_constructor`: Instance of a ModelConstructor, as a mutable reference with lifetime specifier.
     pub fn new(model_constructor: &'a mut ModelConstructor) -> Result<Self> {
 
-        // Construct the list of point-indices per layer
+        // Construct the list of point-indices per layer.
+        // Construct the list of booleans, specifying whether a layer is a mountain-top.
+        // Construct the list of altitudes per layer.
         let mut point_indices_per_layer: Vec<Vec<(usize, usize)>> = Vec::new();
         let mut layer_is_top: Vec<bool> = Vec::new();
         let mut altitude_of_layer: Vec<f32> = Vec::new();
 
-        // Initialize the list, by pushing empty lists for every level curve
+        // Initialize the lists, by pushing empty lists for every level curve
         for _lc in 0..model_constructor.level_curve_map.level_curves.len()+1 {
             point_indices_per_layer.push(Vec::new());
             layer_is_top.push(false);
@@ -44,10 +59,7 @@ impl<'a> Smoother<'a> {
         // 1. Triangulate all the level-curves.
         let mut triangles_per_level_curve: Vec<(usize, Vec<(&Point, &Point, &Point)>, bool, f32)> = Vec::new();
 
-        // for lc in &model_constructor.level_curve_map.level_curves {
-        //     triangles_per_level_curve.push(Smoother::triangulate_level_curve(lc)?);
-        // }
-
+        // 1a. Find out which level-curve has the highest altitude
         let mut current_altitude: f32 = -10.0;
         let mut current_lc: usize = 0;
 
@@ -58,9 +70,18 @@ impl<'a> Smoother<'a> {
             }
         }
 
+        // Initialize a list of level-curves that have already been drawn and triangulated (initially empty)
         let mut drawn_lcs: Vec<usize> = Vec::new();
 
+        // Start the triangulation loop
+        // Triangulation will occur for higher layers first. The reason is explained below:
+        //
+        //      Imagine two level-curves, one at altitude 10 (lc1) and the other at altitude 20 (lc2). All points that triangulate
+        //      into level-curve lc2 will also triangulate in lc1, because lc1 completely encapsulates lc1. The latter is a valid
+        //      statement, since level-curves cannot specify a cave in a mountain.
+        //      Therefore: first triangulate points on higher altitudes, then continue down the mountain.
         loop {
+            // Triangulate the current level-curve and push it to the array
             triangles_per_level_curve.push((
                 current_lc,
                 Smoother::triangulate_level_curve(&model_constructor.level_curve_map.level_curves[current_lc])?,
@@ -68,11 +89,14 @@ impl<'a> Smoother<'a> {
                 model_constructor.level_curve_map.level_curves[current_lc].altitude
             ));
 
-
+            // Mark this level-curve as drawn
             drawn_lcs.push(current_lc);
 
+            // Set the current-altitude back to -10.
             current_altitude = -10.0;
 
+            // While keeping track of whether we've found a new level-curve, find the level-curve that is not yet drawn
+            // and that has the highest altitude.
             let mut found_new = false;
 
             for (i, lc) in model_constructor.level_curve_map.level_curves.iter().enumerate() {
@@ -83,10 +107,13 @@ impl<'a> Smoother<'a> {
                 }
             }
 
+            // If no new level curve was found, break out of the loop.
             if !found_new {
                 break;
             }
         }
+
+        // After the loop: all level curves have been triangulated.
 
         // 2. For every point in the raster, assign it to the right layer, according to this triangulation.
         // Loop over all the level curves
@@ -149,6 +176,7 @@ impl<'a> Smoother<'a> {
             altitude_groups[f32::round(a / model_constructor.level_curve_map.altitude_step) as usize].push(i);
         }
 
+        // Complete the construction and return the new instance
         Ok(Self {
             raster: model_constructor.raster,
             is_svc: &model_constructor.is_svc,
@@ -161,11 +189,23 @@ impl<'a> Smoother<'a> {
 
     }
 
+    /// ## Instance Method
+    /// Compute the number of layers in this mountain.
     pub fn layers(&self) -> usize {
         self.point_indices_per_layer.len()
     }
 
-    /// Method: get all (row, col) indices of points in a certain layer
+    /// ## Instance Method
+    /// Compute the number of altitude groups in this mountain.
+    pub fn number_of_altitude_groups(&self) -> usize {
+        self.altitude_groups.len()
+    }
+
+    /// ## Instance Method
+    /// Get the list of points that belong to a certain level.
+    /// 
+    /// ### Parameters
+    /// - `level`: usize, specifying which level to extract.
     pub fn get_point_indices_in_level(&self, level: usize) -> Result<&Vec<(usize, usize)>> {
         if level < self.point_indices_per_layer.len() {
             return Ok(&self.point_indices_per_layer[level]);
@@ -175,13 +215,14 @@ impl<'a> Smoother<'a> {
     }
 
 
-    /// Method: triangulate all points in a single level-curve.
+    /// ## Instance Method
+    /// Triangulate all points in a single level-curve.
     /// 
-    /// # Arguments:
-    /// * level_curve: The level curve to apply triangulation on
+    /// ### Parameters:
+    /// - `level_curve`: The level curve to apply triangulation on.
     /// 
-    /// # Returns:
-    /// * A triple of Points, representing a triangle
+    /// ### Returns:
+    /// - A triple of `Point`s, representing a triangle
     pub fn triangulate_level_curve(level_curve: &LevelCurve) -> Result<Vec<(&Point, &Point, &Point)>> {
 
         // Prebase: If this level-curve contains less than three points, throw an exception
@@ -303,7 +344,12 @@ impl<'a> Smoother<'a> {
     }
 
 
-    /// Method: check if a point falls within a set of triangles
+    /// ## Private Static Method
+    /// Determine whether a certain point lies within the area of any triangle in a set.
+    /// 
+    /// ### Parameters
+    /// - `triangle_set`: The set of triangles.
+    /// - `p`: The point to check the premise against.
     fn point_in_triangle_set(triangle_set: &Vec<(&Point, &Point, &Point)>, p: &Point) -> bool {
 
         // Loop over all the triangles
@@ -323,19 +369,30 @@ impl<'a> Smoother<'a> {
 
         }
 
+        // Return false otherwise
         false
 
     }
 
-
-    pub fn number_of_altitude_groups(&self) -> usize {
-        self.altitude_groups.len()
-    }
-
     //
-    // SMOOTHING ALGORITHMS
+    // SMOOTHING ALGORITHMS: HELPER FUNCTIONS
     //
 
+    /// ## Private Method
+    /// Get the altitude of a specific neighbour.
+    /// 
+    /// ### Parameters
+    /// - `row`: The row of the item of which to check the neighbours.
+    /// - `col`: The column of the item of which to check the neighbours.
+    /// - `alt_row`: The difference in rows between this item and the specific neighbour.
+    /// - `alt_col`: The difference in columns between this item and the specific neighbour.
+    /// 
+    /// ### Returns
+    /// This method returns a Result.
+    /// 
+    /// Ok - If all goes well, this method returns the altitude of the specified neighbour.
+    ///    - If a neighbour doesn't exist, return 0.0 as altitude. (The bottom layer of the mountain is always zero and the table is altitude zero, as specified in the requirements).
+    /// Err- If something goes wrong, this method will return an error.
     fn get_neighbour_altitude(&self, row: usize, col: usize, alt_row: isize, alt_col: isize) -> Result<f32> {
 
         let row_n = row as isize + alt_row;
@@ -353,6 +410,19 @@ impl<'a> Smoother<'a> {
 
     }
 
+    /// ## Instance Method
+    /// Determine whether the specified neighbour is an svc or not.
+    /// 
+    /// ### Parameters
+    /// - `row`: The row of the item of which to check the neighbours.
+    /// - `col`: The column of the item of which to check the neighbours.
+    /// - `alt_row`: The difference in rows between this item and the specific neighbour.
+    /// - `alt_col`: The difference in columns between this item and the specific neighbour.
+    /// 
+    /// ### Returns
+    /// This method returns a Result. If anything goes wrong, an error will be thrown.
+    /// 
+    /// This method returns trus iff the specified neighbour is an svc. False otherwise.
     fn neighbour_is_svc(&self, row: usize, col: usize, alt_row: isize, alt_col: isize) -> bool {
 
         let row_n = row as isize + alt_row;
@@ -370,6 +440,18 @@ impl<'a> Smoother<'a> {
 
     }
 
+    /// ## Instance Method
+    /// Determine whether the specified neighbour belongs to the specified layer.
+    /// 
+    /// ### Parameters
+    /// - `layer`: The layer to check this premise for.
+    /// - `row`: The row of the item of which to check the neighbours.
+    /// - `col`: The column of the item of which to check the neighbours.
+    /// - `alt_row`: The difference in rows between this item and the specific neighbour.
+    /// - `alt_col`: The difference in columns between this item and the specific neighbour.
+    /// 
+    /// ### Returns
+    /// This method returns a boolean. True iff this neighbour belongs to this layer, false otherwise.
     fn neighbour_belongs_to_layer(&self, layer: usize, row: usize, col: usize, alt_row: isize, alt_col: isize) -> bool {
 
         // If the specified layer doesn't exist, return error
@@ -392,6 +474,23 @@ impl<'a> Smoother<'a> {
 
     }
 
+    //
+    // SMOOTHING ALGORITHMS
+    //
+
+
+    /// ## Instance Method (Smoothing Method)
+    /// Apply neighbour smoothing to the points that reside in the specified layer
+    /// 
+    /// ### Parameters
+    /// - `layer`: The layer to check this premise for.
+    /// - `strength: f32`: The strength of the smoothing, range [0, 1]. Outside this range, undesired behaviour might occur.
+    /// - `coverage: usize`: The size of the rectangle, inside which all neighbours will be incorporated in the compution. The resulting rectangle has size (2xcoverage + 1) by (2xcoverage + 1).
+    /// - `svc_weight: usize`: The number of times an svc-value counts in the averaging of neighbours.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
     pub fn apply_smooth_to_layer(&mut self, layer: usize, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
 
         // If the specified layer doesn't exist, return error
@@ -462,6 +561,16 @@ impl<'a> Smoother<'a> {
     }
 
 
+    /// ## Instance Method (Smoothing Method)
+    /// Set the altitude of a specific layer
+    /// 
+    /// ### Parameters
+    /// - `layer`: The layer to check this premise for.
+    /// - `altitude: f32`: The new altitude to set the points in this layer to.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
     pub fn set_altitude_for_layer(&mut self, layer: usize, altitude: f32, allow_svc_change: bool) -> Result<()> {
 
         // If the specified layer doesn't exist, return error
@@ -492,6 +601,63 @@ impl<'a> Smoother<'a> {
 
     }
 
+
+    /// ## Instance Method (Smoothing Method)
+    /// Apply neighbour smoothing to the points that reside in the specified altitude group.
+    /// 
+    /// ### Parameters
+    /// - `altitude_group: usize`: The altitude group to apply the smoothing to.
+    /// - `strength: f32`: The strength of the smoothing, range [0, 1]. Outside this range, undesired behaviour might occur.
+    /// - `coverage: usize`: The size of the rectangle, inside which all neighbours will be incorporated in the compution. The resulting rectangle has size (2xcoverage + 1) by (2xcoverage + 1).
+    /// - `svc_weight: usize`: The number of times an svc-value counts in the averaging of neighbours.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
+    pub fn apply_smooth_to_altitude_group(&mut self, altitude_group: usize, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
+
+        // Apply the specified smooth to every layer that falls in this group
+        for i in 0..self.altitude_groups[altitude_group].len() {
+            self.apply_smooth_to_layer(self.altitude_groups[altitude_group][i], strength, coverage, svc_weight, allow_svc_change)?;
+        }
+
+        Ok(())
+
+    }
+
+
+    /// ## Instance Method (Smoothing Method)
+    /// Increase the altitude of all points that reside in a certain altitude-group.
+    /// 
+    /// ### Parameters
+    /// - `altitude_group: usize`: The altitude group to apply the smoothing to.
+    /// - `percentage_of_altitude_step`: The percentage of the altitude-step that the points should be set higher with.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
+    pub fn increase_altitude_for_altitude_group(&mut self, altitude_group: usize, percentage_of_altitude_step: f32, allow_svc_change: bool) -> Result<()> {
+
+        // Apply the specified altitude increase to every layer that falls in this group
+        for i in 0..self.altitude_groups[altitude_group].len() {
+            self.set_altitude_for_layer(self.altitude_groups[altitude_group][i], self.altitude_of_layer[self.altitude_groups[altitude_group][i]] + self.altitude_step * percentage_of_altitude_step, allow_svc_change)?;
+        }
+            
+        Ok(())
+
+    }
+
+    /// ## Instance Method (Smoothing Method)
+    /// Apply neighbour smoothing to the points that reside in any middle altitude-layer (being not the bottom and not the mountain-tops).
+    /// 
+    /// ### Parameters
+    /// - `strength: f32`: The strength of the smoothing, range [0, 1]. Outside this range, undesired behaviour might occur.
+    /// - `coverage: usize`: The size of the rectangle, inside which all neighbours will be incorporated in the compution. The resulting rectangle has size (2xcoverage + 1) by (2xcoverage + 1).
+    /// - `svc_weight: usize`: The number of times an svc-value counts in the averaging of neighbours.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
     pub fn apply_smooth_to_middle_layers(&mut self, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
 
         for i in 0..self.layer_is_top.len() {
@@ -506,29 +672,17 @@ impl<'a> Smoother<'a> {
     }
 
 
-    pub fn apply_smooth_to_altitude_group(&mut self, altitude_group: usize, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
-
-        // Apply the specified smooth to every layer that falls in this group
-        for i in 0..self.altitude_groups[altitude_group].len() {
-            self.apply_smooth_to_layer(self.altitude_groups[altitude_group][i], strength, coverage, svc_weight, allow_svc_change)?;
-        }
-
-        Ok(())
-
-    }
-
-    pub fn increase_altitude_for_altitude_group(&mut self, altitude_group: usize, percentage_of_altitude_step: f32, allow_svc_change: bool) -> Result<()> {
-
-        // Apply the specified altitude increase to every layer that falls in this group
-        for i in 0..self.altitude_groups[altitude_group].len() {
-            self.set_altitude_for_layer(self.altitude_groups[altitude_group][i], self.altitude_of_layer[self.altitude_groups[altitude_group][i]]  * (1.0 + percentage_of_altitude_step), allow_svc_change)?;
-        }
-            
-        Ok(())
-
-    }
-
-
+    /// ## Instance Method (Smoothing Method)
+    /// Apply neighbour smoothing to the points that reside in any of the mountain tops.
+    /// 
+    /// ### Parameters
+    /// - `strength: f32`: The strength of the smoothing, range [0, 1]. Outside this range, undesired behaviour might occur.
+    /// - `coverage: usize`: The size of the rectangle, inside which all neighbours will be incorporated in the compution. The resulting rectangle has size (2xcoverage + 1) by (2xcoverage + 1).
+    /// - `svc_weight: usize`: The number of times an svc-value counts in the averaging of neighbours.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
     pub fn apply_smooth_to_mountain_tops(&mut self, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
 
         for i in 0..self.layer_is_top.len() {
@@ -541,6 +695,16 @@ impl<'a> Smoother<'a> {
 
     }
 
+
+    /// ## Instance Method (Smoothing Method)
+    /// Increase the altitude of the points that reside in any of the mountain-tops.
+    /// 
+    /// ### Parameters
+    /// - `percentage_of_altitude_step`: The percentage of the altitude-step that the points should be set higher with.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
     pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32, allow_svc_change: bool) -> Result<()> {
 
         for i in 0..self.layer_is_top.len() {
@@ -554,6 +718,15 @@ impl<'a> Smoother<'a> {
     }
 
 
+    /// ## Instance Method
+    /// Correct for the altitude constraints that are posed by the level-curves.
+    /// It can never be the case that a point that resides in the layer between altitude 10.0 and 20.0 has an altitude of 5.0.
+    /// Then there would have needed to be another level-curve that specified that this point would lay below altitude 10.0.
+    /// This method corrects for this problem, by checking whether a specific point has this problem and then assigning the 
+    /// minimum or maximum altitude to it, according to the layer it resides in.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
     pub fn correct_for_altitude_constraints_to_all_layers(&mut self) -> Result<()> {
 
         for (i, &alt) in self.altitude_of_layer.iter().enumerate() {
