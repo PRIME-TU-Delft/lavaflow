@@ -1,7 +1,3 @@
-use std::thread::current;
-
-use crate::utils::log;
-
 use super::constructor::ModelConstructor;
 use super::raster::Raster;
 use super::level_curves::LevelCurve;
@@ -16,7 +12,8 @@ pub struct Smoother<'a> {
     point_indices_per_layer: Vec<Vec<(usize, usize)>>,
     layer_is_top: Vec<bool>,
     altitude_of_layer: Vec<f32>,
-    altitude_groups: Vec<Vec<usize>>
+    altitude_groups: Vec<Vec<usize>>,
+    altitude_step: f32
 }
 
 
@@ -93,7 +90,7 @@ impl<'a> Smoother<'a> {
 
         // 2. For every point in the raster, assign it to the right layer, according to this triangulation.
         // Loop over all the level curves
-        for (i, triangle_set) in triangles_per_level_curve.iter().enumerate() {
+        for (_i, triangle_set) in triangles_per_level_curve.iter().enumerate() {
             // Loop over all unassigned points
             for j in (0..unassigned_points.len()).rev() {
                 let row = unassigned_points[j].0;
@@ -158,7 +155,8 @@ impl<'a> Smoother<'a> {
             point_indices_per_layer: point_indices_per_layer,
             layer_is_top,
             altitude_of_layer,
-            altitude_groups
+            altitude_groups,
+            altitude_step: model_constructor.level_curve_map.altitude_step
         })
 
     }
@@ -433,7 +431,7 @@ impl<'a> Smoother<'a> {
                         neighbour_altitudes.push(self.get_neighbour_altitude(row, col, alt_row, alt_col)?);
 
                         if self.neighbour_is_svc(row, col, alt_row, alt_col) {
-                            for i in 0..svc_weight-1 {
+                            for _i in 0..svc_weight-1 {
                                 neighbour_altitudes.push(self.get_neighbour_altitude(row, col, alt_row, alt_col)?);
                             }
                         }
@@ -464,7 +462,7 @@ impl<'a> Smoother<'a> {
     }
 
 
-    pub fn set_altitude_for_layer(&mut self, layer: usize, altitude: f32) -> Result<()> {
+    pub fn set_altitude_for_layer(&mut self, layer: usize, altitude: f32, allow_svc_change: bool) -> Result<()> {
 
         // If the specified layer doesn't exist, return error
         if layer >= self.point_indices_per_layer.len() {
@@ -480,8 +478,26 @@ impl<'a> Smoother<'a> {
                     continue;
                 }
 
+                // Skip this pair if it is an svc
+                if self.is_svc[row][col] && !allow_svc_change {
+                    continue;
+                }
+
                 self.raster.altitudes[row][col] = Some(altitude);
 
+            }
+        }
+
+        Ok(())
+
+    }
+
+    pub fn apply_smooth_to_middle_layers(&mut self, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
+
+        for i in 0..self.layer_is_top.len() {
+            if !self.layer_is_top[i] && i != 0 {
+                // This layer is not a top and is also not the bottom layer
+                self.apply_smooth_to_layer(i, strength, coverage, svc_weight, allow_svc_change)?;
             }
         }
 
@@ -501,11 +517,11 @@ impl<'a> Smoother<'a> {
 
     }
 
-    pub fn increase_altitude_for_altitude_group(&mut self, altitude_group: usize, percentage_of_altitude_step: f32) -> Result<()> {
+    pub fn increase_altitude_for_altitude_group(&mut self, altitude_group: usize, percentage_of_altitude_step: f32, allow_svc_change: bool) -> Result<()> {
 
         // Apply the specified altitude increase to every layer that falls in this group
         for i in 0..self.altitude_groups[altitude_group].len() {
-            self.set_altitude_for_layer(self.altitude_groups[altitude_group][i], self.altitude_of_layer[self.altitude_groups[altitude_group][i]]  * (1.0 + percentage_of_altitude_step))?;
+            self.set_altitude_for_layer(self.altitude_groups[altitude_group][i], self.altitude_of_layer[self.altitude_groups[altitude_group][i]]  * (1.0 + percentage_of_altitude_step), allow_svc_change)?;
         }
             
         Ok(())
@@ -525,12 +541,52 @@ impl<'a> Smoother<'a> {
 
     }
 
-    pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32) -> Result<()> {
+    pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32, allow_svc_change: bool) -> Result<()> {
 
         for i in 0..self.layer_is_top.len() {
             if self.layer_is_top[i] {
-                self.set_altitude_for_layer(i, self.altitude_of_layer[i] * (1.0 + percentage_of_altitude_step))?;
+                self.set_altitude_for_layer(i, self.altitude_of_layer[i] + self.altitude_step * percentage_of_altitude_step, allow_svc_change)?;
             }
+        }
+
+        Ok(())
+
+    }
+
+
+    pub fn correct_for_altitude_constraints_to_all_layers(&mut self) -> Result<()> {
+
+        for (i, &alt) in self.altitude_of_layer.iter().enumerate() {
+
+            // i is the current layer we're considering
+            // alt is the lower altitude of the current layer
+            // alt_max is the upper altitude of the current layer
+            let alt_max = alt + self.altitude_step;
+
+            // Loop over all point-indices in this layer
+            for current_index in &self.point_indices_per_layer[i] {
+
+                let row = current_index.0;
+                let col = current_index.1;
+
+                // If the altitude of this index falls outside the lower bound
+                if self.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))? < alt {
+
+                    // Correct this altitude, by setting it to the minimum
+                    self.raster.altitudes[row][col] = Some(alt);
+
+                }
+
+                // If the altitude of this index falls outside the upper bound
+                if self.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))? > alt_max {
+
+                    // Correct this altitude, by setting it to the maximum
+                    self.raster.altitudes[row][col] = Some(alt_max);
+
+                }
+
+            }
+
         }
 
         Ok(())
