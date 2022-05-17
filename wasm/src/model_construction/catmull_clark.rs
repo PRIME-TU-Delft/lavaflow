@@ -103,42 +103,42 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights : bo
 	//TODO REFACTOR : think about how iteration over rows makes checking for duplicates in vs easier
 	//TODO REFACTOR : SHOULD BE X = X* COLUMN WIDTH, Y = Y*ROW HEIGHT -> GIVES WRONG VISUAL RESULT (refactoring must happen in eithor constuctor.rs or in raster.rs)
 	//TODO REFACTOR : rows and columns in for loop must also be swapped when raster problem is fixed
-	for x in 0..raster.rows - 1 {
-		for y in 0..raster.columns- 1 {
+	for x in 0..raster.columns - 1 {
+		for y in 0..raster.rows- 1 {
 			//indexes of face vertices
 			let mut ps = Vec::new();
 
 			// calc corner vertices
 			//0,0
 			let a = Vertex {
-				x: (x as f32 * raster.row_height),
-				y: (( y) as f32 * raster.column_width),
-				z: heights[x][y].unwrap(),
-				is_sharp: if(keep_heights){is_sharp[x][y ]} else {false},
+				x: (x as f32 * raster.column_width),
+				y: (( y) as f32 * raster.row_height),
+				z: heights[y][x].unwrap(),
+				is_sharp: if(keep_heights){is_sharp[y][x]} else {false},
 				half_sharp: false,
 			};
 			//0,1
 			let b = Vertex {
-				x: (x as f32 * raster.row_height),
-				y: (( y + 1) as f32) * raster.column_width,
-				z: heights[x][y + 1].unwrap(),
-				is_sharp: if(keep_heights){is_sharp[x][y + 1 ]} else {false},
+				x: (x as f32 * raster.column_width),
+				y: (( y + 1) as f32) * raster.row_height,
+				z: heights[y +1][x ].unwrap(),
+				is_sharp: if(keep_heights){is_sharp[y][x + 1 ]} else {false},
 				half_sharp: false,
 			};
 			//1, 0
 			let c = Vertex {
-				x: ((x + 1) as f32 * raster.row_height),
-				y: (( y) as f32) * raster.column_width,
-				z: heights[x + 1][y].unwrap(),
-				is_sharp: if(keep_heights){is_sharp[x + 1][y ]} else {false},
+				x: ((x + 1) as f32 * raster.column_width),
+				y: (( y) as f32) * raster.row_height,
+				z: heights[y ][x + 1].unwrap(),
+				is_sharp: if(keep_heights){is_sharp[y ][x + 1 ]} else {false},
 				half_sharp: false,
 			};
 			//1,1
 			let d = Vertex {
-				x: ((x + 1) as f32 * raster.row_height),
-				y: (( y + 1) as f32) * raster.column_width,
-				z: heights[x + 1][y + 1].unwrap(),
-				is_sharp: if(keep_heights){is_sharp[x + 1][y + 1]} else {false},
+				x: ((x + 1) as f32 * raster.column_width),
+				y: (( y + 1) as f32) * raster.row_height,
+				z: heights[y + 1][x + 1].unwrap(),
+				is_sharp: if(keep_heights){is_sharp[y + 1][x + 1]} else {false},
 				half_sharp: false,
 			};
 
