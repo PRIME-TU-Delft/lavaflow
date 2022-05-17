@@ -10,7 +10,6 @@ use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
 use super::raster::Raster;
 
-use super::raster_neighbour_smoothing::RasterNeighbourSmoothing;
 use super::smoother::Smoother;
 
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
@@ -312,25 +311,6 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
-
-	smoother.apply_smooth_to_layer(0, 0.8, 5, 10, false).map_err(|e| e.to_string())?;
-
-	smoother.increase_altitude_for_mountain_tops(0.9, false).map_err(|e| e.to_string())?;
-	smoother.apply_smooth_to_mountain_tops(0.5, 5, 5, false).map_err(|e| e.to_string())?;
-
-	smoother.apply_smooth_to_middle_layers(0.7, 5, 1, false).map_err(|e| e.to_string())?;
-
-	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.3, 0.3, 5, 1, false).map_err(|e| e.to_string())?;
-
-	
-	// RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
-
-	// RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 5, 1, false).map_err(|e| e.to_string())?;
-
-
-	// for i in 0..5 {
-	// 	RasterNeighbourSmoothing::smooth_staircase_effect_without_border(&mut model_constructor, strength_positive, strength_negative, coverage, svc_weight, false).map_err(|e| e.to_string())?;
-	// }
 
 	// convert height raster to flat list of x,y,z points for GLTF format
 	// every cell had 4 corners, becomes two triangles

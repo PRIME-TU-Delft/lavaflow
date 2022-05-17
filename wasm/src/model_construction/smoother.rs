@@ -258,28 +258,24 @@ impl<'a> Smoother<'a> {
             //      pv: The point at index i
             //      pw: The point at index i+1
 
-            let pu_index: usize;
+            let mut pu_index: usize = i-1;
             let pu: &Point;
 
             //  pv_index = i
             let pv: &Point = &level_curve.points[indices_in_polygon[i]];
 
-            let pw_index: usize;
+            let mut pw_index: usize = i+1;
             let pw: &Point;
 
             // if pv is the first point in the list, pu must be the last point in the list
             if i == 0 {
                 pu_index = indices_in_polygon.len()-1;
-            } else {
-                pu_index = i-1;
             }
             pu = &level_curve.points[indices_in_polygon[pu_index]];
 
             // if pv is the last point in the list, pw must be the first point in the list
             if i == indices_in_polygon.len() - 1 {
                 pw_index = 0;
-            } else {
-                pw_index = i+1;
             }
             pw = &level_curve.points[indices_in_polygon[pw_index]];
 
@@ -296,7 +292,7 @@ impl<'a> Smoother<'a> {
             let tri: Triangle = Triangle::new(pv, pu, pw);
             let mut triangle_is_candidate = true;
 
-            for j in 0..indices_in_polygon.len() {
+            for (j, _) in indices_in_polygon.iter().enumerate() {
 
                 // Only determine points that are not part of this triangle
                 if j == pu_index || j == i || j == pw_index {
@@ -350,10 +346,10 @@ impl<'a> Smoother<'a> {
     /// ### Parameters
     /// - `triangle_set`: The set of triangles.
     /// - `p`: The point to check the premise against.
-    fn point_in_triangle_set(triangle_set: &Vec<(&Point, &Point, &Point)>, p: &Point) -> bool {
+    fn point_in_triangle_set(triangle_set: &[(&Point, &Point, &Point)], p: &Point) -> bool {
 
         // Loop over all the triangles
-        for i in 0..triangle_set.len() {
+        for (i, _) in triangle_set.iter().enumerate() {
 
             let a = triangle_set[i].0;
             let b = triangle_set[i].1;
@@ -509,10 +505,8 @@ impl<'a> Smoother<'a> {
 
                 // This point is part of the layer
 
-                if self.is_svc[row][col] {
-                    if !allow_svc_change {
-                        continue;
-                    }
+                if self.is_svc[row][col] && !allow_svc_change {
+                    continue;
                 }
                 
                 // 1. Discover the neighbours
@@ -715,6 +709,92 @@ impl<'a> Smoother<'a> {
 
         Ok(())
 
+    }
+
+
+    /// ## Static Method
+    /// Apply neighbour smoothing to all the points in the raster.
+    /// 
+    /// ### Parameters
+    /// - `strength: f32`: The strength of the smoothing, range [0, 1]. Outside this range, undesired behaviour might occur.
+    /// - `coverage: usize`: The size of the rectangle, inside which all neighbours will be incorporated in the compution. The resulting rectangle has size (2xcoverage + 1) by (2xcoverage + 1).
+    /// - `svc_weight: usize`: The number of times an svc-value counts in the averaging of neighbours.
+    /// - `allow_svc_change`: Boolean determining whether svc values may be assigned a new altitude as result of the smoothing.
+    /// 
+    /// ### Returns
+    /// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
+    pub fn apply_smooth_to_all(&mut self, strength: f32, coverage: usize, svc_weight: usize, allow_svc_change: bool) -> Result<()> {
+
+        let mut new_altitudes: Vec<Vec<Option<f32>>> = Vec::new();
+
+        // Iterate over all the rows and columns in this raster
+        for row in 0..self.raster.rows {
+
+            // Push a new empty vector to 'new_altitudes'
+            new_altitudes.push(Vec::new());
+
+            for col in 0..self.raster.columns {
+
+                // Push None for this entry in the new_altitudes, to make space
+                new_altitudes[row].push(None);
+
+                // For each of these cells in the raster, do the following:
+                
+                // 1. If this cell is an svc-cell, skip this cell.
+                if self.is_svc[row][col] {
+                    new_altitudes[row][col] = Some(self.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?);
+                    
+                    if !allow_svc_change {
+                        continue;
+                    }
+                    
+                }
+
+                // 2. This cell is not svc. Select the specified amount of neighbors
+                let mut neighbour_altitudes: Vec<f32> = Vec::new();
+
+                // Loop over all the neighbours that fall within the rectangle of coverage x coverage
+                for alt_row in -(coverage as isize)..(coverage as isize) {
+                    for alt_col in -(coverage as isize)..(coverage as isize) {
+                        // If both alt_row and alt_col are zero, don't include the altitude. (This is the current point we're considering)
+                        if alt_row == 0 && alt_col == 0 {
+                            continue;
+                        }
+
+                        // Compute the altitude of this particular neighbour and add it to the vector
+                        neighbour_altitudes.push(self.get_neighbour_altitude(row, col, alt_row, alt_col)?);
+
+                        if self.neighbour_is_svc(row, col, alt_row, alt_col) {
+                            for _i in 0..svc_weight-1 {
+                                neighbour_altitudes.push(self.get_neighbour_altitude(row, col, alt_row, alt_col)?);
+                            }
+                        }
+
+                    }
+                }
+
+                // 3. Compute the average of the altitudes of the neighbours.
+                let mut average_neighbour_altitude: f32 = 0.0;
+                for neighbour in &neighbour_altitudes {
+                    average_neighbour_altitude += neighbour;
+                }
+                average_neighbour_altitude /= neighbour_altitudes.len() as f32;
+
+                // 4. Compute the difference between this average altitude and the current altitude for this point
+                let mut deviation = average_neighbour_altitude - self.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))?;
+
+                // 5. Apply the provided strength factor to this deviation and add the deviation once to the new altitude
+                deviation *= strength;
+
+                new_altitudes[row][col] = Some(self.raster.altitudes[row][col].ok_or_else(|| miette!("Altitude not present."))? + deviation);
+
+            }
+        }
+
+        // We have now finished computing the new altitudes, set the altitudes correctly in the model_constructor's raster
+        self.raster.altitudes = new_altitudes;
+
+        Ok(())
     }
 
 

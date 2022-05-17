@@ -9,5 +9,4 @@ pub mod triangle;
 pub mod local_tin_interpolation;
 pub mod point;
 pub mod raster;
-pub mod raster_neighbour_smoothing;
 pub mod smoother;
