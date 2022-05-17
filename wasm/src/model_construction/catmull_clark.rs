@@ -1,10 +1,7 @@
-use super::gltf_conversion::generate_gltf;
-use std::{cmp::Ordering, collections::HashMap, fs::File, io::Write, usize};
-use wasm_bindgen::JsValue;
+use std::{ collections::HashMap, usize};
 
 use super::{
-	point::Point,
-	raster::{self, Raster},
+	raster:: Raster,
 };
 
 /// a face is a square of references to points
@@ -56,7 +53,7 @@ pub struct Edge {
 /// # Return
 /// * `Result<(Vec<Vertex>, Vec<Face>), String>` - Result containing vertex list and face list.
 ///
-pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &Raster, keep_heights: bool) -> Result<(Vec<Vertex>, Vec<Face>), String> {
+pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &Raster, keep_heights: bool) -> Result<(Vec<Vertex>, Vec<Face>), String> {
 	//transform raster to list of faces and vertices
 	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp, keep_heights);
 
@@ -65,10 +62,10 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster:
 		(vs, fs) = catmull_clark(&fs, &vs)?;
 	}
 
-	if (vs.len() <= 0) {
+	if vs.is_empty() {
 		return Err(String::from("surface subdivision returns empty vertex list"));
 	}
-	if (fs.len() <= 0) {
+	if fs.is_empty()  {
 		return Err(String::from("surface subdivision returns empty face list"));
 	}
 
@@ -91,7 +88,7 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster:
 ///
 ///
 ///
-fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights: bool) -> (Vec<Vertex>, Vec<Face>) {
+fn raster_to_faces(raster: &Raster, is_sharp: &[Vec<bool>], keep_heights: bool) -> (Vec<Vertex>, Vec<Face>) {
 	let mut vs = Vec::new();
 	let mut fs = Vec::new();
 
@@ -113,7 +110,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights: boo
 				x: (x as f32 * raster.column_width),
 				y: ((y) as f32 * raster.row_height),
 				z: heights[y][x].unwrap(),
-				is_sharp: if (keep_heights) { is_sharp[y][x] } else { false },
+				is_sharp: if keep_heights { is_sharp[y][x] } else { false },
 				half_sharp: false,
 			};
 			//0,1
@@ -121,7 +118,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights: boo
 				x: (x as f32 * raster.column_width),
 				y: ((y + 1) as f32) * raster.row_height,
 				z: heights[y + 1][x].unwrap(),
-				is_sharp: if (keep_heights) { is_sharp[y][x + 1] } else { false },
+				is_sharp: if keep_heights { is_sharp[y][x + 1] } else { false },
 				half_sharp: false,
 			};
 			//1, 0
@@ -129,7 +126,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights: boo
 				x: ((x + 1) as f32 * raster.column_width),
 				y: ((y) as f32) * raster.row_height,
 				z: heights[y][x + 1].unwrap(),
-				is_sharp: if (keep_heights) { is_sharp[y][x + 1] } else { false },
+				is_sharp: if keep_heights { is_sharp[y][x + 1] } else { false },
 				half_sharp: false,
 			};
 			//1,1
@@ -137,7 +134,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights: boo
 				x: ((x + 1) as f32 * raster.column_width),
 				y: ((y + 1) as f32) * raster.row_height,
 				z: heights[y + 1][x + 1].unwrap(),
-				is_sharp: if (keep_heights) { is_sharp[y + 1][x + 1] } else { false },
+				is_sharp: if keep_heights { is_sharp[y + 1][x + 1] } else { false },
 				half_sharp: false,
 			};
 
@@ -199,9 +196,9 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights: boo
 /// * `fs` - list of faces.
 ///
 /// ## Return
-/// * `Result<(Vec<Vertex>, Vec<Face>), String>` - Result containing vertex list and face list.
+/// * `Result<(Vec<Vertex>, &Vec<Face>), String>` - Result containing vertex list and face list.
 ///
-fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<Face>), String> {
+fn catmull_clark(fs: &[Face], vs: &[Vertex]) -> Result<(Vec<Vertex>, Vec<Face>), String> {
 	//
 	// STEP 1 FINDING ALL NEW POINTS
 	//
@@ -214,7 +211,7 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 	let edges = get_edges_faces(vs, fs)?;
 
 	// per edge get an edge point, = (average of face points + edge center)/2
-	let edge_points = get_edge_points(vs, &edges, &face_points)?;
+	let edge_points = get_edge_points( &edges, &face_points)?;
 
 	// per original point: find the average of the face points of the faces the point belongs to
 	let avg_face_points = get_average_face_points(vs, fs, &face_points)?;
@@ -323,7 +320,7 @@ fn add(p1: &Vertex, p2: &Vertex) -> Vertex {
 	}
 }
 
-fn average_of_points(xs: Vec<Vertex>) -> Vertex {
+fn average_of_points(xs: &Vec<Vertex>) -> Vertex {
 	let n = xs.len() as f32;
 	let mut agr = Vertex {
 		x: 0.0,
@@ -333,7 +330,7 @@ fn average_of_points(xs: Vec<Vertex>) -> Vertex {
 		half_sharp: false,
 	};
 	for x in xs {
-		agr = add(&agr, &x);
+		agr = add(&agr, x);
 	}
 	Vertex {
 		x: agr.x / n,
@@ -345,7 +342,7 @@ fn average_of_points(xs: Vec<Vertex>) -> Vertex {
 }
 
 fn smallest_first(p1: usize, p2: usize) -> (usize, usize) {
-	if (p1 <= p2) {
+	if p1 <= p2 {
 		(p1, p2)
 	} else {
 		(p2, p1)
@@ -353,7 +350,7 @@ fn smallest_first(p1: usize, p2: usize) -> (usize, usize) {
 }
 
 //for all faces find middle point on face
-fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String> {
+fn get_face_points(v: &[Vertex], f: &[Face]) -> Result<Vec<Vertex>, String> {
 	let mut face_points: Vec<Vertex> = Vec::new();
 
 	// per face averace points
@@ -376,7 +373,7 @@ fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String
 			half_sharp: false,
 		});
 	}
-	if (f.len() != face_points.len()) {
+	if f.len() != face_points.len() {
 		return Err(String::from("number face points generated does not match number of faces"));
 	}
 
@@ -384,7 +381,7 @@ fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String
 }
 
 //gets all edges between points represented as : incedent points, adjacent faces, and center of edge
-fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String> {
+fn get_edges_faces(vs: &[Vertex], fs: &[Face]) -> Result<Vec<Edge>, String> {
 	let mut edges: Vec<Edge> = Vec::new();
 
 	// get edges from each face
@@ -471,7 +468,7 @@ fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String
 //Set each edge point to be the average of the two neighbouring face points (AF) and the midpoint of the edge (ME)
 // = (AF + ME)/ 2
 //Handling sharpness : if ME is sharp, so is corresponding edge point. edge point moves less in z dir if ME is sharp
-fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
+fn get_edge_points(edges: &[Edge], face_points: &[Vertex]) -> Result<Vec<Vertex>, String> {
 	let mut edge_points: Vec<Vertex> = Vec::new();
 
 	for edge in edges {
@@ -479,20 +476,20 @@ fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>
 		//if edge has no second face, count single face twice
 		//TODO : not correct, should count once (reason border is ugly)
 		let f2 = match edge.f2 {
-			Some(x) => face_points.get(edge.f2.unwrap()).ok_or("get edge points: no face point")?,
+			Some(x) => face_points.get(x).ok_or("get edge points: no face point")?,
 			None => f1,
 		};
 
-		let AF = add(f1, f2);
-		let ME = &edge.middle;
+		let af = add(f1, f2);
+		let me = &edge.middle;
 		edge_points.push(Vertex {
-			x: (AF.x + ME.x) / 3.0,
-			y: (AF.y + ME.y) / 3.0,
+			x: (af.x + me.x) / 3.0,
+			y: (af.y + me.y) / 3.0,
 			//if sharp, z less impacted
-			z: if ME.is_sharp { (AF.z + (ME.z * 4.0)) / 6.0 } else { (AF.z + ME.z) / 3.0 },
+			z: if me.is_sharp { (af.z + (me.z * 4.0)) / 6.0 } else { (af.z + me.z) / 3.0 },
 			//if ME is sharp, so is corresponding edge point.
-			is_sharp: ME.is_sharp,
-			half_sharp: ME.half_sharp,
+			is_sharp: me.is_sharp,
+			half_sharp: me.half_sharp,
 		});
 	}
 
@@ -500,7 +497,7 @@ fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>
 }
 
 //For each original point (P), take the average (F) of all n (recently created) face points for faces touching P
-fn get_average_face_points(vs: &Vec<Vertex>, fs: &Vec<Face>, face_points: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
+fn get_average_face_points(vs: &[Vertex], fs: &[Face], face_points: &[Vertex]) -> Result<Vec<Vertex>, String> {
 	let mut averages: Vec<Vertex> = Vec::new();
 
 	//for each vertex
@@ -517,14 +514,14 @@ fn get_average_face_points(vs: &Vec<Vertex>, fs: &Vec<Face>, face_points: &Vec<V
 			}
 		}
 		//average of adjacent face points
-		averages.push(average_of_points(adjacents));
+		averages.push(average_of_points(&adjacents));
 	}
 
 	Ok(averages)
 }
 
 //For each original point (P), the average (R) of all n edge midpoints for original edges touching P, where each edge midpoint is the average of its two endpoint vertices
-fn get_average_edges(vs_len: usize, es: &Vec<Edge>) -> Result<Vec<Vertex>, String> {
+fn get_average_edges(vs_len: usize, es: &[Edge]) -> Result<Vec<Vertex>, String> {
 	let mut averages: Vec<Vertex> = Vec::new();
 
 	//for each vertex
@@ -539,18 +536,18 @@ fn get_average_edges(vs_len: usize, es: &Vec<Edge>) -> Result<Vec<Vertex>, Strin
 			}
 		}
 		//ret average
-		averages.push(average_of_points(adjacents));
+		averages.push(average_of_points(&adjacents));
 	}
 
 	Ok(averages)
 }
 
-fn get_faces_per_point(vs_len: usize, fs: &Vec<Face>) -> Result<Vec<usize>, String> {
+fn get_faces_per_point(vs_len: usize, fs: &[Face]) -> Result<Vec<usize>, String> {
 	let mut faces_per_point = vec![0; vs_len];
 
 	for f in fs {
 		for v in &f.points {
-			if (v > &vs_len) {
+			if v > &vs_len {
 				return Err(String::from("get_faces_per_point: invalid vertex number"));
 			}
 			faces_per_point[*v] += 1;
@@ -562,7 +559,7 @@ fn get_faces_per_point(vs_len: usize, fs: &Vec<Face>) -> Result<Vec<usize>, Stri
 //Move each original point to the new vertex point (f + 2r + (n-3)*v)/n
 //if a vertex is sharp, its edge points and original point weigh twice as much as usual -> moves less towards faces and stays towards height original edge
 //					//v				//n								//f							//r
-fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<Vertex>, avg_mid_edges: &Vec<Vertex>) -> Result<(Vec<Vertex>), String> {
+fn get_new_points(vs: &[Vertex], f_per_v: &[usize], avg_face_points: &[Vertex], avg_mid_edges: &[Vertex]) -> Result<Vec<Vertex>, String> {
 	let mut new_vertices: Vec<Vertex> = Vec::new();
 
 	for i in 0..vs.len() {
