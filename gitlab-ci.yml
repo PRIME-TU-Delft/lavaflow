@@ -1,0 +1,3 @@
+include:
+  - wasm/.gitlab-ci.yml
+  - svelte-app/.gitlab-ci.yml
