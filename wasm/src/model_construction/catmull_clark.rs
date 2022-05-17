@@ -75,10 +75,10 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &R
 ///
 /// Transformation of a cell in a raster in the ith column in the jth row:
 ///
-/// 	(i, j) -- (i+ 1, j)
-/// 		|		|			--> Face ( points ((i, j) , (i+ 1, j) , (i, j + 1) , (i+1, j+1)) )
-/// 		|		|
-/// 	(i, j + 1) --(i+1, j+1)
+///      (i, j)----(i+ 1, j)
+///        |           |         ------> Face ( points ((i, j) , (i+ 1, j) , (i, j + 1) , (i+1, j+1)) )
+///        |           |
+///     (i, j + 1)----(i+1, j+1)
 ///
 /// # Arguments
 ///

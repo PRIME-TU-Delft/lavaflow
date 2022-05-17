@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
-use super::catmull_clark::{catmull_clark_super, Face, Vertex};
+use super::catmull_clark::{catmull_clark_super};
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
 // use super::level_curve_tree::LevelCurveTree;
@@ -248,10 +248,10 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		//rgb green = 0, 153, 51
 		//rgb orange = 255, 153, 51
 
-		let tri00 = ([p0.x, p0.z, p0.y], if (p0.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] } );
-		let tri10 = ([p3.x, p3.z, p3.y], if (p3.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
-		let tri01 = ([p1.x, p1.z, p1.y], if (p1.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
-		let tri11 = ([p2.x, p2.z, p2.y], if (p2.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri00 = ([p0.x, p0.z, p0.y], if p0.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] } );
+		let tri10 = ([p3.x, p3.z, p3.y], if p3.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri01 = ([p1.x, p1.z, p1.y], if p1.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri11 = ([p2.x, p2.z, p2.y], if p2.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
 
 
 
