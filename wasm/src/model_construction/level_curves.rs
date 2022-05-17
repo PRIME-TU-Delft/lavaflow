@@ -227,6 +227,7 @@ impl LevelCurveSet {
 		self.add_level_curve(LevelCurve {
 			altitude: peak_height,
 			points: vec![Point { x, y, z: peak_height }],
+    		is_mountain_top: true,
 		});
 	}
 
