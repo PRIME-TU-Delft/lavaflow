@@ -16,10 +16,31 @@ export function detectCurves(image) {
     return [contours, hierarchy]
 }
 
+
+/**
+ * Detects the curves in an image, converts internal OpenCV data structure to arrays usable by JavaScript, and removes double contours
+ * @param img OpenCV image object
+ */
+export function getCurves(img) {
+    const [contours, hierarchy] = detectCurves(image);  // get contours and hierarchy from the detectContours function
+
+    let contours_array = [];
+    let hierarchy_array = hierarchy.data32S;
+
+    // Loop through contours (OpenCV 2D array), and convert it to a JavaScript array
+    for (let i = 0; i < contours.size(); i++) {
+        contours_array.push(contours.get(i).data32S);
+    }
+
+    return [contours_array, hierarchy_array];
+}
+
+
 // this function is used for debugging, it draws the curves detected by the detectCurves function
 export function drawCurves(image) {
-    const [contours, hierarchy] = detectCurves(image) // get contours and hierarchy from the detectContours function
-    let contourColor = new cv.Scalar(255, 0, 0, 255) // this is the color yellow, which will be used to draw the contours
+    const [contours, hierarchy] = getCurves(image);  // get contours and hierarchy from the detectContours function
+
+    let contourColor = new cv.Scalar(255, 0, 0, 255);  // this is the color yellow, which will be used to draw the contours
 
     cv.drawContours(image, contours, -1, contourColor, 1, cv.LINE_8, hierarchy, 100) // draw the contours in the image
     return image
