@@ -229,23 +229,22 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 //	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 7, 1, false).map_err(|e| e.to_string())?;
 
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
-	let raster = model_constructor.raster;
-	let mut is_sharp  = &model_constructor.is_svc;
-//	let vs:  Vec<Vertex> = Vec::new();
-//	let fs: Vec<Face> = Vec::new();
-	let (vs, fs) = catmull_clark_super(1, is_sharp, raster, false ).expect("catumull broke");
-	if(vs.len() <= 0 ) {
-		return Err(JsValue::from("VS EMPTY"));
-	}
-	if(fs.len() <=0 ) {
-		return Err(JsValue::from("FS EMPTY"));
-	}
-	for f in fs {
-		let p0 = vs.get(f.points[0]).unwrap();
-		let p1 = vs.get(f.points[1]).unwrap();
-		let p2 = vs.get(f.points[2]).unwrap();
-		let p3 = vs.get(f.points[3]).unwrap();
 
+	let (vs, fs) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
+
+
+	//Turn faces into triangles
+	for f in fs {
+		if f.points.len() != 4 {
+			return Err(JsValue::from("surface subdivision returns face with incorrect amount of points"));
+		}
+		//get points of face
+		let p0 = vs.get(f.points[0]).ok_or(format!("vertex list does not contain point {} ", f.points[0]))?;
+		let p1 = vs.get(f.points[1]).ok_or(format!("vertex list does not contain point {} ", f.points[1]))?;
+		let p2 = vs.get(f.points[2]).ok_or(format!("vertex list does not contain point {} ", f.points[2]))?;
+		let p3 = vs.get(f.points[3]).ok_or(format!("vertex list does not contain point {} ", f.points[3]))?;
+
+		//make sharp points orange, else green
 		//rgb green = 0, 153, 51
 		//rgb orange = 255, 153, 51
 
@@ -256,7 +255,6 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 		// Add the first triangle
-
 		final_points.push(tri00);
 
 		final_points.push(tri01);

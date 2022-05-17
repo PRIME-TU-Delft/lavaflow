@@ -57,35 +57,20 @@ pub struct Edge {
 	/// * `Result<(Vec<Vertex>, Vec<Face>), String>` - Result containing vertex list and face list.
 	///
 pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &Raster, keep_heights : bool) -> Result<(Vec<Vertex>, Vec<Face>), String> {
-	//uncomment for debugging : input is cube
-	//let (mut vs, mut fs) = gen_box();
 
 	//transform raster to list of faces and vertices
 	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp, keep_heights);
 
-	// // save input obj
-	// let obj = make_obj(&vs, &fs);
-	// make_file(format!("input.obj"), obj);
-	// println!("input file done");
-
-	// //save input gltf
-	// let inp = make_gltf(&vs, &fs);
-	// make_file(format!("input.gltf"), inp?);
-	// println!("input file done");
-
 	// call catmull clark i times
-	for i in 0..iterations {
+	for _ in 0..iterations {
 		(vs, fs) = catmull_clark(&fs, &vs)?;
+	}
 
-		// //save obj
-		// let obj = make_obj(&vs, &fs);
-		// make_file(format!("div_iteration_{i}.obj"), obj);
-
-		// //save gltf
-		// let gltf = make_gltf(&vs, &fs);
-		// make_file(format!("div_iteration_{i}.gltf"), gltf?);
-
-		println!("surface subdivision iteration {i} done!");
+	if(vs.len() <= 0 ) {
+		return Err(String::from("surface subdivision returns empty vertex list"));
+	}
+	if(fs.len() <=0 ) {
+		return Err(String::from("surface subdivision returns empty face list"));
 	}
 
 	Ok((vs, fs))
@@ -628,137 +613,4 @@ fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<
 	}
 
 	Ok(new_vertices)
-}
-
-//
-// FILE MAKING STUFF
-//
-
-// pub fn make_file(name: String, contents: String) {
-// 	let file_name = String::from(name);
-// 	let mut file = File::create(file_name).unwrap();
-// 	file.write_all(contents.as_bytes());
-// }
-
-fn gen_box() -> (Vec<Vertex>, Vec<Face>) {
-	let mut vs = Vec::new();
-	let mut fs = Vec::new();
-
-	vs.push(Vertex {
-		x: 0.0,
-		y: 0.0,
-		z: 0.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-	vs.push(Vertex {
-		x: 0.0,
-		y: 5.0,
-		z: 0.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-	vs.push(Vertex {
-		x: 5.0,
-		y: 0.0,
-		z: 0.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-	vs.push(Vertex {
-		x: 5.0,
-		y: 5.0,
-		z: 0.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-
-	vs.push(Vertex {
-		x: 0.0,
-		y: 0.0,
-		z: 5.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-	vs.push(Vertex {
-		x: 0.0,
-		y: 5.0,
-		z: 5.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-	vs.push(Vertex {
-		x: 5.0,
-		y: 0.0,
-		z: 5.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-	vs.push(Vertex {
-		x: 5.0,
-		y: 5.0,
-		z: 5.0,
-		is_sharp: false,
-		half_sharp: false,
-	});
-
-	fs.push(Face { points: vec![0, 1, 3, 2] });
-	fs.push(Face { points: vec![0, 1, 5, 4] });
-	fs.push(Face { points: vec![0, 2, 6, 4] });
-	fs.push(Face { points: vec![1, 3, 7, 5] });
-	fs.push(Face { points: vec![2, 3, 7, 6] });
-	fs.push(Face { points: vec![4, 5, 7, 6] });
-
-	(vs, fs)
-}
-
-pub fn make_obj(vs: &Vec<Vertex>, fs: &Vec<Face>) -> String {
-	let mut verts: String = String::new();
-	let mut faces: String = String::new();
-
-	for v in vs {
-		verts.push_str(&format!("v {a} {c} {b} \n", a = v.x, b = v.y, c = v.z));
-	}
-	for f in fs {
-		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[0] + 1, b = f.points[1] + 1, c = f.points[2] + 1));
-		faces.push_str(&format!("f {a} {b} {c} \n", a = f.points[3] + 1, b = f.points[2] + 1, c = f.points[0] + 1));
-	}
-
-	verts.push_str(&faces);
-	verts
-}
-
-pub fn make_gltf(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<String, String> {
-	let mut final_points = Vec::new();
-
-	for f in fs {
-		let p0 = vs.get(f.points[0]).unwrap();
-		let p1 = vs.get(f.points[1]).unwrap();
-		let p2 = vs.get(f.points[2]).unwrap();
-		let p3 = vs.get(f.points[3]).unwrap();
-
-		let tri00 = [p0.x, p0.y, p0.z];
-
-		let tri10 = [p3.x, p3.y, p3.z];
-
-		let tri01 = [p1.x, p1.y, p1.z];
-
-		let tri11 = [p2.x, p2.y, p2.z];
-
-		// Add the first triangle
-		final_points.push((tri00, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
-
-		final_points.push((tri01, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
-
-		final_points.push((tri11, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
-
-		// Add the second triangle
-		final_points.push((tri00, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
-
-		final_points.push((tri11, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
-
-		final_points.push((tri10, [130.0 / 255.0, 93.0 / 255.0, 70.0 / 255.0]));
-	}
-
-	generate_gltf(final_points)
 }
