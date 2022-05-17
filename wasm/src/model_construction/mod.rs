@@ -1,5 +1,6 @@
 #![allow(dead_code)] // TODO: remove this!
 pub mod cardinal_intersection;
+pub mod catmull_clark;
 pub mod constructor;
 pub mod generate;
 pub mod gltf_conversion;

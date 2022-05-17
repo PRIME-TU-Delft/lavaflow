@@ -1,8 +1,9 @@
+use crate::utils::log;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
-//use crate::utils::log;
 
+use super::catmull_clark::{catmull_clark_super};
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
 // use super::level_curve_tree::LevelCurveTree;
@@ -77,34 +78,6 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// log!("Running generation algorithm");
 
 	crate::utils::set_panic_hook();
-
-	// Unpack function argument structs & build OpenCV tree struct
-	// let parent_relations = open_cv_tree
-	// 	.parent_relations
-	// 	.iter()
-	// 	.map(|r| match r {
-	// 		-1 => None,
-	// 		_ => Some(*r as usize),
-	// 	})
-	// 	.collect();
-	// let mut tree = LevelCurveTree::from_open_cv(&open_cv_tree.pixels_per_curve, &parent_relations);
-	// let ModelGenerationSettings {
-	// 	mut contour_margin,
-	// 	mut columns,
-	// 	mut rows,
-	// 	mut altitude_step,
-	// 	mut desired_dist,
-	// } = *settings;
-
-	// log!("The tree: {:?}", tree);
-
-	// convert openCV tree to levelCurveMap (input for construction algorithm)
-	//let mut level_curve_map = LevelCurveSet::new(altitude_step).transform_to_LevelCurveMap(&mut tree, altitude_step, desired_dist, 1).map_err(|_| String::from("Could not transform LevelCurveMap"))?;
-
-
-	//
-	// DEBUGGING START
-	// 
 
 	//
 	// BENCHMARK BERG
@@ -239,75 +212,56 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// every cell had 4 corners, becomes two triangles
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 
-	// for row in 1..raster.rows {
-	// 	for col in 0..raster.columns {
-	// 		final_points.push([((row-1) as f32)*raster.row_height, (col as f32)*raster.column_width, raster.altitudes[row][col].ok_or("Point not found")?]);
-	// 		final_points.push([((row) as f32)*raster.row_height, (col as f32)*raster.column_width, raster.altitudes[row][col].ok_or("Point not found")?]);
-	// 	}
-	// }
+	let (vs, fs) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
 
-	let heights = &model_constructor.raster.altitudes;
 
-	for x in 0..model_constructor.raster.columns - 1 {
+	//Turn faces into triangles
+	for f in fs {
+		if f.points.len() != 4 {
+			return Err(JsValue::from("surface subdivision returns face with incorrect amount of points"));
+		}
+		//get points of face
+		let p0 = vs.get(f.points[0]).ok_or(format!("vertex list does not contain point {} ", f.points[0]))?;
+		let p1 = vs.get(f.points[1]).ok_or(format!("vertex list does not contain point {} ", f.points[1]))?;
+		let p2 = vs.get(f.points[2]).ok_or(format!("vertex list does not contain point {} ", f.points[2]))?;
+		let p3 = vs.get(f.points[3]).ok_or(format!("vertex list does not contain point {} ", f.points[3]))?;
 
-		for y in 0..model_constructor.raster.rows - 1 {
+		//make sharp points orange, else green
+		//rgb green = 0, 153, 51
+		//rgb orange = 255, 153, 51
 
-			let tri00 = [
-				(x as f32) * model_constructor.raster.column_width,
-				heights[y][x].ok_or("Error when reading altitude-levels for trangle corner (0, 0).")?,
-				(y as f32) * model_constructor.raster.row_height
-			];
+		let tri00 = ([p0.x, p0.z, p0.y], if p0.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] } );
+		let tri10 = ([p3.x, p3.z, p3.y], if p3.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri01 = ([p1.x, p1.z, p1.y], if p1.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri11 = ([p2.x, p2.z, p2.y], if p2.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
 
-			let tri10 = [
-				(x as f32) * model_constructor.raster.column_width,
-				heights[y+1][x].ok_or("Error when reading altitude-levels for triangle corner (1, 0).")?,
-				(y as f32 + 1.0) * model_constructor.raster.row_height
-			];
 
-			let tri01 = [
-				(x as f32 + 1.0) * model_constructor.raster.column_width,
-				heights[y][x+1].ok_or("Error when reading altitude-levels for triangle corner (0, 1).")?,
-				(y as f32) * model_constructor.raster.row_height
-			];
 
-			let tri11 = [
-				(x as f32 + 1.0) * model_constructor.raster.column_width,
-				heights[y + 1][x + 1].ok_or("Error when reading altitude-levels for triangle corner (1, 1).")?,
-				(y as f32 + 1.0) * model_constructor.raster.row_height
-			];
+		// Add the first triangle
+		final_points.push(tri00);
 
-			// Add the first triangle
-			final_points.push((tri00, [130.0/255.0, 93.0/255.0, 70.0/255.0]));
+		final_points.push(tri01);
 
-			final_points.push((tri01, [130.0/255.0, 93.0/255.0, 70.0/255.0]));
+		final_points.push(tri11);
 
-			final_points.push((tri11, [130.0/255.0, 93.0/255.0, 70.0/255.0]));
+		// Add the second triangle
+		final_points.push(tri00);
 
-			// Add the second triangle
-			final_points.push((tri00, [130.0/255.0, 93.0/255.0, 70.0/255.0]));
+		final_points.push(tri11);
 
-			final_points.push((tri11, [130.0/255.0, 93.0/255.0, 70.0/255.0]));
-
-			final_points.push((tri10, [130.0/255.0, 93.0/255.0, 70.0/255.0]));
-
-		} 
+		final_points.push(tri10);
 	}
-
 
 	// Add triangles for the level-curves
 	for curve in &model_constructor.level_curve_map.level_curves {
-
-		for i in 0..curve.points.len()-1 {
-
+		for i in 0..curve.points.len() - 1 {
 			let p1 = &curve.points[i];
-			let p2 = &curve.points[i+1];
+			let p2 = &curve.points[i + 1];
 
-			final_points.push(([p1.x, p1.z, p1.y-5.0], [1., 0., 0.]));
-			final_points.push(([p2.x, p2.z, p2.y+5.0], [1., 0., 0.]));
-			final_points.push(([p1.x, p1.z, p1.y+5.0], [1., 0., 0.]));
-
+			final_points.push(([p1.x, p1.z, p1.y - 5.0], [1., 0., 0.]));
+			final_points.push(([p2.x, p2.z, p2.y + 5.0], [1., 0., 0.]));
+			final_points.push(([p1.x, p1.z, p1.y + 5.0], [1., 0., 0.]));
 		}
-
 	}
 
 	generate_gltf(final_points).map_err(JsValue::from)
