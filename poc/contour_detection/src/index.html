@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Hello OpenCV.js</title>
+	<!-- <script src="https://unpkg.com/@juliavdkris/opencv-wasm@4.5.7/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script> -->
+	<script src="./sketch.js" type="module"></script>
+</head>
+
+<body>
+	<h2>Hello OpenCV.js</h2>
+	<p id="status">OpenCV.js is loading...</p>
+	<div>
+		<div class="inputoutput">
+			<img id="imageSrc" alt="No Image" style="display: none;" />
+			<div class="caption">imageSrc <input type="file" id="fileInput" name="file" /></div>
+		</div>
+
+		<div id="sketch"></div>
+		<button id="perspective-button" style="display: none;">Warp perspective!</button>
+
+		<div class="inputoutput">
+			<canvas id="canvasOutput"></canvas>
+			<div class="caption">canvasOutput</div>
+		</div>
+	</div>
+
+</body>
+</html>
