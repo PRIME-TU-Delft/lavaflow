@@ -1,7 +1,8 @@
+import cv from "opencv-ts";
 
 
 // this function binarizes the input, then uses cv.findContours to find edges in the image
-function detectCurves(image) {
+export function detectCurves(image) {
     let gray = new cv.Mat() // create empty image for holding the grayscale image
     cv.cvtColor(image, gray, cv.COLOR_RGBA2GRAY, 0) // convert image to grayscale
 
@@ -16,7 +17,7 @@ function detectCurves(image) {
 }
 
 // this function is used for debugging, it draws the curves detected by the detectCurves function
-function drawCurves(image) {
+export function drawCurves(image) {
     const [contours, hierarchy] = detectCurves(image) // get contours and hierarchy from the detectContours function
     contourColor = new cv.Scalar(255, 255, 0, 255) // this is the color yellow, which will be used to draw the contours
 

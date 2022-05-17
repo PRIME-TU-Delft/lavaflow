@@ -1,12 +1,13 @@
+import cv from "opencv-ts";
 
 // this image removes the perspective from an image
 // points is an array of eight elements, which are the x and y coordinates of four points
 // these points are, in order: the top left corner, the top right corner, the bottom right corner and the bottom left corner
 // in short, the points are in clockwise order
-function removePerspective(image, points) {
+export function removePerspective(image, points) {
     // the height and width of the output image
-    outputHeight = 550
-    outputWidth = 1000
+    let outputHeight = 550
+    let outputWidth = 1000
 
     // construct mats (required input for cv.getPerspectiveTransform) with four columns and two rows to represent the four 2d points
     let sourcePoints = cv.matFromArray(4, 2, cv.CV_32FC1, points);

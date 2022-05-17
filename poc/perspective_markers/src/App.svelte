@@ -4,6 +4,9 @@
 
   /** @type Draggable[] */
   let points = [];
+  let input;
+  let image;
+  let hasImage = false;
 
   /**
    * Draw line with p5 from point1 (p2) to point2 (p2)
@@ -32,8 +35,12 @@
     };
 
     // Run on every frame
-    p5.draw = function () {
+    p5.draw = async function () {
       p5.background(255);
+      if(hasImage){
+        let loadedImage = await p5.loadImage(image)
+        p5.image(loadedImage, 30, 30)
+      }
       for (let i = 0; i < points.length; i++) {
         points[i].update(p5); // update position
         points[i].draw(p5); // redraw
@@ -51,7 +58,34 @@
       for (let i = 0; i < points.length; i++) points[i].released(p5);
     };
   };
+
+
+
+  function onChange() {
+    const file = input.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.addEventListener("load", function () {
+        image.setAttribute("src", reader.result);
+      });
+      reader.readAsDataURL(file);
+
+        hasImage = true
+    } else {
+      hasImage = false
+    }
+  }
+
 </script>
+
+<input
+	bind:this={input}
+	on:change={onChange}
+  type="file"
+/>
+
+<img bind:this={image} src="" alt="Preview" />
 
 <P5 {sketch} />
 

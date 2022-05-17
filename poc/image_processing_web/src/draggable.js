@@ -1,7 +1,17 @@
 export default class Draggable {
+  /**
+   * Initialize a draggable marker at a given position
+   *
+   * The offset is used to compensate for the p5 canvas being offset on a webpage.
+   * This means that to get the marker coordinates relative to the p5 canvas,
+   * you will need to use `point.x - point.offsetX` and `point.y - point.offsetY`.
+   *
+   * @param {number} x initial x coordinate of the marker
+   * @param {number} y initial y coordinate of the marker
+   * @param {number} size height/width of the marker in pixels
+   */
   constructor(x, y, size) {
     this.dragging = false; // is this object being dragged
-    this.rollover = false; // TODO: remove
     this.x = x;
     this.y = y;
     this.w = size;
@@ -10,6 +20,12 @@ export default class Draggable {
     this.offsetY = 0;
   }
 
+
+  /**
+   * Update the location of a marker if it's being dragged, and the mouse is inside the canvas
+   *
+   * @param p5 Instance of a p5 sketch
+   */
   update(p5) {
     if (!this.dragging) return;
 
@@ -20,8 +36,13 @@ export default class Draggable {
     this.y = p5.mouseY + this.offsetY;
   }
 
+
+  /**
+   * Visualize the marker, by drawing a rectangle at the marker's current position
+   *
+   * @param p5 Instance of a p5 sketch
+   */
   draw(p5) {
-    // viualize this object
     p5.stroke(0);
     p5.fill(50);
     const indicatorSize = 20;
@@ -34,6 +55,8 @@ export default class Draggable {
     );
   }
 
+
+  // Mouse click event
   pressed(p5) {
     // Check if mouse is over this object when global mouse is pressed
     const xBounded = p5.mouseX > this.x && p5.mouseX < this.x + this.w;

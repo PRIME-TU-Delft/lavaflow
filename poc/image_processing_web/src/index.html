@@ -1,46 +1,30 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-
-<meta charset="utf-8">
-<title>Hello OpenCV.js</title>
-
-
-<script src="detectCurves.js"></script>
+	<meta charset="utf-8">
+	<title>Hello OpenCV.js</title>
+	<!-- <script src="https://unpkg.com/@juliavdkris/opencv-wasm@4.5.7/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script> -->
+	<script src="./sketch.js" type="module"></script>
 </head>
-<body>
-<h2>Hello OpenCV.js</h2>
-<p id="status">OpenCV.js is loading...</p>
-<div>
-	<div class="inputoutput">
-		<img id="imageSrc" alt="No Image" />
-	<div class="caption">imageSrc <input type="file" id="fileInput" name="file" /></div>
-	</div>
-	<div class="inputoutput">
-		<canvas id="canvasOutput" ></canvas>
-		<div class="caption">canvasOutput</div>
-	</div>
-</div>
-<script type="text/javascript">
-async function onOpenCvReady() {
-	cv = await cv;
-	document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
 
-	let imgElement = document.getElementById('imageSrc');
-	let inputElement = document.getElementById('fileInput');
-	inputElement.addEventListener('change', (e) => {
-		imgElement.src = URL.createObjectURL(e.target.files[0]);
-	}, false);
-	imgElement.onload = function() {
-		let mat = cv.imread(imgElement);
-		// replace values in this array with correct pixel coordinates for the image
-		result = removePerspective(mat, [2522, 2876, 1401, 724, 187, 1461, 783, 3669])
-		cv.imshow('canvasOutput', result);
-		mat.delete();
-	};
-}
-</script>
-<script src="https://unpkg.com/@juliavdkris/opencv-wasm@4.5.7/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
-<script src="removePerspective"></script>
+<body>
+	<h2>Hello OpenCV.js</h2>
+	<p id="status">OpenCV.js is loading...</p>
+	<div>
+		<div class="inputoutput">
+			<img id="imageSrc" alt="No Image" style="display: none;" />
+			<div class="caption">imageSrc <input type="file" id="fileInput" name="file" /></div>
+		</div>
+
+		<div id="sketch"></div>
+		<button id="perspective-button" style="display: none;">Warp perspective!</button>
+
+		<div class="inputoutput">
+			<canvas id="canvasOutput"></canvas>
+			<div class="caption">canvasOutput</div>
+		</div>
+	</div>
+
 </body>
 </html>
