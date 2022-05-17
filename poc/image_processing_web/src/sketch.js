@@ -39,9 +39,9 @@ const sketch = (p5) => {
 		p5.background(255);
 		if (img) {
 			p5.image(img, 0, 0, img.width, img.height);
-			// let img = p5.
 		}
 
+		// Render all Draggable points
 		for (let i = 0; i < points.length; i++) {
 			points[i].update(p5); // update position
 			points[i].draw(p5); // redraw
@@ -49,6 +49,8 @@ const sketch = (p5) => {
 		}
 	};
 
+
+	// If the user presses/releases their mouse, signal this to all Draggable points
 	p5.mousePressed = () => {
 		for (let i = 0; i < points.length; i++) points[i].pressed(p5);
 	};
