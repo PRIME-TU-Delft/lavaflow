@@ -495,6 +495,7 @@ impl<'a> Smoother<'a> {
         }
 
         // Iterate over all (row, col) pairs
+        // TODO: Complexity can be improved
         for row in 0..self.raster.rows {
             for col in 0..self.raster.columns {
 
