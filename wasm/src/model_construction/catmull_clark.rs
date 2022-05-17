@@ -9,17 +9,13 @@ use super::{
 
 /// a face is a square of references to points
 /// should only ever have 4 points
-/// TODO: remove pub
 pub struct Face {
 	pub points: Vec<usize>,
 }
 
-//TODO: remove pub
+/// Struct representing a point in 3d space and its sharpness. A vertex is sharp if it is on a contour line or strictly between points on a contour line. If a point is sharp it should not move in the z direction.
+/// 
 
-//Vertex: When a vertex is tagged as "sharp", it simply does not move during the smoothing process. However,
-//if a non-sharp vertex is connected to two or more sharp edges, its behavior changes. If a vertex is connected to two sharp edges,
-//its smoothed position is (0.75 * original) + (0.125 * edge_1_endpoint) + (0.125 * edge_2_endpoint). If it is connected to three or
-//more sharp edges, it is treated as a "sharp" vertex.
 #[derive(Clone, PartialEq)]
 pub struct Vertex {
 	pub x: f32,
@@ -29,25 +25,43 @@ pub struct Vertex {
 	pub half_sharp: bool,
 }
 
-//TODO: remove pub
+/// Struct representing an edge in a vertex-face representation of a model.
+/// 
+/// # Fields
+///  
+/// * `p1 : usize` - index of first point at end of edge.
+/// * `p2 : usize`- index of second point at end of edge.
+/// * `f1 : usize` - index of face edge is adjacent to.  
+/// * `f2 : Optional<usize>` - optional index of face edge is adjacent to. None if egde is on 'end' of model.
+/// * `middle : Vertex`  - Point in the middle of p1 and p2.
+/// 
 #[derive(Clone)]
 pub struct Edge {
 	p1: usize,
 	p2: usize,
 	f1: usize,
 	f2: Option<usize>,
-	center: Vertex,
+	middle: Vertex,
 }
-
-///
-/// TODO: figure out input and return in relation to GLTF : list(triangle(point, point, point))
-///
-pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &Raster) -> Result<(Vec<Vertex>, Vec<Face>), String> {
-	//input is cube
+	/// Applies the catmull clark surface subdivision algorithm over a given raster. Wrapper to use algoritm on raster, see method catmull_clark() for algorithm over only vetices and faces.
+	/// Returns a model in the form of a list of vertices and faces, a face being 4 indexes corresponding to the list of vertexes.
+	///
+	/// # Arguments
+	///
+	/// * `iterations` - The number of subdivisions you want to occur. Setting to zero returns an unchanged model.
+	/// * `is_sharp` -  Matrix of booleans defining 'sharp' points. A point that is sharp will not move in z direction during subdivision.
+	/// * `raster` - The raster representing the model to be subdivided. 
+	/// * `keep_heights` - If set to false sharpness of points will be ignored.
+	///
+	/// # Return
+	/// * `Result<(Vec<Vertex>, Vec<Face>), String>` - Result containing vertex list and face list.
+	///
+pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster: &Raster, keep_heights : bool) -> Result<(Vec<Vertex>, Vec<Face>), String> {
+	//uncomment for debugging : input is cube
 	//let (mut vs, mut fs) = gen_box();
 
-	//input from raster : transform raster to list of faces and vertices
-	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp);
+	//transform raster to list of faces and vertices
+	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp, keep_heights);
 
 	// // save input obj
 	// let obj = make_obj(&vs, &fs);
@@ -76,8 +90,24 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &Vec<Vec<bool>>, raster:
 
 	Ok((vs, fs))
 }
-
-fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, Vec<Face>) {
+	/// Transforms Raster to face -vertex representation.
+	/// 
+	/// Transformation of a cell in a raster in the ith column in the jth row:
+	///
+	/// 	(i, j) -- (i+ 1, j)
+	/// 		|		|			--> Face ( points ((i, j) , (i+ 1, j) , (i, j + 1) , (i+1, j+1)) )
+	/// 		|		|
+	/// 	(i, j + 1) --(i+1, j+1)
+	///
+	/// # Arguments
+	///
+	/// * `raster` - The raster representing the model to be subdivided.
+	/// * `is_sharp` -  Matrix of booleans defining 'sharp' points. A point that is sharp will not move in z direction during subdivision.
+	/// * `keep_heights` - If set to false sharpness of points will be ignored, all is_sharp values in vertices is set to zero
+	///
+	///
+	///
+fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>, keep_heights : bool) -> (Vec<Vertex>, Vec<Face>) {
 	let mut vs = Vec::new();
 	let mut fs = Vec::new();
 
@@ -85,9 +115,9 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 
 	let mut next_index = 0;
 
-	//TODO : think about how iteration over rows makes checking for duplicates in vs easier
+	//TODO REFACTOR : think about how iteration over rows makes checking for duplicates in vs easier
 	//TODO REFACTOR : SHOULD BE X = X* COLUMN WIDTH, Y = Y*ROW HEIGHT -> GIVES WRONG VISUAL RESULT (refactoring must happen in eithor constuctor.rs or in raster.rs)
-	//todo rows and columns in for loop must also be swapped when raster problem is fixed
+	//TODO REFACTOR : rows and columns in for loop must also be swapped when raster problem is fixed
 	for x in 0..raster.rows - 1 {
 		for y in 0..raster.columns- 1 {
 			//indexes of face vertices
@@ -99,7 +129,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 				x: (x as f32 * raster.row_height),
 				y: (( y) as f32 * raster.column_width),
 				z: heights[x][y].unwrap(),
-				is_sharp: is_sharp[x][y ],
+				is_sharp: if(keep_heights){is_sharp[x][y ]} else {false},
 				half_sharp: false,
 			};
 			//0,1
@@ -107,7 +137,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 				x: (x as f32 * raster.row_height),
 				y: (( y + 1) as f32) * raster.column_width,
 				z: heights[x][y + 1].unwrap(),
-				is_sharp: is_sharp[x][y + 1],
+				is_sharp: if(keep_heights){is_sharp[x][y + 1 ]} else {false},
 				half_sharp: false,
 			};
 			//1, 0
@@ -115,7 +145,7 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 				x: ((x + 1) as f32 * raster.row_height),
 				y: (( y) as f32) * raster.column_width,
 				z: heights[x + 1][y].unwrap(),
-				is_sharp: is_sharp[x + 1][y ],
+				is_sharp: if(keep_heights){is_sharp[x + 1][y ]} else {false},
 				half_sharp: false,
 			};
 			//1,1
@@ -123,20 +153,20 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 				x: ((x + 1) as f32 * raster.row_height),
 				y: (( y + 1) as f32) * raster.column_width,
 				z: heights[x + 1][y + 1].unwrap(),
-				is_sharp: is_sharp[x + 1][y + 1],
+				is_sharp: if(keep_heights){is_sharp[x + 1][y + 1]} else {false},
 				half_sharp: false,
 			};
 
-			//check if they are already added before adding, if it exists, get index
+			
+			//per vertex check if they are already in list of vertices before adding, if it exists, push exisitng index instead of duplicating
+			//ORDERING isIMPORTANT DO NOT CHANGE! : (0,0),(0,1),(1,1),(1,0) (has to coincide with an order of edges)
+			//TODO REFACTOR: code duplication
 
-			//ORDERING IMPORTANT DO NOT CHANGE! : (0,0),(0,1),(1,1),(1,0) (has coincide with an order of edges)
-			//TODO: code duplication
 			//(0,0)
 			if vs.contains(&a) {
-				//if point already in list store index to it
+				//if point already in list store its index
 				ps.push(
 					vs.iter()
-						//TODO: do &'s here not break comparison??
 						.position(|x| x == &a)
 						.unwrap(),
 				);
@@ -151,7 +181,6 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 				//if point already in list store index to it
 				ps.push(
 					vs.iter()
-						//TODO: do &'s here not break comparison??
 						.position(|x| x == &b)
 						.unwrap(),
 				);
@@ -165,7 +194,6 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 				//if point already in list store index to it
 				ps.push(
 					vs.iter()
-						//TODO: do &'s here not break comparison??
 						.position(|x| x == &d)
 						.unwrap(),
 				);
@@ -179,7 +207,6 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 				//if point already in list store index to it
 				ps.push(
 					vs.iter()
-						//TODO: do &'s here not break comparison??
 						.position(|x| x == &c)
 						.unwrap(),
 				);
@@ -195,50 +222,54 @@ fn raster_to_faces(raster: &Raster, is_sharp: &Vec<Vec<bool>>) -> (Vec<Vertex>, 
 	}
 	(vs, fs)
 }
-
-// implemented using : https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
-//   			and : https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
-//TODO modify implementation such that sharp values are not modified
+	/// Applies the catmull clark surface subdivision algorithm to a a list of vertices and faces, a face being 4 indexes corresponding to the list of vertexes.
+	/// Implemented using https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface and  https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface as reference.
+	/// Vertexes contain a bool feild is_sharp, when this is set to true its z position will be less affected by the algorithm. (To keep height of points on a contour line consistent).
+	/// 
+	/// ## Arguments
+	///
+	/// * `vs` - list of vertices.
+	/// * `fs` - list of faces.
+	///
+	/// ## Return
+	/// * `Result<(Vec<Vertex>, Vec<Face>), String>` - Result containing vertex list and face list.
+	///
 fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<Face>), String> {
 	//
-	// FINDING ALL NEW POINTS
+	// STEP 1 FINDING ALL NEW POINTS
 	//
+	let vs_len = vs.len();
 
-	// 1. for each face, a face point is created which is the average of all the points of the face.
-	// each entry in the returned list is a vertex.
+	// for each face, a face point is created which is the average of all the points of the face.
 	let face_points = get_face_points(vs, fs)?;
 
-	// get list of edges with 1 or 2 adjacent faces
-	// [pointnum_1, pointnum_2, facenum_1, facenum_2, center] or
-	// [pointnum_1, pointnum_2, facenum_1, None, center]
-
+	// get list of all edges and their middle points (edge.middle)
 	let edges = get_edges_faces(vs, fs)?;
 
-	// get edge points, a list of points = (average of face points + edge center)/2
+	// per edge get an edge point, = (average of face points + edge center)/2
 	let edge_points = get_edge_points(vs, &edges, &face_points)?;
 
-	// per point: the average of the face points of the faces the point belongs to (avg_face_points)
+	// per original point: find the average of the face points of the faces the point belongs to
 	let avg_face_points = get_average_face_points(vs, fs, &face_points)?;
 
-	//per point:  the average of the centers of edges the point belongs to (avg_mid_edges)
-	let avg_mid_edges = get_average_edges(vs, &edges)?;
+	// per original point: the average of the middles of its incidental edges  
+	let avg_mid_edges = get_average_edges(vs_len, &edges)?;
 
-	// how many faces a point belongs to
-	let points_faces = get_faces_per_point(vs, fs)?;
+	// per point find n : how many faces a point belongs to
+	let points_faces = get_faces_per_point(vs_len, fs)?;
 
-	//find out new locations of exisitng points in mesh
-	//sharp points never move in y direction
+	//Using previously calculated points :
+		//calculate new locations of original points 
+		//sharp points move less in z direction
 	let mut new_points = get_new_points(vs, &points_faces, &avg_face_points, &avg_mid_edges)?;
 
 	//
-	// ADDING NEW POINTS TO USABLE LISTS
+	// STEP 2. ADDING NEW POINTS TO USABLE LISTS
 	//
 
 	// add face points to new_points
 	// and keep track of indexes of newly added points
 	let mut face_point_index: Vec<usize> = Vec::new();
-
-	//TODO is use of & and * here correct? want to avoid copying vec to get len but use literal len.
 	let mut next_index = new_points.len();
 
 	for face_point in face_points {
@@ -250,42 +281,34 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 	// add edge points to new_points, using hash so you can find index per edge
 	let mut edge_index_map: HashMap<(usize, usize), usize> = HashMap::with_capacity(edges.len());
 
-	//TODO how to do index trav properly in rust ;-;
-	let mut edgenum = 0;
-	for edge in edges {
-		let edge_point = edge_points.get(edgenum).ok_or("catmull clark: edge does not exist at index")?.clone();
+	for (i, edge) in edges.iter().enumerate() {
+        let edge_point = edge_points.get(i).ok_or("catmull clark: edge does not exist at index")?.clone();
 		new_points.push(edge_point);
 		edge_index_map.insert(smallest_first(edge.p1, edge.p2), next_index);
 		next_index += 1;
-		edgenum += 1;
-	}
-	// println!("MAP");
-	// for e in &edge_index_map{
-	// 	println!("edge ({a} , {b})", a = e.0.0, b = e.0.1)
+    }
 
-	// }
-	//println!("smallest first test : {a} {b}", a = smallest_first(2, 0).0 , b = smallest_first(2, 0).1);
 	//
-	//  GENERATE FACES USING NEW POINTS
+	//  STEP 3. CREATE NEW FACES USING NEW POINTS
 	//
 
 	let mut new_faces: Vec<Face> = Vec::new();
 
-	//TODO how to do index trav properly in rust ;-;
-	let mut facenum = 0;
-
-	for f in fs {
+	//split each face in to 4 : connect moved original points, to edge points, to face points.
+	for (i, f) in fs.iter().enumerate() {
 		// 4 point required in face
 		if f.points.len() == 4 {
-			let a = *f.points.get(0).unwrap();
-			let b = *f.points.get(1).unwrap();
-			let c = *f.points.get(2).unwrap();
-			let d = *f.points.get(3).unwrap();
-			let face_point_abcd = face_point_index[facenum];
+			let a = f.points[0];
+			let b = f.points[1];
+			let c = f.points[2];
+			let d = f.points[3];
+
+			let face_point_abcd = face_point_index[i];
+
 			let edge_point_ab = *edge_index_map.get(&smallest_first(a, b)).ok_or(format!("catmull : egde ab not found in map: {a} , {b}"))?;
 			let edge_point_da = *edge_index_map.get(&smallest_first(d, a)).ok_or(format!("catmull : da de ab not found in map: {d} , {a}"))?;
-			let edge_point_bc = *edge_index_map.get(&smallest_first(b, c)).ok_or("catmull : egde index bc not found in map")?;
-			let edge_point_cd = *edge_index_map.get(&smallest_first(c, d)).ok_or("catmull : egde index cd not found in map")?;
+			let edge_point_bc = *edge_index_map.get(&smallest_first(b, c)).ok_or(format!("catmull : egde ab not found in map: {b} , {c}"))?;
+			let edge_point_cd = *edge_index_map.get(&smallest_first(c, d)).ok_or(format!("catmull : egde ab not found in map: {c} , {d}"))?;
 
 			new_faces.push(Face {
 				points: vec![a, edge_point_ab, face_point_abcd, edge_point_da],
@@ -300,7 +323,6 @@ fn catmull_clark(fs: &Vec<Face>, vs: &Vec<Vertex>) -> Result<(Vec<Vertex>, Vec<F
 				points: vec![d, edge_point_da, face_point_abcd, edge_point_cd],
 			});
 
-			facenum += 1;
 		} else {
 			return Err(String::from("catmull ; face found with less than 4 vertices"));
 		}
@@ -325,7 +347,6 @@ fn center_point(p1: &Vertex, p2: &Vertex) -> Vertex {
 	}
 }
 
-//TODO what do if p is sharp
 fn add(p1: &Vertex, p2: &Vertex) -> Vertex {
 	Vertex {
 		x: (p1.x + p2.x),
@@ -337,26 +358,6 @@ fn add(p1: &Vertex, p2: &Vertex) -> Vertex {
 }
 
 fn average_of_points(xs: Vec<Vertex>) -> Vertex {
-	let n = xs.len() as f32;
-	let mut agr = Vertex {
-		x: 0.0,
-		y: 0.0,
-		z: 0.0,
-		is_sharp: false,
-		half_sharp: false,
-	};
-	for x in xs {
-		agr = add(&agr, &x);
-	}
-	Vertex {
-		x: agr.x / n,
-		y: agr.y / n,
-		z: agr.z / n,
-		is_sharp: false,
-		half_sharp: false,
-	}
-}
-fn average_of_points_b(xs: Vec<&Vertex>) -> Vertex {
 	let n = xs.len() as f32;
 	let mut agr = Vertex {
 		x: 0.0,
@@ -401,7 +402,6 @@ fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String
 			y += curr_point.y;
 			z += curr_point.z;
 		}
-		//TODO what do if points are sharp
 		face_points.push(Vertex {
 			x: x / 4.0,
 			y: y / 4.0,
@@ -417,71 +417,62 @@ fn get_face_points(v: &Vec<Vertex>, f: &Vec<Face>) -> Result<Vec<Vertex>, String
 	Ok(face_points)
 }
 
-//gets all edges of faces -> for each edge the adjacent faces and center of edge
+//gets all edges between points represented as : incedent points, adjacent faces, and center of edge
 fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String> {
-	// will have [pointnum_1, pointnum_2, facenum]
-
 	let mut edges: Vec<Edge> = Vec::new();
 
 	// get edges from each face
 
-	for facenum in 0..fs.len() {
-		let f = fs.get(facenum).ok_or(format!("get_edges_faces: vertex at index does not exist at {facenum}, f.len = {} ", fs.len()))?;
-		let num_points = f.points.len();
-		// hardcoded tuples of face corners that make edges
+	for (face_index, f) in fs.iter().enumerate() {
+		
+		if  f.points.len() < 4 {
+			return Err(String::from("get_edges_faces: face does not have enough points"));
+		}
+
+		// hardcoded tuples of points that make face edges
 		let es = vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])];
 
 		for (i1, i2) in es {
-			let p1 = vs.get(i1).ok_or("get_edges_faces: vertex at index does not exist")?;
-			let p2 = vs.get(i2).ok_or("get_edges_faces: vertex at index does not exist")?;
+			let p1 = vs.get(i1).ok_or(format!("get_edges_faces: vertex at index {i1} does not exist"))?;
+			let p2 = vs.get(i2).ok_or(format!("get_edges_faces: vertex at index {i2} does not exist"))?;
 
 			// order points in edge by lowest point number
 			// and define center of edges
-			if (i1 < i2) {
 				edges.push(Edge {
-					p1: i1,
-					p2: i2,
-					f1: facenum,
+					p1: smallest_first(i1, i2).0,
+					p2: smallest_first(i1, i2).1,
+					f1: face_index,
 					f2: None,
-					center: center_point(p1, p2),
+					middle: center_point(p1, p2),
 				});
-			} else {
-				edges.push(Edge {
-					p1: i2,
-					p2: i1,
-					f1: facenum,
-					f2: None,
-					center: center_point(p1, p2),
-				});
-			}
 		}
 	}
 
-	//sort edges by pointnum_1, pointnum_2, facenum, for merge step
+	//sort edges by p1, p2, f1, to be able to detect duplicates in merge step
 	edges.sort_by_key(|a| (a.p1, a.p2, a.f1));
 
-	//if two faces share an edge it is currently in edges list twice so
-	// merge edges with 2 adjacent faces
+	//if two faces share an edge, the edge is currently duplicate in edges, so we can combine them to one edge with 2 faces
 	// results in :
 	// [pointnum_1, pointnum_2, facenum_1, facenum_2] or
-	// [pointnum_1, pointnum_2, facenum_1, None]
+	// [pointnum_1, pointnum_2, facenum_1, None] (if edge is not duplciate)
 
 	let num_edges = edges.len();
 	let mut e_index = 0;
 	let mut merged_edges: Vec<Edge> = Vec::new();
 
 	while e_index < num_edges {
-		let e1 = edges.get(e_index).ok_or("get_edges_faces: edge at index does not exist")?;
-		// check if not last edge, if so no e2 and no neighboring edge
+		let e1 = edges.get(e_index).ok_or(format!("get_edges_faces: edge at index {e_index} does not exist"))?;
+		
+		// check if not last edge
 		if e_index < num_edges - 1 {
-			let e2 = edges.get(e_index + 1).ok_or("get_edges_faces: edge at index does not exist")?;
+			let e2 = edges.get(e_index + 1).ok_or(format!("get_edges_faces: edge at index {a} does not exist", a = e_index + 1))?;
 			if e1.p1 == e2.p1 && e1.p2 == e2.p2 {
 				merged_edges.push(Edge {
 					p1: e1.p1,
 					p2: e1.p2,
 					f1: e1.f1,
 					f2: Some(e2.f1),
-					center: e1.center.clone(),
+					middle: e1.middle.clone(),
 				});
 				e_index += 2
 			} else {
@@ -490,28 +481,23 @@ fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String
 					p2: e1.p2,
 					f1: e1.f1,
 					f2: None,
-					center: e1.center.clone(),
+					middle: e1.middle.clone(),
 				});
 				e_index += 1
 			}
+
+		//if last edge no e2 and no neighboring edge
 		} else {
 			merged_edges.push(Edge {
 				p1: e1.p1,
 				p2: e1.p2,
 				f1: e1.f1,
 				f2: None,
-				center: e1.center.clone(),
+				middle: e1.middle.clone(),
 			});
 			e_index += 1
 		}
 	}
-
-	// println!("final edges");
-	// for e in &merged_edges{
-	// 	println !("e : ({e1},{e2}), face num : {e3}" , e1 =e.p1,
-	// 	e2 = e.p2,
-	// 	e3 = e.f1)
-	// }
 
 	Ok(merged_edges)
 }
@@ -519,25 +505,26 @@ fn get_edges_faces(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<Edge>, String
 //For each edge, add an edge point.
 //Set each edge point to be the average of the two neighbouring face points (AF) and the midpoint of the edge (ME)
 // = (AF + ME)/ 2
-//Handling sharp : if ME is sharp, so is corresponding edge point. it does not move in y dir if ME is sharp
+//Handling sharpness : if ME is sharp, so is corresponding edge point. edge point moves less in z dir if ME is sharp
 fn get_edge_points(v: &Vec<Vertex>, edges: &Vec<Edge>, face_points: &Vec<Vertex>) -> Result<Vec<Vertex>, String> {
 	let mut edge_points: Vec<Vertex> = Vec::new();
 
 	for edge in edges {
 		let f1 = face_points.get(edge.f1).ok_or("get edge points: no face point")?;
-		//catch error if edge has no second face
+		//if edge has no second face, count single face twice
+		//TODO : not correct, should count once (reason border is ugly)
 		let f2 = match edge.f2 {
 			Some(x) => face_points.get(edge.f2.unwrap()).ok_or("get edge points: no face point")?,
 			None => f1,
 		};
 
 		let AF = add(f1, f2);
-		let ME = &edge.center;
+		let ME = &edge.middle;
 		edge_points.push(Vertex {
 			x: (AF.x + ME.x) / 3.0,
 			y: (AF.y + ME.y) / 3.0 ,
 			//if sharp, z less impacted
-			z: if ME.is_sharp { (AF.z + (ME.z * 3.0)) / 5.0  } else { (AF.z + ME.z) / 3.0 },
+			z: if ME.is_sharp { (AF.z + (ME.z * 4.0)) / 6.0  } else { (AF.z + ME.z) / 3.0 },
 			//if ME is sharp, so is corresponding edge point.
 			is_sharp: ME.is_sharp,
 			half_sharp: ME.half_sharp,
@@ -553,19 +540,19 @@ fn get_average_face_points(vs: &Vec<Vertex>, fs: &Vec<Face>, face_points: &Vec<V
 
 	//for each vertex
 	for i in 0..vs.len() {
+
 		let mut adjacents: Vec<Vertex> = Vec::new();
 
 		//for each face
-		for j in 0..fs.len() {
-			let f = fs.get(j).ok_or("get average face points : could not find face")?;
-			//if face is adjacent
+		for (j, f) in fs.iter().enumerate() {
+			//if p is part of face
 			if f.points.contains(&i) {
 				//add face point to list
 				let fp = face_points.get(j).ok_or("get average face points : could not find face point")?.clone();
 				adjacents.push(fp);
 			}
 		}
-		//ret average
+		//average of adjacent face points
 		averages.push(average_of_points(adjacents));
 	}
 
@@ -573,62 +560,63 @@ fn get_average_face_points(vs: &Vec<Vertex>, fs: &Vec<Face>, face_points: &Vec<V
 }
 
 //For each original point (P), the average (R) of all n edge midpoints for original edges touching P, where each edge midpoint is the average of its two endpoint vertices
-fn get_average_edges(vs: &Vec<Vertex>, es: &Vec<Edge>) -> Result<Vec<Vertex>, String> {
+fn get_average_edges(vs_len: usize, es: &Vec<Edge>) -> Result<Vec<Vertex>, String> {
+	
 	let mut averages: Vec<Vertex> = Vec::new();
 
 	//for each vertex
-	for p in 0..vs.len() {
+	for p in 0..vs_len {
 		let mut adjacents: Vec<Vertex> = Vec::new();
 
 		//for each edge
 		for e in es {
-			//if egde is adjacent
+			//if egde is incedent on vertex add its middle to list
 			if e.p1 == p || e.p2 == p {
-				//add center of edge to list
-				adjacents.push(e.center.clone());
+				adjacents.push(e.middle.clone());
 			}
 		}
-		//ret average
+		//ret average 
 		averages.push(average_of_points(adjacents));
 	}
+
 	Ok(averages)
 }
 
-fn get_faces_per_point(vs: &Vec<Vertex>, fs: &Vec<Face>) -> Result<Vec<usize>, String> {
-	let mut faces_per_point = vec![0; vs.len()];
+fn get_faces_per_point(vs_len: usize, fs: &Vec<Face>) -> Result<Vec<usize>, String> {
+	let mut faces_per_point = vec![0; vs_len];
 
 	for f in fs {
 		for v in &f.points {
+			if (v > &vs_len ){
+				return Err(String::from("get_faces_per_point: invalid vertex number"));
+			}
 			faces_per_point[*v] += 1;
 		}
 	}
 	Ok(faces_per_point)
 }
 
-//Move each original point to the new vertex point (F + 2R + (n-3)*v)/n
-
-//Sharp Vertex: When a vertex is tagged as "sharp", it simply does not move during the smoothing process. However,
-//if a non-sharp vertex is connected to two or more sharp edges, its behavior changes. If a vertex is connected to two sharp edges,
-//its smoothed position is (0.75 * original) + (0.125 * edge_1_endpoint) + (0.125 * edge_2_endpoint). If it is connected to three or
-//more sharp edges, it is treated as a "sharp" vertex.
-
-//v				//n								//F							//R
+//Move each original point to the new vertex point (f + 2r + (n-3)*v)/n
+//if a vertex is sharp, its edge points and original point weigh twice as much as usual -> moves less towards faces and stays towards height original edge
+//					//v				//n								//f							//r
 fn get_new_points(vs: &Vec<Vertex>, f_per_v: &Vec<usize>, avg_face_points: &Vec<Vertex>, avg_mid_edges: &Vec<Vertex>) -> Result<(Vec<Vertex>), String> {
 	let mut new_vertices: Vec<Vertex> = Vec::new();
 
 	for i in 0..vs.len() {
+		//get all vertices to derive new point from
 		let v = vs.get(i).ok_or("get average face points : could not find face")?;
-
 		let n = *f_per_v.get(i).ok_or("get average face points : could not find face")? as f32;
-		let F = avg_face_points.get(i).ok_or("get average face points : could not find face")?;
-		let R = avg_mid_edges.get(i).ok_or("get average face points : could not find face")?;
+		let f = avg_face_points.get(i).ok_or("get average face points : could not find face")?;
+		let r = avg_mid_edges.get(i).ok_or("get average face points : could not find face")?;
 
-		let x = ((v.x * (n - 3.0)) + (2.0 * R.x) + F.x) / n;
+		//calculate new coordinates : new point =(f + 2r + (n-3)*v)/n
+		let x = ((v.x * (n - 3.0)) + (2.0 * r.x) + f.x) / n;
 
-		let y = ((v.y * (n - 3.0)) + (2.0 * R.y) + F.y) / n;
-		//if v is sharp it should move alot less in z direction
-		let z = if v.is_sharp { ((v.z * (n)) + (2.0 * R.z) + F.z) / (n + 3.0)} else { ((v.z * (n - 3.0)) + (2.0 * R.z) + F.z) / n };
-		//let z = ((v.z * (n - 3.0)) + (2.0 * R.z) + F.z) / n;
+		let y = ((v.y * (n - 3.0)) + (2.0 * r.y) + f.y) / n;
+
+		//if v is sharp :  new point =(f + 4r + (n-1)*v)/ (n + 4)
+		let z = if v.is_sharp { ((v.z * (n - 1.0)) + (4.0 * r.z) + f.z) / (n + 4.0)} else { ((v.z * (n - 3.0)) + (2.0 * r.z) + f.z) / n };
+
 
 		new_vertices.push(Vertex {
 			x,

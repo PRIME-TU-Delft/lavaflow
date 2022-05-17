@@ -224,16 +224,16 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	model_constructor.construct().map_err(|e| e.to_string())?;
 
 	//RENS STUFF
-	//RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
+//	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 7, 1, false).map_err(|e| e.to_string())?;
 
-//	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 5, 1, false).map_err(|e| e.to_string())?;
+//	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.2, 0.2, 7, 1, false).map_err(|e| e.to_string())?;
 
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 	let raster = model_constructor.raster;
 	let mut is_sharp  = &model_constructor.is_svc;
 //	let vs:  Vec<Vertex> = Vec::new();
 //	let fs: Vec<Face> = Vec::new();
-	let (vs, fs) = catmull_clark_super(2, is_sharp, raster).expect("catumull broke");
+	let (vs, fs) = catmull_clark_super(1, is_sharp, raster, false ).expect("catumull broke");
 	if(vs.len() <= 0 ) {
 		return Err(JsValue::from("VS EMPTY"));
 	}
@@ -246,13 +246,14 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		let p2 = vs.get(f.points[2]).unwrap();
 		let p3 = vs.get(f.points[3]).unwrap();
 
+		//rgb green = 0, 153, 51
+		//rgb orange = 255, 153, 51
+
 		let tri00 = ([p0.y, p0.z, p0.x], if (p0.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] } );
 		let tri10 = ([p3.y, p3.z, p3.x], if (p3.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
 		let tri01 = ([p1.y, p1.z, p1.x], if (p1.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
 		let tri11 = ([p2.y, p2.z, p2.x], if (p2.is_sharp) {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
 
-		//rgb green = 0, 153, 51
-		//rgb orange = 255, 153, 51
 
 		// Add the first triangle
 
