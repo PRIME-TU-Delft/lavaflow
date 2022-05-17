@@ -38,41 +38,26 @@
         <a-box position="0 0 0" material="color: red; opacity: 0.5;"></a-box>
       </a-marker>
 
-      <a-marker id="marker1" type="barcode" value="1">
-        <a-plane
-          position="-1.5 0 2"
-          rotation="90 0 90"
-          material="side: double"
-          width="4"
-          height="3"
-          color="purple"
-        ></a-plane>
-        <a-box position="0 0 0" material="color: green; opacity: 0.5;"></a-box>
-      </a-marker>
+    <a-marker id="marker1" type='barcode' value='1' >
+      <a-obj-model material="side: double" position="0 0 0" scale="0.01 0.01 0.01" src="#output" ></a-obj-model>
+      <a-plane position="-1.5 0 2" rotation="90 0 90" material="side: double" width="4" height="3" color="purple"></a-plane>
+      <a-box position='0 0 0' material='color: green; opacity: 0.5;' ></a-box>
+    </a-marker>
 
-      <a-marker id="marker2" type="barcode" value="2">
-        <a-plane
-          position="-1.5 0 -2"
-          rotation="90 0 90"
-          material="side: double"
-          width="4"
-          height="3"
-          color="purple"
-        ></a-plane>
-        <a-box position="0 0 0" material="color: yellow; opacity: 0.5;"></a-box>
-      </a-marker>
+   <a-marker id="marker2" type='barcode' value='2' >
+    <a-obj-model material="side: double" position="0 0 0" scale="0.01 0.01 0.01" src="#output" ></a-obj-model>
+    <a-plane position="-1.5 0 -2" rotation="90 0 90" material="side: double" width="4" height="3" color="purple"></a-plane>
+    <a-box position='0 0 0' material='color: yellow; opacity: 0.5;' ></a-box>
+  </a-marker>
 
-      <a-marker id="marker3" type="barcode" value="3">
-        <a-plane
-          position="1.5 0 -2"
-          rotation="90 0 90"
-          material="side: double"
-          width="4"
-          height="3"
-          color="purple"
-        ></a-plane>
-        <a-box position="0 0 0" material="color: blue; opacity: 0.5;"></a-box>
-      </a-marker>
+  <a-marker id="marker3" type='barcode' value='3' >
+    <a-obj-model material="side: double" position="0 0 0" scale="0.01 0.01 0.01" src="#output" ></a-obj-model>
+    <a-plane position="1.5 0 -2" rotation="90 0 90" material="side: double" width="4" height="3" color="purple"></a-plane>
+    <a-box position='0 0 0' material='color: blue; opacity: 0.5;' ></a-box>
+  </a-marker>
+  
+
+    <a-entity camera look-around></a-entity>
 
       <a-entity camera look-around></a-entity>
     </a-scene>
