@@ -1,6 +1,5 @@
-use super::level_curves::{LevelCurve, LevelCurveSet};
+use super::level_curves::LevelCurve;
 use super::point::Point;
-use super::raster::Raster;
 use super::constructor::ModelConstructor;
 use miette::{Result, miette};
 
@@ -88,7 +87,7 @@ impl RasterNeighbourSmoothing {
                         neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
 
                         if RasterNeighbourSmoothing::neighbour_is_svc(model_constructor, row, col, alt_row, alt_col) {
-                            for i in 0..svc_weight-1 {
+                            for _i in 0..svc_weight-1 {
                                 neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
                             }
                         }
@@ -185,7 +184,7 @@ impl RasterNeighbourSmoothing {
                         neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
 
                         if RasterNeighbourSmoothing::neighbour_is_svc(model_constructor, row, col, alt_row, alt_col) {
-                            for i in 0..svc_weight-1 {
+                            for _i in 0..svc_weight-1 {
                                 neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
                             }
                         }
@@ -337,7 +336,7 @@ impl RasterNeighbourSmoothing {
                         neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
 
                         if RasterNeighbourSmoothing::neighbour_is_svc(model_constructor, row, col, alt_row, alt_col) {
-                            for i in 0..svc_weight-1 {
+                            for _i in 0..svc_weight-1 {
                                 neighbour_altitudes.push(RasterNeighbourSmoothing::get_neighbour_altitude(model_constructor, row, col, alt_row, alt_col)?);
                             }
                         }

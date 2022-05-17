@@ -22,10 +22,10 @@ impl<'a> Triangle<'a> {
         let c2 = Point::xy_dist_sqr(self.a, self.b);
 
         // Compute the cosin of angle A (angle at self.a)
-        let cosA = (b2 + c2 - a2) / (2.0 * f32::sqrt(b2) * f32::sqrt(c2));
+        let cos_a = (b2 + c2 - a2) / (2.0 * f32::sqrt(b2) * f32::sqrt(c2));
 
         // Comself.cte and return the angle
-        f32::acos(cosA)
+        f32::acos(cos_a)
 	}
 
     /// Method: compute angle at pv
@@ -44,10 +44,10 @@ impl<'a> Triangle<'a> {
         let c2 = Point::xy_dist_sqr(pv, pw);
 
         // Compute the cosin of angle A (angle at pv)
-        let cosA = (b2 + c2 - a2) / (2.0 * f32::sqrt(b2) * f32::sqrt(c2));
+        let cos_a = (b2 + c2 - a2) / (2.0 * f32::sqrt(b2) * f32::sqrt(c2));
 
         // Compute and return the angle
-        f32::acos(cosA)
+        f32::acos(cos_a)
 
     }
 

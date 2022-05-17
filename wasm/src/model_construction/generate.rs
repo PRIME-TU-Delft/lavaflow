@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
-use crate::utils::log;
+//use crate::utils::log;
 
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
@@ -311,7 +311,16 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// Apply smoothing
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
-	smoother.increase_altitude_for_mountain_tops(30.0).map_err(|e| e.to_string())?;
+	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
+
+	smoother.apply_smooth_to_layer(0, 0.8, 5, 10, false).map_err(|e| e.to_string())?;
+
+	smoother.increase_altitude_for_mountain_tops(0.9, false).map_err(|e| e.to_string())?;
+	smoother.apply_smooth_to_mountain_tops(0.5, 5, 5, false).map_err(|e| e.to_string())?;
+
+	smoother.apply_smooth_to_middle_layers(0.7, 5, 1, false).map_err(|e| e.to_string())?;
+
+	RasterNeighbourSmoothing::apply(&mut model_constructor, 0.3, 0.3, 5, 1, false).map_err(|e| e.to_string())?;
 
 	
 	// RasterNeighbourSmoothing::apply(&mut model_constructor, 0.7, 0.7, 1, 1, false).map_err(|e| e.to_string())?;
