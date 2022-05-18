@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Hello OpenCV.js</title>
+		<script src="./sketch.ts" type="module"></script>
+	</head>
 
-<head>
-	<meta charset="utf-8">
-	<title>Hello OpenCV.js</title>
-	<script src="./sketch.js" type="module"></script>
-</head>
+	<body>
+		<h2>Hello OpenCV.js</h2>
+		<p id="status">OpenCV.js is loading...</p>
+		<div>
+			<div class="inputoutput">
+				<img id="imageSrc" alt="No Image" style="display: none" />
+				<div class="caption">imageSrc <input type="file" id="fileInput" name="file" /></div>
+			</div>
 
-<body>
-	<h2>Hello OpenCV.js</h2>
-	<p id="status">OpenCV.js is loading...</p>
-	<div>
-		<div class="inputoutput">
-			<img id="imageSrc" alt="No Image" style="display: none;" />
-			<div class="caption">imageSrc <input type="file" id="fileInput" name="file" /></div>
+			<button id="draw-contours-button" style="display: none">Draw contours</button>
+			<div id="sketch"></div>
+
+			<div class="inputoutput">
+				<canvas id="canvasOutput"></canvas>
+				<div class="caption">canvasOutput</div>
+			</div>
 		</div>
-
-		<button id="draw-contours-button" style="display: none;">Draw contours</button>
-		<div id="sketch"></div>
-
-		<div class="inputoutput">
-			<canvas id="canvasOutput"></canvas>
-			<div class="caption">canvasOutput</div>
-		</div>
-	</div>
-
-</body>
+	</body>
 </html>

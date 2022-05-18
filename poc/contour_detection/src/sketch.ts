@@ -1,27 +1,22 @@
 import { getCurves } from "./detectCurves.js";
 
-import cv from "opencv-ts";
+import cv, { type Mat } from "opencv-ts";
 import p5 from "p5";
 
-/** @type Draggable[] */
-let points = [];
+let opencvDummyImg = document.getElementById("imageSrc") as HTMLImageElement;
+let inputElement = document.getElementById("fileInput") as HTMLInputElement;
 
-let opencvDummyImg = document.getElementById("imageSrc");
-let inputElement = document.getElementById("fileInput");
-
-
-const sketch = (p5) => {
+const sketch = (p5: p5) => {
 	p5.setup = () => {
 		p5.createCanvas(1000, 1000);
 	};
-
 
 	// Trigger: a file has been selected
 	inputElement.addEventListener(
 		"change",
 		(e) => {
 			// Create an invisible dummy image for OpenCV to load the file from
-			let imgURL = URL.createObjectURL(e.target.files[0]);
+			let imgURL = URL.createObjectURL((e.target as HTMLInputElement).files[0]);
 			opencvDummyImg.src = imgURL;
 
 			// Unhide button
@@ -30,12 +25,11 @@ const sketch = (p5) => {
 		false
 	);
 
-
 	// Trigger: user clicked "draw contours" button
 	document.getElementById("draw-contours-button").addEventListener("click", () => {
-		p5.clear();
+		p5.clear(1, 1, 1, 1);
 
-		let mat = cv.imread(opencvDummyImg);
+		let mat: Mat = cv.imread(opencvDummyImg);
 		let [contours, hierarchy] = getCurves(mat);
 
 		contours.forEach((contour, index) => {
@@ -45,12 +39,11 @@ const sketch = (p5) => {
 			// `contour` is a flattened array of coordinates, so group them by pairs of two when iterating over it
 			for (let i = 0; i < contour.length; i += 2) {
 				let x = contour[i];
-				let y = contour[i+1];
+				let y = contour[i + 1];
 				p5.point(x, y);
 			}
 		});
 	});
 };
-
 
 new p5(sketch, document.getElementById("sketch"));
