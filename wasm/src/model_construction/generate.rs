@@ -6,7 +6,7 @@ use wasm_bindgen::JsValue;
 use super::catmull_clark::{catmull_clark_super, Vertex};
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
-use super::lava_path::get_lava_path;
+use super::lava_path::get_lava_paths_super;
 // use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
@@ -225,7 +225,8 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//highest_point += 170;
 
 	//find lava path from the highest point of the model
-	let lava_path : Vec<&Vertex> = get_lava_path(highest_point, 50, &vs, &edge_map)?;
+	//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
+	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(highest_point, 50, 0.5, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles
@@ -272,21 +273,27 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
 
 
-	//draw lava path 
-	let mut  ps = lava_path.iter();
-	let mut o1 = ps.next();
-	while(o1.is_some() ){
-		let mut o2 = ps.next();
-		let p1 = o1.unwrap();
-		let p2 = if o2.is_some() {
-			o2.unwrap()
-		} else { p1} ;
+	//draw lava paths
+	for path in lava_paths {
+		let mut  ps = path.iter();
+		let mut o1 = ps.next();
+		while(o1.is_some() ){
+			let mut o2 = ps.next();
+			let p1 = o1.unwrap();
+			let p2 = if o2.is_some() {
+						o2.unwrap()
+					} else { 
+						p1
+					} ;
 		final_points.push(([p1.x, p1.z, p1.y], [0., 0., 1.]));
 		final_points.push(([p1.x  ,p1.z + 10.0 , p1.y ], [0., 0., 1.]));
 		final_points.push(([(p1.x + p2.x)/2.0 ,p1.z + 5.0 , (p1.y + p2.y)/2.0], [0., 0., 1.]));
 		o1 = o2;
 	}
 
+	}
+
+	
 	// Add triangles for the level-curves
 	for curve in &model_constructor.level_curve_map.level_curves {
 		for i in 0..curve.points.len() - 1 {
