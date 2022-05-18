@@ -1,6 +1,17 @@
 use super::catmull_clark::{Vertex, Edge};
-
-pub fn get_lava_paths<'a>(start: usize, length : usize, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec< &'a Vertex>, String>{
+/// Gets a lava path of a specified length starting at a specfied point in the model.
+///
+/// # Arguments 
+///
+/// * `start` - The index of the first point in the lava flow.
+/// * `length` - Amount of points to be added to the lava flow
+/// * `vs` - List of all points of the model.
+/// * `es` - List of neighbors indexes per point in  the model.
+///
+/// # Return
+/// *  `Result<Vec< &'a Vertex>, String>` - Result of list of vertexes in lava path
+///
+pub fn get_lava_path<'a>(start: usize, length : usize, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec< &'a Vertex>, String>{
 
     let mut path = Vec::with_capacity(length);
 
@@ -39,10 +50,18 @@ pub fn get_lava_paths<'a>(start: usize, length : usize, vs: &'a Vec<Vertex>, es:
     Ok(path)
 }
 
-///calulate gradient between points
-/// "gradient" is length of the vector
-/// order matters wrt negative gradients
-/// gradient is negative based on change in z direction
+/// Gets a lava path of a specified length starting at a specfied point in the model.
+///
+/// # Arguments 
+///
+/// * `start` - The index of the first point in the lava flow.
+/// * `length` - Amount of points to be added to the lava flow
+/// * `vs` - List of all points of the model.
+/// * `es` - List of neighbors indexes per point in  the model.
+///
+/// # Return
+/// *  Result<Vec< &'a Vertex>, String>
+///
 fn gradient_between_points(from : &Vertex, to : &Vertex) -> f32 {
     //(sqr(from.x-to.x) + sqr(from.y-to.y) + sqr(from.z - to.z)).sqrt() * ((from.z - to.z) / (from.z - to.z))
 

@@ -6,7 +6,7 @@ use wasm_bindgen::JsValue;
 use super::catmull_clark::{catmull_clark_super, Vertex};
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
-use super::lava_path::get_lava_paths;
+use super::lava_path::get_lava_path;
 // use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
@@ -212,12 +212,10 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
 
-	// convert height raster to flat list of x,y,z points for GLTF format
-	// every cell had 4 corners, becomes two triangles
-	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
-
+	//apply surface subdivision
 	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
 	
+	//find vertex index of the highest point in the model
 	let mut highest_point : usize = 0;
 	for (i, v ) in vs.iter().enumerate() {
 		if v.z > vs[highest_point].z {
@@ -225,10 +223,13 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		}
 	}
 	//highest_point += 170;
-	let lava_path : Vec<&Vertex> = get_lava_paths(highest_point, 50, &vs, &edge_map)?;
+
+	//find lava path from the highest point of the model
+	let lava_path : Vec<&Vertex> = get_lava_path(highest_point, 50, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles
+	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 	for f in fs {
 		if f.points.len() != 4 {
 			return Err(JsValue::from("surface subdivision returns face with incorrect amount of points"));
@@ -285,13 +286,6 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		final_points.push(([(p1.x + p2.x)/2.0 ,p1.z + 5.0 , (p1.y + p2.y)/2.0], [0., 0., 1.]));
 		o1 = o2;
 	}
-
-	// for p1 in lava_path.iter() {
-	// 	final_points.push(([p1.x, p1.z, p1.y], [0., 0., 1.]));
-	// 	final_points.push(([p1.x + 10.0 ,p1.z + 10.0 , p1.y + 10.0], [0., 0., 1.]));
-	// 	final_points.push(([p1.x - 10.0 ,p1.z + 10.0 , p1.y - 10.0], [0., 0., 1.]));
-	// }
-
 
 	// Add triangles for the level-curves
 	for curve in &model_constructor.level_curve_map.level_curves {
