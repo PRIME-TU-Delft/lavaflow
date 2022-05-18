@@ -1,87 +1,101 @@
 <script lang="ts">
-	import { Temporal } from '@js-temporal/polyfill';
 	import init, * as wasm from 'wasm';
-	import {
-		convertToObject,
-		hc_level_curves,
-		hc_parent_relations,
-		initSettingsOptions,
-		initSmoothOptions,
-		type SettingsOptionNames,
-		type SmoothOptionNames
-	} from '$lib/data/hardCoded';
-	import Button from '$lib/components/Button.svelte';
-	import VisualizeGLTF from '$lib/components/VisualizeGLTF.svelte';
-	import OptionsList from '$lib/components/OptionsList.svelte';
 
-	let settings_options = initSettingsOptions();
-	let smooth_options = initSmoothOptions();
+	import { onMount, onDestroy } from 'svelte';
 
-	let tree: wasm.OpenCVTree;
-	let gltf: string;
+	import { hc_level_curves, hc_parent_relations } from '$lib/data/hardCoded';
+	import type { BufferGeometry, Material, Mesh } from 'three';
+	import { DoubleSide } from 'three';
 
-	let loadingGLTF = false;
-	let timeTaken = '0';
+	let mounted: boolean;
+	let aframe: boolean;
+	let ar: boolean;
+	let gltfUrl: string;
+	$: ready = aframe && ar && mounted;
 
-	function regenerateGLTF() {
-		loadingGLTF = true;
+	const arLoaded = () => (ar = true);
+	const aframeLoaded = () => {
+		aframe = true;
 
-		const startTime = Temporal.Now.instant();
-		const settings_mapped = convertToObject<SettingsOptionNames>(settings_options);
-		const settings = new wasm.ModelGenerationSettings(
-			settings_mapped.contour_margin,
-			settings_mapped.columns,
-			settings_mapped.rows,
-			settings_mapped.altitude_step,
-			settings_mapped.desired_dist
-		);
-		console.log(settings.debug());
-		loadingGLTF = false;
+		AFRAME.registerComponent('double-render', {
+			schema: { opacityFactor: { default: 0.5 } },
+			init: function () {
+				this.traverseMesh.bind(this);
 
-		const smooth_mapped = convertToObject<SmoothOptionNames>(smooth_options);
-		gltf = wasm.generate_3d_model(
-			tree,
-			settings,
-			smooth_mapped.repetitions,
-			smooth_mapped.strength_positive,
-			smooth_mapped.strength_negative,
-			smooth_mapped.coverage,
-			smooth_mapped.svc_weight,
-			30,
-			30,
-			10
-		);
-		const endTime = Temporal.Now.instant();
-		timeTaken = startTime.until(endTime).toString();
-	}
+				this.el.addEventListener('model-loaded', () => {
+					this.traverseMesh();
+				});
+			},
+			traverseMesh: function () {
+				const mesh = this.el.getObject3D('mesh');
 
-	async function initWasm() {
+				if (!mesh) return;
+
+				mesh.traverse((node) => {
+					if (node.type == 'Mesh') {
+						(node as Mesh<BufferGeometry, Material>).material.side = DoubleSide;
+					}
+				});
+			}
+		});
+	};
+
+	onMount(async () => {
 		await init();
 
-		tree = new wasm.OpenCVTree({
+		const tree = new wasm.OpenCVTree({
 			pixels_per_curve: hc_level_curves,
 			parent_relations: hc_parent_relations
 		});
-	}
+
+		const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
+		const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);
+		const gltfBlob = new Blob([gltf], { type: 'application/json' });
+		gltfUrl = URL.createObjectURL(gltfBlob);
+		mounted = true;
+	});
+
+	onDestroy(() => {
+		delete AFRAME.components['double-render'];
+	});
 </script>
 
-{#if !gltf}
-	<!-- SETTINGS -->
-	<OptionsList name="Settings" bind:options={settings_options} />
+<svelte:head>
+	{#if mounted}
+		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={aframeLoaded}></script>
+		<script
+			src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"
+			on:load={arLoaded}></script>
+	{/if}
+</svelte:head>
 
-	<!-- OPTIONS -->
-	<OptionsList name="Options" bind:options={smooth_options} />
+{#if ready}
+	<a-scene
+		embedded
+		arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+	>
+		<a-marker type="barcode" value="1">
+			<a-box position="0 0.5 0" material="opacity: 0.5;" color="red" />
+
+			<a-entity
+				double-render
+				gltf-model="url({gltfUrl})"
+				position="0 0.5 0"
+				scale="0.003 0.003 0.003"
+				rotation="0 -90 0"
+				id="model"
+			/>
+		</a-marker>
+		<a-entity camera />
+	</a-scene>
 {/if}
 
-{#await initWasm()}
-	<h1>WAITING ON WASM</h1>
-{:then}
-	{#if gltf}
-		<h1>GLTF is loaded</h1>
-		{#key gltf}
-			<VisualizeGLTF {gltf} />
-		{/key}
-	{:else if tree}
-		<Button disabled={loadingGLTF} on:click={() => regenerateGLTF()}>Regenerate GLTF</Button>
-	{/if}
-{/await}
+<style>
+	:global(.a-canvas, #arjs-video) {
+		display: block;
+		width: 100% !important;
+		height: 100% !important;
+		margin: 0 !important;
+		object-fit: contain !important;
+	}
+</style>

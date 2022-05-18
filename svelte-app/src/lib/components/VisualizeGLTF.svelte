@@ -60,30 +60,36 @@
 
 <Input label="move y" bind:value={modelPos} />
 
-<a-scene embedded renderer="colorManagement: true">
+<a-scene embedded arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
 	<!-- LIGHTS -->
 	<a-light position="0 2 -1.9" intensity="2" type="point" />
 
-	<a-marker preset="hiro">
+	<a-marker type="barcode" value="0">
+		<a-box color="red" position="0 0.5 0" />
+
 		<!-- GLTF MODEL -->
 		<a-entity
 			double-render
-			position="-20 {modelPos} -10"
-			scale="0.01 0.01 0.01"
+			position="0 {modelPos} 0"
+			scale="0.005 0.005 0.005"
+			rotation="0 -90 0"
 			bind:this={model}
 			id="model"
 		/>
-
-		<!-- SPHERE FOR DEBUGGING -->
-		<a-sphere material="opacity: 0.5" position="0 1.25 -5" radius="1.25" color="#EF2D5E" />
 	</a-marker>
+
+	<!-- SPHERE FOR DEBUGGING -->
+	<!-- <a-sphere material="opacity: 0.5" position="0 1.25 -5" radius="1.25" color="#EF2D5E" /> -->
+
+	<a-entity camera />
 </a-scene>
 
 <style>
-	:global(.canvas canvas) {
-		width: calc(95vmin - 3rem) !important;
-		height: calc(95vmin - 3rem) !important;
-		border-radius: 1.5rem;
-		margin: 1rem auto;
+	:global(.a-canvas, #arjs-video) {
+		display: block;
+		width: 100% !important;
+		height: 100% !important;
+		margin: 0 !important;
+		object-fit: contain !important;
 	}
 </style>
