@@ -212,7 +212,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// every cell had 4 corners, becomes two triangles
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 
-	let (vs, fs) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
+	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
 
 
 	//Turn faces into triangles

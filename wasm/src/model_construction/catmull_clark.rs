@@ -53,7 +53,7 @@ pub struct Edge {
 /// # Return
 /// * `Result<(Vec<Vertex>, Vec<Face>), String>` - Result containing vertex list and face list.
 ///
-pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &Raster, keep_heights: bool) -> Result<(Vec<Vertex>, Vec<Face>), String> {
+pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &Raster, keep_heights: bool) -> Result<(Vec<Vertex>, Vec<Face>, Vec<Vec<usize>>), String> {
 	//transform raster to list of faces and vertices
 	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp, keep_heights);
 
@@ -69,8 +69,22 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &R
 		return Err(String::from("surface subdivision returns empty face list"));
 	}
 
-	Ok((vs, fs))
+	//es : index in edge map = index in vertices, so for each position the list of indeces of its neighbors
+	let es = edge_list_to_map( &get_edges_faces(&vs, &fs)? , vs.len())?;
+
+	Ok((vs, fs , es))
 }
+
+//iterate over list of edges and transfrom into desired edge structure
+pub fn edge_list_to_map(es : &[Edge], len: usize) -> Result<Vec<Vec<usize>>, String> {
+	let mut edges :Vec<Vec<usize>> = Vec::with_capacity(len);
+	for e in es {
+		edges[e.p1].push(e.p2);
+		edges[e.p2].push(e.p1);
+	}
+	Ok(edges)
+}
+
 /// Transforms Raster to face -vertex representation.
 ///
 /// Transformation of a cell in a raster in the ith column in the jth row:
@@ -242,7 +256,8 @@ fn catmull_clark(fs: &[Face], vs: &[Vertex]) -> Result<(Vec<Vertex>, Vec<Face>),
 		next_index += 1;
 	}
 
-	// add edge points to new_points, using hash so you can find index per edge
+	// add edge points to new_points, using hash so you can find index of edge point per edge
+	// per edge new entry in hashmap ; ((from_i, to_j), index edge point) 
 	let mut edge_index_map: HashMap<(usize, usize), usize> = HashMap::with_capacity(edges.len());
 
 	for (i, edge) in edges.iter().enumerate() {
@@ -291,7 +306,7 @@ fn catmull_clark(fs: &[Face], vs: &[Vertex]) -> Result<(Vec<Vertex>, Vec<Face>),
 		}
 	}
 
-	Ok((new_points, new_faces))
+	Ok((new_points, new_faces ))
 }
 
 ///
