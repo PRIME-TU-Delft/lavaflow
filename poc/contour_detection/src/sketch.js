@@ -33,8 +33,9 @@ const sketch = (p5) => {
 
 	// Trigger: user clicked "draw contours" button
 	document.getElementById("draw-contours-button").addEventListener("click", () => {
-		let mat = cv.imread(opencvDummyImg);
+		p5.clear();
 
+		let mat = cv.imread(opencvDummyImg);
 		let [contours, hierarchy] = getCurves(mat);
 
 		contours.forEach((contour, index) => {
