@@ -34,7 +34,7 @@
 			if (!mesh) return;
 
 			mesh.traverse((node) => {
-				if (node.isMesh) node.material.side = 2;
+				if (node.isMesh) node.material.side = THREE.DoubleSide;
 			});
 		}
 	});
@@ -49,15 +49,17 @@
 <a-scene embedded renderer="colorManagement: true">
 	<a-light position="0 2 -1.9" intensity="2" type="point" />
 
-	<a-entity
-		model-relative-opacity
-		position="-10 {modelPos} -20"
-		scale="0.01 0.01 0.01"
-		bind:this={model}
-		id="model"
-	/>
-	<a-sphere material="opacity: 0.5" position="0 1.25 -5" radius="1.25" color="#EF2D5E" />
-	<a-entity id="entity" position="0 2 -2" />
+	<a-marker preset="hiro">
+		<a-entity
+			model-relative-opacity
+			position="0 {modelPos} 0"
+			scale="0.01 0.01 0.01"
+			bind:this={model}
+			id="model"
+		/>
+		<a-sphere material="opacity: 0.5" position="0 1.25 -5" radius="1.25" color="#EF2D5E" />
+		<a-entity id="entity" position="0 2 -2" />
+	</a-marker>
 </a-scene>
 
 <style>
