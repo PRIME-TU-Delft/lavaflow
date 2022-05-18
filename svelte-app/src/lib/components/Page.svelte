@@ -64,13 +64,18 @@
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: var(--vh);
+		height: 100vh;
+		height: min(var(--vh), 100vh);
 		z-index: -1;
 	}
 	.backdrop {
 		backdrop-filter: blur(4rem);
 		-webkit-backdrop-filter: blur(4rem);
 		z-index: 1;
+	}
+
+	:global(.background > div) {
+		height: 100%;
 	}
 
 	.foreground {

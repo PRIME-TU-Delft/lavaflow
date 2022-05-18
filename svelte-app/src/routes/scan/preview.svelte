@@ -1,6 +1,6 @@
 <script>
 	/**
-	 * Page for dragging markers on document edges
+	 * This is where the user inspects the level curves that are drawn, to check if the user wants to rescan the image or not
 	 */
 	import Button from '$lib/components/Button.svelte';
 	import Page from '$lib/components/Page.svelte';
@@ -9,15 +9,12 @@
 
 	import { rawImage } from '$lib/stores/imageStore';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
 
 	function gotoPreview() {
 		// TODO: take the positions of the markers and transform image
 
 		goto('/scan/preview');
 	}
-
-	onMount(() => {});
 </script>
 
 <Page title="image transformation">

@@ -20,7 +20,6 @@
 
 	onMount(async () => {
 		await obtenerVideoCamara();
-		console.log('mounted', stream);
 	});
 
 	onDestroy(() => {
