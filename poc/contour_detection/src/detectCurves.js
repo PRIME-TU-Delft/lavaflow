@@ -31,8 +31,6 @@ export function getCurves(img) {
 		contours_array.push(contours.get(i).data32S);
 	}
 
-	// TODO? pair every two elements (X and Y coords) of subarrays in contours
-
 	// Get every 4th element of the hierarchy array (4th element is the parent node)
 	for (let i = 3; i < hierarchy.data32S.length; i += 4) {
 		hierarchy_array.push(hierarchy.data32S[i]);
@@ -80,8 +78,8 @@ function removeDoubleContours(contours, hierarchy) {
 			parent_of_parents[i] = hierarchy[i];
 		} else {
 			contours_dedup.push(contours[i]);
-			let new_parent = i == 0 ? -1 : Math.floor(parent_of_parents[hierarchy[i]] / 2); // Root node keeps -1 as index
-			hierarchy_dedup.push(new_parent);
+			let new_parent_index = (i == 0) ? -1 : Math.floor(parent_of_parents[hierarchy[i]] / 2); // Root node keeps -1 as index
+			hierarchy_dedup.push(new_parent_index);
 		}
 	});
 

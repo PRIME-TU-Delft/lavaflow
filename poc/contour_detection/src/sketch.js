@@ -6,7 +6,6 @@ import p5 from "p5";
 /** @type Draggable[] */
 let points = [];
 
-let img;
 let opencvDummyImg = document.getElementById("imageSrc");
 let inputElement = document.getElementById("fileInput");
 
@@ -42,6 +41,7 @@ const sketch = (p5) => {
 			// Add text to the contour: "index (index of parent)"
 			p5.text(`${index} (${hierarchy[index]})`, contour[0], contour[1]);
 
+			// `contour` is a flattened array of coordinates, so group them by pairs of two when iterating over it
 			for (let i = 0; i < contour.length; i += 2) {
 				let x = contour[i];
 				let y = contour[i+1];
