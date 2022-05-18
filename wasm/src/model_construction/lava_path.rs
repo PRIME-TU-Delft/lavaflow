@@ -41,8 +41,14 @@ pub fn get_lava_paths(start: usize, length : usize, vs: Vec<Vertex>, es: Vec<Vec
     Ok(path)
 }
 
-///calulate gradient w=between points
+///calulate gradient between points
+/// "gradient" is length of the vector
 /// order matters wrt negative gradients
-fn gradient_between_points(from : &Vertex, to : &Vertex) -> f32{
-    5.0
+/// gradient is negative based on change in z direction
+fn gradient_between_points(from : &Vertex, to : &Vertex) -> f32 {
+    (sqr(from.x-to.x) + sqr(from.y-to.y) + sqr(from.z - to.z)).sqrt() * ((from.z - to.z) / (from.z - to.z))
+}
+
+fn sqr(a :f32) -> f32{
+    a * a
 }
