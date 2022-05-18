@@ -5,13 +5,26 @@
 	import Video from '$lib/components/Video.svelte';
 	import Instructions from '$lib/components/Instructions.svelte';
 
-	import { mdiAlertCircleOutline } from '@mdi/js';
-	import { mdiBookOpenVariant } from '@mdi/js';
+	import { mdiAlertCircleOutline, mdiBookOpenVariant } from '@mdi/js';
+	import { imageUrl } from '$lib/stores/imageStore';
+	import { goto } from '$app/navigation';
 
 	let instructionVisible = false;
+	let videoSource: HTMLVideoElement;
 	$: title = instructionVisible ? 'Instructions' : 'Map Scanning';
 
 	const toggleInstuction = () => (instructionVisible = !instructionVisible);
+
+	/**
+	 * Goto scan/maptransform
+	 */
+	function gotoTransform() {
+		imageUrl.setImage(videoSource);
+
+		console.log($imageUrl);
+		return;
+		goto('/scan/maptransform');
+	}
 </script>
 
 <VideoStream let:loading let:stream>
@@ -23,7 +36,7 @@
 		{#if instructionVisible}
 			<Instructions />
 		{:else}
-			<Video style="border-radius: 1rem;" {loading} {stream}>
+			<Video bind:videoSource style="border-radius: 1rem;" {loading} {stream}>
 				<h1>loading...</h1>
 			</Video>
 		{/if}
@@ -33,7 +46,7 @@
 				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstuction}>
 					Read scan instructions
 				</Button>
-				<Button icon={mdiAlertCircleOutline}>
+				<Button icon={mdiAlertCircleOutline} on:click={gotoTransform}>
 					<span>No keystones found</span>
 					<span slot="content">
 						To recognize the level curves, we need to have 3 markers visible

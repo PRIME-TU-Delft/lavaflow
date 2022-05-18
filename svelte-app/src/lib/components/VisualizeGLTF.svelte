@@ -1,24 +1,34 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
-
 	import Input from '$lib/components/Input.svelte';
 
+	import { onDestroy, onMount } from 'svelte';
+
+	import type { BufferGeometry, Material, Mesh } from 'three';
+	import { DoubleSide } from 'three';
+	import { registerComponent, components } from 'aframe';
+
 	export let gltf: string;
+
 	let model: HTMLElement;
+	let modelPos = -2; // y position of model
 
-	let modelPos = -2;
-
+	/**
+	 * Run on mount (when all DOM elements have laoded)
+	 * Convert gltf string to (blob) url and set gltf-model attribute to model element
+	 */
 	onMount(() => {
 		if (!gltf) return;
 
 		const gltfBlob = new Blob([gltf], { type: 'application/json' });
 		const gltfUrl = URL.createObjectURL(gltfBlob);
 
-		console.log(model, gltfUrl);
 		model.setAttribute('gltf-model', `url(${gltfUrl})`);
 	});
 
-	AFRAME.registerComponent('model-relative-opacity', {
+	/**
+	 * Register aframe component to render a mesh on both sides
+	 */
+	registerComponent('double-render', {
 		schema: { opacityFactor: { default: 0.5 } },
 		init: function () {
 			this.traverseMesh.bind(this);
@@ -29,36 +39,43 @@
 		},
 		traverseMesh: function () {
 			const mesh = this.el.getObject3D('mesh');
-			console.log('mesh', mesh);
 
 			if (!mesh) return;
 
 			mesh.traverse((node) => {
-				if (node.isMesh) node.material.side = THREE.DoubleSide;
+				if (node.type == 'Mesh') {
+					(node as Mesh<BufferGeometry, Material>).material.side = DoubleSide;
+				}
 			});
 		}
 	});
 
+	/**
+	 * Destoy double-render component when this svelte component is out of memory
+	 */
 	onDestroy(() => {
-		delete AFRAME.components['model-relative-opacity'];
+		delete components['double-render'];
 	});
 </script>
 
 <Input label="move y" bind:value={modelPos} />
 
 <a-scene embedded renderer="colorManagement: true">
+	<!-- LIGHTS -->
 	<a-light position="0 2 -1.9" intensity="2" type="point" />
 
 	<a-marker preset="hiro">
+		<!-- GLTF MODEL -->
 		<a-entity
-			model-relative-opacity
-			position="0 {modelPos} 0"
+			double-render
+			position="-20 {modelPos} -10"
 			scale="0.01 0.01 0.01"
 			bind:this={model}
 			id="model"
 		/>
+
+		<!-- SPHERE FOR DEBUGGING -->
 		<a-sphere material="opacity: 0.5" position="0 1.25 -5" radius="1.25" color="#EF2D5E" />
-		<a-entity id="entity" position="0 2 -2" />
 	</a-marker>
 </a-scene>
 
