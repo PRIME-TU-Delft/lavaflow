@@ -24,12 +24,19 @@ init().then(() => {
 	let coverage = 4;
 	let svc_weight = 100;
 
-	let rows = 150;
-	let columns = 150;
-	let contour_margin = 10.0;
+	let rows = 60;
+	let columns = 60;
+	let contour_margin = 15.0;
+
+	// Measure the performance
+	let start = performance.now();
 
 	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin);
 	//console.log(gltf);
+
+	let end = performance.now();
+
+	console.log("Time needed for rendering: " + (end - start) + "ms");
 
 	// View the GLTF in the browser
 	const scene = new THREE.Scene();
