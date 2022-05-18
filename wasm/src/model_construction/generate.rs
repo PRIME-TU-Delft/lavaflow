@@ -3,9 +3,10 @@ use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
-use super::catmull_clark::{catmull_clark_super};
+use super::catmull_clark::{catmull_clark_super, Vertex};
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
+use super::lava_path::get_lava_paths;
 // use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
@@ -214,6 +215,9 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
 
+	//todo determine start properly
+	let lava_path : Vec<&Vertex> = get_lava_paths(30, 50, &vs, &edge_map)?;
+
 
 	//Turn faces into triangles
 	for f in fs {
@@ -226,14 +230,13 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		let p2 = vs.get(f.points[2]).ok_or(format!("vertex list does not contain point {} ", f.points[2]))?;
 		let p3 = vs.get(f.points[3]).ok_or(format!("vertex list does not contain point {} ", f.points[3]))?;
 
-		//make sharp points orange, else green
 		//rgb green = 0, 153, 51
 		//rgb orange = 255, 153, 51
 
-		let tri00 = ([p0.x, p0.z, p0.y], if p0.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] } );
-		let tri10 = ([p3.x, p3.z, p3.y], if p3.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
-		let tri01 = ([p1.x, p1.z, p1.y], if p1.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
-		let tri11 = ([p2.x, p2.z, p2.y], if p2.is_sharp {[225.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] } else { [0.0 / 255.0, 153.0 / 										255.0, 51.0 / 255.0] });
+		let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]  );
+		let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
+		let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
+		let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
 
 
 
@@ -251,6 +254,15 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 		final_points.push(tri10);
 	}
+
+	//draw lava path 
+	for p1 in lava_path {
+
+			final_points.push(([p1.x, p1.z, p1.y - 5.0], [0., 0., 1.]));
+			final_points.push(([p1.x + 5.0 ,p1.z + 5.0 , p1.y + 5.0], [0., 0., 1.]));
+			final_points.push(([p1.x - 5.0 ,p1.z - 5.0 , p1.y - 5.0], [0., 0., 1.]));
+	}
+
 
 	// Add triangles for the level-curves
 	for curve in &model_constructor.level_curve_map.level_curves {

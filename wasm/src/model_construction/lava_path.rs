@@ -1,12 +1,10 @@
 use super::catmull_clark::{Vertex, Edge};
 
-//TODO: CURRENTLY RETURNS LIST OF INDEXES SHOULD BE POINTS FOR ABEL
-pub fn get_lava_paths(start: usize, length : usize, vs: Vec<Vertex>, es: Vec<Vec<usize>>) -> Result<Vec<usize>, String>{
+pub fn get_lava_paths<'a>(start: usize, length : usize, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec< &'a Vertex>, String>{
 
     let mut path = Vec::with_capacity(length);
 
-    //path.push(vs.get(start).ok_or(String::from("start point for lava does not exist in vertex list"))?);
-    path.push(start);
+    path.push(vs.get(start).ok_or(String::from("start point for lava does not exist in vertex list"))?);
     
     //index vertex pair of current point in parth
     let mut cur = (start, vs.get(start).ok_or(String::from("start point for lava does not exist in vertex list"))?);
@@ -33,7 +31,7 @@ pub fn get_lava_paths(start: usize, length : usize, vs: Vec<Vertex>, es: Vec<Vec
         }
 
         //add steepest neighbor to path
-        path.push(max.0);
+        path.push(max.1);
         //mark naighbor as next point
         cur = max;
 
