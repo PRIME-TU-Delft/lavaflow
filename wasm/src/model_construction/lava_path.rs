@@ -21,7 +21,7 @@ pub fn get_lava_paths<'a>(start: usize, length : usize, vs: &'a Vec<Vertex>, es:
 
         //per neighbor calculate gradient and find maximum
         let mut max = cur;
-        let mut max_g = 0.0;
+        let mut max_g = f32::MIN;
         for n in neighbors {   
             let new_g = gradient_between_points(cur.1, n.1 );
             if max_g < new_g {
@@ -45,7 +45,11 @@ pub fn get_lava_paths<'a>(start: usize, length : usize, vs: &'a Vec<Vertex>, es:
 /// gradient is negative based on change in z direction
 fn gradient_between_points(from : &Vertex, to : &Vertex) -> f32 {
     //(sqr(from.x-to.x) + sqr(from.y-to.y) + sqr(from.z - to.z)).sqrt() * ((from.z - to.z) / (from.z - to.z))
-    (from.z - to.z) 
+
+    //gradient = diff in z
+    //(from.z - to.z) 
+    //gradient = z diff divided by length of edge
+    (from.z - to.z) / (sqr(from.x-to.x) + sqr(from.y-to.y) + sqr(from.z - to.z)).sqrt()
 }
 
 fn sqr(a :f32) -> f32{

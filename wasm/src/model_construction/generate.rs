@@ -209,6 +209,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// Apply smoothing
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
+	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
 
 	// convert height raster to flat list of x,y,z points for GLTF format
@@ -223,7 +224,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 			highest_point = i;
 		}
 	}
-	
+	//highest_point += 170;
 	let lava_path : Vec<&Vertex> = get_lava_paths(highest_point, 50, &vs, &edge_map)?;
 
 
@@ -271,11 +272,25 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	//draw lava path 
-	for p1 in lava_path {
-			final_points.push(([p1.x, p1.z, p1.y], [0., 0., 1.]));
-			final_points.push(([p1.x + 10.0 ,p1.z + 10.0 , p1.y + 10.0], [0.3, 0.3, 1.]));
-			final_points.push(([p1.x - 10.0 ,p1.z + 10.0 , p1.y - 10.0], [0.3, 0.3, 1.]));
+	let mut  ps = lava_path.iter();
+	let mut o1 = ps.next();
+	while(o1.is_some() ){
+		let mut o2 = ps.next();
+		let p1 = o1.unwrap();
+		let p2 = if o2.is_some() {
+			o2.unwrap()
+		} else { p1} ;
+		final_points.push(([p1.x, p1.z, p1.y], [0., 0., 1.]));
+		final_points.push(([p1.x  ,p1.z + 10.0 , p1.y ], [0., 0., 1.]));
+		final_points.push(([(p1.x + p2.x)/2.0 ,p1.z + 5.0 , (p1.y + p2.y)/2.0], [0., 0., 1.]));
+		o1 = o2;
 	}
+
+	// for p1 in lava_path.iter() {
+	// 	final_points.push(([p1.x, p1.z, p1.y], [0., 0., 1.]));
+	// 	final_points.push(([p1.x + 10.0 ,p1.z + 10.0 , p1.y + 10.0], [0., 0., 1.]));
+	// 	final_points.push(([p1.x - 10.0 ,p1.z + 10.0 , p1.y - 10.0], [0., 0., 1.]));
+	// }
 
 
 	// Add triangles for the level-curves
