@@ -44,7 +44,8 @@ pub fn get_lava_paths<'a>(start: usize, length : usize, vs: &'a Vec<Vertex>, es:
 /// order matters wrt negative gradients
 /// gradient is negative based on change in z direction
 fn gradient_between_points(from : &Vertex, to : &Vertex) -> f32 {
-    (sqr(from.x-to.x) + sqr(from.y-to.y) + sqr(from.z - to.z)).sqrt() * ((from.z - to.z) / (from.z - to.z))
+    //(sqr(from.x-to.x) + sqr(from.y-to.y) + sqr(from.z - to.z)).sqrt() * ((from.z - to.z) / (from.z - to.z))
+    (from.z - to.z) 
 }
 
 fn sqr(a :f32) -> f32{

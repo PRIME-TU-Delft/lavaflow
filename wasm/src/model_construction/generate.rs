@@ -187,10 +187,12 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let border_x = 0.5 * (max.x - min.x);
 	let border_y = 0.5 * (max.y - min.y);
 
+	//TODO WHAT DOES COMMENT MEAN
 	//ensure none of the level curve points have negative coordinates
 	level_curve_map.align_with_origin(&min, border_x, border_y);
 
 	//find maxum cooridinates in level curve model
+	//TODO WHY IS THIS HERE?  and why does model break if removed
 	let max = level_curve_map.get_bounding_points().1;
 
 	// log!("The configured height is: {}", (max.y - min.y) + border_y);
@@ -214,9 +216,15 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 
 	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
-
-	//todo determine start properly
-	let lava_path : Vec<&Vertex> = get_lava_paths(30, 50, &vs, &edge_map)?;
+	
+	let mut highest_point : usize = 0;
+	for (i, v ) in vs.iter().enumerate() {
+		if v.z > vs[highest_point].z {
+			highest_point = i;
+		}
+	}
+	
+	let lava_path : Vec<&Vertex> = get_lava_paths(highest_point, 50, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles
@@ -255,12 +263,18 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		final_points.push(tri10);
 	}
 
+	//draw highest point mof model
+	let hp = &vs[highest_point];
+	final_points.push(([hp.x, hp.z, hp.y  ], [1., 0., 0.]));
+	final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
+	final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
+
+
 	//draw lava path 
 	for p1 in lava_path {
-
-			final_points.push(([p1.x, p1.z, p1.y - 5.0], [0., 0., 1.]));
-			final_points.push(([p1.x + 5.0 ,p1.z + 5.0 , p1.y + 5.0], [0., 0., 1.]));
-			final_points.push(([p1.x - 5.0 ,p1.z - 5.0 , p1.y - 5.0], [0., 0., 1.]));
+			final_points.push(([p1.x, p1.z, p1.y], [0., 0., 1.]));
+			final_points.push(([p1.x + 10.0 ,p1.z + 10.0 , p1.y + 10.0], [0.3, 0.3, 1.]));
+			final_points.push(([p1.x - 10.0 ,p1.z + 10.0 , p1.y - 10.0], [0.3, 0.3, 1.]));
 	}
 
 
