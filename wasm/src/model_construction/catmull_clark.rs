@@ -398,7 +398,7 @@ fn get_face_points(v: &[Vertex], f: &[Face]) -> Result<Vec<Vertex>, String> {
 
 //gets all edges between points represented as : incedent points, adjacent faces, and center of edge
 // argument get_diagnoal_edges : if true also returns diagonals over a face : SET TO FALSE IN SUBDIVISION PROCESS
-fn get_edges_faces(vs: &[Vertex], fs: &[Face], get_diagnoal_edges : bool) -> Result<Vec<Edge>, String> {
+fn get_edges_faces(vs: &[Vertex], fs: &[Face], get_diagonal_edges : bool) -> Result<Vec<Edge>, String> {
 	let mut edges: Vec<Edge> = Vec::new();
 
 	// get edges from each face
@@ -413,7 +413,7 @@ fn get_edges_faces(vs: &[Vertex], fs: &[Face], get_diagnoal_edges : bool) -> Res
 		let es = if get_diagonal_edges {
 			vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0]), (f.points[0], f.points[2]), (f.points[1], f.points[3])]
 		} else {
-			vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])];
+			vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])]
 		};
 
 		for (i1, i2) in es {
