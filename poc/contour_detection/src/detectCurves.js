@@ -19,6 +19,7 @@ export function detectCurves(image) {
 
 /**
  * Detects the curves in an image, converts internal OpenCV data structure to arrays usable by JavaScript, and removes double contours
+ *
  * @param img OpenCV image object
  */
 export function getCurves(img) {
@@ -32,15 +33,23 @@ export function getCurves(img) {
         contours_array.push(contours.get(i).data32S);
     }
 
+    // TODO? pair every two elements (X and Y coords) of subarrays in contours
+
     // Get every 4th element of the hierarchy array (4th element is the parent node)
     for (let i = 3; i < hierarchy.data32S.length; i += 4) {
         hierarchy_array.push(hierarchy.data32S[i]);
     }
 
-    return [contours_array, hierarchy_array];
+    return removeDoubleContours(contours_array, hierarchy_array);
 }
 
 
+/**
+ * Calculates the depth level of every node in an OpenCV tree
+ *
+ * @param hierarchy_array array of parents for every node
+ * @returns array of depth levels of every node
+ */
 function getLevels(hierarchy_array) {
     let levels = [];
     for (let parent of hierarchy_array) {
@@ -55,12 +64,32 @@ function getLevels(hierarchy_array) {
 }
 
 
-// this function is used for debugging, it draws the curves detected by the detectCurves function
-export function drawCurves(image) {
-    const [contours, hierarchy] = detectCurves(image);  // get contours and hierarchy from the detectContours function
+/**
+ * Remove every odd-leveled node from the contours tree
+ *
+ * @param contours JavaScript (not OpenCV!) array of contours
+ * @param hierarchy List of parent nodes for every node
+ * @returns Magically de-duplicated version of the tree
+ */
+function removeDoubleContours(contours, hierarchy) {
+    let levels = getLevels(hierarchy);
 
-    let contourColor = new cv.Scalar(255, 0, 0, 255);  // this is the color yellow, which will be used to draw the contours
+    let contours_dedup = [];
+    let hierarchy_dedup = [];
+    let parent_of_parents = Array(hierarchy.length);
 
-    cv.drawContours(image, contours, -1, contourColor, 1, cv.LINE_8, hierarchy, 100) // draw the contours in the image
-    return image
+    // For every odd-leveled node: keep track of their parent
+    // For every level-leveled node (which is a child of an odd-leveled node), look up its parent's parent, and set that as its own parent
+    levels.forEach((level, i) => {
+        if (level % 2 == 1) {
+            parent_of_parents[i] = hierarchy[i];
+        }
+        else {
+            contours_dedup.push(contours[i]);
+            let new_parent = (i == 0) ? -1 : Math.floor(parent_of_parents[hierarchy[i]]/2);  // Root node keeps -1 as index
+            hierarchy_dedup.push(new_parent);
+        }
+    });
+
+    return [contours_dedup, hierarchy_dedup];
 }

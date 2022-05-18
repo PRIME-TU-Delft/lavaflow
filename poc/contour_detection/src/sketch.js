@@ -1,4 +1,4 @@
-import { detectCurves, drawCurves } from './detectCurves.js';
+import { detectCurves, drawCurves, getCurves } from './detectCurves.js';
 
 import cv from "opencv-ts";
 
@@ -18,16 +18,13 @@ inputElement.addEventListener('change', (e) => {
 	opencvDummyImg.src = imgURL;
 
 	// Unhide button
-	document.getElementById("opencv-button").style.display = 'block';
+	document.getElementById("draw-contours-button").style.display = 'block';
 }, false);
 
 
-// Trigger: user has set the perspective markers and clicked the "warp perspective!" button
-document.getElementById("opencv-button").addEventListener('click', () => {
+// Trigger: user clicked "draw contours" button
+document.getElementById("draw-contours-button").addEventListener('click', () => {
 	let mat = cv.imread(opencvDummyImg);
 
-	// Apply the perspective transformation using the selected marker coords
-	let result = drawCurves(mat)
-	cv.imshow('canvasOutput', result);
-	mat.delete();
+	// TODO: use p5 to show debug output
 });
