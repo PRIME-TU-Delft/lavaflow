@@ -1,4 +1,4 @@
-import { getCurves } from "./detectCurves.js";
+import { getCurves } from "./detectCurves";
 
 import cv, { type Mat } from "opencv-ts";
 import p5 from "p5";

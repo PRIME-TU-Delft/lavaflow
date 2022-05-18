@@ -12,7 +12,7 @@ export function detectCurves(image: Mat): [MatVector, Mat] {
 
 	let contours = new cv.MatVector(); // this will be used to hold the contours
 	let hierarchy = new cv.Mat(); // this will be used to hold the hierarchy of the contours
-	cv.findContours(thresholded, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE); // get contours out of the image
+	cv.findContours(thresholded, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE); // get contours out of the image
 
 	return [contours, hierarchy];
 }
