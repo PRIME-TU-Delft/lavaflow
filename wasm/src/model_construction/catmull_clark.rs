@@ -78,6 +78,7 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &R
 //iterate over list of edges and transfrom into desired edge structure
 pub fn edge_list_to_map(es : &[Edge], len: usize) -> Result<Vec<Vec<usize>>, String> {
 	let mut edges :Vec<Vec<usize>> = Vec::with_capacity(len);
+	//todo bug catch edge[x]
 	for e in es {
 		edges[e.p1].push(e.p2);
 		edges[e.p2].push(e.p1);

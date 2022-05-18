@@ -11,3 +11,4 @@ pub mod local_tin_interpolation;
 pub mod point;
 pub mod raster;
 pub mod smoother;
+pub mod lava_path;
