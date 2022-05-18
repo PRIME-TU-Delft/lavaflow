@@ -209,8 +209,9 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// Apply smoothing
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
-	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
+	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
+
 
 	//apply surface subdivision
 	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
@@ -226,7 +227,8 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	//find lava path from the highest point of the model
 	//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(highest_point, 50, 0.5, &vs, &edge_map)?;
+	//0.02 also nice
+	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(highest_point, 50, 0.1, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles
@@ -274,9 +276,15 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	//draw lava paths
-	for path in lava_paths {
+	for (i, path) in lava_paths.iter().enumerate() {
+
 		let mut  ps = path.iter();
 		let mut o1 = ps.next();
+
+		let path_color = [(i as f32 )/lava_paths.len() as f32, 
+						0.0  ,
+						1. - (i as f32 )/lava_paths.len()  as f32 ];
+
 		while(o1.is_some() ){
 			let mut o2 = ps.next();
 			let p1 = o1.unwrap();
@@ -285,11 +293,12 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 					} else { 
 						p1
 					} ;
-		final_points.push(([p1.x, p1.z, p1.y], [0., 0., 1.]));
-		final_points.push(([p1.x  ,p1.z + 10.0 , p1.y ], [0., 0., 1.]));
-		final_points.push(([(p1.x + p2.x)/2.0 ,p1.z + 5.0 , (p1.y + p2.y)/2.0], [0., 0., 1.]));
-		o1 = o2;
-	}
+			final_points.push(([p1.x, p1.z, p1.y], path_color));
+			final_points.push(([p1.x  ,p1.z + 10.0 , p1.y ], path_color));
+			final_points.push(([(p1.x + p2.x)/2.0 ,p1.z + 5.0 , (p1.y + p2.y)/2.0], path_color));
+
+			o1 = o2;
+		}
 
 	}
 
