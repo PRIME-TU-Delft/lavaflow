@@ -43,7 +43,7 @@ def binarize(img):
 
 
 def test():
-    asdf = cv.imread("ar-for-education\\poc\\python_image_processing\\images\\rectified.png")
+    asdf = cv.imread("images\\rectified.png")
 
     result = getContours(asdf)
 

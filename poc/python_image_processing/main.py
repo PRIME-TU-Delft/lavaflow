@@ -50,7 +50,7 @@ def highlight(image):
 
 
 def test():
-    input = cv.imread("ar-for-education\\poc\\python_image_processing\\images\\rectified.png")
+    input = cv.imread("images\\rectified.png")
 
     result = highlight(input)
     cv.imshow("test", result)

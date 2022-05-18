@@ -130,7 +130,7 @@ def removePerspective(corners, img):
     return result
 
 def test():
-    input1 = cv.imread("ar-for-education\\poc\\python_image_processing\\images\\photo.png")
+    input1 = cv.imread("images\\photo.png")
     corners = findCorners(input1)
 
     result = removePerspective(corners, input1)
