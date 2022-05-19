@@ -184,21 +184,14 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let (min, max) = level_curve_map.get_bounding_points();
 
 	//to keep border of 10% of each axis around model
-	let border_x = 0.5 * (max.x - min.x);
-	let border_y = 0.5 * (max.y - min.y);
+	let border_x = 0.2 * (max.x - min.x);
+	let border_y = 0.2 * (max.y - min.y);
 
-	//TODO WHAT DOES COMMENT MEAN
-	//ensure none of the level curve points have negative coordinates
+	//ensure none of the level curve points have negative coordinates , and have a 'border' distance from the axes
 	level_curve_map.align_with_origin(&min, border_x, border_y);
 
-	//find maxum cooridinates in level curve model
-	//TODO WHY IS THIS HERE?  and why does model break if removed
-	let max = level_curve_map.get_bounding_points().1;
-
-	// log!("The configured height is: {}", (max.y - min.y) + border_y);
-
 	//create raster based on level curve model and desired rows and columns
-	let mut raster = Raster::new((max.x - min.x) + border_x, (max.y - min.y) + border_y, rows, columns);
+	let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0) , (max.y - min.y) + (border_y* 2.0), rows, columns);
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
@@ -270,11 +263,25 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		final_points.push(tri10);
 	}
 
-	//draw highest point mof model
+	//draw highest point of model for debug
 	let hp = &vs[highest_point];
 	final_points.push(([hp.x, hp.z, hp.y], [1., 0., 0.]));
 	final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
 	final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
+
+	//draw x, y  axes for visual debug
+	//0,0 is green
+	final_points.push(([0.0, 0.0, 0.0], [0., 1., 0.]));
+	final_points.push(([ 5.0, 100.0,  5.0], [0., 1., 0.]));
+	final_points.push(([- 5.0,  100.0, - 5.0], [0., 1., 0.]));
+	//x is yellow
+	final_points.push(([1000.0, 0.0, 0.0], [1., 1., 0.]));
+	final_points.push(([ 1005.0, 100.0,  5.0], [1., 1., 0.]));
+	final_points.push(([ 995.0,  100.0, - 5.0], [1., 1., 0.]));
+	// y is cyan
+	final_points.push(([0.0, 0.0, 1000.0], [0., 1., 1.]));
+	final_points.push(([ 5.0, 100.0,  1005.0], [0., 1., 1.]));
+	final_points.push(([- 5.0,  100.0,  995.0], [0., 1., 1.]));
 
 	//draw lava paths
 	for (i, path) in lava_paths.iter().enumerate() {
