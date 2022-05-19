@@ -9,7 +9,7 @@ interface HandleType {
 }
 
 // paths to not apply ssr
-const noSSR = ['/demo', '/visualize'];
+const noSSR = ['/demo', '/visualize', '/scan/maptransform'];
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }: HandleType) {

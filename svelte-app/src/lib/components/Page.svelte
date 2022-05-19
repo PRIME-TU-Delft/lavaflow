@@ -107,7 +107,7 @@
 
 	.title {
 		background: var(--secondary-color);
-		color: var(--text-color);
+		color: white;
 		width: 100%;
 		max-width: 20rem;
 		padding: 0.75rem 1.1rem;
