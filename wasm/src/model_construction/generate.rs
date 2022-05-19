@@ -226,9 +226,13 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//highest_point += 170;
 
 	//find lava path from the highest point of the model
-	//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-	//0.02 also nice
-	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(highest_point, 50, 0.1, &vs, &edge_map)?;
+		//maximum path length
+	let path_length = 50;
+		//min alt determines at which alitude a lava path stops
+	let min_altitude = level_curve_map.altitude_step / 2.0;
+		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
+		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(highest_point, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles

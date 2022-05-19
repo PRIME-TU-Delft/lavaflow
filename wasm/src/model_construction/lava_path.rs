@@ -12,9 +12,9 @@ use super::catmull_clark::{Vertex, Edge};
 /// # Return
 /// *  `Result<Vec<Vec< &'a Vertex>>, String>` - Result of list of lava paths. A lava path is a list of
 /// 
-pub fn get_lava_paths_super<'a> (start_index: usize, length : usize, fork_val: f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec< &'a Vertex>>, String>    {
+pub fn get_lava_paths_super<'a> (start_index: usize, length : usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec< &'a Vertex>>, String>    {
     let mut paths = LavaPathSet{all_paths: Vec::new()};
-    paths.get_lava_path(start_index, length, fork_val, vs, es, )?;
+    paths.get_lava_path(start_index, length, fork_val,min_altitude, vs, es, )?;
     Ok(paths.all_paths)
 
 }
@@ -37,7 +37,7 @@ impl<'a> LavaPathSet<'a> {
 /// # Return
 /// *  `Result<Vec< &'a Vertex>, String>` - Result of list of vertexes in lava path
 ///
-fn get_lava_path(&mut self, start_index: usize, length : usize, fork_val : f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<(), String>{
+fn get_lava_path(&mut self, start_index: usize, length : usize, fork_val : f32,min_altitude: f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<(), String>{
 
     let mut path = Vec::with_capacity(length);
 
@@ -75,13 +75,18 @@ fn get_lava_path(&mut self, start_index: usize, length : usize, fork_val : f32, 
                 second_best_g= new_g;
             }
         }
+
+        //break loop if next point has low altitude (avoid path going to edge of map)
+        if(max.1.z <= min_altitude){
+            break;
+        }
         //add steepest neighbor to path
         path.push(max.1);
 
         
         //if diffence is smaller than given value, start another path with half length at second best neighbor
         if(max_g -second_best_g) < fork_val {
-            self.get_lava_path(second_best.0, length/2,fork_val, vs, es)?;
+            self.get_lava_path(second_best.0, length/2,fork_val, min_altitude, vs, es)?;
         }
 
         //mark steepest neighbor as next point
