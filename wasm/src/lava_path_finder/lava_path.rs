@@ -1,4 +1,5 @@
-use super::catmull_clark::{Edge, Vertex};
+use crate::model_construction::catmull_clark::Vertex;
+
 /// Finds set of lava paths for a given model, from a specified starting vertex on the model.
 ///
 /// # Arguments
@@ -113,13 +114,10 @@ fn gradient_between_points(from: &Vertex, to: &Vertex) -> f32 {
 	(from.z - to.z) / (sqr(from.x - to.x) + sqr(from.y - to.y) + sqr(from.z - to.z)).sqrt()
 }
 
-fn get_start(highest_points : &Vec<usize>, vs : &Vec<Vertex>, es : &Vec<Vec<usize>>) -> Result<usize, String> {
-
+fn get_start(highest_points: &Vec<usize>, vs: &Vec<Vertex>, es: &Vec<Vec<usize>>) -> Result<usize, String> {
 	let mut store = (highest_points[0], f32::MIN);
 
-
 	for i in highest_points {
-
 		let mut neighbors: Vec<(usize, &Vertex)> = Vec::new();
 
 		//per neighbor calculate gradient and find maximum
@@ -132,12 +130,11 @@ fn get_start(highest_points : &Vec<usize>, vs : &Vec<Vertex>, es : &Vec<Vec<usiz
 
 		for n in neighbors {
 			let new_g = gradient_between_points(cur.1, n.1);
-			if store.1 > new_g {
+			if store.1 < new_g {
 				store = (*cur.0, new_g);
 			}
 		}
-		
-	} 
+	}
 
 	Ok(store.0)
 }

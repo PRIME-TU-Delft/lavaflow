@@ -1,3 +1,4 @@
+use crate::lava_path_finder::lava_path::get_lava_paths_super;
 use crate::utils::log;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -6,8 +7,6 @@ use wasm_bindgen::JsValue;
 use super::catmull_clark::{catmull_clark_super, Vertex};
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
-use super::lava_path::get_lava_paths_super;
-// use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
 use super::raster::Raster;
@@ -203,8 +202,8 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
-	smoother.increase_altitude_for_mountain_tops(1.5,false).map_err(|e| e.to_string())?;
-	smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, false).map_err(|e| e.to_string())?;
+	smoother.increase_altitude_for_mountain_tops(2.0,false).map_err(|e| e.to_string())?;
+	smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, true).map_err(|e| e.to_string())?;
 	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
 
 
@@ -283,20 +282,20 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	// final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
 	// final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
 
-	//draw x, y  axes for visual debug
-	//TODO: REMOVE
-	//0,0 is green
-	final_points.push(([0.0, 0.0, 0.0], [0., 1., 0.]));
-	final_points.push(([ 5.0, 100.0,  5.0], [0., 1., 0.]));
-	final_points.push(([- 5.0,  100.0, - 5.0], [0., 1., 0.]));
-	//x is yellow
-	final_points.push(([1000.0, 0.0, 0.0], [1., 1., 0.]));
-	final_points.push(([ 1005.0, 100.0,  5.0], [1., 1., 0.]));
-	final_points.push(([ 995.0,  100.0, - 5.0], [1., 1., 0.]));
-	// y is cyan
-	final_points.push(([0.0, 0.0, 1000.0], [0., 1., 1.]));
-	final_points.push(([ 5.0, 100.0,  1005.0], [0., 1., 1.]));
-	final_points.push(([- 5.0,  100.0,  995.0], [0., 1., 1.]));
+	// //draw x, y  axes for visual debug
+	// //TODO: REMOVE
+	// //0,0 is green
+	// final_points.push(([0.0, 0.0, 0.0], [0., 1., 0.]));
+	// final_points.push(([ 5.0, 100.0,  5.0], [0., 1., 0.]));
+	// final_points.push(([- 5.0,  100.0, - 5.0], [0., 1., 0.]));
+	// //x is yellow
+	// final_points.push(([1000.0, 0.0, 0.0], [1., 1., 0.]));
+	// final_points.push(([ 1005.0, 100.0,  5.0], [1., 1., 0.]));
+	// final_points.push(([ 995.0,  100.0, - 5.0], [1., 1., 0.]));
+	// // y is cyan
+	// final_points.push(([0.0, 0.0, 1000.0], [0., 1., 1.]));
+	// final_points.push(([ 5.0, 100.0,  1005.0], [0., 1., 1.]));
+	// final_points.push(([- 5.0,  100.0,  995.0], [0., 1., 1.]));
 
 	//draw lava paths for visual debug
 	//TODO: REMOVE -> should not be part of final model

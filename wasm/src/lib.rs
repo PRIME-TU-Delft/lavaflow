@@ -1,3 +1,4 @@
+mod lava_path_finder;
 mod model_construction;
 mod utils;
 
