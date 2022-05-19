@@ -183,7 +183,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//find maximum and minimum cooridinates in level curve model
 	let (min, max) = level_curve_map.get_bounding_points();
 
-	//to keep border of 10% of each axis around model
+	// keep border of 20% of each axis around model
 	let border_x = 0.2 * (max.x - min.x);
 	let border_y = 0.2 * (max.y - min.y);
 
@@ -203,19 +203,32 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
+	smoother.increase_altitude_for_mountain_tops(1.5,false).map_err(|e| e.to_string())?;
+	smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, false).map_err(|e| e.to_string())?;
 	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
 
 
 	//apply surface subdivision
 	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
-	
+
 	//find vertex index of the highest point in the model
-	let mut highest_point : usize = 0;
-	for (i, v ) in vs.iter().enumerate() {
-		if v.z > vs[highest_point].z {
-			highest_point = i;
+
+	let mut top_height = f32::MIN;
+	for curve in &level_curve_map.level_curves {
+		if curve.altitude > top_height {
+			top_height = curve.altitude;
 		}
 	}
+	//top_height -= level_curve_map.altitude_step;
+
+	//get list of indexes of points above or on highest level curev
+	let mut  highest_points = Vec::new();
+	for (i, v ) in vs.iter().enumerate() {
+		if v.z >= top_height {
+			highest_points.push(i);
+		}
+	}
+
 	//highest_point += 170;
 
 	//find lava path from the highest point of the model
@@ -225,7 +238,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let min_altitude = level_curve_map.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(highest_point, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
+	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles
@@ -263,13 +276,15 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		final_points.push(tri10);
 	}
 
-	//draw highest point of model for debug
-	let hp = &vs[highest_point];
-	final_points.push(([hp.x, hp.z, hp.y], [1., 0., 0.]));
-	final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
-	final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
+	//draw highest point of model for visual debug
+	//TODO: REMOVE
+	// let hp = &vs[highest_point];
+	// final_points.push(([hp.x, hp.z, hp.y], [1., 0., 0.]));
+	// final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
+	// final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
 
 	//draw x, y  axes for visual debug
+	//TODO: REMOVE
 	//0,0 is green
 	final_points.push(([0.0, 0.0, 0.0], [0., 1., 0.]));
 	final_points.push(([ 5.0, 100.0,  5.0], [0., 1., 0.]));
@@ -283,7 +298,8 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	final_points.push(([ 5.0, 100.0,  1005.0], [0., 1., 1.]));
 	final_points.push(([- 5.0,  100.0,  995.0], [0., 1., 1.]));
 
-	//draw lava paths
+	//draw lava paths for visual debug
+	//TODO: REMOVE -> should not be part of final model
 	for (i, path) in lava_paths.iter().enumerate() {
 		let mut ps = path.iter();
 		let mut o1 = ps.next();
@@ -302,7 +318,8 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		}
 	}
 
-	// Add triangles for the level-curves
+	// Add triangles for the level-curves for visual debug
+	//TODO: REMOVE -> should not be part of final model
 	for curve in &model_constructor.level_curve_map.level_curves {
 		for i in 0..curve.points.len() - 1 {
 			let p1 = &curve.points[i];

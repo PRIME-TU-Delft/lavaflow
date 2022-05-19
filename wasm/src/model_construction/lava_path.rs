@@ -12,9 +12,10 @@ use super::catmull_clark::{Edge, Vertex};
 /// # Return
 /// *  `Result<Vec<Vec< &'a Vertex>>, String>` - Result of list of lava paths. A lava path is a list of
 ///
-pub fn get_lava_paths_super<'a>(start_index: usize, length: usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Vertex>>, String> {
+pub fn get_lava_paths_super<'a>(highest_points: &Vec<usize>, length: usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Vertex>>, String> {
 	let mut paths = LavaPathSet { all_paths: Vec::new() };
-	paths.get_lava_path(start_index, length, fork_val, min_altitude, vs, es)?;
+	let start_point = get_start(highest_points, vs, es)?;
+	paths.get_lava_path(start_point, length, fork_val, min_altitude, vs, es)?;
 	Ok(paths.all_paths)
 }
 
@@ -110,6 +111,35 @@ fn gradient_between_points(from: &Vertex, to: &Vertex) -> f32 {
 	//(from.z - to.z)
 	//gradient = z diff divided by length of edge
 	(from.z - to.z) / (sqr(from.x - to.x) + sqr(from.y - to.y) + sqr(from.z - to.z)).sqrt()
+}
+
+fn get_start(highest_points : &Vec<usize>, vs : &Vec<Vertex>, es : &Vec<Vec<usize>>) -> Result<usize, String> {
+
+	let mut store = (highest_points[0], f32::MIN);
+
+
+	for i in highest_points {
+
+		let mut neighbors: Vec<(usize, &Vertex)> = Vec::new();
+
+		//per neighbor calculate gradient and find maximum
+
+		for j in &es[*i] {
+			neighbors.push((*j, vs.get(*j).ok_or(format!("lava_path: index {i} not found in vertex list"))?));
+		}
+
+		let cur: (&usize, &Vertex) = (i, &vs[*i]);
+
+		for n in neighbors {
+			let new_g = gradient_between_points(cur.1, n.1);
+			if store.1 > new_g {
+				store = (*cur.0, new_g);
+			}
+		}
+		
+	} 
+
+	Ok(store.0)
 }
 
 fn sqr(a: f32) -> f32 {
