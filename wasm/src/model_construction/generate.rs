@@ -250,12 +250,10 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		//rgb green = 0, 153, 51
 		//rgb orange = 255, 153, 51
 
-		let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]  );
-		let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
-		let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
-		let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
-
-
+		let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+		let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+		let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+		let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
 
 		// Add the first triangle
 		final_points.push(tri00);
@@ -274,39 +272,29 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	//draw highest point mof model
 	let hp = &vs[highest_point];
-	final_points.push(([hp.x, hp.z, hp.y  ], [1., 0., 0.]));
+	final_points.push(([hp.x, hp.z, hp.y], [1., 0., 0.]));
 	final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
 	final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
 
-
 	//draw lava paths
 	for (i, path) in lava_paths.iter().enumerate() {
-
-		let mut  ps = path.iter();
+		let mut ps = path.iter();
 		let mut o1 = ps.next();
 
-		let path_color = [(i as f32 )/lava_paths.len() as f32, 
-						0.0  ,
-						1. - (i as f32 )/lava_paths.len()  as f32 ];
+		let path_color = [(i as f32) / lava_paths.len() as f32, 0.0, 1. - (i as f32) / lava_paths.len() as f32];
 
-		while(o1.is_some() ){
+		while (o1.is_some()) {
 			let mut o2 = ps.next();
 			let p1 = o1.unwrap();
-			let p2 = if o2.is_some() {
-						o2.unwrap()
-					} else { 
-						p1
-					} ;
+			let p2 = if o2.is_some() { o2.unwrap() } else { p1 };
 			final_points.push(([p1.x, p1.z, p1.y], path_color));
-			final_points.push(([p1.x  ,p1.z + 10.0 , p1.y ], path_color));
-			final_points.push(([(p1.x + p2.x)/2.0 ,p1.z + 5.0 , (p1.y + p2.y)/2.0], path_color));
+			final_points.push(([p1.x, p1.z + 10.0, p1.y], path_color));
+			final_points.push(([(p1.x + p2.x) / 2.0, p1.z + 5.0, (p1.y + p2.y) / 2.0], path_color));
 
 			o1 = o2;
 		}
-
 	}
 
-	
 	// Add triangles for the level-curves
 	for curve in &model_constructor.level_curve_map.level_curves {
 		for i in 0..curve.points.len() - 1 {
