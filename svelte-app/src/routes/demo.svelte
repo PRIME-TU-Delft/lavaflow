@@ -1,4 +1,6 @@
 <script lang="ts">
+	import NavigationButton from '$lib/components/NavigationButton.svelte';
+
 	import init, * as wasm from 'wasm';
 
 	import { onMount, onDestroy } from 'svelte';
@@ -34,6 +36,7 @@
 				mesh.traverse((node) => {
 					if (node.type == 'Mesh') {
 						(node as Mesh<BufferGeometry, Material>).material.side = DoubleSide;
+						// (node as Mesh<BufferGeometry, Material>).material.opacity = 0.8;
 					}
 				});
 			}
@@ -74,14 +77,22 @@
 		embedded
 		arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
 	>
+		<div class="backButton">
+			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
+		</div>
+		<!-- <a-entity light="type: ambient; color: #CCC" /> -->
+
 		<a-marker type="barcode" value="1">
-			<a-box position="0 0.5 0" material="opacity: 0.5;" color="red" />
+			<a-light position="0 3 0" intensity="2" type="point" />
+			<a-light position="-3 3 4" intensity="2" type="point" />
+
+			<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
 
 			<a-entity
 				double-render
 				gltf-model="url({gltfUrl})"
-				position="0 0.5 0"
-				scale="0.003 0.003 0.003"
+				position="1 0 -1"
+				scale="0.0038 0.0038 0.0038"
 				rotation="0 -90 0"
 				id="model"
 			/>
@@ -97,5 +108,14 @@
 		height: 100% !important;
 		margin: 0 !important;
 		object-fit: contain !important;
+	}
+
+	.backButton {
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+		z-index: 1;
+		width: 15rem;
+		max-width: calc(100vw - 2rem);
 	}
 </style>
