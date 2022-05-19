@@ -1,9 +1,20 @@
 use super::catmull_clark::{Vertex, Edge};
-
-
-pub fn get_lava_paths_super<'a> (start: usize, length : usize, fork_val: f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec< &'a Vertex>>, String>    {
+/// Finds set of lava paths for a given model, from a specified starting vertex on the model.
+/// 
+/// # Arguments
+/// 
+/// * `start_index` - Index of first vertex in lava path.
+/// * `length` - Desired amount of points in lava path. 
+/// * `fork_val` - Value that determines amount of forking. If two potential next points have a smaller difference than fork_val, an additional path will be added to the set.
+/// * `vs` - List of all points of the model.
+/// * `es` - List of neighbors indexes per point in  the model.
+/// 
+/// # Return
+/// *  `Result<Vec<Vec< &'a Vertex>>, String>` - Result of list of lava paths. A lava path is a list of
+/// 
+pub fn get_lava_paths_super<'a> (start_index: usize, length : usize, fork_val: f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec< &'a Vertex>>, String>    {
     let mut paths = LavaPathSet{all_paths: Vec::new()};
-    paths.get_lava_path(start, length, fork_val, vs, es, )?;
+    paths.get_lava_path(start_index, length, fork_val, vs, es, )?;
     Ok(paths.all_paths)
 
 }
@@ -13,26 +24,27 @@ struct LavaPathSet<'a> {
 }
 
 impl<'a> LavaPathSet<'a> {
-/// Gets a lava path of a specified length starting at a specfied point in the model. A lava path follows the edges witht the steepest gradient in the z direction.
+/// Gets a singled lava path of a specified length starting at a specfied point in the model. A lava path follows the edges witht the steepest gradient in the z direction.
 ///
 /// # Arguments 
 ///
-/// * `start` - The index of the first point in the lava flow.
-/// * `length` - Amount of points to be added to the lava flow
+/// * `start` - The index of the first point in the lava path.
+/// * `length` - Amount of points to be added to the lava path.
+/// * `fork_val` - Value that determines amount of forking. If two potential next points have a smaller difference than fork_val, an additional path will be added to the set.
 /// * `vs` - List of all points of the model.
 /// * `es` - List of neighbors indexes per point in  the model.
 ///
 /// # Return
 /// *  `Result<Vec< &'a Vertex>, String>` - Result of list of vertexes in lava path
 ///
-fn get_lava_path(&mut self, start: usize, length : usize, fork_val : f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<(), String>{
+fn get_lava_path(&mut self, start_index: usize, length : usize, fork_val : f32, vs: &'a Vec<Vertex>, es: &'a Vec<Vec<usize>>) -> Result<(), String>{
 
     let mut path = Vec::with_capacity(length);
 
-    path.push(vs.get(start).ok_or(String::from("start point for lava does not exist in vertex list"))?);
+    path.push(vs.get(start_index).ok_or(String::from("start point for lava does not exist in vertex list"))?);
     
     //index vertex pair of current point in parth
-    let mut cur = (start, vs.get(start).ok_or(String::from("start point for lava does not exist in vertex list"))?);
+    let mut cur = (start_index, vs.get(start_index).ok_or(String::from("start point for lava does not exist in vertex list"))?);
 
     while (path.len() < length){
 
