@@ -9,7 +9,7 @@
 	<div class="img backdrop" />
 	<div class="title">
 		<div class="logo" />
-		<h2>AR Lavaflow</h2>
+		<h2>AR lavaFlow</h2>
 	</div>
 </header>
 

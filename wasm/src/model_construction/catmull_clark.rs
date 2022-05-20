@@ -53,7 +53,7 @@ pub struct Edge {
 /// # Return
 /// * `Result<(Vec<Vertex>, Vec<Face>), String>` - Result containing vertex list and face list.
 ///
-pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &Raster, keep_heights: bool) -> Result<(Vec<Vertex>, Vec<Face>), String> {
+pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &Raster, keep_heights: bool) -> Result<(Vec<Vertex>, Vec<Face>, Vec<Vec<usize>>), String> {
 	//transform raster to list of faces and vertices
 	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp, keep_heights);
 
@@ -69,8 +69,23 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &R
 		return Err(String::from("surface subdivision returns empty face list"));
 	}
 
-	Ok((vs, fs))
+	//es : index in edge map = index in vertices, so for each position the list of indeces of its neighbors
+	let es = edge_list_to_map( &get_edges_faces(&vs, &fs, true)? , vs.len())?;
+
+	Ok((vs, fs , es))
 }
+
+//iterate over list of edges and transfrom into desired edge structure
+pub fn edge_list_to_map(es : &[Edge], len: usize) -> Result<Vec<Vec<usize>>, String> {
+	let mut edges :Vec<Vec<usize>> = vec![Vec::new(); len];
+	//todo bug catch edge[x]
+	for e in es {
+		edges[e.p1].push(e.p2);
+		edges[e.p2].push(e.p1);
+	}
+	Ok(edges)
+}
+
 /// Transforms Raster to face -vertex representation.
 ///
 /// Transformation of a cell in a raster in the ith column in the jth row:
@@ -208,7 +223,7 @@ fn catmull_clark(fs: &[Face], vs: &[Vertex]) -> Result<(Vec<Vertex>, Vec<Face>),
 	let face_points = get_face_points(vs, fs)?;
 
 	// get list of all edges and their middle points (edge.middle)
-	let edges = get_edges_faces(vs, fs)?;
+	let edges = get_edges_faces(vs, fs, false)?;
 
 	// per edge get an edge point, = (average of face points + edge center)/2
 	let edge_points = get_edge_points( &edges, &face_points)?;
@@ -242,7 +257,8 @@ fn catmull_clark(fs: &[Face], vs: &[Vertex]) -> Result<(Vec<Vertex>, Vec<Face>),
 		next_index += 1;
 	}
 
-	// add edge points to new_points, using hash so you can find index per edge
+	// add edge points to new_points, using hash so you can find index of edge point per edge
+	// per edge new entry in hashmap ; ((from_i, to_j), index edge point) 
 	let mut edge_index_map: HashMap<(usize, usize), usize> = HashMap::with_capacity(edges.len());
 
 	for (i, edge) in edges.iter().enumerate() {
@@ -291,7 +307,7 @@ fn catmull_clark(fs: &[Face], vs: &[Vertex]) -> Result<(Vec<Vertex>, Vec<Face>),
 		}
 	}
 
-	Ok((new_points, new_faces))
+	Ok((new_points, new_faces ))
 }
 
 ///
@@ -381,7 +397,8 @@ fn get_face_points(v: &[Vertex], f: &[Face]) -> Result<Vec<Vertex>, String> {
 }
 
 //gets all edges between points represented as : incedent points, adjacent faces, and center of edge
-fn get_edges_faces(vs: &[Vertex], fs: &[Face]) -> Result<Vec<Edge>, String> {
+// argument get_diagnoal_edges : if true also returns diagonals over a face : SET TO FALSE IN SUBDIVISION PROCESS
+fn get_edges_faces(vs: &[Vertex], fs: &[Face], get_diagonal_edges : bool) -> Result<Vec<Edge>, String> {
 	let mut edges: Vec<Edge> = Vec::new();
 
 	// get edges from each face
@@ -391,8 +408,13 @@ fn get_edges_faces(vs: &[Vertex], fs: &[Face]) -> Result<Vec<Edge>, String> {
 			return Err(String::from("get_edges_faces: face does not have enough points"));
 		}
 
-		// hardcoded tuples of points that make face edges
-		let es = vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])];
+		// hardcoded tuples of points that make a face's edges
+		// if diagonals are to be included: add (1, 3) and (2,0) to hardcoded edges
+		let es = if get_diagonal_edges {
+			vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0]), (f.points[0], f.points[2]), (f.points[1], f.points[3])]
+		} else {
+			vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])]
+		};
 
 		for (i1, i2) in es {
 			let p1 = vs.get(i1).ok_or(format!("get_edges_faces: vertex at index {i1} does not exist"))?;

@@ -3,7 +3,7 @@
 	export let style: string = '';
 	export let loading: boolean = true;
 
-	let videoSource: HTMLVideoElement;
+	export let videoSource: HTMLVideoElement | undefined = undefined;
 
 	$: {
 		if (stream && !loading && videoSource) {
