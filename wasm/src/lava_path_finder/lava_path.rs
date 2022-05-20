@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::model_construction::catmull_clark::Vertex;
 
 /// Finds set of lava paths for a given model, from a specified starting vertex on the model.
@@ -113,9 +115,22 @@ fn gradient_between_points(from: &Vertex, to: &Vertex) -> f32 {
 	//gradient = z diff divided by length of edge
 	(from.z - to.z) / (sqr(from.x - to.x) + sqr(from.y - to.y) + sqr(from.z - to.z)).sqrt()
 }
-
+/// Given list of indexes (Desired is list of index of points that can be the top of the model), find the correct start point. The correct start point is the upper vertex of the steepest edge in the set of possible start points.
+///
+/// # Arguments
+///
+/// * `highest_points` - Indeces of points that could possibly first start point.
+/// * `vs` - List of all points of the model.
+/// * `es` - List of neighbors indexes per point in  the model.
+///
+/// # Return
+/// *  `Result<usize>, String>` - Result of index of start point of lava path.
+///
 fn get_start(highest_points: &Vec<usize>, vs: &Vec<Vertex>, es: &Vec<Vec<usize>>) -> Result<usize, String> {
-	let mut store = (highest_points[0], f32::MIN);
+	if highest_points.is_empty() {
+		return Err(String::from("lava path: cannot find highest point because no points exist above top contour line."));
+	}
+	let mut store = (0, f32::MIN);
 
 	for i in highest_points {
 		let mut neighbors: Vec<(usize, &Vertex)> = Vec::new();
