@@ -240,7 +240,7 @@ impl LevelCurveSet {
 			y: std::f32::MAX,
 			z: 0.0,
 		};
-		let mut max = Point { x: 0.0, y: 0.0, z: 0.0 };
+		let mut max = Point { x:std::f32::MIN, y: std::f32::MIN, z: 0.0 };
 		for curve in &self.level_curves {
 			for point in &curve.points {
 				min.x = f32::min(min.x, point.x);
@@ -352,13 +352,13 @@ impl LevelCurveSet {
 
 	///
 	/// Shifts all points in level curve set such that the set is aligned with the x and y axis.
-	/// Not exactly aligned, distance to keep from axis can be specified.
+	/// Not exactly aligned, distance to keep from axes can be specified.
 	///  
 	/// # Arguments
 	///
 	/// * `min` - point with the minimal occurring x and y values
 	/// * `border_x` - distance to keep model from x axis
-	/// * `border_y` - distance to keep model from x axis
+	/// * `border_y` - distance to keep model from y axis
 	pub fn align_with_origin(&mut self, min: &Point, border_x: f32, border_y: f32) {
 		for curve in &mut self.level_curves {
 			for p in &mut curve.points {

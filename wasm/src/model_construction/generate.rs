@@ -1,3 +1,4 @@
+use crate::lava_path_finder::lava_path::get_lava_paths_super;
 use crate::utils::log;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -6,8 +7,6 @@ use wasm_bindgen::JsValue;
 use super::catmull_clark::{catmull_clark_super, Vertex};
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
-use super::lava_path::get_lava_paths_super;
-// use super::level_curve_tree::LevelCurveTree;
 use super::level_curves::{LevelCurve, LevelCurveSet};
 use super::point::Point;
 use super::raster::Raster;
@@ -183,22 +182,15 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//find maximum and minimum cooridinates in level curve model
 	let (min, max) = level_curve_map.get_bounding_points();
 
-	//to keep border of 10% of each axis around model
-	let border_x = 0.5 * (max.x - min.x);
-	let border_y = 0.5 * (max.y - min.y);
+	// keep border of 20% of each axis around model
+	let border_x = 0.2 * (max.x - min.x);
+	let border_y = 0.2 * (max.y - min.y);
 
-	//TODO WHAT DOES COMMENT MEAN
-	//ensure none of the level curve points have negative coordinates
+	//ensure none of the level curve points have negative coordinates , and have a 'border' distance from the axes
 	level_curve_map.align_with_origin(&min, border_x, border_y);
 
-	//find maxum cooridinates in level curve model
-	//TODO WHY IS THIS HERE?  and why does model break if removed
-	let max = level_curve_map.get_bounding_points().1;
-
-	// log!("The configured height is: {}", (max.y - min.y) + border_y);
-
 	//create raster based on level curve model and desired rows and columns
-	let mut raster = Raster::new((max.x - min.x) + border_x, (max.y - min.y) + border_y, rows, columns);
+	let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0) , (max.y - min.y) + (border_y* 2.0), rows, columns);
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
@@ -210,25 +202,42 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
+	smoother.increase_altitude_for_mountain_tops(2.0,false).map_err(|e| e.to_string())?;
+	smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, true).map_err(|e| e.to_string())?;
 	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
 
 
 	//apply surface subdivision
 	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
-	
+
 	//find vertex index of the highest point in the model
-	let mut highest_point : usize = 0;
-	for (i, v ) in vs.iter().enumerate() {
-		if v.z > vs[highest_point].z {
-			highest_point = i;
+
+	let mut top_height = f32::MIN;
+	for curve in &level_curve_map.level_curves {
+		if curve.altitude > top_height {
+			top_height = curve.altitude;
 		}
 	}
+	//top_height -= level_curve_map.altitude_step;
+
+	//get list of indexes of points above or on highest level curev
+	let mut  highest_points = Vec::new();
+	for (i, v ) in vs.iter().enumerate() {
+		if v.z >= top_height {
+			highest_points.push(i);
+		}
+	}
+
 	//highest_point += 170;
 
 	//find lava path from the highest point of the model
-	//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-	//0.02 also nice
-	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(highest_point, 50, 0.1, &vs, &edge_map)?;
+		//maximum path length
+	let path_length = 50;
+		//min alt determines at which alitude a lava path stops
+	let min_altitude = level_curve_map.altitude_step / 2.0;
+		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
+		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles
@@ -246,12 +255,10 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		//rgb green = 0, 153, 51
 		//rgb orange = 255, 153, 51
 
-		let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]  );
-		let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
-		let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
-		let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0] );
-
-
+		let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+		let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+		let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+		let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
 
 		// Add the first triangle
 		final_points.push(tri00);
@@ -268,42 +275,50 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		final_points.push(tri10);
 	}
 
-	//draw highest point mof model
-	let hp = &vs[highest_point];
-	final_points.push(([hp.x, hp.z, hp.y  ], [1., 0., 0.]));
-	final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
-	final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
+	//draw highest point of model for visual debug
+	//TODO: REMOVE
+	// let hp = &vs[highest_point];
+	// final_points.push(([hp.x, hp.z, hp.y], [1., 0., 0.]));
+	// final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
+	// final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
 
+	// //draw x, y  axes for visual debug
+	// //TODO: REMOVE
+	// //0,0 is green
+	// final_points.push(([0.0, 0.0, 0.0], [0., 1., 0.]));
+	// final_points.push(([ 5.0, 100.0,  5.0], [0., 1., 0.]));
+	// final_points.push(([- 5.0,  100.0, - 5.0], [0., 1., 0.]));
+	// //x is yellow
+	// final_points.push(([1000.0, 0.0, 0.0], [1., 1., 0.]));
+	// final_points.push(([ 1005.0, 100.0,  5.0], [1., 1., 0.]));
+	// final_points.push(([ 995.0,  100.0, - 5.0], [1., 1., 0.]));
+	// // y is cyan
+	// final_points.push(([0.0, 0.0, 1000.0], [0., 1., 1.]));
+	// final_points.push(([ 5.0, 100.0,  1005.0], [0., 1., 1.]));
+	// final_points.push(([- 5.0,  100.0,  995.0], [0., 1., 1.]));
 
-	//draw lava paths
+	//draw lava paths for visual debug
+	//TODO: REMOVE -> should not be part of final model
 	for (i, path) in lava_paths.iter().enumerate() {
-
-		let mut  ps = path.iter();
+		let mut ps = path.iter();
 		let mut o1 = ps.next();
 
-		let path_color = [(i as f32 )/lava_paths.len() as f32, 
-						0.0  ,
-						1. - (i as f32 )/lava_paths.len()  as f32 ];
+		let path_color = [(i as f32) / lava_paths.len() as f32, 0.0, 1. - (i as f32) / lava_paths.len() as f32];
 
-		while(o1.is_some() ){
+		while (o1.is_some()) {
 			let mut o2 = ps.next();
 			let p1 = o1.unwrap();
-			let p2 = if o2.is_some() {
-						o2.unwrap()
-					} else { 
-						p1
-					} ;
+			let p2 = if o2.is_some() { o2.unwrap() } else { p1 };
 			final_points.push(([p1.x, p1.z, p1.y], path_color));
-			final_points.push(([p1.x  ,p1.z + 10.0 , p1.y ], path_color));
-			final_points.push(([(p1.x + p2.x)/2.0 ,p1.z + 5.0 , (p1.y + p2.y)/2.0], path_color));
+			final_points.push(([p1.x, p1.z + 10.0, p1.y], path_color));
+			final_points.push(([(p1.x + p2.x) / 2.0, p1.z + 5.0, (p1.y + p2.y) / 2.0], path_color));
 
 			o1 = o2;
 		}
-
 	}
 
-	
-	// Add triangles for the level-curves
+	// Add triangles for the level-curves for visual debug
+	//TODO: REMOVE -> should not be part of final model
 	for curve in &model_constructor.level_curve_map.level_curves {
 		for i in 0..curve.points.len() - 1 {
 			let p1 = &curve.points[i];
