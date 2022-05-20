@@ -6,8 +6,6 @@ export default function removePerspective(
 	width: number = 1000,
 	height: number = 550
 ): Mat {
-	// the height and width of the output image
-
 	// construct mats (required input for cv.getPerspectiveTransform) with four columns and two rows to represent the four 2d points
 	let sourcePoints = cv.matFromArray(4, 2, cv.CV_32FC1, points);
 	let outputPoints = cv.matFromArray(4, 2, cv.CV_32FC1, [0, 0, width, 0, width, height, 0, height]);
