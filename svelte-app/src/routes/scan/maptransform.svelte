@@ -17,6 +17,7 @@
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
+	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
 
 	function gotoPreview() {
@@ -36,9 +37,7 @@
 		let result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
 		cv.imshow('canvasOutput', result);
 
-		// TODO implement svelte magic
-		const canvasOutput = document.getElementById('canvasOutput') as HTMLCanvasElement;
-		perspectiveImage.set(canvasOutput.toDataURL());
+		perspectiveImage.set(outputCanvas.toDataURL());
 
 		result.delete();
 		mat.delete();
@@ -71,7 +70,7 @@
 		alt="background"
 	/>
 
-	<canvas id="canvasOutput" />
+	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
 	<div slot="footer">
 		<Button on:click={gotoPreview}>

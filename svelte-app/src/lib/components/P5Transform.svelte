@@ -1,12 +1,15 @@
 <script lang="ts">
+	/**
+	 * Dragging marker over an image to transform it.
+	 */
 	import P5 from 'p5-svelte';
 	import type p5 from 'p5';
 
 	import Draggable from '$lib/data/draggable';
 	import { rawImage } from '$lib/stores/imageStore';
 
-	export let foregroundWidth: number;
-	export let foregroundHeight: number;
+	export let foregroundWidth: number; // Width of the foreground canvas
+	export let foregroundHeight: number; // Height of the foreground canvas
 
 	export let points: Draggable[] = [];
 	let image: p5.Image;

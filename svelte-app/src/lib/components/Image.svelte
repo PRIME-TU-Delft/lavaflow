@@ -1,6 +1,10 @@
 <script lang="ts">
-	export let src: string;
-	export let alt: string;
+	/**
+	 * Stylistic component for an image.
+	 */
+
+	export let src: string; // Image source
+	export let alt: string; // Image alt text
 </script>
 
 <img {src} {alt} />
