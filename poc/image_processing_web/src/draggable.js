@@ -8,7 +8,7 @@ export default class Draggable {
    *
    * @param {number} x initial x coordinate of the marker
    * @param {number} y initial y coordinate of the marker
-   * @param {number} size height/width of the marker in pixels
+   * @param {number} size height/width of the draggable surface in pixels
    */
   constructor(x, y, size) {
     this.dragging = false; // is this object being dragged
@@ -19,6 +19,8 @@ export default class Draggable {
     this.offsetX = 0;
     this.offsetY = 0;
   }
+
+
 
 
   /**
@@ -36,22 +38,91 @@ export default class Draggable {
     this.y = p5.mouseY + this.offsetY;
   }
 
+  /**
+   * Moves the point to the input x and y coordinates
+   * 
+   * @param x  The x position the point should be moved to
+   * @param y  The y position the point should be moved to
+   */
+  setPosition(x, y) {
+    this.x = x
+    this.y = y
+  }
 
   /**
-   * Visualize the marker, by drawing a rectangle at the marker's current position
+   * Visualize the marker by drawing a rectangle at the marker's current position
    *
    * @param p5 Instance of a p5 sketch
+   * @param markerSize The size in pixels of the marker to be drawn
    */
-  draw(p5) {
+  drawRect(p5, markerSize) {
     p5.stroke(0);
     p5.fill(50);
-    const indicatorSize = 20;
+    p5.strokeWeight(1)
+    p5.rectMode(p5.CENTER)
 
     p5.rect(
-      this.x + (this.w - indicatorSize) / 2,
-      this.y + (this.h - indicatorSize) / 2,
-      indicatorSize,
-      indicatorSize
+      this.x + this.w / 2,
+      this.y + this.h / 2,
+      markerSize,
+      markerSize
+    );
+  }
+
+  /**
+   * Visualize the marker by drawing a circle at the marker's current position
+   * 
+   * @param p5 Instance of a p5 sketch
+   * @param markerSize The size in pixels of the marker to be drawn
+   */
+  drawCircle(p5, markerSize) {
+    p5.stroke(0);
+    p5.fill(50);
+    p5.strokeWeight(1);
+
+    p5.circle(this.x + this.w / 2, this.y + this.h / 2, markerSize);
+  }
+
+   /**
+   * Visualize the marker by drawing a triangle at the marker's current position
+   * 
+   * @param p5 Instance of a p5 sketch
+   * @param markerSize The size in pixels of the marker to be drawn
+   */
+  drawTriangle(p5, markerSize) {
+    p5.stroke(0);
+    p5.fill(50);
+    p5.strokeWeight(1);
+
+    // corners in order: bottom left corner, bottom right corner, top corner in the center
+    p5.triangle(
+      this.x + (this.w - markerSize) / 2, this.y + (this.h + markerSize) / 2,
+      this.x + (this.w + markerSize) / 2, this.y + (this.h + markerSize) / 2,
+      this.x + (this.w) / 2, this.y + (this.h - markerSize) / 2
+    );
+  }
+
+ /**
+   * Visualize the marker by drawing a cross at the marker's current position
+   * 
+   * @param p5 Instance of a p5 sketch
+   * @param markerSize The size in pixels of the marker to be drawn
+   */
+  drawCross(p5, markerSize) {
+    p5.stroke(0);
+    p5.strokeWeight(7);
+    // cross is drawn using two thick lines
+
+    // draw line from top left to bottom right
+    p5.line(
+      this.x + (this.w - markerSize) / 2, this.y + (this.h + markerSize) / 2,
+      this.x + (this.w + markerSize) / 2, this.y + (this.h - markerSize) / 2,
+    );
+
+    // draw line from top right to bottom left
+    p5.line(
+      this.x + (this.w + markerSize) / 2, this.y + (this.h + markerSize) / 2,
+      this.x + (this.w - markerSize) / 2, this.y + (this.h - markerSize) / 2
     );
   }
 
