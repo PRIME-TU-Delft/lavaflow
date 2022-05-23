@@ -1,7 +1,6 @@
 use miette::{miette, Result};
 
-use super::point::Point;
-use super::{level_curves::LevelCurveSet, raster::Raster};
+use crate::objects::{level_curves::LevelCurveSet, point::Point, raster::Raster};
 
 #[derive(Debug)]
 pub struct ModelConstructor<'a> {
