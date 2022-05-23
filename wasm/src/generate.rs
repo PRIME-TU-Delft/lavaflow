@@ -62,7 +62,7 @@ impl ModelGenerationSettings {
 /// Supermethod that takes in an openCV tree and outputs an GTLF model.
 /// - `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
 #[wasm_bindgen]
-pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, repetitions: usize, strength_positive: f32, strength_negative: f32, coverage: usize, svc_weight: usize, rows: usize, columns: usize, contour_margin: f32) -> Result<String, JsValue> {
+pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, smoothing_repetitions: usize, strength_positive: f32, strength_negative: f32, coverage: usize, svc_weight: usize, rows: usize, columns: usize, contour_margin: f32, border : f32, path_length : usize , fork_val : f32 , subdivisions : usize) -> Result<String, JsValue> {
 
 	// log!("The provided open_cv_tree: {:?}", open_cv_tree);
 	// log!("The provided settings: {:?}", settings);
@@ -174,9 +174,9 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//find maximum and minimum cooridinates in level curve model
 	let (min, max) = level_curve_map.get_bounding_points();
 
-	// keep border of 20% of each axis around model
-	let border_x = 0.2 * (max.x - min.x);
-	let border_y = 0.2 * (max.y - min.y);
+	// keep desired border of each axis around model
+	let border_x = border * (max.x - min.x);
+	let border_y = border * (max.y - min.y);
 
 	//ensure none of the level curve points have negative coordinates , and have a 'border' distance from the axes
 	level_curve_map.align_with_origin(&min, border_x, border_y);
@@ -200,7 +200,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 
 	//apply surface subdivision
-	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
+	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
 
 	//for lava path generation : find point index of the highest point in the model
 
@@ -221,13 +221,11 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	}
 
 	//find lava path from the highest point of the model
-		//maximum path length
-	let path_length = 50;
 		//min alt determines at which alitude a lava path stops
 	let min_altitude = level_curve_map.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-	let lava_paths : Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
+	let lava_paths : Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, path_length, fork_val , min_altitude, &vs, &edge_map)?;
 
 
 	//Turn faces of model into triangles
