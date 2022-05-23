@@ -237,7 +237,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let min_altitude = level_curve_map.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
+	//let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
 
 
 	//Turn faces into triangles
@@ -299,23 +299,23 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 
 	//draw lava paths for visual debug
 	//TODO: REMOVE -> should not be part of final model
-	for (i, path) in lava_paths.iter().enumerate() {
-		let mut ps = path.iter();
-		let mut o1 = ps.next();
+	// for (i, path) in lava_paths.iter().enumerate() {
+	// 	let mut ps = path.iter();
+	// 	let mut o1 = ps.next();
 
-		let path_color = [(i as f32) / lava_paths.len() as f32, 0.0, 1. - (i as f32) / lava_paths.len() as f32];
+	// 	let path_color = [(i as f32) / lava_paths.len() as f32, 0.0, 1. - (i as f32) / lava_paths.len() as f32];
 
-		while (o1.is_some()) {
-			let mut o2 = ps.next();
-			let p1 = o1.unwrap();
-			let p2 = if o2.is_some() { o2.unwrap() } else { p1 };
-			final_points.push(([p1.x, p1.z, p1.y], path_color));
-			final_points.push(([p1.x, p1.z + 10.0, p1.y], path_color));
-			final_points.push(([(p1.x + p2.x) / 2.0, p1.z + 5.0, (p1.y + p2.y) / 2.0], path_color));
+	// 	while (o1.is_some()) {
+	// 		let mut o2 = ps.next();
+	// 		let p1 = o1.unwrap();
+	// 		let p2 = if o2.is_some() { o2.unwrap() } else { p1 };
+	// 		final_points.push(([p1.x, p1.z, p1.y], path_color));
+	// 		final_points.push(([p1.x, p1.z + 10.0, p1.y], path_color));
+	// 		final_points.push(([(p1.x + p2.x) / 2.0, p1.z + 5.0, (p1.y + p2.y) / 2.0], path_color));
 
-			o1 = o2;
-		}
-	}
+	// 		o1 = o2;
+	// 	}
+	// }
 
 	// Add triangles for the level-curves for visual debug
 	//TODO: REMOVE -> should not be part of final model
