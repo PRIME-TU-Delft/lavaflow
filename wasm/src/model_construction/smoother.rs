@@ -395,12 +395,12 @@ impl<'a> Smoother<'a> {
 
         // If the considered neighbour falls outside of the raster, return altitude 0.0
         if row_n < 0 || col_n < 0 || row_n as usize >= self.raster.rows || col_n as usize >= self.raster.columns {
-            return Ok(0.0);
+            Ok(0.0)
         }
 
         // Else, find the neighbour and return its altitude value
         else {
-            return Ok(self.raster.altitudes[row_n as usize][col_n as usize].ok_or_else(|| miette!("Altitude not present."))?);
+            Ok(self.raster.altitudes[row_n as usize][col_n as usize].ok_or_else(|| miette!("Altitude not present."))?)
         }
 
     }
@@ -425,12 +425,12 @@ impl<'a> Smoother<'a> {
 
         // If the considered neighbour falls outside of the raster, return altitude 0.0
         if row_n < 0 || col_n < 0 || row_n as usize >= self.raster.rows || col_n as usize >= self.raster.columns {
-            return false;
+            false
         }
 
         // Else, find the neighbour and return its altitude value
         else {
-            return self.is_svc[row_n as usize][col_n as usize];
+            self.is_svc[row_n as usize][col_n as usize]
         }
 
     }
@@ -459,12 +459,12 @@ impl<'a> Smoother<'a> {
 
         // If the considered neighbour falls outside of the raster, return altitude 0.0
         if row_n < 0 || col_n < 0 || row_n as usize >= self.raster.rows || col_n as usize >= self.raster.columns {
-            return false;
+            false
         }
 
         // Else, determine whether this neighbour is part of the specified layer.
         else {
-            return self.point_indices_per_layer[layer].contains(&(row_n as usize, col_n as usize));
+            self.point_indices_per_layer[layer].contains(&(row_n as usize, col_n as usize))
         }
 
     }

@@ -14,7 +14,7 @@ use crate::objects::point::Point;
 /// # Return
 /// *  `Result<Vec<Vec< &'a Point>>, String>` - Result of list of lava paths. A lava path is a list of
 ///
-pub fn get_lava_paths_super<'a>(highest_points: &Vec<usize>, length: usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Point>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Point>>, String> {
+pub fn get_lava_paths_super<'a>(highest_points: &[usize], length: usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Point>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Point>>, String> {
 	let mut paths = LavaPathSet { all_paths: Vec::new() };
 	let start_point = get_start(highest_points, vs, es)?;
 	paths.get_lava_path(start_point, length, fork_val, min_altitude, vs, es)?;
@@ -42,10 +42,11 @@ impl<'a> LavaPathSet<'a> {
 	fn get_lava_path(&mut self, start_index: usize, length: usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Point>, es: &'a Vec<Vec<usize>>) -> Result<(), String> {
 		let mut path = Vec::with_capacity(length);
 
-		path.push(vs.get(start_index).ok_or(String::from("start point for lava does not exist in point list"))?);
+		let start_point = vs.get(start_index).ok_or(String::from("start point for lava does not exist in point list"))?;
+		path.push(start_point);
 
 		//index point pair of current point in parth
-		let mut cur = (start_index, vs.get(start_index).ok_or(String::from("start point for lava does not exist in point list"))?);
+		let mut cur = (start_index, start_point);
 
 		while path.len() < length {
 			//get neighbors
@@ -125,7 +126,7 @@ fn gradient_between_points(from: &Point, to: &Point) -> f32 {
 /// # Return
 /// *  `Result<usize>, String>` - Result of index of start point of lava path.
 ///
-fn get_start(highest_points: &Vec<usize>, vs: &Vec<Point>, es: &Vec<Vec<usize>>) -> Result<usize, String> {
+fn get_start(highest_points: &[usize], vs: &[Point], es: &Vec<Vec<usize>>) -> Result<usize, String> {
 	if highest_points.is_empty() {
 		return Err(String::from("lava path: cannot find highest point because no points exist above top contour line."));
 	}
