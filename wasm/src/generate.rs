@@ -1,7 +1,6 @@
 use crate::gltf_conversion::generate_gltf;
 use crate::objects::level_curves::{LevelCurve, LevelCurveSet};
 use crate::objects::{raster::Raster, point::Point};
-use crate::surface_subdivision::catmull_clark::Vertex;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
@@ -203,7 +202,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//apply surface subdivision
 	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
 
-	//for lava path generation : find vertex index of the highest point in the model
+	//for lava path generation : find point index of the highest point in the model
 
 	let mut top_height = f32::MIN;
 	for curve in &level_curve_map.level_curves {
@@ -228,7 +227,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let min_altitude = level_curve_map.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-	let lava_paths : Vec<Vec<&Vertex>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
+	let lava_paths : Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
 
 
 	//Turn faces of model into triangles
@@ -238,10 +237,10 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 			return Err(JsValue::from("surface subdivision returns face with incorrect amount of points"));
 		}
 		//get points of face
-		let p0 = vs.get(f.points[0]).ok_or(format!("vertex list does not contain point {} ", f.points[0]))?;
-		let p1 = vs.get(f.points[1]).ok_or(format!("vertex list does not contain point {} ", f.points[1]))?;
-		let p2 = vs.get(f.points[2]).ok_or(format!("vertex list does not contain point {} ", f.points[2]))?;
-		let p3 = vs.get(f.points[3]).ok_or(format!("vertex list does not contain point {} ", f.points[3]))?;
+		let p0 = vs.get(f.points[0]).ok_or(format!("point list does not contain point {} ", f.points[0]))?;
+		let p1 = vs.get(f.points[1]).ok_or(format!("point list does not contain point {} ", f.points[1]))?;
+		let p2 = vs.get(f.points[2]).ok_or(format!("point list does not contain point {} ", f.points[2]))?;
+		let p3 = vs.get(f.points[3]).ok_or(format!("point list does not contain point {} ", f.points[3]))?;
 
 		//rgb green = 0, 153, 51
 		//rgb orange = 255, 153, 51
