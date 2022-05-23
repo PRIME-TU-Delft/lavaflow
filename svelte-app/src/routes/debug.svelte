@@ -1,17 +1,16 @@
 <script lang="ts">
-	import Button from '$lib/components/Button.svelte';
+	import DebugSidebar from '$lib/components/DebugSidebar.svelte';
 
 	import init, * as wasm from 'wasm';
 	import 'aframe';
 
-	import { onMount, onDestroy, beforeUpdate, afterUpdate } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	import { hc_level_curves, hc_parent_relations } from '$lib/data/hardCoded';
 	import type { BufferGeometry, Material, Mesh } from 'three';
 	import { DoubleSide } from 'three';
 
 	let gltfUrl: string;
-	let sidebarOpen = true;
 	let ready = false;
 
 	AFRAME.registerComponent('double-render', {
@@ -53,9 +52,9 @@
 	});
 
 	onMount(async () => {
-		await init();
-
-		ready = true;
+		// TODO: remove these comments to see mountain
+		// await init();
+		// ready = true;
 	});
 
 	onDestroy(() => {
@@ -64,11 +63,7 @@
 	});
 </script>
 
-<div class="openSidebar">
-	<Button on:click={() => (sidebarOpen = !sidebarOpen)}>Open sidebar</Button>
-</div>
-
-<aside class="sideBar" class:sidebarOpen />
+<DebugSidebar />
 
 {#if ready}
 	<a-scene embedded>
@@ -87,29 +82,3 @@
 		/>
 	</a-scene>
 {/if}
-
-<style lang="scss">
-	.openSidebar {
-		width: 20rem;
-		max-width: calc(100vw - 2rem);
-		left: 1rem;
-		top: 1rem;
-		position: fixed;
-	}
-
-	aside {
-		position: fixed;
-		top: 0;
-		right: 0;
-		width: 300px;
-		height: 100vh;
-		background: var(--primary);
-		z-index: 10;
-		transform: translateX(-100%);
-		transition: transform 0.5s ease-in-out;
-	}
-
-	aside.sidebarOpen {
-		transform: translateX(0);
-	}
-</style>
