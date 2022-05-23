@@ -8,7 +8,7 @@
 	export let icon: string = '';
 </script>
 
-<button class:disabled class:large class:secondary on:click>
+<button {disabled} class:disabled class:large class:secondary on:click>
 	<div class="title">
 		{#if icon}
 			<Icon path={icon} color="var(--text-color)" />
@@ -39,6 +39,10 @@
 		cursor: pointer;
 	}
 
+	button.disabled {
+		background: grey;
+	}
+
 	.title {
 		font-size: 1.1rem;
 		display: flex;
@@ -57,5 +61,6 @@
 
 	.secondary {
 		background: var(--secondary-color);
+		color: var(--text-color-secondary);
 	}
 </style>

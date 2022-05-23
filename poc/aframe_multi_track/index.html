@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+    <title>Multi marker detection</title>
+  </head>
+  <body>
+    <a-scene
+      embedded
+      renderer="logarithmicDepthBuffer: true;"
+      arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+    >
+      <a-assets>
+        <a-asset-item id="output" src="output.obj"></a-asset-item>
+      </a-assets>
+
+      <!-- create your content here. just a box for now -->
+      <a-marker id="marker0" type="barcode" value="0">
+        <a-obj-model
+          material="side: double"
+          position="0 0 0"
+          scale="0.01 0.01 0.01"
+          src="#output"
+        ></a-obj-model>
+        <a-plane
+          position="1.5 0 2"
+          rotation="90 0 90"
+          material="side: double"
+          width="4"
+          height="3"
+          color="purple"
+        ></a-plane>
+        <a-box position="0 0 0" material="color: red; opacity: 0.5;"></a-box>
+      </a-marker>
+
+    <a-marker id="marker1" type='barcode' value='1' >
+      <a-obj-model material="side: double" position="0 0 0" scale="0.01 0.01 0.01" src="#output" ></a-obj-model>
+      <a-plane position="-1.5 0 2" rotation="90 0 90" material="side: double" width="4" height="3" color="purple"></a-plane>
+      <a-box position='0 0 0' material='color: green; opacity: 0.5;' ></a-box>
+    </a-marker>
+
+   <a-marker id="marker2" type='barcode' value='2' >
+    <a-obj-model material="side: double" position="0 0 0" scale="0.01 0.01 0.01" src="#output" ></a-obj-model>
+    <a-plane position="-1.5 0 -2" rotation="90 0 90" material="side: double" width="4" height="3" color="purple"></a-plane>
+    <a-box position='0 0 0' material='color: yellow; opacity: 0.5;' ></a-box>
+  </a-marker>
+
+  <a-marker id="marker3" type='barcode' value='3' >
+    <a-obj-model material="side: double" position="0 0 0" scale="0.01 0.01 0.01" src="#output" ></a-obj-model>
+    <a-plane position="1.5 0 -2" rotation="90 0 90" material="side: double" width="4" height="3" color="purple"></a-plane>
+    <a-box position='0 0 0' material='color: blue; opacity: 0.5;' ></a-box>
+  </a-marker>
+  
+
+    <a-entity camera look-around></a-entity>
+
+      <a-entity camera look-around></a-entity>
+    </a-scene>
+    <script>
+      let visible = 1;
+      let DEBUG = false; // toggle in console to see print messages
+
+      function print(msg) {
+        if (DEBUG) {
+          console.log(msg);
+        }
+      }
+
+      // Check if the dom is loaded
+      window.addEventListener('load', () => {
+        const markers = [0, 1, 2, 3].map((x) =>
+          document.querySelector('#marker' + x)
+        ); // array of markers
+        const found = markers.map((x) => false);
+
+        // check if marker is visible
+        markers.forEach((marker, index) => {
+          marker.addEventListener(
+            'markerFound',
+            (event) => (found[index] = true)
+          );
+          marker.addEventListener(
+            'markerLost',
+            (event) => (found[index] = false)
+          );
+
+          marker.flushToDOM();
+        });
+
+        function setPlaneVisible() {
+          // set plane visible if index visible
+          markers.forEach((marker, index) => {
+            const plane = marker.querySelector('a-plane');
+            plane.object3D.visible = index == visible;
+          });
+        }
+
+        setInterval(() => {
+          // if previous marker is still visible
+          print(found);
+          if (visible > 0 && found[visible]) return;
+
+          visible = -1;
+          // else try to find largest visible marker
+          for (i = 0; i < found.length; i++) {
+            if (found[i]) {
+              visible = i;
+            }
+          }
+
+          // set correct plane visible
+          setPlaneVisible();
+          print(visible);
+        }, 200);
+      });
+    </script>
+  </body>
+</html>
