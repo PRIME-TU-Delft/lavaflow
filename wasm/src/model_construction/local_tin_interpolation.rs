@@ -1,7 +1,5 @@
-use super::level_curves::{LevelCurve, LevelCurveSet};
-use super::point::Point;
-use super::triangle::Triangle;
-use miette::{Result, miette};
+use crate::objects::{level_curves::LevelCurve, level_curves::LevelCurveSet, point::Point, triangle::Triangle};
+use miette::{miette, Result};
 
 // pub struct LevelCurveSet {
 // 	altitude_step: f32,
@@ -69,8 +67,7 @@ impl LevelCurveSet {
 		let mut point_a = 0;
 		let mut point_b = closest_two_levelcurves
 			.1
-			.find_closest_point_with_index_on_level_curve(closest_two_levelcurves.0.get_point(0)
-			.ok_or_else(|| miette!("Error when extracting point from level-curve."))?)
+			.find_closest_point_with_index_on_level_curve(closest_two_levelcurves.0.get_point(0).ok_or_else(|| miette!("Error when extracting point from level-curve."))?)
 			.0
 			.ok_or_else(|| miette!("Error when extracting point-index from level-curve."))?;
 
@@ -98,7 +95,10 @@ impl LevelCurveSet {
 			let triangle_1 = Triangle::new(
 				closest_two_levelcurves.0.get_point(point_a).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
 				closest_two_levelcurves.1.get_point(point_b).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
-				closest_two_levelcurves.0.get_point(next_point_a).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
+				closest_two_levelcurves
+					.0
+					.get_point(next_point_a)
+					.ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
 			);
 			let min_angle_t1 = triangle_1.minimal_internal_angle();
 
@@ -106,7 +106,10 @@ impl LevelCurveSet {
 			let triangle_2 = Triangle::new(
 				closest_two_levelcurves.0.get_point(point_a).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
 				closest_two_levelcurves.1.get_point(point_b).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
-				closest_two_levelcurves.1.get_point(next_point_b).ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
+				closest_two_levelcurves
+					.1
+					.get_point(next_point_b)
+					.ok_or_else(|| miette!("Error when extracting point from level-curve."))?,
 			);
 			let min_angle_t2 = triangle_2.minimal_internal_angle();
 

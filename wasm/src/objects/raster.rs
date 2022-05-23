@@ -55,13 +55,10 @@ impl Raster {
 
 	/// # Instance Method
 	/// Get the pixels (x, y) for a given row and column.
-	/// 
+	///
 	/// What is meant by this: the raster has a certain pixel-width and pixel-height, as well as a number of
 	/// rows and columns. This function maps the row-column to pixel-positions.
 	pub fn get_pixel(&self, row: usize, col: usize) -> (f32, f32) {
-		(
-			(col as f32) * self.column_width,
-			(row as f32) * self.row_height
-		)
+		((col as f32) * self.column_width, (row as f32) * self.row_height)
 	}
 }
