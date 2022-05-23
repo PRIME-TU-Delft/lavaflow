@@ -39,7 +39,7 @@ pub struct Edge {
 ///
 /// # Return
 /// * `Result<(Vec<Point>, Vec<Face>), String>` - Result containing point list and face list.
-///
+#[allow(clippy::type_complexity)]
 pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &Raster, keep_heights: bool) -> Result<(Vec<Point>, Vec<Face>, Vec<Vec<usize>>), String> {
 	//transform raster to list of faces and vertices
 	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp, keep_heights);
@@ -62,11 +62,15 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &R
 	Ok((vs, fs, es))
 }
 
-//iterate over list of edges and transfrom into desired edge structure
+//iterate over list of edges and transfrom into edge map
+//edge[i] gives list of neighbor indexes of point at vertices[i]
 pub fn edge_list_to_map(es: &[Edge], len: usize) -> Result<Vec<Vec<usize>>, String> {
 	let mut edges: Vec<Vec<usize>> = vec![Vec::new(); len];
-	//todo bug catch edge[x]
 	for e in es {
+		if e.p1 >= len || e.p2 >= len {
+			return Err(String::from("catmull calark: edge_list_to_map ; point index exeds number of vertices"));
+		}
+		//add edges's end points as eachothers neighbors
 		edges[e.p1].push(e.p2);
 		edges[e.p2].push(e.p1);
 	}

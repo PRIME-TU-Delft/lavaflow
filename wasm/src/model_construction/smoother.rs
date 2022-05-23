@@ -56,6 +56,7 @@ impl<'a> Smoother<'a> {
         }
 
         // 1. Triangulate all the level-curves.
+        #[allow(clippy::type_complexity)]
         let mut triangles_per_level_curve: Vec<(usize, Vec<(&Point, &Point, &Point)>, bool, f32)> = Vec::new();
 
         // 1a. Find out which level-curve has the highest altitude
@@ -179,7 +180,7 @@ impl<'a> Smoother<'a> {
         Ok(Self {
             raster: model_constructor.raster,
             is_svc: &model_constructor.is_svc,
-            point_indices_per_layer: point_indices_per_layer,
+            point_indices_per_layer,
             layer_is_top,
             altitude_of_layer,
             altitude_groups,
@@ -258,25 +259,24 @@ impl<'a> Smoother<'a> {
             //      pw: The point at index i+1
 
             let mut pu_index: usize = i-1;
-            let pu: &Point;
+
 
             //  pv_index = i
             let pv: &Point = &level_curve.points[indices_in_polygon[i]];
 
             let mut pw_index: usize = i+1;
-            let pw: &Point;
 
             // if pv is the first point in the list, pu must be the last point in the list
             if i == 0 {
                 pu_index = indices_in_polygon.len()-1;
             }
-            pu = &level_curve.points[indices_in_polygon[pu_index]];
+            let pu: &Point = &level_curve.points[indices_in_polygon[pu_index]];
 
             // if pv is the last point in the list, pw must be the first point in the list
             if i == indices_in_polygon.len() - 1 {
                 pw_index = 0;
             }
-            pw = &level_curve.points[indices_in_polygon[pw_index]];
+            let pw: &Point = &level_curve.points[indices_in_polygon[pw_index]];
 
             // 1b.  Determine the angle at pv
             let pv_angle = Triangle::angle_at_pv(pu, pv, pw);

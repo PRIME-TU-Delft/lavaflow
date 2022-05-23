@@ -1,6 +1,5 @@
 use crate::objects::point::Point;
 
-
 /// Finds set of lava paths for a given model, from a specified starting point on the model.
 ///
 /// # Arguments
@@ -14,7 +13,7 @@ use crate::objects::point::Point;
 /// # Return
 /// *  `Result<Vec<Vec< &'a Point>>, String>` - Result of list of lava paths. A lava path is a list of
 ///
-pub fn get_lava_paths_super<'a>(highest_points: &[usize], length: usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Point>, es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Point>>, String> {
+pub fn get_lava_paths_super<'a>(highest_points: &[usize], length: usize, fork_val: f32, min_altitude: f32, vs: &'a [Point], es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Point>>, String> {
 	let mut paths = LavaPathSet { all_paths: Vec::new() };
 	let start_point = get_start(highest_points, vs, es)?;
 	paths.get_lava_path(start_point, length, fork_val, min_altitude, vs, es)?;
@@ -39,10 +38,10 @@ impl<'a> LavaPathSet<'a> {
 	/// # Return
 	/// *  `Result<Vec< &'a Point>, String>` - Result of list of points in lava path
 	///
-	fn get_lava_path(&mut self, start_index: usize, length: usize, fork_val: f32, min_altitude: f32, vs: &'a Vec<Point>, es: &'a Vec<Vec<usize>>) -> Result<(), String> {
+	fn get_lava_path(&mut self, start_index: usize, length: usize, fork_val: f32, min_altitude: f32, vs: &'a [Point], es: &'a Vec<Vec<usize>>) -> Result<(), String> {
 		let mut path = Vec::with_capacity(length);
 
-		let start_point = vs.get(start_index).ok_or(String::from("start point for lava does not exist in point list"))?;
+		let start_point = vs.get(start_index).ok_or_else(|| String::from("start point for lava does not exist in point list"))?;
 		path.push(start_point);
 
 		//index point pair of current point in parth
@@ -113,7 +112,7 @@ fn gradient_between_points(from: &Point, to: &Point) -> f32 {
 	//gradient = diff in z
 	//(from.z - to.z)
 	//gradient = z diff divided by length of edge
-	(from.z - to.z) / (sqr(from.x - to.x) + sqr(from.y - to.y) + sqr(from.z - to.z)).sqrt()
+	(from.z - to.z) / ((from.x - to.x).powf(2.0) + (from.y - to.y).powf(2.0) + (from.z - to.z).powf(2.0)).sqrt()
 }
 /// Given list of indexes (Desired is list of index of points that can be the top of the model), find the correct start point. The correct start point is the upper point of the steepest edge in the set of possible start points.
 ///
@@ -126,7 +125,7 @@ fn gradient_between_points(from: &Point, to: &Point) -> f32 {
 /// # Return
 /// *  `Result<usize>, String>` - Result of index of start point of lava path.
 ///
-fn get_start(highest_points: &[usize], vs: &[Point], es: &Vec<Vec<usize>>) -> Result<usize, String> {
+fn get_start(highest_points: &[usize], vs: &[Point], es: &[Vec<usize>]) -> Result<usize, String> {
 	if highest_points.is_empty() {
 		return Err(String::from("lava path: cannot find highest point because no points exist above top contour line."));
 	}
@@ -152,8 +151,4 @@ fn get_start(highest_points: &[usize], vs: &[Point], es: &Vec<Vec<usize>>) -> Re
 	}
 
 	Ok(store.0)
-}
-
-fn sqr(a: f32) -> f32 {
-	a * a
 }

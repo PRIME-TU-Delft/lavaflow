@@ -62,6 +62,7 @@ impl ModelGenerationSettings {
 /// Supermethod that takes in an openCV tree and outputs an GTLF model.
 /// - `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
 #[wasm_bindgen]
+#[allow(clippy::too_many_arguments)] //todo : REMOVE
 pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, smoothing_repetitions: usize, strength_positive: f32, strength_negative: f32, coverage: usize, svc_weight: usize, rows: usize, columns: usize, contour_margin: f32, border : f32, path_length : usize , fork_val : f32 , subdivisions : usize) -> Result<String, JsValue> {
 
 	// log!("The provided open_cv_tree: {:?}", open_cv_tree);
@@ -196,7 +197,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
 	smoother.increase_altitude_for_mountain_tops(2.0, false).map_err(|e| e.to_string())?;
 	smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, true).map_err(|e| e.to_string())?;
-	smoother.apply_smooth_to_all(0.3, 5, 5, true);
+	smoother.apply_smooth_to_all(0.3, 5, 5, true).map_err(|e| e.to_string())?;
 
 	//apply surface subdivision
 	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions, &model_constructor.is_svc, model_constructor.raster, false).expect("catumull broke");
