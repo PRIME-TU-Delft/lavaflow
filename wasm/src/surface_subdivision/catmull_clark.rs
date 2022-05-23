@@ -94,6 +94,7 @@ pub fn edge_list_to_map(es: &[Edge], len: usize) -> Result<Vec<Vec<usize>>, Stri
 ///
 ///
 ///
+#[allow(clippy::unwrap_used)]
 fn raster_to_faces(raster: &Raster, _is_sharp: &[Vec<bool>], _keep_heights: bool) -> (Vec<Point>, Vec<Face>) {
 	let mut vs = Vec::new();
 	let mut fs = Vec::new();
@@ -143,6 +144,7 @@ fn raster_to_faces(raster: &Raster, _is_sharp: &[Vec<bool>], _keep_heights: bool
 			//(0,0)
 			if vs.contains(&a) {
 				//if point already in list store its index
+				#[allow(clippy::unwrap_used)] // because vs is checked to contain a
 				ps.push(vs.iter().position(|x| x == &a).unwrap());
 			} else {
 				ps.push(next_index);
@@ -153,6 +155,7 @@ fn raster_to_faces(raster: &Raster, _is_sharp: &[Vec<bool>], _keep_heights: bool
 			//(0,1)
 			if vs.contains(&b) {
 				//if point already in list store index to it
+				#[allow(clippy::unwrap_used)] // because vs is checked to contain b
 				ps.push(vs.iter().position(|x| x == &b).unwrap());
 			} else {
 				ps.push(next_index);
@@ -162,6 +165,7 @@ fn raster_to_faces(raster: &Raster, _is_sharp: &[Vec<bool>], _keep_heights: bool
 			//(1,1)
 			if vs.contains(&d) {
 				//if point already in list store index to it
+				#[allow(clippy::unwrap_used)] // because vs is checked to contain d
 				ps.push(vs.iter().position(|x| x == &d).unwrap());
 			} else {
 				ps.push(next_index);
@@ -171,6 +175,7 @@ fn raster_to_faces(raster: &Raster, _is_sharp: &[Vec<bool>], _keep_heights: bool
 			//(0 , 1)
 			if vs.contains(&c) {
 				//if point already in list store index to it
+				#[allow(clippy::unwrap_used)] // because vs is checked to contain c
 				ps.push(vs.iter().position(|x| x == &c).unwrap());
 			} else {
 				ps.push(next_index);

@@ -200,7 +200,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	smoother.apply_smooth_to_all(0.3, 5, 5, true).map_err(|e| e.to_string())?;
 
 	//apply surface subdivision
-	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions, &model_constructor.is_svc, model_constructor.raster, false).expect("catumull broke");
+	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions, &model_constructor.is_svc, model_constructor.raster, false)?;
 
 	//for lava path generation : find point index of the highest point in the model
 
