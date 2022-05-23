@@ -1,5 +1,6 @@
 mod lava_path_finder;
 mod model_construction;
+mod surface_subdivision;
 mod utils;
 
 use wasm_bindgen::prelude::*;

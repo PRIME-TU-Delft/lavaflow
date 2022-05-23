@@ -1,6 +1,8 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::model_construction::catmull_clark::Vertex;
+use crate::surface_subdivision::catmull_clark::Vertex;
+
+
 
 /// Finds set of lava paths for a given model, from a specified starting vertex on the model.
 ///
