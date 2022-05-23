@@ -1,5 +1,5 @@
-use wasm_bindgen::prelude::wasm_bindgen;
 use crate::objects::point::Point;
+
 
 /// Finds set of lava paths for a given model, from a specified starting point on the model.
 ///
@@ -47,7 +47,7 @@ impl<'a> LavaPathSet<'a> {
 		//index point pair of current point in parth
 		let mut cur = (start_index, vs.get(start_index).ok_or(String::from("start point for lava does not exist in point list"))?);
 
-		while (path.len() < length) {
+		while path.len() < length {
 			//get neighbors
 			//neighbor is (index, Point)
 			let mut neighbors: Vec<(usize, &Point)> = Vec::new();
@@ -76,7 +76,7 @@ impl<'a> LavaPathSet<'a> {
 			}
 
 			//break loop if next point has low altitude (avoid path going to edge of map)
-			if (max.1.z <= min_altitude) {
+			if max.1.z <= min_altitude {
 				break;
 			}
 			//add steepest neighbor to path

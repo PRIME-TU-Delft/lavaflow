@@ -1,4 +1,3 @@
-
 /// # Struct: Point
 /// This struct is used in many places where coordinates (x, y, z) should be connected.
 /// It provides functionality for computing the distance between two points, also isolated on (x,y) dimensions.

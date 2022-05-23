@@ -1,8 +1,7 @@
-use std::{ collections::HashMap, usize};
+use std::{collections::HashMap, usize};
 
-use crate::objects::raster::Raster;
 use crate::objects::point::Point;
-
+use crate::objects::raster::Raster;
 
 /// a face is a square of references to points
 /// should only ever have 4 points
@@ -53,19 +52,19 @@ pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &R
 	if vs.is_empty() {
 		return Err(String::from("surface subdivision returns empty point list"));
 	}
-	if fs.is_empty()  {
+	if fs.is_empty() {
 		return Err(String::from("surface subdivision returns empty face list"));
 	}
 
 	//es : index in edge map = index in vertices, so for each position the list of indeces of its neighbors
-	let es = edge_list_to_map( &get_edges_faces(&vs, &fs, true)? , vs.len())?;
+	let es = edge_list_to_map(&get_edges_faces(&vs, &fs, true)?, vs.len())?;
 
-	Ok((vs, fs , es))
+	Ok((vs, fs, es))
 }
 
 //iterate over list of edges and transfrom into desired edge structure
-pub fn edge_list_to_map(es : &[Edge], len: usize) -> Result<Vec<Vec<usize>>, String> {
-	let mut edges :Vec<Vec<usize>> = vec![Vec::new(); len];
+pub fn edge_list_to_map(es: &[Edge], len: usize) -> Result<Vec<Vec<usize>>, String> {
+	let mut edges: Vec<Vec<usize>> = vec![Vec::new(); len];
 	//todo bug catch edge[x]
 	for e in es {
 		edges[e.p1].push(e.p2);
@@ -91,7 +90,7 @@ pub fn edge_list_to_map(es : &[Edge], len: usize) -> Result<Vec<Vec<usize>>, Str
 ///
 ///
 ///
-fn raster_to_faces(raster: &Raster, is_sharp: &[Vec<bool>], keep_heights: bool) -> (Vec<Point>, Vec<Face>) {
+fn raster_to_faces(raster: &Raster, _is_sharp: &[Vec<bool>], _keep_heights: bool) -> (Vec<Point>, Vec<Face>) {
 	let mut vs = Vec::new();
 	let mut fs = Vec::new();
 
@@ -206,7 +205,7 @@ fn catmull_clark(fs: &[Face], vs: &[Point]) -> Result<(Vec<Point>, Vec<Face>), S
 	let edges = get_edges_faces(vs, fs, false)?;
 
 	// per edge get an edge point, = (average of face points + edge center)/2
-	let edge_points = get_edge_points( &edges, &face_points)?;
+	let edge_points = get_edge_points(&edges, &face_points)?;
 
 	// per original point: find the average of the face points of the faces the point belongs to
 	let avg_face_points = get_average_face_points(vs, fs, &face_points)?;
@@ -238,7 +237,7 @@ fn catmull_clark(fs: &[Face], vs: &[Point]) -> Result<(Vec<Point>, Vec<Face>), S
 	}
 
 	// add edge points to new_points, using hash so you can find index of edge point per edge
-	// per edge new entry in hashmap ; ((from_i, to_j), index edge point) 
+	// per edge new entry in hashmap ; ((from_i, to_j), index edge point)
 	let mut edge_index_map: HashMap<(usize, usize), usize> = HashMap::with_capacity(edges.len());
 
 	for (i, edge) in edges.iter().enumerate() {
@@ -287,7 +286,7 @@ fn catmull_clark(fs: &[Face], vs: &[Point]) -> Result<(Vec<Point>, Vec<Face>), S
 		}
 	}
 
-	Ok((new_points, new_faces ))
+	Ok((new_points, new_faces))
 }
 
 ///
@@ -314,11 +313,7 @@ fn add(p1: &Point, p2: &Point) -> Point {
 
 fn average_of_points(xs: &Vec<Point>) -> Point {
 	let n = xs.len() as f32;
-	let mut agr = Point {
-		x: 0.0,
-		y: 0.0,
-		z: 0.0,
-	};
+	let mut agr = Point { x: 0.0, y: 0.0, z: 0.0 };
 	for x in xs {
 		agr = add(&agr, x);
 	}
@@ -353,11 +348,7 @@ fn get_face_points(v: &[Point], f: &[Face]) -> Result<Vec<Point>, String> {
 			y += curr_point.y;
 			z += curr_point.z;
 		}
-		face_points.push(Point {
-			x: x / 4.0,
-			y: y / 4.0,
-			z: z / 4.0,
-		});
+		face_points.push(Point { x: x / 4.0, y: y / 4.0, z: z / 4.0 });
 	}
 	if f.len() != face_points.len() {
 		return Err(String::from("number face points generated does not match number of faces"));
@@ -368,7 +359,7 @@ fn get_face_points(v: &[Point], f: &[Face]) -> Result<Vec<Point>, String> {
 
 //gets all edges between points represented as : incedent points, adjacent faces, and center of edge
 // argument get_diagnoal_edges : if true also returns diagonals over a face : SET TO FALSE IN SUBDIVISION PROCESS
-fn get_edges_faces(vs: &[Point], fs: &[Face], get_diagonal_edges : bool) -> Result<Vec<Edge>, String> {
+fn get_edges_faces(vs: &[Point], fs: &[Face], get_diagonal_edges: bool) -> Result<Vec<Edge>, String> {
 	let mut edges: Vec<Edge> = Vec::new();
 
 	// get edges from each face
@@ -381,7 +372,14 @@ fn get_edges_faces(vs: &[Point], fs: &[Face], get_diagonal_edges : bool) -> Resu
 		// hardcoded tuples of points that make a face's edges
 		// if diagonals are to be included: add (1, 3) and (2,0) to hardcoded edges
 		let es = if get_diagonal_edges {
-			vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0]), (f.points[0], f.points[2]), (f.points[1], f.points[3])]
+			vec![
+				(f.points[0], f.points[1]),
+				(f.points[1], f.points[2]),
+				(f.points[2], f.points[3]),
+				(f.points[3], f.points[0]),
+				(f.points[0], f.points[2]),
+				(f.points[1], f.points[3]),
+			]
 		} else {
 			vec![(f.points[0], f.points[1]), (f.points[1], f.points[2]), (f.points[2], f.points[3]), (f.points[3], f.points[0])]
 		};
@@ -478,7 +476,7 @@ fn get_edge_points(edges: &[Edge], face_points: &[Point]) -> Result<Vec<Point>, 
 			x: (af.x + me.x) / 3.0,
 			y: (af.y + me.y) / 3.0,
 			//if sharp, z less impacted
-			z: (af.z + me.z) / 3.0 ,
+			z: (af.z + me.z) / 3.0,
 			//if ME is sharp, so is corresponding edge point.
 		});
 	}
@@ -565,11 +563,7 @@ fn get_new_points(vs: &[Point], f_per_v: &[usize], avg_face_points: &[Point], av
 
 		let z = ((v.z * (n - 3.0)) + (2.0 * r.z) + f.z) / n;
 
-		new_vertices.push(Point {
-			x,
-			y,
-			z,
-		})
+		new_vertices.push(Point { x, y, z })
 	}
 
 	Ok(new_vertices)

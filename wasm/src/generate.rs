@@ -1,6 +1,6 @@
 use crate::gltf_conversion::generate_gltf;
 use crate::objects::level_curves::{LevelCurve, LevelCurveSet};
-use crate::objects::{raster::Raster, point::Point};
+use crate::objects::{point::Point, raster::Raster};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
@@ -182,7 +182,7 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	level_curve_map.align_with_origin(&min, border_x, border_y);
 
 	//create raster based on level curve model and desired rows and columns
-	let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0) , (max.y - min.y) + (border_y* 2.0), rows, columns);
+	let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0), (max.y - min.y) + (border_y * 2.0), rows, columns);
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
 	let mut model_constructor = crate::model_construction::constructor::ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
@@ -194,13 +194,12 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	let mut smoother = crate::model_construction::smoother::Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
-	smoother.increase_altitude_for_mountain_tops(2.0,false).map_err(|e| e.to_string())?;
+	smoother.increase_altitude_for_mountain_tops(2.0, false).map_err(|e| e.to_string())?;
 	smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, true).map_err(|e| e.to_string())?;
-	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
-
+	smoother.apply_smooth_to_all(0.3, 5, 5, true);
 
 	//apply surface subdivision
-	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
+	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions, &model_constructor.is_svc, model_constructor.raster, false).expect("catumull broke");
 
 	//for lava path generation : find point index of the highest point in the model
 
@@ -213,20 +212,19 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//top_height -= level_curve_map.altitude_step;
 
 	//for lava path generation : get list of indexes of points above or on highest level curve
-	let mut  highest_points = Vec::new();
-	for (i, v ) in vs.iter().enumerate() {
+	let mut highest_points = Vec::new();
+	for (i, v) in vs.iter().enumerate() {
 		if v.z >= top_height {
 			highest_points.push(i);
 		}
 	}
 
 	//find lava path from the highest point of the model
-		//min alt determines at which alitude a lava path stops
+	//min alt determines at which alitude a lava path stops
 	let min_altitude = level_curve_map.altitude_step / 2.0;
-		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-	let lava_paths : Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, path_length, fork_val , min_altitude, &vs, &edge_map)?;
-
+	//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
+	// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+	let _lava_paths: Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, path_length, fork_val, min_altitude, &vs, &edge_map)?;
 
 	//Turn faces of model into triangles
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
