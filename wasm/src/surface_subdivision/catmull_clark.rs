@@ -1,6 +1,7 @@
 use std::{ collections::HashMap, usize};
 
-use crate::model_construction::raster::Raster;
+use crate::objects::raster::Raster;
+
 
 /// a face is a square of references to points
 /// should only ever have 4 points

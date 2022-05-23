@@ -1,6 +1,4 @@
-use super::level_curves::{LevelCurve, LevelCurveSet};
-use super::point::Point;
-use super::triangle::Triangle;
+use crate::objects::{point::Point, triangle::Triangle, level_curves::LevelCurveSet, level_curves::LevelCurve};
 use miette::{Result, miette};
 
 // pub struct LevelCurveSet {

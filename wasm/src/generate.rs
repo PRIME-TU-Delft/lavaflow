@@ -1,6 +1,6 @@
 use crate::lava_path_finder::lava_path::get_lava_paths_super;
 use crate::surface_subdivision::catmull_clark::{catmull_clark_super, Vertex};
-use crate::utils::log;
+use crate::objects::{raster::Raster, point::Point};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
@@ -9,8 +9,6 @@ use wasm_bindgen::JsValue;
 use super::constructor::ModelConstructor;
 use super::gltf_conversion::generate_gltf;
 use super::level_curves::{LevelCurve, LevelCurveSet};
-use super::point::Point;
-use super::raster::Raster;
 
 use super::smoother::Smoother;
 

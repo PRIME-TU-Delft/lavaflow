@@ -1,8 +1,7 @@
+use crate::objects::{raster::Raster, point::Point, triangle::Triangle};
+
 use super::constructor::ModelConstructor;
-use super::raster::Raster;
-use super::level_curves::LevelCurve;
-use super::point::Point;
-use super::triangle::Triangle;
+
 use miette::{Result, miette};
 
 
@@ -223,7 +222,7 @@ impl<'a> Smoother<'a> {
     /// 
     /// ### Returns:
     /// - A triple of `Point`s, representing a triangle
-    pub fn triangulate_level_curve(level_curve: &LevelCurve) -> Result<Vec<(&Point, &Point, &Point)>> {
+    pub fn triangulate_level_curve(level_curve: &crate::objects::level_curves::LevelCurve) -> Result<Vec<(&Point, &Point, &Point)>> {
 
         // Prebase: If this level-curve contains less than three points, throw an exception
         if level_curve.points.len() < 3 {

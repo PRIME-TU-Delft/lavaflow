@@ -6,7 +6,7 @@ use miette::{miette, Result};
 // Class: LevelCurves
 //
 use super::level_curve_tree::LevelCurveTree;
-use super::point::Point;
+use crate::objects::point::Point;
 
 #[derive(Debug)]
 pub struct LevelCurve {
