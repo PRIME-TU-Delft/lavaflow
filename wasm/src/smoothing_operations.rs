@@ -1,20 +1,17 @@
+
+use miette::Result;
+
+//use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::model_construction::smoother::Smoother;
-use miette::{Result};
+use crate::api::SmoothingOperation;
+use smoothing_operation_derive::SmoothingOperation;
 
-trait SmoothingOperation {
-    fn apply(&self, smoother: &mut Smoother) -> Result<()>;
-}
-
-struct SmoothingOperationApplySmoothToLayer {
-    layer: usize,
-    strength: f32,
-    coverage: usize,
-    svc_weight: usize,
-    allow_svc_change: bool
-}
-
-impl SmoothingOperation for SmoothingOperationApplySmoothToLayer {
-    fn apply(&self, smoother: &mut Smoother) -> Result<()> {
-        smoother.apply_smooth_to_layer(self.layer, self.strength, self.coverage, self.svc_weight, self.allow_svc_change)
-    }
+#[derive(SmoothingOperation)]
+pub struct SmoothingOperationApplySmoothToLayer {
+    pub layer: usize,
+    pub strength: f32,
+    pub coverage: usize,
+    pub svc_weight: usize,
+    pub allow_svc_change: bool
 }
