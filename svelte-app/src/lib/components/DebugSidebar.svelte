@@ -60,22 +60,35 @@
 	};
 
 	let smoothLayers: SmoothParameters[] = hc_smooth_parameters;
-	function sortSmoothLayers(ev: any) {
+
+	/**
+	 * Sort the smooth parameters when dragging one over another
+	 * @param ev - Custom event with a list new SmoothParameters ordered by new index
+	 */
+	function sortSmoothLayers(ev: CustomEvent<SmoothParameters[]>) {
 		smoothLayers = ev.detail;
 	}
 
+	/**
+	 * Open the create parameter modal to add a new smooth parameter
+	 */
 	function openCreateModal() {
 		newSmoothParameterType = hc_smooth_parameter_types[0];
 		newSmoothModalOpen = true;
-		// TODO
 	}
 
+	/**
+	 * Add new parameters to list of other paremeters. then Close the create parameter modal and reset it.
+	 */
 	function addParameters() {
 		smoothLayers = [...smoothLayers, smoothParametersOpen];
 		newSmoothModalOpen = false;
 		newSmoothParameterType = hc_smooth_parameter_types[0];
 	}
 
+	/**
+	 * Remove a parameter from the list of parameters
+	 */
 	function removeParameter() {
 		smoothLayers = smoothLayers.filter((_, i) => i !== indexEditing);
 		editSmoothModalOpen = false;
@@ -93,27 +106,42 @@
 		console.log(smoothParametersOpen);
 	}
 
+	/**
+	 * Open the edit parameter modal to edit a smooth parameter
+	 * @param smoothLayer
+	 * @param index
+	 */
 	function openEditModalWith(smoothLayer: SmoothParameters, index: number) {
 		indexEditing = index;
 		editSmoothModalOpen = true;
 		smoothParametersOpen = smoothLayer;
 	}
 
+	/**
+	 * Set a certain value of a smooth parameter
+	 */
 	function setParameter(key: string, value: any) {
 		smoothParametersOpen.setValue(key, value);
-
-		smoothParametersOpen = smoothParametersOpen.clone();
 	}
 
+	/**
+	 * Extends the function above with for a boolean value
+	 */
 	function toggleBooleanParameter(key: string) {
-		smoothParametersOpen.setValue(key, !smoothParametersOpen.getValue(key));
+		setParameter(key, !smoothParametersOpen.getValue(key));
 	}
 
+	/**
+	 * Set the smooth parameter for a certain smooth layer index
+	 */
 	function editParametersForIndex() {
 		smoothLayers[indexEditing] = smoothParametersOpen;
 		editSmoothModalOpen = false;
 	}
 
+	/**
+	 * Helper function to set the type of Object.entries
+	 */
 	function objToArr(obj: Options<GeneralSettings>) {
 		return Object.entries(obj) as Entries<Options<GeneralSettings>>;
 	}

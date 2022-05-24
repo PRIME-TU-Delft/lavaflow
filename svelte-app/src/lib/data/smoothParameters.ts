@@ -82,20 +82,6 @@ export class SmoothParameters {
 				.join(', ')
 		);
 	}
-
-	clone() {
-		return new SmoothParameters(
-			this.name,
-			this.layer,
-			this.strength,
-			this.coverage,
-			this.svc_weight,
-			this.allow_svc_change,
-			this.altitude,
-			this.altitude_group,
-			this.percentage_of_altitude_step
-		);
-	}
 }
 
 export class ApplySmoothToLayer extends SmoothParameters {
