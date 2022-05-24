@@ -1,33 +1,21 @@
 import type { Option, OptionObj } from '$lib/types/OptionSettings';
+import { type SmoothParameters, ApplySmoothToLayer } from './smoothParameters';
 
 export let hc_parent_relations = [-1, 0, 1, 2, 3];
 
-export type SettingsOptionNames =
-	| 'contour_margin'
-	| 'columns'
-	| 'rows'
-	| 'altitude_step'
-	| 'desired_dist';
-export let initSettingsOptions = (): Option<SettingsOptionNames>[] => [
-	{ name: 'contour_margin', value: 5, description: 'TODO' },
-	{ name: 'columns', value: 50, description: 'Amount of columns in grid' },
-	{ name: 'rows', value: 50, description: 'Amount of rows in grid' },
-	{ name: 'altitude_step', value: 50, description: 'fixed increase in height per level curve' },
-	{ name: 'desired_dist', value: 1.0, description: 'TODO' }
+export let hc_smooth_parameters: SmoothParameters[] = [
+	new ApplySmoothToLayer(0, 0.5, 0.5, 0.5, true),
+	new ApplySmoothToLayer(1, 0.5, 0.5, 0.5, true)
 ];
 
-export type SmoothOptionNames =
-	| 'repetitions'
-	| 'strength_positive'
-	| 'strength_negative'
-	| 'coverage'
-	| 'svc_weight';
-export let initSmoothOptions = (): Option<SmoothOptionNames>[] => [
-	{ name: 'repetitions', value: 2, description: 'TODO' },
-	{ name: 'strength_positive', value: 0.7, description: 'TODO' },
-	{ name: 'strength_negative', value: 0.7, description: 'TODO' },
-	{ name: 'coverage', value: 4, description: 'TODO' },
-	{ name: 'svc_weight', value: 1.0, description: 'TODO' }
+export let hc_smooth_parameter_types = [
+	'None',
+	'ApplySmoothToLayer',
+	'SetAltitudeForLayer',
+	'ApplySmoothToAltitudeGroup',
+	'IncreaseAltitudeForAltitudeGroup',
+	'ApplySmoothToMiddleLayers',
+	'ApplySmoothToMountainTop'
 ];
 
 export function convertToObject<N extends string>(arr: Option<N>[]): OptionObj<N> {

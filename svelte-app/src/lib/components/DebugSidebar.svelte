@@ -1,20 +1,30 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import type { Options } from '$lib/types/Options';
-	import Input from '$lib/components/Input.svelte';
+	import EmitInput from '$lib/components/EmitInput.svelte';
+	import Range from '$lib/components/Range.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 
-	let sidebarOpen = true;
+	import type { Options, Entries } from '$lib/types/Options';
+	import { hc_smooth_parameters, hc_smooth_parameter_types } from '$lib/data/hardCoded';
+	import { SmoothParameters } from '$lib/data/smoothParameters';
+	import Dropdown from './Dropdown.svelte';
 
 	interface GeneralSettings {
 		rows: number;
 		columns: number;
 		border_size: number;
 		svc_distance: number;
-		smoothing_settings: Object[]; // update type
 		catmull_clark_iterations: number;
 	}
 
-	let generalSettingsOptions: Partial<Options<GeneralSettings>> = {
+	let sidebarOpen = true;
+	let newSmoothModalOpen = false;
+	let newSmoothParameterType: string = hc_smooth_parameter_types[0];
+	let editSmoothModalOpen = false;
+	let smoothParametersOpen: SmoothParameters;
+	let indexEditing: number;
+
+	let generalSettingsOptions: Options<GeneralSettings> = {
 		rows: {
 			default: 5,
 			from: 1,
@@ -39,15 +49,64 @@
 			to: 10,
 			step: 1
 		},
-		smoothing_settings: {
-			default: [],
-			from: [],
-			to: [],
+		catmull_clark_iterations: {
+			default: 5,
+			from: 1,
+			to: 10,
 			step: 1
 		}
 	};
 
-	console.log(generalSettingsOptions);
+	let smoothLayers: SmoothParameters[] = hc_smooth_parameters;
+
+	function openCreateModal() {
+		newSmoothParameterType = hc_smooth_parameter_types[0];
+		newSmoothModalOpen = true;
+		// TODO
+	}
+
+	function addParameters() {
+		smoothLayers = [...smoothLayers, smoothParametersOpen];
+		newSmoothModalOpen = false;
+		newSmoothParameterType = hc_smooth_parameter_types[0];
+	}
+
+	/**
+	 * Initialize the new smooth parameters
+	 */
+	function setNewParametersForType() {
+		// If the `newSmoothParameterType` is not set
+		if (newSmoothParameterType == hc_smooth_parameter_types[0]) return;
+
+		smoothParametersOpen = SmoothParameters.create(newSmoothParameterType);
+
+		console.log(smoothParametersOpen);
+	}
+
+	function openEditModalWith(smoothLayer: SmoothParameters, index: number) {
+		indexEditing = index;
+		editSmoothModalOpen = true;
+		smoothParametersOpen = smoothLayer;
+	}
+
+	function setParameter(key: string, value: any) {
+		smoothParametersOpen.setValue(key, value);
+
+		smoothParametersOpen = smoothParametersOpen.clone();
+	}
+
+	function toggleBooleanParameter(key: string) {
+		smoothParametersOpen.setValue(key, !smoothParametersOpen.getValue(key));
+	}
+
+	function editParametersForIndex() {
+		smoothLayers[indexEditing] = smoothParametersOpen;
+		editSmoothModalOpen = false;
+	}
+
+	function objToArr(obj: Options<GeneralSettings>) {
+		return Object.entries(obj) as Entries<Options<GeneralSettings>>;
+	}
 </script>
 
 {#if !sidebarOpen}
@@ -60,11 +119,64 @@
 	<Button secondary on:click={() => (sidebarOpen = !sidebarOpen)}>Close sidebar</Button>
 
 	<h3>General Settings</h3>
-	{#each Object.entries(generalSettingsOptions) as [key, option]}
-		<Input label={key} bind:value={generalSettingsOptions[key].default} />
-		({key}, {option.default}, [{option.from}, {option.to}])
+	{#each objToArr(generalSettingsOptions) as [key, option]}
+		{#if 'from' in option}
+			<Range
+				label={key}
+				from={option.from}
+				to={option.to}
+				step={option.step}
+				bind:value={generalSettingsOptions[key].default}
+			/>
+		{:else}
+			test: {key} {option}
+		{/if}
 	{/each}
+
+	{#each smoothLayers as smoothLayer, index}
+		<Button on:click={() => openEditModalWith(smoothLayer, index)}>
+			{smoothLayer.toString()}
+		</Button>
+	{/each}
+
+	<Button secondary on:click={openCreateModal}>New smooth layer</Button>
+
+	<Button secondary on:click={() => console.log('Regenerate model')}>Regenerate model</Button>
 </aside>
+
+<!-- EDIT SMOOTH ITEM-->
+<Modal bind:visible={editSmoothModalOpen}>
+	{#each smoothParametersOpen.toArray() as [key, value]}
+		{#if typeof value == 'number'}
+			<EmitInput label={key} {value} on:input={(e) => setParameter(key, e.detail.value)} />
+		{:else if typeof value == 'boolean'}
+			<Dropdown options={[true, false]} {value} on:change={() => toggleBooleanParameter(key)} />
+		{/if}
+	{/each}
+
+	<Button on:click={editParametersForIndex}>Set parameters</Button>
+</Modal>
+
+<!-- CREATE NEW SMOOTH ITEM -->
+<Modal bind:visible={newSmoothModalOpen}>
+	<Dropdown
+		options={hc_smooth_parameter_types}
+		bind:value={newSmoothParameterType}
+		on:change={setNewParametersForType}
+	/>
+
+	{#if newSmoothParameterType != 'None' && smoothParametersOpen?.toArray()}
+		{#each smoothParametersOpen.toArray() as [key, value]}
+			{#if typeof value == 'number'}
+				<EmitInput label={key} {value} on:input={(e) => setParameter(key, e.detail.value)} />
+
+				<!-- TODO add boolean -->
+			{/if}
+		{/each}
+
+		<Button on:click={addParameters}>Set parameters</Button>
+	{/if}
+</Modal>
 
 <style lang="scss">
 	.openSidebar {
