@@ -29,13 +29,11 @@ fn impl_smoothing_operation(ast: &syn::DeriveInput) -> TokenStream {
 	// Extract the name of the struct
 	let name = &ast.ident;
 
-	// Turn this identifier into a string
-	let mut function_name_str = name.to_string();
-
 	// Turn the name into the right function-call towards the smoother,
 	// by removing prefix 'SmoothingOperation' and transforming the name from camel-case to snake-case.
-	function_name_str = function_name_str.replace("SmoothingOperation", "");
-	function_name_str = function_name_str.to_case(Case::Snake);
+	let function_name_str = name.to_string()
+		.replace("SmoothingOperation", "")
+		.to_case(Case::Snake);
 
 	// Convert this new name into an identity-format
 	let function_name_ident = Ident::new(&function_name_str, name.span());
