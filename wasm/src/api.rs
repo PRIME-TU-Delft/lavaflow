@@ -3,11 +3,16 @@ use wasm_bindgen::prelude::wasm_bindgen;
 // use wasm_bindgen::JsValue;
 
 // Imports for miette
-
+use miette::Result;
 
 // Internal imports
+use crate::model_construction::smoother::Smoother;
 
 
+// Create a trait that will be used for the procedural macro 'SmoothingOperation'
+pub trait SmoothingOperation {
+	fn apply(&self, smoother: &mut Smoother) -> Result<()>;
+}
 
 #[wasm_bindgen]
 pub struct ModelConstructionApi {
@@ -19,6 +24,13 @@ pub struct ModelConstructionApi {
     pub catmull_clark_iterations: usize,
 
     // Private properties
+}
+
+// Implement the 'Default' trait for ModelConstructionApi
+impl Default for ModelConstructionApi {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[wasm_bindgen]
