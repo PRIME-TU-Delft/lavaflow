@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script> -->
+		<!-- <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script> -->
+
+		<style>
+			body {
+				background: #1a1717;
+				color: white;
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
+					Cantarell, 'Helvetica Neue', sans-serif;
+			}
+
+			:root {
+				--primary-color: rgb(225 95 85 / 90%);
+				--secondary-color: rgb(144 53 44 / 90%);
+				--text-color: rgba(94, 14, 14, 100%);
+				--text-color-secondary: rgb(230 223 223);
+			}
+		</style>
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', window.innerHeight + 'px');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+		<meta http-equiv="content-security-policy" content="">
+	<link rel="modulepreload" href="/_app/start-ee3ad715.js">
+	<link rel="modulepreload" href="/_app/chunks/index-cd071420.js">
+	<link rel="modulepreload" href="/_app/chunks/singletons-5be3e935.js">
+	<link rel="modulepreload" href="/_app/chunks/preload-helper-e4860ae8.js">
+	</head>
+	<body>
+		<!-- TODO: test demo route with <div> encasulated here -->
+		
+		<script type="module" data-hydrate="45h">
+		import { start } from "/_app/start-ee3ad715.js";
+		start({
+			target: document.querySelector('[data-hydrate="45h"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: true,
+			trailing_slash: "never",
+			hydrate: null
+		});
+	</script>
+	</body>
+</html>

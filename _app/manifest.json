@@ -1,0 +1,193 @@
+{
+  ".svelte-kit/runtime/client/start.js": {
+    "file": "start-ee3ad715.js",
+    "src": ".svelte-kit/runtime/client/start.js",
+    "isEntry": true,
+    "imports": [
+      "_index-cd071420.js",
+      "_singletons-5be3e935.js",
+      "_preload-helper-e4860ae8.js"
+    ],
+    "dynamicImports": [
+      "src/routes/__layout.svelte",
+      ".svelte-kit/runtime/components/error.svelte",
+      "src/routes/demo.svelte",
+      "src/routes/index.svelte",
+      "src/routes/scan/mapscanning.svelte",
+      "src/routes/scan/maptransform.svelte",
+      "src/routes/scan/preview.svelte",
+      "src/routes/visualize.svelte"
+    ]
+  },
+  "src/routes/__layout.svelte": {
+    "file": "pages/__layout.svelte-69c9620f.js",
+    "src": "src/routes/__layout.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js"
+    ],
+    "css": [
+      "assets/pages/__layout.svelte-773bbc69.css"
+    ]
+  },
+  ".svelte-kit/runtime/components/error.svelte": {
+    "file": "error.svelte-04b3b49f.js",
+    "src": ".svelte-kit/runtime/components/error.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js"
+    ]
+  },
+  "src/routes/demo.svelte": {
+    "file": "pages/demo.svelte-77e4f966.js",
+    "src": "src/routes/demo.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js",
+      "_NavigationButton-1ab31783.js",
+      "_three.module-c1f40604.js",
+      "_mdi-ff5aee52.js"
+    ],
+    "css": [
+      "assets/pages/demo.svelte-c593fcfb.css"
+    ]
+  },
+  "src/routes/index.svelte": {
+    "file": "pages/index.svelte-06fa303a.js",
+    "src": "src/routes/index.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js",
+      "_NavigationButton-1ab31783.js",
+      "_mdi-ff5aee52.js"
+    ],
+    "css": [
+      "assets/pages/index.svelte-1a548119.css"
+    ]
+  },
+  "src/routes/scan/mapscanning.svelte": {
+    "file": "pages/scan/mapscanning.svelte-170eacd9.js",
+    "src": "src/routes/scan/mapscanning.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js",
+      "_mdi-ff5aee52.js",
+      "_imageStore-78473fa9.js",
+      "_singletons-5be3e935.js"
+    ],
+    "css": [
+      "assets/pages/scan/mapscanning.svelte-d80a7fd1.css"
+    ]
+  },
+  "src/routes/scan/maptransform.svelte": {
+    "file": "pages/scan/maptransform.svelte-6b963d19.js",
+    "src": "src/routes/scan/maptransform.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js",
+      "_mdi-ff5aee52.js",
+      "_imageStore-78473fa9.js",
+      "_NavigationButton-1ab31783.js",
+      "__commonjsHelpers-56d41998.js",
+      "_preload-helper-e4860ae8.js",
+      "_singletons-5be3e935.js"
+    ],
+    "dynamicImports": [
+      "_p5.min-0883924f.js"
+    ],
+    "css": [
+      "assets/pages/scan/maptransform.svelte-25c5ed0a.css"
+    ]
+  },
+  "src/routes/scan/preview.svelte": {
+    "file": "pages/scan/preview.svelte-088d7b4c.js",
+    "src": "src/routes/scan/preview.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js",
+      "_mdi-ff5aee52.js",
+      "_imageStore-78473fa9.js",
+      "_NavigationButton-1ab31783.js",
+      "_singletons-5be3e935.js"
+    ],
+    "css": [
+      "assets/pages/scan/preview.svelte-0e1d3943.css"
+    ]
+  },
+  "src/routes/visualize.svelte": {
+    "file": "pages/visualize.svelte-915792ac.js",
+    "src": "src/routes/visualize.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-cd071420.js",
+      "_three.module-c1f40604.js",
+      "__commonjsHelpers-56d41998.js"
+    ],
+    "css": [
+      "assets/pages/visualize.svelte-533c7dfa.css"
+    ]
+  },
+  "_index-cd071420.js": {
+    "file": "chunks/index-cd071420.js"
+  },
+  "_singletons-5be3e935.js": {
+    "file": "chunks/singletons-5be3e935.js",
+    "imports": [
+      "_index-cd071420.js"
+    ]
+  },
+  "_preload-helper-e4860ae8.js": {
+    "file": "chunks/preload-helper-e4860ae8.js"
+  },
+  "_NavigationButton-1ab31783.js": {
+    "file": "chunks/NavigationButton-1ab31783.js",
+    "imports": [
+      "_index-cd071420.js",
+      "_mdi-ff5aee52.js"
+    ],
+    "css": [
+      "assets/NavigationButton-7253cb1c.css"
+    ]
+  },
+  "_three.module-c1f40604.js": {
+    "file": "chunks/three.module-c1f40604.js"
+  },
+  "_mdi-ff5aee52.js": {
+    "file": "chunks/mdi-ff5aee52.js",
+    "imports": [
+      "_index-cd071420.js"
+    ],
+    "css": [
+      "assets/mdi-8d7a5b2d.css"
+    ]
+  },
+  "_imageStore-78473fa9.js": {
+    "file": "chunks/imageStore-78473fa9.js",
+    "imports": [
+      "_index-cd071420.js",
+      "_mdi-ff5aee52.js",
+      "_singletons-5be3e935.js"
+    ],
+    "css": [
+      "assets/imageStore-fd802cc1.css"
+    ]
+  },
+  "__commonjsHelpers-56d41998.js": {
+    "file": "chunks/_commonjsHelpers-56d41998.js"
+  },
+  "_p5.min-0883924f.js": {
+    "file": "chunks/p5.min-0883924f.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "__commonjsHelpers-56d41998.js"
+    ]
+  }
+}
