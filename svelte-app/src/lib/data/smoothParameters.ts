@@ -1,4 +1,5 @@
 export class SmoothParameters {
+	id: string = Math.random().toString(36);
 	name: Readonly<string>;
 	layer?: number;
 	strength?: number;
@@ -67,7 +68,9 @@ export class SmoothParameters {
 	}
 
 	toArray() {
-		return Object.entries(this).filter(([key, value]) => value !== undefined && key != 'name');
+		return Object.entries(this).filter(
+			([key, value]) => value !== undefined && key != 'name' && key != 'id'
+		);
 	}
 
 	toString() {

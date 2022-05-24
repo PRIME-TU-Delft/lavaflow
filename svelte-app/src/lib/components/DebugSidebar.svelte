@@ -4,6 +4,8 @@
 	import Range from '$lib/components/Range.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 
+	import SortableList from 'svelte-sortable-list';
+
 	import type { Options, Entries } from '$lib/types/Options';
 	import { hc_smooth_parameters, hc_smooth_parameter_types } from '$lib/data/hardCoded';
 	import { SmoothParameters } from '$lib/data/smoothParameters';
@@ -58,6 +60,9 @@
 	};
 
 	let smoothLayers: SmoothParameters[] = hc_smooth_parameters;
+	function sortSmoothLayers(ev: any) {
+		smoothLayers = ev.detail;
+	}
 
 	function openCreateModal() {
 		newSmoothParameterType = hc_smooth_parameter_types[0];
@@ -69,6 +74,11 @@
 		smoothLayers = [...smoothLayers, smoothParametersOpen];
 		newSmoothModalOpen = false;
 		newSmoothParameterType = hc_smooth_parameter_types[0];
+	}
+
+	function removeParameter() {
+		smoothLayers = smoothLayers.filter((_, i) => i !== indexEditing);
+		editSmoothModalOpen = false;
 	}
 
 	/**
@@ -133,11 +143,11 @@
 		{/if}
 	{/each}
 
-	{#each smoothLayers as smoothLayer, index}
-		<Button on:click={() => openEditModalWith(smoothLayer, index)}>
-			{smoothLayer.toString()}
+	<SortableList list={smoothLayers} key="id" on:sort={sortSmoothLayers} let:item let:index>
+		<Button on:click={() => openEditModalWith(item, index)}>
+			{item.toString()}
 		</Button>
-	{/each}
+	</SortableList>
 
 	<Button secondary on:click={openCreateModal}>New smooth layer</Button>
 
@@ -154,6 +164,7 @@
 		{/if}
 	{/each}
 
+	<Button secondary on:click={removeParameter}>Remove smooth layer</Button>
 	<Button on:click={editParametersForIndex}>Set parameters</Button>
 </Modal>
 
@@ -169,8 +180,8 @@
 		{#each smoothParametersOpen.toArray() as [key, value]}
 			{#if typeof value == 'number'}
 				<EmitInput label={key} {value} on:input={(e) => setParameter(key, e.detail.value)} />
-
-				<!-- TODO add boolean -->
+			{:else if typeof value == 'boolean'}
+				<Dropdown options={[true, false]} {value} on:change={() => toggleBooleanParameter(key)} />
 			{/if}
 		{/each}
 
