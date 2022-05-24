@@ -56,8 +56,8 @@ export default class Draggable {
    * @param markerSize The size in pixels of the marker to be drawn
    */
   drawRect(p5, markerSize) {
-    p5.stroke(0);
-    p5.fill(50);
+    p5.stroke(0, 127);
+    p5.fill(50, 127);
     p5.strokeWeight(1)
     p5.rectMode(p5.CENTER)
 
@@ -76,8 +76,8 @@ export default class Draggable {
    * @param markerSize The size in pixels of the marker to be drawn
    */
   drawCircle(p5, markerSize) {
-    p5.stroke(0);
-    p5.fill(50);
+    p5.stroke(0, 127);
+    p5.fill(50, 127);
     p5.strokeWeight(1);
 
     p5.circle(this.x + this.w / 2, this.y + this.h / 2, markerSize);
@@ -90,8 +90,8 @@ export default class Draggable {
    * @param markerSize The size in pixels of the marker to be drawn
    */
   drawTriangle(p5, markerSize) {
-    p5.stroke(0);
-    p5.fill(50);
+    p5.stroke(0, 127);
+    p5.fill(50, 127);
     p5.strokeWeight(1);
 
     // corners in order: bottom left corner, bottom right corner, top corner in the center
@@ -109,7 +109,7 @@ export default class Draggable {
    * @param markerSize The size in pixels of the marker to be drawn
    */
   drawCross(p5, markerSize) {
-    p5.stroke(0);
+    p5.stroke(0, 127);
     p5.strokeWeight(7);
     // cross is drawn using two thick lines
 
