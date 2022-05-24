@@ -10,7 +10,6 @@ use wasm_bindgen::prelude::*;
 mod generate;
 mod gltf_conversion;
 mod api;
-mod smoothing_operations;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.

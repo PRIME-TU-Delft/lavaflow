@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
-use crate::smoothing_operations::SmoothingOperationApplySmoothToLayer;
-use crate::api::SmoothingOperation;
+// use crate::smoothing_operations::SmoothingOperationApplySmoothToLayer;
+// use crate::api::SmoothingOperation;
 
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
@@ -195,22 +195,22 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	model_constructor.construct().map_err(|e| e.to_string())?;
 
 	// Apply smoothing
-	let mut smoother = crate::model_construction::smoother::Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
+	//let mut smoother = crate::model_construction::smoother::Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
 	// smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
 	// smoother.increase_altitude_for_mountain_tops(2.0, false).map_err(|e| e.to_string())?;
 	// smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, true).map_err(|e| e.to_string())?;
 	// smoother.apply_smooth_to_all(0.3, 5, 5, true).map_err(|e| e.to_string())?;
 
-	let operand = SmoothingOperationApplySmoothToLayer {
-		layer: 0,
-		strength: 0.1,
-		coverage: 10,
-		svc_weight: 1,
-		allow_svc_change: false
-	};
+	// let operand = SmoothingOperationApplySmoothToLayer {
+	// 	layer: 0,
+	// 	strength: 0.1,
+	// 	coverage: 10,
+	// 	svc_weight: 1,
+	// 	allow_svc_change: false
+	// };
 
-	operand.apply(&mut smoother).map_err(|e| e.to_string())?;
+	// operand.apply(&mut smoother).map_err(|e| e.to_string())?;
 
 	//apply surface subdivision
 	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions, &model_constructor.is_svc, model_constructor.raster, false)?;

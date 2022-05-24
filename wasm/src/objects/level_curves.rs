@@ -286,7 +286,7 @@ impl LevelCurveSet {
 	/// * `current_height` - to track height when traversing tree, initial call should start with 1
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap<'a>(&self, tree: &'a mut LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
+	pub fn transform_to_LevelCurveMap<'a>(tree: &'a LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
 		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
 
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
@@ -343,7 +343,7 @@ impl LevelCurveSet {
 		}
 
 		for mut child in tree.get_children() {
-			let childmap = self.transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);
+			let childmap = LevelCurveSet::transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);
 			for curve in childmap?.level_curves {
 				ret.add_level_curve(curve);
 			}
