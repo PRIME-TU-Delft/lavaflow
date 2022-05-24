@@ -3,8 +3,8 @@ import cv, { type Mat } from 'opencv-ts';
 export default function removePerspective(
 	image: Mat,
 	points: number[],
-	width: number = 1000,
-	height: number = 550
+	width: number = 800,
+	height: number = 667
 ): Mat {
 	// construct mats (required input for cv.getPerspectiveTransform) with four columns and two rows to represent the four 2d points
 	let sourcePoints = cv.matFromArray(4, 2, cv.CV_32FC1, points);

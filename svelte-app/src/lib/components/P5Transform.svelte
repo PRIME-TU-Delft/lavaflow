@@ -47,10 +47,16 @@
 			// Render all Draggable points
 			for (let i = 0; i < points.length; i++) {
 				points[i].update(p5); // update position
-				points[i].draw(p5); // redraw
+
 
 				drawLine(points[i], points[(i + 1) % points.length]); // draw line between points
 			}
+			
+			let markerSize = 20;
+			points[0].drawCircle(p5, markerSize);
+			points[1].drawRect(p5, markerSize);
+			points[2].drawCross(p5, markerSize);
+			points[3].drawTriangle(p5, markerSize);
 		};
 
 		// If the user presses/releases their mouse, signal this to all Draggable points
