@@ -8,8 +8,10 @@
 
 	import type Draggable from '$lib/data/draggable';
 	import { rawImage, perspectiveImage } from '$lib/stores/imageStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import removePerspective from '$lib/opencv/removePerspective';
+	import { getCurves } from '$lib/opencv/detectCurves';
 
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
@@ -24,8 +26,6 @@
 		// TODO: move this to seperate file
 		let mat = cv.imread('foregroundImage');
 
-		console.log(points);
-
 		// Fetch the marker coordinates of the draggable buttons
 		let markerCoords: number[] = [];
 		for (let p of points) {
@@ -34,7 +34,32 @@
 		}
 
 		// Apply the perspective transformation using the selected marker coords
-		let result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
+		const result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
+
+		// Set contour line store to the detected contour lines with hirarchy
+		const { curves, hierarchy } = getCurves(result);
+
+		if (curves.length == 0 || hierarchy.length == 0) {
+			alert('No contours found');
+			return;
+		}
+
+		const contourArray = curves.map((c) => Array.from(c));
+		const contourTuples: [number, number][][] = contourArray.map((contour) => {
+			let contourTuple: [number, number][] = [];
+
+			for (let i = 0; i < contour.length - 1; i += 2) {
+				contourTuple.push([contour[i], contour[i + 1]]);
+			}
+
+			return contourTuple;
+		});
+
+		contourLines.set({
+			curves: contourTuples,
+			hierarchy: hierarchy
+		});
+
 		cv.imshow('canvasOutput', result);
 
 		perspectiveImage.set(outputCanvas.toDataURL());

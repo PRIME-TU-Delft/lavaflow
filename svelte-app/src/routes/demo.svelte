@@ -5,9 +5,10 @@
 
 	import { onMount, onDestroy } from 'svelte';
 
-	import { hc_level_curves, hc_parent_relations } from '$lib/data/hardCoded';
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import type { BufferGeometry, Material, Mesh } from 'three';
 	import { DoubleSide } from 'three';
+	import { goto } from '$app/navigation';
 
 	let mounted: boolean;
 	let aframe: boolean;
@@ -44,12 +45,20 @@
 	};
 
 	onMount(async () => {
+		if (!$contourLines.curves?.length || !$contourLines.hierarchy?.length) {
+			goto('/scan/mapscanning');
+		}
+
+		console.log($contourLines);
+
 		await init();
 
 		const tree = new wasm.OpenCVTree({
-			pixels_per_curve: hc_level_curves,
-			parent_relations: hc_parent_relations
+			pixels_per_curve: $contourLines.curves,
+			parent_relations: $contourLines.hierarchy
 		});
+
+		console.log($contourLines.curves);
 
 		const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
 		const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);

@@ -8,13 +8,18 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
 	import { perspectiveImage } from '$lib/stores/imageStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	function gotoVisualise() {
-		// TODO: take the positions of the markers and transform image
-
 		goto('/demo');
 	}
+
+	onMount(() => {
+		if (!$perspectiveImage && !$contourLines.curves && !$contourLines.hierarchy)
+			goto('/scan/mapscanning');
+	});
 </script>
 
 <Page title="image transformation">
