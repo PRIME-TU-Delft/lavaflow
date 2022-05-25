@@ -89,8 +89,8 @@ impl Raster {
 		// Compute the min and max altitude
 		let mut min_max: (f32, f32) = (self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?, self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?);
 
-		for row in 0..self.altitudes.len() {
-			for col in 0..self.altitudes[row].len() {
+		for (row, _) in self.altitudes.iter().enumerate() {
+			for (col, _) in self.altitudes[row].iter().enumerate() {
 				if self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))? < min_max.0 {
 					min_max.0 = self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))?;
 				}
@@ -100,12 +100,20 @@ impl Raster {
 			}
 		}
 
+		// Create a new altitudes vector, that will later replace the one currently stored in 'self'
+		let mut updated_altitudes: Vec<Vec<Option<f32>>> = Vec::new();
+
 		// Map every altitude between these values to between 0.0 and 100.0
-		for row in 0..self.altitudes.len() {
-			for col in 0..self.altitudes[row].len() {
-				self.altitudes[row][col] = Raster::map(self.altitudes[row][col], min_max.0, min_max.1, 0.0, 100.0);
+		for (row, _) in self.altitudes.iter().enumerate() {
+			updated_altitudes.push(Vec::new());
+			for (col, _) in self.altitudes[row].iter().enumerate() {
+				updated_altitudes[row].push(None);
+				updated_altitudes[row][col] = Raster::map(self.altitudes[row][col], min_max.0, min_max.1, 0.0, 100.0);
 			}
 		}
+
+		// Replace the current altitudes-vector by the updated one
+		self.altitudes = updated_altitudes;
 
 		Ok(())
 
