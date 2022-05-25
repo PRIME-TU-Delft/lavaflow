@@ -86,7 +86,7 @@ impl ModelConstructionApi {
 		Self {
 			rows: 10,
 			columns: 10,
-			border_size: 0.0,
+			border_size: 10.0,
 			altitude_step: 10.0,
 			svc_distance: 10.0,
 			catmull_clark_iterations: 0,
@@ -160,7 +160,7 @@ impl ModelConstructionApi {
 		let level_curve_tree = LevelCurveTree::from_open_cv(&self.open_cv_tree.pixels_per_curve, transformed_parent_relations);
 
 		// Transform this LevelCurveTree into a LevelCurveSet
-		let mut level_curve_map = LevelCurveSet::transform_to_LevelCurveMap(&level_curve_tree, self.altitude_step, self.svc_distance, 1).map_err(|e| e.to_string())?;
+		let mut level_curve_map = LevelCurveSet::transform_to_LevelCurveMap(&level_curve_tree, self.altitude_step, 2.0 * self.svc_distance, 1).map_err(|e| e.to_string())?;
 
 		//find maximum and minimum cooridinates in level curve model
 		let (min, max) = level_curve_map.get_bounding_points();
