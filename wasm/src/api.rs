@@ -81,7 +81,7 @@ impl ModelConstructionApi {
     /// 
     /// Setup the properties for the ModelConstructionApi and give them a default value.
     /// If the user of the API wants, the parameters for the algorithm can be changed by calling other methods afterwards.
-    pub fn new() -> ModelConstructionApi {
+    pub fn new() -> Self {
         // The presented values below are the default values for the different parameters
         Self {
             rows: 10,
@@ -183,10 +183,13 @@ impl ModelConstructionApi {
         // determine heights
         model_constructor.construct().map_err(|e| e.to_string())?;
 
-        // Apply smoothing
-        //let mut smoother = crate::model_construction::smoother::Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
+        // Construct smoother instance
+        let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
-        
+        // Apply smoothing
+        for operation in &self.smoothing_operations_queue {
+            operation.apply(&mut smoother).map_err(|e| e.to_string())?;
+        }
 
         //apply surface subdivision
         let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, &model_constructor.is_svc, model_constructor.raster, false)?;

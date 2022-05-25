@@ -7,7 +7,6 @@ mod surface_subdivision;
 mod utils;
 use wasm_bindgen::prelude::*;
 
-mod generate;
 mod gltf_conversion;
 mod api;
 

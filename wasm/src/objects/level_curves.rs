@@ -342,8 +342,8 @@ impl LevelCurveSet {
 			return Ok(ret);
 		}
 
-		for mut child in tree.get_children() {
-			let childmap = LevelCurveSet::transform_to_LevelCurveMap(&mut child, altitude_step, desired_dist, current_height + 1);
+		for child in tree.get_children() {
+			let childmap = LevelCurveSet::transform_to_LevelCurveMap(&child, altitude_step, desired_dist, current_height + 1);
 			for curve in childmap?.level_curves {
 				ret.add_level_curve(curve);
 			}
