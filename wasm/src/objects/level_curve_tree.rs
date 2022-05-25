@@ -169,7 +169,7 @@ mod tests {
 		parent_relations.push(None); // index 0 has no parent
 		parent_relations.push(Some(0)); // index 1 has parent 0
 		parent_relations.push(Some(1)); // index 2 has parent 1
-		parent_relations.push(Some(2)); // index 3 has parent 1
+		parent_relations.push(Some(1)); // index 3 has parent 1
 
 		// Pass these vectors to the constuctor
 		LevelCurveTree::from_open_cv(pixels_per_curve, parent_relations)

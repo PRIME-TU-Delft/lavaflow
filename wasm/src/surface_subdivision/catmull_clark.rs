@@ -81,10 +81,11 @@ pub fn edge_list_to_map(es: &[Edge], len: usize) -> Result<Vec<Vec<usize>>, Stri
 ///
 /// Transformation of a cell in a raster in the ith column in the jth row:
 ///
-///      (i, j)----(i+ 1, j)
-///        |           |         ------> Face ( points ((i, j) , (i+ 1, j) , (i, j + 1) , (i+1, j+1)) )
-///        |           |
-///     (i, j + 1)----(i+1, j+1)
+// /      (i, j)----(i+ 1, j)
+// /        |           |         =======> Face ( points ((i, j) , (i+ 1, j) , (i, j + 1) , (i+1, j+1)) )
+// /        |           |
+// /     (i, j + 1)----(i+1, j+1)
+///
 ///
 /// # Arguments
 ///
