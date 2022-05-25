@@ -63,6 +63,7 @@ fn impl_smoothing_operation(ast: &syn::DeriveInput) -> TokenStream {
 	//
 
 	let impl_model_construction_api = quote! {
+		#[wasm_bindgen]
 		impl ModelConstructionApi {
 			pub fn #function_name_ident(&mut self, #(#found_field_names:#found_field_types),*) {
 				self.enqueue_smoothing_operation(Box::new(#name::new(#(#found_field_names),*)));
