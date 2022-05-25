@@ -6,7 +6,7 @@
 
 	import { onMount, onDestroy } from 'svelte';
 
-	import { hc_level_curves, hc_parent_relations } from '$lib/data/hardCoded';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 	import type { BufferGeometry, Material, Mesh } from 'three';
 	import { DoubleSide } from 'three';
 
@@ -38,8 +38,8 @@
 	AFRAME.registerComponent('dynamic-gltf', {
 		init: function () {
 			const tree = new wasm.OpenCVTree({
-				pixels_per_curve: hc_level_curves,
-				parent_relations: hc_parent_relations
+				pixels_per_curve: hc_curves,
+				parent_relations: hc_hierarchy
 			});
 
 			const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
