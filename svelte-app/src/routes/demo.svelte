@@ -51,8 +51,14 @@
 			parent_relations: hc_parent_relations
 		});
 
-		const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
-		const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);
+		const api = new wasm.ModelConstructionApi();
+		api.base(tree);
+		api.set_basic_parameters(100, 100, 10);
+
+		const gltf = api.build();
+
+		console.log({ api });
+
 		const gltfBlob = new Blob([gltf], { type: 'application/json' });
 		gltfUrl = URL.createObjectURL(gltfBlob);
 		mounted = true;
