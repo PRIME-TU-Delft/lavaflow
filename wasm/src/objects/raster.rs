@@ -1,4 +1,4 @@
-use miette::{Result, miette};
+use miette::{miette, Result};
 
 /// # Struct: Raster
 /// This struct is used for keeping track of the altitude levels of rows and columns.
@@ -66,17 +66,16 @@ impl Raster {
 
 	/// ## Instance Method
 	/// Normalise the dimensions of this mountain, while maintaining all altitude-information.
-	/// 
+	///
 	/// ### Concrete
 	/// - The number of rows and columns remains the same.
 	/// - The ```width``` will become 100.0
 	/// - The ```height``` will become 100.0
 	/// - The altitudes will be mapped to values between 0.0 and 100.0, where the minimum altitude will always be 0.0 and the maximal altitude 100.0
 	/// After having performed all these operations, the volcano will fit exactly in a cube of 100.0 x 100.0 x 100.0.
-	/// 
+	///
 	/// This method changes the state of the raster and returns void.
 	pub fn normalise(&mut self) -> Result<()> {
-
 		// Set the width and height to 100.0 by 100.0
 		self.row_height = 100.0 / (self.rows as f32);
 		self.column_width = 100.0 / (self.columns as f32);
@@ -87,7 +86,10 @@ impl Raster {
 		}
 
 		// Compute the min and max altitude
-		let mut min_max: (f32, f32) = (self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?, self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?);
+		let mut min_max: (f32, f32) = (
+			self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?,
+			self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?,
+		);
 
 		for (row, _) in self.altitudes.iter().enumerate() {
 			for (col, _) in self.altitudes[row].iter().enumerate() {
@@ -116,11 +118,7 @@ impl Raster {
 		self.altitudes = updated_altitudes;
 
 		Ok(())
-
 	}
-
-
-
 
 	/// ## Private Static Method
 	/// Map an Option<f32> value to a new range, return None if the input is None.
@@ -134,9 +132,7 @@ impl Raster {
 			Some(to_min + ((unpacked - from_min) / (from_max - from_min) * (to_max - to_min)))
 		}
 	}
-
 }
-
 
 //
 // UNIT TESTS
@@ -144,7 +140,7 @@ impl Raster {
 
 #[cfg(test)]
 mod tests {
-    use super::Raster;
+	use super::Raster;
 
 	/// ## Unit Test Provider
 	fn assert_float_eq(actual: Option<f32>, desired: Option<f32>) {
@@ -166,15 +162,12 @@ mod tests {
 	/// | from_max  | 10 |
 	/// | to_min    | 0 |
 	/// | to_max    | 100 |
-	/// 
+	///
 	/// ### Expected output
 	/// **Return:** 0
 	#[test]
 	fn map_test_1() {
-		assert_float_eq(
-			Raster::map(Some(0.0), 0.0, 10.0, 0.0, 100.0),
-			Some(0.0)
-		);
+		assert_float_eq(Raster::map(Some(0.0), 0.0, 10.0, 0.0, 100.0), Some(0.0));
 	}
 
 	/// ## Unit Test
@@ -186,15 +179,12 @@ mod tests {
 	/// | from_max  | 10 |
 	/// | to_min    | 0 |
 	/// | to_max    | 100 |
-	/// 
+	///
 	/// ### Expected output
 	/// **Return:** 10
 	#[test]
 	fn map_test_2() {
-		assert_float_eq(
-			Raster::map(Some(1.0), 0.0, 10.0, 0.0, 100.0),
-			Some(10.0)
-		);
+		assert_float_eq(Raster::map(Some(1.0), 0.0, 10.0, 0.0, 100.0), Some(10.0));
 	}
 
 	/// ## Unit Test
@@ -206,15 +196,12 @@ mod tests {
 	/// | from_max  | 10 |
 	/// | to_min    | 0 |
 	/// | to_max    | 100 |
-	/// 
+	///
 	/// ### Expected output
 	/// **Return:** 50
 	#[test]
 	fn map_test_3() {
-		assert_float_eq(
-			Raster::map(Some(5.0), 0.0, 10.0, 0.0, 100.0),
-			Some(50.0)
-		);
+		assert_float_eq(Raster::map(Some(5.0), 0.0, 10.0, 0.0, 100.0), Some(50.0));
 	}
 
 	/// ## Unit Test
@@ -226,15 +213,12 @@ mod tests {
 	/// | from_max  | 10 |
 	/// | to_min    | 0 |
 	/// | to_max    | 100 |
-	/// 
+	///
 	/// ### Expected output
 	/// **Return:** 110
 	#[test]
 	fn map_test_4() {
-		assert_float_eq(
-			Raster::map(Some(11.0), 0.0, 10.0, 0.0, 100.0),
-			Some(110.0)
-		);
+		assert_float_eq(Raster::map(Some(11.0), 0.0, 10.0, 0.0, 100.0), Some(110.0));
 	}
 
 	/// ## Unit Test
@@ -246,15 +230,12 @@ mod tests {
 	/// | from_max  | 10 |
 	/// | to_min    | 0 |
 	/// | to_max    | 100 |
-	/// 
+	///
 	/// ### Expected output
 	/// **Return:** -10
 	#[test]
 	fn map_test_5() {
-		assert_float_eq(
-			Raster::map(Some(-1.0), 0.0, 10.0, 0.0, 100.0),
-			Some(-10.0)
-		);
+		assert_float_eq(Raster::map(Some(-1.0), 0.0, 10.0, 0.0, 100.0), Some(-10.0));
 	}
 
 	/// ## Unit Test
@@ -266,17 +247,14 @@ mod tests {
 	/// | from_max  | 10 |
 	/// | to_min    | 0 |
 	/// | to_max    | 100 |
-	/// 
+	///
 	/// ### Expected output
 	/// **Return:** 50
 	#[test]
 	fn map_test_6() {
-		assert_float_eq(
-			Raster::map(Some(0.0), -10.0, 10.0, 0.0, 100.0),
-			Some(50.0)
-		);
+		assert_float_eq(Raster::map(Some(0.0), -10.0, 10.0, 0.0, 100.0), Some(50.0));
 	}
-	
+
 	/// ## Unit Test
 	/// ### Input
 	/// | Parameter | Value |
@@ -286,15 +264,12 @@ mod tests {
 	/// | from_max  | 10 |
 	/// | to_min    | 0 |
 	/// | to_max    | 100 |
-	/// 
+	///
 	/// ### Expected output
 	/// **Return:** None
 	#[test]
 	fn map_test_7() {
-		assert_float_eq(
-			Raster::map(None, 0.0, 10.0, 0.0, 100.0),
-			None
-		);
+		assert_float_eq(Raster::map(None, 0.0, 10.0, 0.0, 100.0), None);
 	}
 
 	/// ## Unit Test
@@ -321,5 +296,4 @@ mod tests {
 		assert_float_eq(*raster.get(1, 0), Some(50.0));
 		assert_float_eq(*raster.get(1, 1), Some(0.0));
 	}
-
 }
