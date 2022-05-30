@@ -27,11 +27,12 @@ const sketch = (p5) => {
 
 	/**
 	 * Draw line with p5 from point1 (p2) to point2 (p2)
-	 * @param p5 - p5 instance
 	 * @param p1 - point1 with x and y coordinates and width and height
 	 * @param p2 - point2 with x and y coordinates and width and height
 	 */
-	function drawLine(p, p1, p2) {
+	function drawLine(p1, p2) {
+		p5.stroke(0)
+		p5.strokeWeight(1)
 		p5.line(p1.x + p1.w / 2, p1.y + p1.h / 2, p2.x + p2.w / 2, p2.y + p2.h / 2);
 	}
 
@@ -41,12 +42,18 @@ const sketch = (p5) => {
 			p5.image(img, 0, 0, img.width, img.height);
 		}
 
-		// Render all Draggable points
+		// Render lines between points
 		for (let i = 0; i < points.length; i++) {
 			points[i].update(p5); // update position
-			points[i].draw(p5); // redraw
-			drawLine(p5, points[i], points[(i + 1) % points.length]); // draw line between points
+			drawLine(points[i], points[(i + 1) % points.length]); // draw line between points
 		}
+
+		// draw all the different markers
+		let markerSize = 20;
+		points[0].drawCircle(p5, markerSize);
+		points[1].drawRect(p5, markerSize);
+		points[2].drawCross(p5, markerSize);
+		points[3].drawTriangle(p5, markerSize);
 	};
 
 
@@ -69,6 +76,12 @@ const sketch = (p5) => {
 		// Load the uploaded image into p5 and show it on the canvas
 		img = p5.loadImage(imgURL, i => {
 			p5.resizeCanvas(i.width, i.height);
+
+			// make sure all the points are on the image after changing image sizes
+			points[0].setPosition(i.width / 4, i.height / 4);
+			points[1].setPosition(i.width / 4 * 3, i.height / 4);
+			points[2].setPosition(i.width / 4 * 3, i.height / 4 * 3);
+			points[3].setPosition(i.width / 4, i.height / 4 * 3);
 		});
 		document.getElementById("perspective-button").style.display = 'block';  // Unhide button
 	}, false);

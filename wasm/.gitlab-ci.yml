@@ -1,26 +1,64 @@
-wasm-rustfmt:
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/wasm/.cargo
+
+
+stages:
+  - build
+  - test
+
+
+wasm-build:
+  stage: build
   image: rust:1.61
   script:
     - cd wasm
+    - cargo build
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - wasm/target/
+      - $CARGO_HOME
+
+
+wasm-rustfmt:
+  stage: test
+  image: rust:1.61
+  before_script:
     - rustup component add rustfmt
+  script:
+    - cd wasm
     - cargo fmt --check
   allow_failure: true
 
 
 wasm-clippy:
+  stage: test
   image: rust:1.61
+  before_script:
+    - rustup component add clippy
   script:
     - cd wasm
-    - rustup component add clippy
     - cargo clippy -- -D warnings -D clippy::unwrap_used -D clippy::expect_used
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - wasm/target/
+      - $CARGO_HOME
   allow_failure: true
 
 
 wasm-test:
+  stage: test
   image: rust:1.61
-  script:
+  before_script:
     - wget -qO- https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-gnu.tgz | tar -xz -C /usr/bin
-    - cargo binstall --no-confirm cargo-tarpaulin && cargo binstall --no-confirm cargo-nextest
+    - mkdir -p $CARGO_HOME/bin && cargo binstall --no-confirm --install-path $CARGO_HOME/bin --log-level debug cargo-tarpaulin && cargo binstall --no-confirm --install-path $CARGO_HOME/bin --log-level debug cargo-nextest
+  script:
     - cd wasm
     - cargo nextest run
     - cargo tarpaulin --skip-clean
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - wasm/target/
+      - $CARGO_HOME

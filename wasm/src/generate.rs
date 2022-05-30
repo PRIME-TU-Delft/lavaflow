@@ -1,17 +1,9 @@
-use crate::lava_path_finder::lava_path::get_lava_paths_super;
-use crate::utils::log;
+use crate::gltf_conversion::generate_gltf;
+use crate::objects::level_curves::{LevelCurve, LevelCurveSet};
+use crate::objects::{point::Point, raster::Raster};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
-
-use super::catmull_clark::{catmull_clark_super, Vertex};
-use super::constructor::ModelConstructor;
-use super::gltf_conversion::generate_gltf;
-use super::level_curves::{LevelCurve, LevelCurveSet};
-use super::point::Point;
-use super::raster::Raster;
-
-use super::smoother::Smoother;
 
 /// Struct representing a tree coming from OpenCV, that has not yet been converted to our internal tree structure
 #[wasm_bindgen]
@@ -70,7 +62,8 @@ impl ModelGenerationSettings {
 /// Supermethod that takes in an openCV tree and outputs an GTLF model.
 /// - `tree`- input from the image processing step, a representation of level curves. To be converted to 3D model
 #[wasm_bindgen]
-pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, repetitions: usize, strength_positive: f32, strength_negative: f32, coverage: usize, svc_weight: usize, rows: usize, columns: usize, contour_margin: f32) -> Result<String, JsValue> {
+#[allow(clippy::too_many_arguments)] //todo : REMOVE
+pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSettings, smoothing_repetitions: usize, strength_positive: f32, strength_negative: f32, coverage: usize, svc_weight: usize, rows: usize, columns: usize, contour_margin: f32, border : f32, path_length : usize , fork_val : f32 , subdivisions : usize) -> Result<String, JsValue> {
 
 	// log!("The provided open_cv_tree: {:?}", open_cv_tree);
 	// log!("The provided settings: {:?}", settings);
@@ -182,35 +175,34 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	//find maximum and minimum cooridinates in level curve model
 	let (min, max) = level_curve_map.get_bounding_points();
 
-	// keep border of 20% of each axis around model
-	let border_x = 0.2 * (max.x - min.x);
-	let border_y = 0.2 * (max.y - min.y);
+	// keep desired border of each axis around model
+	let border_x = border * (max.x - min.x);
+	let border_y = border * (max.y - min.y);
 
 	//ensure none of the level curve points have negative coordinates , and have a 'border' distance from the axes
 	level_curve_map.align_with_origin(&min, border_x, border_y);
 
 	//create raster based on level curve model and desired rows and columns
-	let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0) , (max.y - min.y) + (border_y* 2.0), rows, columns);
+	let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0), (max.y - min.y) + (border_y * 2.0), rows, columns);
 
 	// create new modelConstructor (module containing 3D-model construction algorithm)
-	let mut model_constructor = ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
+	let mut model_constructor = crate::model_construction::constructor::ModelConstructor::new(&mut raster, contour_margin, &level_curve_map);
 
 	// determine heights
 	model_constructor.construct().map_err(|e| e.to_string())?;
 
 	// Apply smoothing
-	let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
+	let mut smoother = crate::model_construction::smoother::Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
 	smoother.correct_for_altitude_constraints_to_all_layers().map_err(|e| e.to_string())?;
-	smoother.increase_altitude_for_mountain_tops(2.0,false).map_err(|e| e.to_string())?;
+	smoother.increase_altitude_for_mountain_tops(2.0, false).map_err(|e| e.to_string())?;
 	smoother.apply_smooth_to_mountain_tops(0.6, 4, 5, true).map_err(|e| e.to_string())?;
-	smoother.apply_smooth_to_all( 0.3,  5,  5,  true);
-
+	smoother.apply_smooth_to_all(0.3, 5, 5, true).map_err(|e| e.to_string())?;
 
 	//apply surface subdivision
-	let (vs, fs, edge_map) = catmull_clark_super(1,  &model_constructor.is_svc , model_constructor.raster, false ).expect("catumull broke");
+	let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(subdivisions, &model_constructor.is_svc, model_constructor.raster, false)?;
 
-	//find vertex index of the highest point in the model
+	//for lava path generation : find point index of the highest point in the model
 
 	let mut top_height = f32::MIN;
 	for curve in &level_curve_map.level_curves {
@@ -220,37 +212,32 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 	}
 	//top_height -= level_curve_map.altitude_step;
 
-	//get list of indexes of points above or on highest level curev
-	let mut  highest_points = Vec::new();
-	for (i, v ) in vs.iter().enumerate() {
+	//for lava path generation : get list of indexes of points above or on highest level curve
+	let mut highest_points = Vec::new();
+	for (i, v) in vs.iter().enumerate() {
 		if v.z >= top_height {
 			highest_points.push(i);
 		}
 	}
 
-	//highest_point += 170;
-
 	//find lava path from the highest point of the model
-		//maximum path length
-	let path_length = 50;
-		//min alt determines at which alitude a lava path stops
+	//min alt determines at which alitude a lava path stops
 	let min_altitude = level_curve_map.altitude_step / 2.0;
-		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-	let lava_paths : Vec<Vec<&Vertex>> = get_lava_paths_super(&highest_points, path_length, 0.02 ,min_altitude, &vs, &edge_map)?;
+	//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
+	// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+	let _lava_paths: Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, path_length, fork_val, min_altitude, &vs, &edge_map)?;
 
-
-	//Turn faces into triangles
+	//Turn faces of model into triangles
 	let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 	for f in fs {
 		if f.points.len() != 4 {
 			return Err(JsValue::from("surface subdivision returns face with incorrect amount of points"));
 		}
 		//get points of face
-		let p0 = vs.get(f.points[0]).ok_or(format!("vertex list does not contain point {} ", f.points[0]))?;
-		let p1 = vs.get(f.points[1]).ok_or(format!("vertex list does not contain point {} ", f.points[1]))?;
-		let p2 = vs.get(f.points[2]).ok_or(format!("vertex list does not contain point {} ", f.points[2]))?;
-		let p3 = vs.get(f.points[3]).ok_or(format!("vertex list does not contain point {} ", f.points[3]))?;
+		let p0 = vs.get(f.points[0]).ok_or(format!("point list does not contain point {} ", f.points[0]))?;
+		let p1 = vs.get(f.points[1]).ok_or(format!("point list does not contain point {} ", f.points[1]))?;
+		let p2 = vs.get(f.points[2]).ok_or(format!("point list does not contain point {} ", f.points[2]))?;
+		let p3 = vs.get(f.points[3]).ok_or(format!("point list does not contain point {} ", f.points[3]))?;
 
 		//rgb green = 0, 153, 51
 		//rgb orange = 255, 153, 51
@@ -275,60 +262,38 @@ pub fn generate_3d_model(open_cv_tree: &OpenCVTree, settings: &ModelGenerationSe
 		final_points.push(tri10);
 	}
 
-	//draw highest point of model for visual debug
-	//TODO: REMOVE
-	// let hp = &vs[highest_point];
-	// final_points.push(([hp.x, hp.z, hp.y], [1., 0., 0.]));
-	// final_points.push(([hp.x + 5.0, hp.z + 100.0, hp.y + 5.0], [1., 0., 0.]));
-	// final_points.push(([hp.x - 5.0, hp.z + 100.0, hp.y - 5.0], [1., 0., 0.]));
+	// //draw lava paths for visual debug
+	// //TODO: REMOVE -> should not be part of final model
+	// for (i, path) in lava_paths.iter().enumerate() {
+	// 	let mut ps = path.iter();
+	// 	let mut o1 = ps.next();
 
-	// //draw x, y  axes for visual debug
-	// //TODO: REMOVE
-	// //0,0 is green
-	// final_points.push(([0.0, 0.0, 0.0], [0., 1., 0.]));
-	// final_points.push(([ 5.0, 100.0,  5.0], [0., 1., 0.]));
-	// final_points.push(([- 5.0,  100.0, - 5.0], [0., 1., 0.]));
-	// //x is yellow
-	// final_points.push(([1000.0, 0.0, 0.0], [1., 1., 0.]));
-	// final_points.push(([ 1005.0, 100.0,  5.0], [1., 1., 0.]));
-	// final_points.push(([ 995.0,  100.0, - 5.0], [1., 1., 0.]));
-	// // y is cyan
-	// final_points.push(([0.0, 0.0, 1000.0], [0., 1., 1.]));
-	// final_points.push(([ 5.0, 100.0,  1005.0], [0., 1., 1.]));
-	// final_points.push(([- 5.0,  100.0,  995.0], [0., 1., 1.]));
+	// 	let path_color = [(i as f32) / lava_paths.len() as f32, 0.0, 1. - (i as f32) / lava_paths.len() as f32];
 
-	//draw lava paths for visual debug
-	//TODO: REMOVE -> should not be part of final model
-	for (i, path) in lava_paths.iter().enumerate() {
-		let mut ps = path.iter();
-		let mut o1 = ps.next();
+	// 	while (o1.is_some()) {
+	// 		let mut o2 = ps.next();
+	// 		let p1 = o1.unwrap();
+	// 		let p2 = if o2.is_some() { o2.unwrap() } else { p1 };
+	// 		final_points.push(([p1.x, p1.z, p1.y], path_color));
+	// 		final_points.push(([p1.x, p1.z + 10.0, p1.y], path_color));
+	// 		final_points.push(([(p1.x + p2.x) / 2.0, p1.z + 5.0, (p1.y + p2.y) / 2.0], path_color));
 
-		let path_color = [(i as f32) / lava_paths.len() as f32, 0.0, 1. - (i as f32) / lava_paths.len() as f32];
+	// 		o1 = o2;
+	// 	}
+	// }
 
-		while (o1.is_some()) {
-			let mut o2 = ps.next();
-			let p1 = o1.unwrap();
-			let p2 = if o2.is_some() { o2.unwrap() } else { p1 };
-			final_points.push(([p1.x, p1.z, p1.y], path_color));
-			final_points.push(([p1.x, p1.z + 10.0, p1.y], path_color));
-			final_points.push(([(p1.x + p2.x) / 2.0, p1.z + 5.0, (p1.y + p2.y) / 2.0], path_color));
+	// // Add triangles for the level-curves for visual debug
+	// //TODO: REMOVE -> should not be part of final model
+	// for curve in &model_constructor.level_curve_map.level_curves {
+	// 	for i in 0..curve.points.len() - 1 {
+	// 		let p1 = &curve.points[i];
+	// 		let p2 = &curve.points[i + 1];
 
-			o1 = o2;
-		}
-	}
-
-	// Add triangles for the level-curves for visual debug
-	//TODO: REMOVE -> should not be part of final model
-	for curve in &model_constructor.level_curve_map.level_curves {
-		for i in 0..curve.points.len() - 1 {
-			let p1 = &curve.points[i];
-			let p2 = &curve.points[i + 1];
-
-			final_points.push(([p1.x, p1.z, p1.y - 5.0], [1., 0., 0.]));
-			final_points.push(([p2.x, p2.z, p2.y + 5.0], [1., 0., 0.]));
-			final_points.push(([p1.x, p1.z, p1.y + 5.0], [1., 0., 0.]));
-		}
-	}
+	// 		final_points.push(([p1.x, p1.z, p1.y - 5.0], [1., 0., 0.]));
+	// 		final_points.push(([p2.x, p2.z, p2.y + 5.0], [1., 0., 0.]));
+	// 		final_points.push(([p1.x, p1.z, p1.y + 5.0], [1., 0., 0.]));
+	// 	}
+	// }
 
 	generate_gltf(final_points).map_err(JsValue::from)
 }
