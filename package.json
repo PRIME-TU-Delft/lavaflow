@@ -18,8 +18,5 @@
     "three": "^0.140.2",
     "vite": "^2.9.6",
     "vite-plugin-wasm-pack": "^0.1.11"
-  },
-  "devDependencies": {
-    "netlify-cli": "^10.3.1"
   }
 }
