@@ -1,4 +1,7 @@
 <script lang="ts">
+	/**
+	 * This component is a modal that can be opened and closed
+	 */
 	import Button from '$lib/components/Button.svelte';
 
 	export let visible = false;

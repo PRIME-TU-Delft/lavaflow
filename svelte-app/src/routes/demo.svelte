@@ -55,13 +55,14 @@
 
 		console.log(tree);
 
-		// const api = new wasm.ModelConstructionApi();
-		// api.base(tree);
+		const api = new wasm.ModelConstructionApi();
+		api.base(tree);
 		// api.set_basic_parameters(100, 100, 10);
 
-		// const gltf = api.build();
+		console.log('before gltf build');
+		const gltf = api.build();
 
-		// console.log({ api });
+		console.log({ gltf });
 
 		// const gltfBlob = new Blob([gltf], { type: 'application/json' });
 		// gltfUrl = URL.createObjectURL(gltfBlob);

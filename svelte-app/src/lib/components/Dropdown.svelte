@@ -1,4 +1,7 @@
 <script lang="ts">
+	/**
+	 * This component is a dropdown input
+	 */
 	export let value: any;
 	export let options: any[];
 </script>

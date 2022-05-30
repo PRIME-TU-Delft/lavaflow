@@ -1,4 +1,8 @@
 <script lang="ts">
+	/**
+	 * This component is a range slider that can be used to select a value
+	 */
+
 	export let label: string;
 	export let value: number;
 	export let from: number;
