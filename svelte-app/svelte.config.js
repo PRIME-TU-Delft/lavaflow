@@ -20,6 +20,10 @@ const config = {
 			optimizeDeps: {
 				exclude: ['./../wasm']
 			}
+		},
+
+		paths: {
+			base: process.env.NODE_ENV === "production" ? "/lavaflow" : ""
 		}
 	}
 };
