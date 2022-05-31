@@ -3,8 +3,7 @@
 	import { mdiChevronLeft, mdiClose } from '@mdi/js';
 
 	import Button from '$lib/components/Button.svelte';
-	// @ts-ignore
-	import Icon from 'mdi-svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	export let title = '';
 	export let closeButton = false;

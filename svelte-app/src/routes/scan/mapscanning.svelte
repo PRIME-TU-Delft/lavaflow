@@ -5,13 +5,14 @@
 	import VideoStream from '$lib/components/VideoStream.svelte';
 	import Video from '$lib/components/Video.svelte';
 
-	import { mdiAlertCircleOutline, mdiBookOpenVariant } from '@mdi/js';
+	import { mdiCamera, mdiBookOpenVariant } from '@mdi/js';
 	import { goto } from '$app/navigation';
 	import { rawImage } from '$lib/stores/imageStore';
 
 	let instructionVisible = false;
 	let videoSource: HTMLVideoElement;
 	let canvas: HTMLCanvasElement;
+	let loadingNextPage: boolean = false;
 	$: title = instructionVisible ? 'Instructions' : 'Map Scanning';
 
 	const toggleInstuction = () => (instructionVisible = !instructionVisible);
@@ -19,9 +20,10 @@
 	/**
 	 * Goto scan/maptransform
 	 */
-	function gotoTransform() {
+	async function gotoTransform() {
+		loadingNextPage = true;
+
 		const context = canvas.getContext('2d');
-		console.log(videoSource.videoWidth, videoSource.videoHeight);
 		canvas.height = videoSource.videoHeight;
 		canvas.width = videoSource.videoWidth;
 
@@ -43,7 +45,7 @@
 		{#if instructionVisible}
 			<Instructions />
 		{:else}
-			<Video bind:videoSource style="border-radius: 1rem;" {loading} {stream}>
+			<Video bind:videoSource --corner-radius="1rem" {loading} {stream}>
 				<h1>loading...</h1>
 			</Video>
 		{/if}
@@ -53,11 +55,8 @@
 				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstuction}>
 					Read scan instructions
 				</Button>
-				<Button icon={mdiAlertCircleOutline} on:click={gotoTransform}>
-					<span>No keystones found</span>
-					<span slot="content">
-						To recognize the level curves, we need to have 3 markers visible
-					</span>
+				<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>
+					Capture photo of map
 				</Button>
 			{/if}
 		</div>

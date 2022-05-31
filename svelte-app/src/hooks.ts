@@ -14,7 +14,7 @@ const noSSR = ['/demo', '/scan/maptransform', '/debug'];
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }: HandleType) {
 	const response = await resolve(event, {
-		!noSSR.some((path) => event.url.pathname.startsWith(path)), // Check if the current route is not in the noSSR array
+		ssr: !noSSR.some((path) => event.url.pathname.startsWith(path)), // Check if the current route is not in the noSSR array
 		transformPage: ({ html }) => html.replace('old', 'new')
 	});
 
