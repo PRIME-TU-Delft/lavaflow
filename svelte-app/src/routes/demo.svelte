@@ -15,7 +15,7 @@
 	let aframe: boolean;
 	let ar: boolean;
 	let gltfUrl: string;
-	$: ready = aframe && ar && mounted;
+	$: ready = aframe && mounted;
 
 	const arLoaded = () => (ar = true);
 	const aframeLoaded = () => {
@@ -68,17 +68,19 @@
 
 		console.log('before gltf build');
 		// Construct the final model and extract the gltf and lava_paths
-		const model_construction_result = api.build();
+		const model_construction_result = api.build().to_json();
 		const gltf = model_construction_result.gltf;
 		const lava_paths = model_construction_result.lava_paths;
+
+		console.log(model_construction_result);
 
 		// console.log($contourLines.curves);
 
 		// const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
 		// const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);
-		// const gltfBlob = new Blob([gltf], { type: 'application/json' });
-		// gltfUrl = URL.createObjectURL(gltfBlob);
-		// mounted = true;
+		const gltfBlob = new Blob([gltf], { type: 'application/json' });
+		gltfUrl = URL.createObjectURL(gltfBlob);
+		mounted = true;
 	});
 
 	onDestroy(() => {
@@ -89,9 +91,7 @@
 <svelte:head>
 	{#if mounted}
 		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={aframeLoaded}></script>
-		<script
-			src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"
-			on:load={arLoaded}></script>
+
 	{/if}
 </svelte:head>
 
@@ -105,7 +105,6 @@
 		</div>
 		<!-- <a-entity light="type: ambient; color: #CCC" /> -->
 
-		<a-marker type="barcode" value="1">
 			<a-light position="0 3 0" intensity="2" type="point" />
 			<a-light position="-3 3 4" intensity="2" type="point" />
 
@@ -115,11 +114,10 @@
 				double-render
 				gltf-model="url({gltfUrl})"
 				position="1 0 -1"
-				scale="0.0038 0.0038 0.0038"
+				scale="1 1 1"
 				rotation="0 -90 0"
 				id="model"
 			/>
-		</a-marker>
 		<a-entity camera />
 	</a-scene>
 {/if}
