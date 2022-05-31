@@ -20,6 +20,11 @@ export default function removePerspective(
 	// use the matrix to apply the transformation
 	cv.warpPerspective(image, result, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
 
+	// Deallocate all Mat instances. Instances of Size and Scalar do not need to be manually deallocated.
 	M.delete();
+	sourcePoints.delete();
+	outputPoints.delete();
+	result.delete();
+
 	return result;
 }
