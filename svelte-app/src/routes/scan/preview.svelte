@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	/**
 	 * This is where the user inspects the level curves that are drawn, to check if the user wants to rescan the image or not
 	 */
@@ -11,6 +11,10 @@
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
+
+	let foregroundWidth: number;
+	let foregroundHeight: number;
 
 	import init, * as wasm from 'wasm';
 
@@ -54,9 +58,26 @@
 
 	<Image src={$perspectiveImage} alt="foreground" />
 
+	{console.log($contourLines)}
+	{#if $contourLines.curves && $contourLines.hierarchy}
+		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
+			<P5CurvesDebugView curves={$contourLines.curves} hierarchy={$contourLines.hierarchy} {foregroundHeight} {foregroundWidth} />
+		</div>
+	{/if}
+
 	<div slot="footer">
 		<Button loading={!gltfLoaded} on:click={gotoVisualise}>
 			<span>Visualise</span>
 		</Button>
 	</div>
 </Page>
+
+<style>
+	.sketch {
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		top: 0;
+		touch-action: none;
+	}
+</style>

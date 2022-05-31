@@ -2,7 +2,7 @@ import cv, { type MatVector, type Mat } from 'opencv-ts';
 
 export type ContourTree = [number[][], number[]];
 export type ContourTreeObject = {
-	curves: Int32Array[];
+	curves: number[][];
 	hierarchy: number[];
 };
 
@@ -29,12 +29,12 @@ export function detectCurves(image: Mat): [MatVector, Mat] {
 export function getCurves(img: Mat): ContourTreeObject {
 	const [contours, hierarchy] = detectCurves(img); // get contours and hierarchy from the detectContours function
 
-	let contours_array: Int32Array[] = [];
+	let contours_array: number[][] = [];
 	let hierarchy_array: number[] = [];
 
 	// Loop through contours (OpenCV 2D array), and convert it to a JavaScript array
 	for (let i = 0; i < contours.size(); i++) {
-		contours_array.push(contours.get(i).data32S as unknown as Int32Array);
+		contours_array.push(Array.from(contours.get(i).data32S));
 	}
 
 	// Get every 4th element of the hierarchy array (4th element is the parent node)
@@ -42,6 +42,7 @@ export function getCurves(img: Mat): ContourTreeObject {
 		hierarchy_array.push(hierarchy.data32S[i]);
 	}
 
+	// return { curves: contours_array, hierarchy: hierarchy_array };  // For debugging purposes, if you want to check the contours without de-duplication
 	return removeDoubleContours(contours_array, hierarchy_array);
 }
 
@@ -70,10 +71,10 @@ function getLevels(hierarchy_array: number[]): number[] {
  * @param hierarchy List of parent nodes for every node
  * @returns Magically de-duplicated version of the tree
  */
-function removeDoubleContours(contours: Int32Array[], hierarchy: number[]): ContourTreeObject {
+function removeDoubleContours(contours: number[][], hierarchy: number[]): ContourTreeObject {
 	let levels = getLevels(hierarchy);
 
-	let contours_dedup: Int32Array[] = [];
+	let contours_dedup: number[][] = [];
 	let hierarchy_dedup: number[] = [];
 	let parent_of_parents: number[] = Array(hierarchy.length);
 

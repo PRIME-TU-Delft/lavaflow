@@ -17,6 +17,7 @@
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/P5Transform.svelte';
+	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
 	import { mdiInformation, mdiChevronRight } from '@mdi/js';
 
 	let foregroundWidth: number;
@@ -38,7 +39,7 @@
 		const result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
 
 		// Set contour line store to the detected contour lines with hirarchy
-		const { curves, hierarchy } = getCurves(result);
+		const {curves, hierarchy} = getCurves(result);
 
 		if (curves.length == 0 || hierarchy.length == 0) {
 			alert('No contours found');
