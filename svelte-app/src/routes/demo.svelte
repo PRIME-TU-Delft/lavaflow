@@ -5,7 +5,7 @@
 
 	import { onMount, onDestroy } from 'svelte';
 
-	import { hc_level_curves, hc_parent_relations } from '$lib/data/hardCoded';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 	import type { BufferGeometry, Material, Mesh } from 'three';
 	import { DoubleSide } from 'three';
 
@@ -47,15 +47,26 @@
 		await init();
 
 		const tree = new wasm.OpenCVTree({
-			pixels_per_curve: hc_level_curves,
-			parent_relations: hc_parent_relations
+			pixels_per_curve: hc_curves,
+			parent_relations: hc_hierarchy
 		});
 
-		const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
-		const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);
-		const gltfBlob = new Blob([gltf], { type: 'application/json' });
-		gltfUrl = URL.createObjectURL(gltfBlob);
-		mounted = true;
+		console.log(hc_curves, hc_hierarchy);
+
+		console.log(tree);
+
+		const api = new wasm.ModelConstructionApi();
+		api.base(tree);
+		// api.set_basic_parameters(100, 100, 10);
+
+		console.log('before gltf build');
+		const gltf = api.build();
+
+		console.log({ gltf });
+
+		// const gltfBlob = new Blob([gltf], { type: 'application/json' });
+		// gltfUrl = URL.createObjectURL(gltfBlob);
+		// mounted = true;
 	});
 
 	onDestroy(() => {

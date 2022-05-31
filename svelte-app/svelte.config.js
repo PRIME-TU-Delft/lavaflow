@@ -6,13 +6,7 @@ import wasmPack from 'vite-plugin-wasm-pack';
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
-	preprocess: [
-		preprocess({
-			scss: {
-				prependData: '@use "src/variables.scss" as *;'
-			}
-		})
-	],
+	preprocess: [preprocess()],
 
 	kit: {
 		adapter: adapter({
@@ -25,13 +19,6 @@ const config = {
 			plugins: [wasmPack(['./../wasm'])],
 			optimizeDeps: {
 				exclude: ['./../wasm']
-			},
-			css: {
-				preprocessorOptions: {
-					scss: {
-						additionalData: '@use "src/variables.scss" as *;'
-					}
-				}
 			}
 		},
 

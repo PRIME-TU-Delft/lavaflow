@@ -7,7 +7,7 @@ mod surface_subdivision;
 mod utils;
 use wasm_bindgen::prelude::*;
 
-mod generate;
+mod api;
 mod gltf_conversion;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
