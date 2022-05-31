@@ -60,7 +60,10 @@
 		// api.set_basic_parameters(100, 100, 10);
 
 		console.log('before gltf build');
-		const gltf = api.build();
+		// Construct the final model and extract the gltf and lava_paths
+		const model_construction_result = api.build();
+		const gltf = model_construction_result.gltf;
+		const lava_paths = model_construction_result.lava_paths;
 
 		console.log({ gltf });
 
