@@ -3,8 +3,7 @@
 
 	import { mdiChevronRight } from '@mdi/js';
 	import { mdiChevronLeft } from '@mdi/js';
-	// @ts-ignore
-	import Icon from 'mdi-svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	export let to = '/';
 	export let secondary = false;

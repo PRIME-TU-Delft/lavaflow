@@ -2090,11 +2090,6 @@ map-limit@0.0.1:
   dependencies:
     once "~1.3.0"
 
-mdi-svelte@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/mdi-svelte/-/mdi-svelte-1.1.2.tgz#b0fd281587c69891e40e31cf4e0b4da6be073462"
-  integrity sha512-jVn/CxVzOXTVWDJpUgkgbL/Dt3GTcxa51bOZHQtmrW+lPNypKXddNJIvcqSX+xW6KRIgjB4m715XjaqbDT/mFA==
-
 merge2@^1.3.0, merge2@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"

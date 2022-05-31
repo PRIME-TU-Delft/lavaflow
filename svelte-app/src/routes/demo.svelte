@@ -66,11 +66,11 @@
 		// Pass this tree to Rust, through the API
 		api.base(tree);
 
-		// Extract the gltf file from the API, by calling 'build()'
-		const gltf = api.build();
-		const gltfBlob = new Blob([gltf], { type: 'application/json' });
-		gltfUrl = URL.createObjectURL(gltfBlob);
-		mounted = true;
+		console.log('before gltf build');
+		// Construct the final model and extract the gltf and lava_paths
+		const model_construction_result = api.build();
+		const gltf = model_construction_result.gltf;
+		const lava_paths = model_construction_result.lava_paths;
 
 		// console.log($contourLines.curves);
 

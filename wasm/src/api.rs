@@ -41,6 +41,28 @@ impl OpenCVTree {
 	}
 }
 
+/// API Struct: ModelConstructionResult
+/// This api struct is used to return the computed result to JavaScript.
+/// It's useful, since this rust code will return multiple components: the 3D model and the lava-paths, for example.
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ModelConstructionResult {
+	gltf: String,
+	lava_paths: Vec<Vec<(f32, f32, f32)>>,
+}
+
+#[wasm_bindgen]
+impl ModelConstructionResult {
+	#[wasm_bindgen(constructor)]
+	pub fn new(val: JsValue) -> Result<ModelConstructionResult, JsValue> {
+		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid ModelConstructionResult"))
+	}
+
+	pub fn debug(&self) -> String {
+		format!("{self:?}")
+	}
+}
+
 /// Main API
 ///
 /// This struct represents the main API towards WASM and can be used for all communication with the library.
@@ -151,7 +173,7 @@ impl ModelConstructionApi {
 	/// ## Build: Perform the complete 3D model construction and return the GLTF file as result.
 	///
 	/// Before calling this method, the user should have setup all the desired parameters already.
-	pub fn build(&self) -> Result<String, JsValue> {
+	pub fn build(&self) -> Result<ModelConstructionResult, JsValue> {
 		// Transform the array of parent relations from <isize> into Option<usize>
 		let transformed_parent_relations = &self.open_cv_tree.parent_relations.iter().map(|&e| if e < 0 { None } else { Some(e as usize) }).collect();
 
@@ -214,7 +236,19 @@ impl ModelConstructionApi {
 		let min_altitude = level_curve_map.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let _lava_paths: Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+		let computed_lava_paths: Vec<Vec<&Point>> =
+			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+
+		// Transform these lava-paths to an array that can be returned towards JavaScript
+		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
+
+		// Transform every point to a tuple of three floats: (x, y, z)
+		for (i, arr) in computed_lava_paths.iter().enumerate() {
+			lava_path_triples.push(Vec::new());
+			for p in arr {
+				lava_path_triples[i].push((p.x, p.y, p.z));
+			}
+		}
 
 		//Turn faces of model into triangles
 		let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
@@ -251,7 +285,11 @@ impl ModelConstructionApi {
 			final_points.push(tri10);
 		}
 
-		generate_gltf(final_points).map_err(JsValue::from)
+		// Return the result in the form of a ModelConstructionResult
+		Ok(ModelConstructionResult {
+			gltf: generate_gltf(final_points)?,
+			lava_paths: lava_path_triples,
+		})
 	}
 
 	//

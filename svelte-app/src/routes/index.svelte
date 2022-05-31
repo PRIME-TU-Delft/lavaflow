@@ -23,7 +23,7 @@
 	</div>
 
 	<NavigationButton large to="scan/mapscanning">Start flowing</NavigationButton>
-	<NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton>
+	<!-- <NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton> -->
 </main>
 
 <style lang="scss">
