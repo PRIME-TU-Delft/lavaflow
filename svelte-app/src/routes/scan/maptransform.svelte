@@ -23,7 +23,7 @@
 	let points: Draggable[] = [];
 
 	function gotoPreview() {
-		let mat = cv.imread('backgroundImage');
+		let mat = cv.imread('foregroundImage');
 
 		// Fetch the marker coordinates of the draggable buttons
 		let markerCoords: number[] = [];
@@ -60,6 +60,15 @@
 	<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 		<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
 	</div>
+
+	<img
+		style="display:none"
+		height={foregroundHeight}
+		width={foregroundWidth}
+		id="foregroundImage"
+		src={$rawImage}
+		alt="background"
+	/>
 
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
