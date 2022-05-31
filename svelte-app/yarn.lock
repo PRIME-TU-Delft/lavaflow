@@ -2860,6 +2860,11 @@ svelte-preprocess@^4.0.0, svelte-preprocess@^4.10.5:
     sorcery "^0.10.0"
     strip-indent "^3.0.0"
 
+svelte-sortable-list@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/svelte-sortable-list/-/svelte-sortable-list-1.1.0.tgz#e56c935f45013cbc348149904ac85f80a531d3ec"
+  integrity sha512-K8axS2OEJhN8KI/aXx1LEJkMGZTkR13U191nVhvN0BImZpNmFJ10Zy8K9T0EAg6chB6/hz3/hOeFoe2RVZylSw==
+
 svelte@^3.44.0:
   version "3.48.0"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.48.0.tgz#f98c866d45e155bad8e1e88f15f9c03cd28753d3"

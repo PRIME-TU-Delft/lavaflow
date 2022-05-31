@@ -28,7 +28,7 @@ impl<'a> LevelCurveTree<'a> {
 		let mut own_index = 0;
 
 		// 1. Find the node that has no parent (this is the root of the tree)
-		for (index, relation) in parent_relations.iter().enumerate() {
+		for (index, &relation) in parent_relations.iter().enumerate() {
 			if relation.is_none() {
 				// We've found the root!
 				own_index = index;
