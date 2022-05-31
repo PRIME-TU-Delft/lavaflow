@@ -46,11 +46,11 @@
 	};
 
 	onMount(async () => {
-		if (!$contourLines.curves?.length || !$contourLines.hierarchy?.length) {
-			goto('/scan/mapscanning');
-		}
+		// if (!$contourLines.curves?.length || !$contourLines.hierarchy?.length) {
+		// 	goto('/scan/mapscanning');
+		// }
 
-		console.log($contourLines);
+		//console.log($contourLines);
 
 		await init();
 
@@ -60,14 +60,14 @@
 			parent_relations: hc_hierarchy
 		});
 
+		// Load the api
+		const api = new wasm.ModelConstructionApi();
+
 		// Pass this tree to Rust, through the API
-		wasm.base(tree);
-
-		
-
+		api.base(tree);
 
 		// Extract the gltf file from the API, by calling 'build()'
-		const gltf = wasm.build();
+		const gltf = api.build();
 		const gltfBlob = new Blob([gltf], { type: 'application/json' });
 		gltfUrl = URL.createObjectURL(gltfBlob);
 		mounted = true;
