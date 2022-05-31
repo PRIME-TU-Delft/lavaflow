@@ -54,18 +54,31 @@
 
 		await init();
 
+		// Construct an OpenCV tree from the information that we retrieved from OpenCV
 		const tree = new wasm.OpenCVTree({
-			pixels_per_curve: $contourLines.curves,
-			parent_relations: $contourLines.hierarchy
+			pixels_per_curve: hc_curves,
+			parent_relations: hc_hierarchy
 		});
 
-		console.log($contourLines.curves);
+		// Pass this tree to Rust, through the API
+		wasm.base(tree);
 
-		const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
-		const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);
+		
+
+
+		// Extract the gltf file from the API, by calling 'build()'
+		const gltf = wasm.build();
 		const gltfBlob = new Blob([gltf], { type: 'application/json' });
 		gltfUrl = URL.createObjectURL(gltfBlob);
 		mounted = true;
+
+		// console.log($contourLines.curves);
+
+		// const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
+		// const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);
+		// const gltfBlob = new Blob([gltf], { type: 'application/json' });
+		// gltfUrl = URL.createObjectURL(gltfBlob);
+		// mounted = true;
 	});
 
 	onDestroy(() => {
