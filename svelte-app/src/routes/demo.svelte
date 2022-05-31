@@ -6,7 +6,7 @@
 	import { onMount, onDestroy } from 'svelte';
 
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
-	import { contourLines } from '$lib/stores/contourLineStore';
+	//import { contourLines } from '$lib/stores/contourLineStore';
 	import type { BufferGeometry, Material, Mesh } from 'three';
 	import { DoubleSide } from 'three';
 	import { goto } from '$app/navigation';
