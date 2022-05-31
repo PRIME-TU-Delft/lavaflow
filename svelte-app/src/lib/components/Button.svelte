@@ -18,12 +18,13 @@
 >
 	{#if loading}
 		<div class="title">
-			<Icon path={mdiLoading} spin={1} color="var(--text-color)">Loading...</Icon>
+			<Icon path={mdiLoading} spin={1} />
+			Loading...
 		</div>
 	{:else}
 		<div class="title">
 			{#if icon}
-				<Icon path={icon} color="var(--text-color)" />
+				<Icon path={icon} />
 			{/if}
 			<slot />
 		</div>
@@ -74,5 +75,9 @@
 	.secondary {
 		background: var(--secondary-color);
 		color: var(--text-color-secondary);
+	}
+
+	:global(button > .title > span) {
+		width: 100%;
 	}
 </style>

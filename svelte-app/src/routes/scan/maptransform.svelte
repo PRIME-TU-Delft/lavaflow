@@ -3,6 +3,7 @@
 	 * Page for dragging markers on document edges
 	 */
 	import Button from '$lib/components/Button.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import Page from '$lib/components/Page.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
@@ -14,6 +15,7 @@
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/P5Transform.svelte';
+	import { mdiInformation, mdiChevronRight } from '@mdi/js';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
@@ -21,10 +23,7 @@
 	let points: Draggable[] = [];
 
 	function gotoPreview() {
-		// TODO: move this to seperate file
-		let mat = cv.imread('foregroundImage');
-
-		console.log(points);
+		let mat = cv.imread('backgroundImage');
 
 		// Fetch the marker coordinates of the draggable buttons
 		let markerCoords: number[] = [];
@@ -46,6 +45,7 @@
 	}
 
 	onMount(() => {
+		// If no raw image in cache, go back to scan/mapscanning
 		if (!$rawImage) goto('/scan/mapscanning');
 	});
 </script>
@@ -61,20 +61,16 @@
 		<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
 	</div>
 
-	<img
-		style="display:none"
-		height={foregroundHeight}
-		width={foregroundWidth}
-		id="foregroundImage"
-		src={$rawImage}
-		alt="background"
-	/>
-
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
 	<div slot="footer">
+		<Button secondary icon={mdiInformation}>
+			Drag each marker to the correct corner on the map
+		</Button>
+
 		<Button on:click={gotoPreview}>
-			<span>Proceed</span>
+			<span>Preview transformation</span>
+			<Icon path={mdiChevronRight} />
 		</Button>
 	</div>
 </Page>
