@@ -1,21 +1,20 @@
 <script lang="ts">
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import { onMount, onDestroy } from 'svelte';
+	import {gltfUrl} from "$lib/stores/gltfStore"
+	import { onMount } from 'svelte';
 
 	let mounted: boolean;
 	let aframe: boolean;
-	let gltfUrl: string = '/output20.gltf';
-	$: ready = aframe && mounted; // TODO: mounted is always true when aframe is true
+	$: ready = (aframe || window.AFRAME) && mounted;
 
 	onMount(async () => {
 		mounted = true;
-		console.log('mounted')
 	});
 </script>
 
 <svelte:head>
-	{#if mounted}
+	{#if mounted && !window.AFRAME}
 		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={() => (aframe = true)}></script>
 	{/if}
 </svelte:head>
@@ -29,7 +28,7 @@
 		<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
 
 		<a-entity
-			gltf-model="url({gltfUrl})"
+			gltf-model="url({$gltfUrl})"
 			position="3 0 -5"
 			scale="0.00038 0.1 0.00038"
 			rotation="0 -90 0"

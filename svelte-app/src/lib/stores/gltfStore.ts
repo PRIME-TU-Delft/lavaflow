@@ -7,4 +7,4 @@
 
 import { writable } from 'svelte/store';
 
-export const mountainGltf = writable<string>();
+export const gltfUrl = writable<string>('/output20.gltf');

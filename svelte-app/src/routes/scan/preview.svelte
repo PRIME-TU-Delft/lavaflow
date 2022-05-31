@@ -12,13 +12,34 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
+	import init, * as wasm from 'wasm';
+
+	let gltfLoaded = false;
+
 	function gotoVisualise() {
 		goto('/demo');
 	}
 
-	onMount(() => {
-		if (!$perspectiveImage && !$contourLines.curves && !$contourLines.hierarchy)
-			goto('/scan/mapscanning');
+	onMount(async () => {
+		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
+			return goto('/scan/mapscanning');
+		}
+
+		await init();
+
+		const tree = new wasm.OpenCVTree({
+			pixels_per_curve: $contourLines.curves,
+			parent_relations: $contourLines.hierarchy
+		});
+
+		const api = new wasm.ModelConstructionApi();
+		api.base(tree);
+
+		const model_construction_result = api.build();
+
+		console.log(model_construction_result);
+
+		gltfLoaded = true;
 	});
 </script>
 
@@ -34,7 +55,7 @@
 	<Image src={$perspectiveImage} alt="foreground" />
 
 	<div slot="footer">
-		<Button on:click={gotoVisualise}>
+		<Button loading={!gltfLoaded} on:click={gotoVisualise}>
 			<span>Visualise</span>
 		</Button>
 	</div>
