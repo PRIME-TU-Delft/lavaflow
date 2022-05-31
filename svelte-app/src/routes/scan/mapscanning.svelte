@@ -36,7 +36,7 @@
 	}
 </script>
 
-<VideoStream let:loading let:stream>
+<VideoStream let:loading let:stream let:error>
 	<Page {title} closeButton={instructionVisible} on:close={toggleInstuction}>
 		<div slot="background">
 			<Video {loading} {stream} />
@@ -45,7 +45,7 @@
 		{#if instructionVisible}
 			<Instructions />
 		{:else}
-			<Video bind:videoSource --corner-radius="1rem" {loading} {stream}>
+			<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream}>
 				<h1>loading...</h1>
 			</Video>
 		{/if}

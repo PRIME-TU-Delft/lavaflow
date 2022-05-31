@@ -3,6 +3,7 @@
 
 	let stream: MediaStream;
 	let loading = true;
+	let error: string;
 
 	const obtenerVideoCamara = async () => {
 		try {
@@ -13,8 +14,9 @@
 				}
 			});
 			loading = false;
-		} catch (error) {
-			console.log(error);
+			error = '';
+		} catch (err) {
+			error = ('' + err) as string;
 		}
 	};
 
@@ -29,4 +31,4 @@
 	});
 </script>
 
-<slot {loading} {stream} />
+<slot {loading} {stream} {error} />
