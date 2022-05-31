@@ -241,13 +241,13 @@ impl ModelConstructionApi {
 			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
-		let mut lava_path_tuples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
+		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
 
 		// Transform every point to a tuple of three floats: (x, y, z)
 		for (i, arr) in computed_lava_paths.iter().enumerate() {
-			lava_path_tuples.push(Vec::new());
+			lava_path_triples.push(Vec::new());
 			for p in arr {
-				lava_path_tuples[i].push((p.x, p.y, p.z));
+				lava_path_triples[i].push((p.x, p.y, p.z));
 			}
 		}
 
@@ -289,7 +289,7 @@ impl ModelConstructionApi {
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
 			gltf: generate_gltf(final_points)?,
-			lava_paths: lava_path_tuples,
+			lava_paths: lava_path_triples,
 		})
 	}
 
