@@ -1,26 +1,38 @@
 <script lang="ts">
-	// @ts-ignore
-	import Icon from 'mdi-svelte';
+	import Icon from '$lib/components/Icon.svelte';
+	import { mdiLoading } from '@mdi/js';
 
+	export let loading = false;
 	export let disabled = false;
 	export let large = false;
 	export let secondary = false;
 	export let icon: string = '';
 </script>
 
-<button {disabled} class:disabled class:large class:secondary on:click>
-	<div class="title">
-		{#if icon}
-			<Icon path={icon} color="var(--text-color)" />
-		{/if}
-
-		<slot />
-	</div>
-
-	{#if $$slots.content}
-		<div class="content">
-			<slot name="content" />
+<button
+	disabled={disabled || loading}
+	class:disabled={disabled || loading}
+	class:large
+	class:secondary
+	on:click
+>
+	{#if loading}
+		<div class="title">
+			<Icon path={mdiLoading} spin={1} color="var(--text-color)">Loading...</Icon>
 		</div>
+	{:else}
+		<div class="title">
+			{#if icon}
+				<Icon path={icon} color="var(--text-color)" />
+			{/if}
+			<slot />
+		</div>
+
+		{#if $$slots.content}
+			<div class="content">
+				<slot name="content" />
+			</div>
+		{/if}
 	{/if}
 </button>
 
