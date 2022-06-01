@@ -25,10 +25,10 @@
 
 			const size = 100; // size of draggble surface
 
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // []
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // ()
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // []
 			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // ><
 			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.8, size)); // /\
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // ()
 		};
 
 		/**
@@ -53,10 +53,10 @@
 			}
 
 			let markerSize = 20;
-			points[0].drawCircle(p5, markerSize);
-			points[1].drawRect(p5, markerSize);
-			points[2].drawCross(p5, markerSize);
-			points[3].drawTriangle(p5, markerSize);
+			points[0].drawRect(p5, markerSize);
+			points[1].drawCross(p5, markerSize);
+			points[2].drawTriangle(p5, markerSize);
+			points[3].drawCircle(p5, markerSize);
 		};
 
 		// If the user presses/releases their mouse, signal this to all Draggable points
