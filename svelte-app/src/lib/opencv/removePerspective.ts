@@ -25,7 +25,6 @@ export default function removePerspective(
 	M.delete();
 	sourcePoints.delete();
 	outputPoints.delete();
-	result.delete();
 
 	return result;
 }
