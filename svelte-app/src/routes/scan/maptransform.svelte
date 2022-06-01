@@ -17,15 +17,12 @@
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/P5Transform.svelte';
-	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
 	import { mdiInformation, mdiChevronRight } from '@mdi/js';
 
-	let foregroundWidth: number;
-	let foregroundHeight: number;
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
 
-	function gotoPreview() {
+	function gotoPreview(width: number, height: number) {
 		let mat = cv.imread('foregroundImage');
 
 		// Fetch the marker coordinates of the draggable buttons
@@ -36,7 +33,7 @@
 		}
 
 		// Apply the perspective transformation using the selected marker coords
-		const result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
+		const result = removePerspective(mat, markerCoords, width, height);
 
 		// Set contour line store to the detected contour lines with hirarchy
 		const { curves, hierarchy } = getCurves(result);
@@ -79,14 +76,14 @@
 	});
 </script>
 
-<Page title="Image transformation">
+<Page title="Image transformation" let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="/scan/mapscanning" back>Rescan image</NavigationButton>
 
 	<div slot="background">
 		<img id="backgroundImage" src={$rawImage} alt="background" />
 	</div>
 
-	<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
+	<div class="sketch">
 		<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
 	</div>
 
@@ -106,7 +103,7 @@
 			Drag each marker to the correct corner on the map
 		</Button>
 
-		<Button on:click={gotoPreview}>
+		<Button on:click={() => gotoPreview(foregroundWidth, foregroundHeight)}>
 			<span>Preview transformation</span>
 			<Icon path={mdiChevronRight} />
 		</Button>
