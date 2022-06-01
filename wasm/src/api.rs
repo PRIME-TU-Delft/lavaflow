@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use crate::gltf_conversion::generate_gltf;
 use crate::model_construction::smoother::Smoother;
 use crate::objects::level_curve_tree::LevelCurveTree;
-use crate::objects::level_curves::LevelCurveSet;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
