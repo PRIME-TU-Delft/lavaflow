@@ -1,11 +1,6 @@
-use miette::{miette, Result};
-
-// use crate::utils::log;
-
 //
 // Class: LevelCurves
 //
-use super::level_curve_tree::LevelCurveTree;
 use crate::objects::point::Point;
 
 #[derive(Debug)]
@@ -276,83 +271,6 @@ impl LevelCurveSet {
 		min_dist.0
 	}
 	///
-	/// transforms `levelCurveTree` to `levelCurveMap` structure, while reducing amount of total points from pixelStructure
-	///
-	/// # Arguments
-	///
-	/// * `tree` - `levelCurveTree` datastructure containing information from scanning step
-	/// * `altitude_step` - increase in height per contour line
-	/// * `desired_dist` - minimum desired distance between points in final conout map
-	/// * `current_height` - to track height when traversing tree, initial call should start with 1
-	///
-	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap<'a>(tree: &'a LevelCurveTree<'a>, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
-		let mut ret: LevelCurveSet = LevelCurveSet::new(altitude_step);
-
-		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
-
-		let first_pixel = tree.get_first_pixel().ok_or_else(|| miette!("Could not get first pixel"))?;
-		let mut last_saved = first_pixel;
-		let mut last_visited = first_pixel;
-		let mut current_pixel = first_pixel;
-
-		// untill we rencounter the first pixel, search direct neightborhood (directly adjacent pixels) of current pixel for next pixel
-		// Assumption: there are no breaks in the line
-		// break for loop in line 165
-
-		loop {
-			// Assumption: pixels have directly connected neighbors (diagonals do not count as adjacent)
-			// Assumption: line is exactly 1 pixel wide
-			// TODO; check if in actual input every pixel has adjacent pixel
-			let neighbors = vec![
-				(current_pixel.0 - 1, current_pixel.1),
-				(current_pixel.0 + 1, current_pixel.1),
-				(current_pixel.0, current_pixel.1 - 1),
-				(current_pixel.0, current_pixel.1 + 1),
-			];
-			for (x, y) in neighbors {
-				// TODO: check how this holds for corner cases
-				if
-				/*(x, y) != current_pixel &&*/
-				(x, y) != last_visited && tree.contains_pixel(x, y) {
-					// if dist to last saved and current pixel is desired length, save current pixel, else move on
-					if pixel_dist(&(x, y), &last_saved) >= desired_dist {
-						current_level_curve.add_point(Point {
-							x: x as f32,
-							y: y as f32,
-							z: current_level_curve.altitude,
-						});
-						last_saved = (x, y);
-					}
-
-					last_visited = current_pixel;
-					current_pixel = (x, y);
-				}
-			}
-			if current_pixel == first_pixel {
-				break;
-			}
-		}
-
-		// Add this level curve to the result
-		ret.add_level_curve(current_level_curve);
-
-		// for every child get levelcurvemap and add to ret
-		if tree.get_children().is_empty() {
-			return Ok(ret);
-		}
-
-		for child in tree.get_children() {
-			let childmap = LevelCurveSet::transform_to_LevelCurveMap(&child, altitude_step, desired_dist, current_height + 1);
-			for curve in childmap?.level_curves {
-				ret.add_level_curve(curve);
-			}
-		}
-
-		Ok(ret)
-	}
-
-	///
 	/// Shifts all points in level curve set such that the set is aligned with the x and y axis.
 	/// Not exactly aligned, distance to keep from axes can be specified.
 	///  
@@ -369,9 +287,4 @@ impl LevelCurveSet {
 			}
 		}
 	}
-}
-
-// TODO: find better method
-fn pixel_dist(a: &(u64, u64), b: &(u64, u64)) -> f32 {
-	((a.0 as f32 - b.0 as f32).powi(2) + (a.1 as f32 - b.1 as f32).powi(2)).sqrt()
 }

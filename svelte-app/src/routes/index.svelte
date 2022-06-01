@@ -36,6 +36,7 @@
 		background-repeat: no-repeat;
 		height: 4rem;
 		width: 100%;
+		z-index: 1000;
 	}
 
 	header {
