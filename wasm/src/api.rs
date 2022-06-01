@@ -64,6 +64,17 @@ impl ModelConstructionResult {
 	}
 }
 
+/// API Struct: AltitudeGradientPair
+/// This API struct is used to return the result of the get_altitude_and_gradient_for_point function,
+/// that is implemented in the ModelConstructionApi struct.
+#[wasm_bindgen]
+pub struct AltitudeGradientPair {
+	x: f32,
+	y: f32,
+	altitude: f32,
+	gradient: f32,
+}
+
 /// Main API
 ///
 /// This struct represents the main API towards WASM and can be used for all communication with the library.
@@ -84,6 +95,7 @@ pub struct ModelConstructionApi {
 	// Private properties
 	open_cv_tree: OpenCVTree,
 	smoothing_operations_queue: Vec<Box<dyn SmoothingOperation>>,
+	computed_model_raster: Option<Raster>,
 }
 
 /// Main API
@@ -119,6 +131,7 @@ impl ModelConstructionApi {
 				parent_relations: Vec::new(),
 			},
 			smoothing_operations_queue: Vec::new(),
+			computed_model_raster: None,
 		}
 	}
 
@@ -291,6 +304,24 @@ impl ModelConstructionApi {
 			gltf: generate_gltf(final_points)?,
 			lava_paths: lava_path_triples,
 		})
+	}
+
+	/// # API Function
+	/// ## After Build: get the altitude and gradient of a specified x and y in pixels.
+	///
+	/// This function will use the raster that was created after the smoothing operations were completed.
+	/// This means that any effect on the altitude and gradient, due to catmull clark, will **not** be incorportated
+	/// in this computation. The reason for this is that having to compute a continuous altitude/gradient on a set of
+	/// faces and vertices is much harder than to interpolate the points on a raster.
+	///
+	/// ### Parameters
+	/// - `x` (f32): The x-coordinate of the point
+	/// - `y` (f32): The y-coordinate of the point
+	///
+	/// ### Returns
+	/// This method returns a tuple (f32, f32). The first entry is the altitude and the second the gradient.
+	pub fn get_altitude_and_gradient_for_point(&self, x: f32, y: f32) -> Result<AltitudeGradientPair, JsValue> {
+		Ok(AltitudeGradientPair { x, y, altitude: 0.0, gradient: 0.0 })
 	}
 
 	//
