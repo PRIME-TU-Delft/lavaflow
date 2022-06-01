@@ -21,8 +21,12 @@
 
 {#if ready}
 	<a-scene embedded>
-		<div class="backButton">
+		<div class="button backButton">
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
+		</div>
+
+		<div class="button placeHouses">
+			<NavigationButton to="/houseplacement">Place houses</NavigationButton>
 		</div>
 
 		<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
@@ -40,12 +44,20 @@
 {/if}
 
 <style>
-	.backButton {
+	.button {
 		position: absolute;
+		width: 15rem;
+		max-width: calc(50vw - 2rem);
+		z-index: 1;
+	}
+
+	.backButton {
 		top: 1rem;
 		left: 1rem;
-		z-index: 1;
-		width: 15rem;
-		max-width: calc(100vw - 2rem);
+	}
+
+	.placeHouses {
+		top: 1rem;
+		right: 1rem;
 	}
 </style>

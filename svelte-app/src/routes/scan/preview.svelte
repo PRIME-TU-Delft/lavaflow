@@ -36,12 +36,12 @@
 			parent_relations: $contourLines.hierarchy
 		});
 
-		const api = new wasm.ModelConstructionApi();
-		api.base(tree);
+		// const api = new wasm.ModelConstructionApi();
+		// api.base(tree);
 
-		const model_construction_result = api.build();
+		// const model_construction_result = api.build();
 
-		console.log(model_construction_result);
+		// console.log(model_construction_result);
 
 		gltfLoaded = true;
 	});
@@ -58,7 +58,7 @@
 
 	<Image src={$perspectiveImage} alt="foreground" />
 
-	{#if $contourLines.curves && $contourLines.hierarchy}
+	{#if $contourLines?.curves && $contourLines?.hierarchy}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 			<P5CurvesDebugView
 				curves={$contourLines.curves}

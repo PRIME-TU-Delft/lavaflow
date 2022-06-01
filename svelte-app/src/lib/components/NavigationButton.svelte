@@ -19,9 +19,9 @@
 				<Icon path={mdiChevronLeft} color="var(--text-color)" />
 			{/if}
 
-			<div class="text">
+			<span class="text">
 				<slot />
-			</div>
+			</span>
 
 			{#if !back}
 				<Icon path={mdiChevronRight} color="var(--text-color)" />
@@ -35,6 +35,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		width: 100%;
 	}
 
 	.text {
