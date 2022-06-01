@@ -155,13 +155,19 @@ impl<'a> LevelCurveTree<'a> {
 	///
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap(&'a self, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
+	pub fn transform_to_LevelCurveMap(&'a self, altitude_step: f32, mut desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
 		let mut result: LevelCurveSet = LevelCurveSet::new(altitude_step);
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
 
 		//get pixels from tree
 		let pixels = self.get_pixels_for_curve().ok_or_else(|| miette!("Could not get pixels in tree"))?;
 		let first_pixel: &(u64, u64) = pixels.get(0).ok_or_else(|| miette!("Could not get first pixel"))?;
+
+		// If there are only 50 pixels, select all of them
+		// TODO: 50 is somewhat arbitrarily chosen, there's probably a better way to do this
+		if pixels.len() < 50 {
+			desired_dist = 0.0;
+		}
 
 		//add first point to level curve and store as most recently added
 		current_level_curve.add_point(Point {

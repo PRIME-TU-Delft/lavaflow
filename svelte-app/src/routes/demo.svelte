@@ -25,7 +25,7 @@
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
 
-		<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
+		<a-entity light="color: #AFA; intensity: 1.5" position="-1 1 0"></a-entity>
 
 		<a-entity
 			gltf-model="url({$gltfUrl})"

@@ -36,8 +36,8 @@ impl OpenCVTree {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
 	}
 
-	pub fn debug(&self) -> String {
-		format!("{self:?}")
+	pub fn debug(&self) -> Result<JsValue, JsValue> {
+		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize OpenCVTree"))
 	}
 }
 
@@ -62,8 +62,7 @@ impl ModelConstructionResult {
 		format!("{self:?}")
 	}
 
-	pub fn to_json(&self) -> Result<JsValue, JsValue> {
-		// serde_json::to_string(self).map_err(|_| String::from("Could not serialize ModelConstructionResult"))
+	pub fn to_js(&self) -> Result<JsValue, JsValue> {
 		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize ModelConstructionResult"))
 	}
 }

@@ -9,6 +9,7 @@
 
 	import { perspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
+	import { gltfUrl } from '$lib/stores/gltfStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
@@ -38,8 +39,11 @@
 
 		const api = new wasm.ModelConstructionApi();
 		api.base(tree);
+		api.set_basic_parameters(30, 30, 0.2);
 
-		const model_construction_result = api.build();
+		const model_construction_result = api.build().to_js();
+		const gltfBlob = new Blob([model_construction_result.gltf], { type: 'application/json' });
+		gltfUrl.set(URL.createObjectURL(gltfBlob));
 
 		console.log(model_construction_result);
 
