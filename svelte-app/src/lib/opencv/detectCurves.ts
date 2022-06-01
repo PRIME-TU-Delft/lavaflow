@@ -18,6 +18,9 @@ export function detectCurves(image: Mat): [MatVector, Mat] {
 	let hierarchy = new cv.Mat(); // this will be used to hold the hierarchy of the contours
 	cv.findContours(thresholded, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE); // get contours out of the image
 
+	gray.delete();
+	threshold.delete();
+
 	return [contours, hierarchy];
 }
 
@@ -41,6 +44,9 @@ export function getCurves(img: Mat): ContourTreeObject {
 	for (let i = 3; i < hierarchy.data32S.length; i += 4) {
 		hierarchy_array.push(hierarchy.data32S[i]);
 	}
+
+	contours.delete();
+	hierarchy.delete();
 
 	// return { curves: contours_array, hierarchy: hierarchy_array };  // For debugging purposes, if you want to check the contours without de-duplication
 	return removeDoubleContours(contours_array, hierarchy_array);
