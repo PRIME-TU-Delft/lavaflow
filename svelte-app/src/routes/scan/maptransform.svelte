@@ -9,12 +9,15 @@
 
 	import type Draggable from '$lib/data/draggable';
 	import { rawImage, perspectiveImage } from '$lib/stores/imageStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import removePerspective from '$lib/opencv/removePerspective';
+	import { getCurves } from '$lib/opencv/detectCurves';
 
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/P5Transform.svelte';
+	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
 	import { mdiInformation, mdiChevronRight } from '@mdi/js';
 
 	let foregroundWidth: number;
@@ -33,9 +36,35 @@
 		}
 
 		// Apply the perspective transformation using the selected marker coords
-		let result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
+		const result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
+
+		// Set contour line store to the detected contour lines with hirarchy
+		const { curves, hierarchy } = getCurves(result);
+
+		if (curves.length == 0 || hierarchy.length == 0) {
+			alert('No contours found');
+			return;
+		}
+
+		// Convert the OpenCV Mat to a array of tuples for mountain model construction
+		const contourTuples: [number, number][][] = curves.map((contour) => {
+			let contourTuple: [number, number][] = [];
+
+			for (let i = 0; i < contour.length - 1; i += 2) {
+				contourTuple.push([contour[i], contour[i + 1]]);
+			}
+
+			return contourTuple;
+		});
+
+		contourLines.set({
+			curves: contourTuples,
+			hierarchy: hierarchy
+		});
+
 		cv.imshow('canvasOutput', result);
 
+		// set the output image to a store
 		perspectiveImage.set(outputCanvas.toDataURL());
 
 		result.delete();
