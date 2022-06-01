@@ -14,10 +14,10 @@
 	import { onMount } from 'svelte';
 	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
 
+	import init, * as wasm from 'wasm';
+
 	let foregroundWidth: number;
 	let foregroundHeight: number;
-
-	import init, * as wasm from 'wasm';
 
 	let gltfLoaded = false;
 

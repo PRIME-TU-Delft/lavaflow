@@ -26,7 +26,7 @@
 	let points: Draggable[] = [];
 
 	function gotoPreview() {
-		let mat = cv.imread('foregroundImage');
+		const mat = cv.imread('foregroundImage');
 
 		// Fetch the marker coordinates of the draggable buttons
 		let markerCoords: number[] = [];

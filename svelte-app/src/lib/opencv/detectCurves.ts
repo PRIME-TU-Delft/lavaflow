@@ -78,7 +78,7 @@ function getLevels(hierarchy_array: number[]): number[] {
  * @returns Magically de-duplicated version of the tree
  */
 function removeDoubleContours(contours: number[][], hierarchy: number[]): ContourTreeObject {
-	let levels = getLevels(hierarchy);
+	const levels = getLevels(hierarchy);
 
 	let contours_dedup: number[][] = [];
 	let hierarchy_dedup: number[] = [];
