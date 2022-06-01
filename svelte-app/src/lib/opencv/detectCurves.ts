@@ -12,7 +12,7 @@ export function detectCurves(image: Mat): [MatVector, Mat] {
 	cv.cvtColor(image, gray, cv.COLOR_RGBA2GRAY, 0); // convert image to grayscale
 
 	let blurred = new cv.Mat(); // create image to hold blurred image
-	let kernelSize = new cv.Size(5, 5); // set the size of the blur
+	const kernelSize = new cv.Size(5, 5); // set the size of the blur
 	cv.GaussianBlur(gray, blurred, kernelSize, 0, 0, cv.BORDER_DEFAULT); // blur the image
 
 	let sharpened = new cv.Mat(); // create new image to hold sharpened image
