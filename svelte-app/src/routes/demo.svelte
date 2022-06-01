@@ -29,8 +29,8 @@
 
 		<a-entity
 			gltf-model="url({$gltfUrl})"
-			position="3 0 -5"
-			scale="0.00038 0.1 0.00038"
+			position="5 0 5"
+			scale="0.01 0.1 0.01"
 			rotation="0 -90 0"
 			id="model"
 		/>

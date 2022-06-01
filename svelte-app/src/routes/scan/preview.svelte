@@ -40,6 +40,12 @@
 		const api = new wasm.ModelConstructionApi();
 		api.base(tree);
 		api.set_basic_parameters(30, 30, 0.2);
+		api.set_svc_parameters(15);
+		api.set_catmull_clark_parameters(1);
+		api.set_lava_path_parameters(30, 0.1);
+		api.apply_smooth_to_layer(0, 0.7, 4, 10, false);  // Smooth foot of the mountain
+		api.increase_altitude_for_mountain_tops(0.3, false);
+		api.apply_smooth_to_all(0.3, 6, 10, false);
 
 		const model_construction_result = api.build().to_js();
 		const gltfBlob = new Blob([model_construction_result.gltf], { type: 'application/json' });
