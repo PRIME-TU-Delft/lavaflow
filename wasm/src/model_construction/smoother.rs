@@ -9,7 +9,7 @@ use miette::{miette, Result};
 /// For example, it enables smoothing per altitude-group of level-curves. Developers can detach specific parts of
 /// the mountain, such as the mountain tops, and smooth them, separately using specific paremeters.
 pub struct Smoother<'a> {
-	raster: &'a mut Raster,
+	pub raster: &'a mut Raster,
 	is_svc: &'a Vec<Vec<bool>>,
 	point_indices_per_layer: Vec<Vec<(usize, usize)>>,
 	layer_is_top: Vec<bool>,
