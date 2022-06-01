@@ -58,10 +58,14 @@
 
 	<Image src={$perspectiveImage} alt="foreground" />
 
-	{console.log($contourLines)}
 	{#if $contourLines.curves && $contourLines.hierarchy}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
-			<P5CurvesDebugView curves={$contourLines.curves} hierarchy={$contourLines.hierarchy} {foregroundHeight} {foregroundWidth} />
+			<P5CurvesDebugView
+				curves={$contourLines.curves}
+				hierarchy={$contourLines.hierarchy}
+				{foregroundHeight}
+				{foregroundWidth}
+			/>
 		</div>
 	{/if}
 

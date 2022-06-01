@@ -39,15 +39,15 @@
 		const result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
 
 		// Set contour line store to the detected contour lines with hirarchy
-		const {curves, hierarchy} = getCurves(result);
+		const { curves, hierarchy } = getCurves(result);
 
 		if (curves.length == 0 || hierarchy.length == 0) {
 			alert('No contours found');
 			return;
 		}
 
-		const contourArray = curves.map((c) => Array.from(c));
-		const contourTuples: [number, number][][] = contourArray.map((contour) => {
+		// Convert the OpenCV Mat to a array of tuples for mountain model construction
+		const contourTuples: [number, number][][] = curves.map((contour) => {
 			let contourTuple: [number, number][] = [];
 
 			for (let i = 0; i < contour.length - 1; i += 2) {
@@ -64,6 +64,7 @@
 
 		cv.imshow('canvasOutput', result);
 
+		// set the output image to a store
 		perspectiveImage.set(outputCanvas.toDataURL());
 
 		result.delete();

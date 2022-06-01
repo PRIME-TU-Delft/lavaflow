@@ -28,7 +28,7 @@
 		<script>
 			function appHeight() {
 				const doc = document.documentElement;
-				doc.style.setProperty('--vh', window.innerHeight + 'px');
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
 			}
 
 			window.addEventListener('resize', appHeight);

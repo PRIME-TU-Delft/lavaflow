@@ -23,11 +23,12 @@
 		p5.setup = () => {
 			p5.createCanvas(foregroundWidth, foregroundHeight);
 
-			const size = 120; // size of draggble surface
-			points.push(new Draggable(25, 25, size));
-			points.push(new Draggable(25, 300, size));
-			points.push(new Draggable(300, 300, size));
-			points.push(new Draggable(300, 25, size));
+			const size = 100; // size of draggble surface
+
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // []
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // ()
+			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // ><
+			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.8, size)); // /\
 		};
 
 		/**
