@@ -23,11 +23,12 @@
 		p5.setup = () => {
 			p5.createCanvas(foregroundWidth, foregroundHeight);
 
-			const size = 120; // size of draggble surface
-			points.push(new Draggable(25, 25, size));
-			points.push(new Draggable(25, 300, size));
-			points.push(new Draggable(300, 300, size));
-			points.push(new Draggable(300, 25, size));
+			const size = 100; // size of draggble surface
+
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // []
+			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // ><
+			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.8, size)); // /\
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // ()
 		};
 
 		/**
@@ -48,15 +49,14 @@
 			for (let i = 0; i < points.length; i++) {
 				points[i].update(p5); // update position
 
-
 				drawLine(points[i], points[(i + 1) % points.length]); // draw line between points
 			}
-			
+
 			let markerSize = 20;
-			points[0].drawCircle(p5, markerSize);
-			points[1].drawRect(p5, markerSize);
-			points[2].drawCross(p5, markerSize);
-			points[3].drawTriangle(p5, markerSize);
+			points[0].drawRect(p5, markerSize);
+			points[1].drawCross(p5, markerSize);
+			points[2].drawTriangle(p5, markerSize);
+			points[3].drawCircle(p5, markerSize);
 		};
 
 		// If the user presses/releases their mouse, signal this to all Draggable points

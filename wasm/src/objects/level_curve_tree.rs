@@ -6,6 +6,14 @@
 // This includes information that could be required by other algorithms.
 //
 
+use std::collections::HashSet;
+
+use super::{
+	level_curves::{LevelCurve, LevelCurveSet},
+	point::Point,
+};
+use miette::{miette, Result};
+
 #[derive(Debug)]
 pub struct LevelCurveTree<'a> {
 	pixels_per_curve: &'a Vec<Vec<(u64, u64)>>,
@@ -130,6 +138,86 @@ impl<'a> LevelCurveTree<'a> {
 	pub fn get_first_pixel(&self) -> Option<(u64, u64)> {
 		self.pixels_per_curve.get(self.own_index).map(|v| v[0])
 	}
+	/// Method: Retrieve pixels in curve at current top of tree
+	pub fn get_pixels_for_curve(&self) -> Option<&Vec<(u64, u64)>> {
+		self.pixels_per_curve.get(self.own_index)
+	}
+	///
+	///
+	/// transforms `levelCurveTree` to `levelCurveSet` structure, while reducing amount of total points from tree structure
+	///
+	/// # Arguments
+	///
+	/// * `tree` - `levelCurveTree` datastructure containing information from scanning step
+	/// * `altitude_step` - increase in height per contour line
+	/// * `desired_dist` - minimum desired distance between points in final contour map
+	/// * `current_height` - used to track height when traversing tree recursively, initial call should start with 1
+	///
+	///
+	#[allow(non_snake_case)]
+	pub fn transform_to_LevelCurveMap(&'a self, altitude_step: f32, mut desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
+		let mut result: LevelCurveSet = LevelCurveSet::new(altitude_step);
+		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
+
+		//get pixels from tree
+		let pixels = self.get_pixels_for_curve().ok_or_else(|| miette!("Could not get pixels in tree"))?;
+		let first_pixel: &(u64, u64) = pixels.get(0).ok_or_else(|| miette!("Could not get first pixel"))?;
+
+		// If there are only 50 pixels, select all of them
+		// TODO: 50 is somewhat arbitrarily chosen, there's probably a better way to do this
+		if pixels.len() < 50 {
+			desired_dist = 0.0;
+		}
+
+		//add first point to level curve and store as most recently added
+		current_level_curve.add_point(Point {
+			x: first_pixel.0 as f32,
+			y: first_pixel.1 as f32,
+			z: current_level_curve.altitude,
+		});
+		let mut last_added = first_pixel;
+
+		//keep track of traversed pixels
+		let mut visited: HashSet<&(u64, u64)> = HashSet::with_capacity(pixels.len());
+		visited.insert(first_pixel);
+
+		//loop to add rest of pixels to level curve
+		for pixel in pixels {
+			if !visited.contains(pixel) {
+				//check if next pixel is desired distance from last saved pixel , if so add to current level curve
+				if pixel_dist(&(pixel.0, pixel.1), last_added) >= desired_dist {
+					current_level_curve.add_point(Point {
+						x: pixel.0 as f32,
+						y: pixel.1 as f32,
+						z: current_level_curve.altitude,
+					});
+					last_added = pixel;
+				}
+			}
+		}
+
+		result.add_level_curve(current_level_curve);
+
+		// if there are no children to traverse return current set
+		if self.get_children().is_empty() {
+			return Ok(result);
+		}
+
+		//if current node has children find their level curves recursively
+		for child in &self.get_children() {
+			let child_set = child.transform_to_LevelCurveMap(altitude_step, desired_dist, current_height + 1)?;
+			//TODO: is this bad space wise?
+			for curve in child_set.level_curves {
+				result.add_level_curve(curve);
+			}
+		}
+
+		Ok(result)
+	}
+}
+
+fn pixel_dist(a: &(u64, u64), b: &(u64, u64)) -> f32 {
+	((a.0 as f32 - b.0 as f32).powi(2) + (a.1 as f32 - b.1 as f32).powi(2)).sqrt()
 }
 
 //

@@ -31456,4 +31456,4 @@ export const hc_curves = [
 	]
 ]
 
-export const hc_hierarchy = [-1, 0, 5]
+export const hc_hierarchy = [-1, 0, 1]

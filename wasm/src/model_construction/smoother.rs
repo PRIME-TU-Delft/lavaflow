@@ -155,7 +155,7 @@ impl<'a> Smoother<'a> {
 		}
 
 		// Initialize the array of altitude-groups, by computing how many layers we will have
-		for _i in 0..(f32::round(max_altitude / model_constructor.level_curve_map.altitude_step) as usize) {
+		for _i in 0..((f32::round(max_altitude / model_constructor.level_curve_map.altitude_step) as usize) + 1) {
 			altitude_groups.push(Vec::new());
 		}
 
