@@ -19,7 +19,7 @@
 			styles.push(['width', width]);
 			styles.push(['height', width]);
 		}
-		styles.push(['fill', color !== null ? color : 'currentColor']);
+		styles.push(['fill', color ? color : 'currentColor']);
 		if (flip === 'h') transform.push('scaleX(-1)');
 		if (flip === 'v') transform.push('scaleY(-1)');
 

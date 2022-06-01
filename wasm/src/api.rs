@@ -12,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use crate::gltf_conversion::generate_gltf;
 use crate::model_construction::smoother::Smoother;
 use crate::objects::level_curve_tree::LevelCurveTree;
-use crate::objects::level_curves::LevelCurveSet;
 use crate::objects::point::Point;
 use crate::objects::raster::Raster;
 
@@ -37,8 +36,8 @@ impl OpenCVTree {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
 	}
 
-	pub fn debug(&self) -> String {
-		format!("{self:?}")
+	pub fn debug(&self) -> Result<JsValue, JsValue> {
+		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize OpenCVTree"))
 	}
 }
 
@@ -61,6 +60,10 @@ impl ModelConstructionResult {
 
 	pub fn debug(&self) -> String {
 		format!("{self:?}")
+	}
+
+	pub fn to_js(&self) -> Result<JsValue, JsValue> {
+		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize ModelConstructionResult"))
 	}
 }
 
@@ -182,7 +185,7 @@ impl ModelConstructionApi {
 		let level_curve_tree = LevelCurveTree::from_open_cv(&self.open_cv_tree.pixels_per_curve, transformed_parent_relations);
 
 		// Transform this LevelCurveTree into a LevelCurveSet
-		let mut level_curve_map = LevelCurveSet::transform_to_LevelCurveMap(&level_curve_tree, self.altitude_step, 2.0 * self.svc_distance, 1).map_err(|e| e.to_string())?;
+		let mut level_curve_map = LevelCurveTree::transform_to_LevelCurveMap(&level_curve_tree, self.altitude_step, 2.0 * self.svc_distance, 1).map_err(|e| e.to_string())?;
 
 		//find maximum and minimum cooridinates in level curve model
 		let (min, max) = level_curve_map.get_bounding_points();
@@ -237,8 +240,8 @@ impl ModelConstructionApi {
 		let min_altitude = level_curve_map.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let computed_lava_paths: Vec<Vec<&Point>> =
-			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+		let computed_lava_paths: Vec<Vec<&Point>> = Vec::new();
+		// crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
 		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
