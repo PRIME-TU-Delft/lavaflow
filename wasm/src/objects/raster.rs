@@ -1,9 +1,10 @@
+use crate::objects::point::Point;
 use miette::{miette, Result};
 
 /// # Struct: Raster
 /// This struct is used for keeping track of the altitude levels of rows and columns.
 /// It is required as input for many other structs, because all construction and smoothing algorithms depend on it.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Raster {
 	pub rows: usize,
 	pub columns: usize,
@@ -62,6 +63,24 @@ impl Raster {
 	/// rows and columns. This function maps the row-column to pixel-positions.
 	pub fn get_pixel(&self, row: usize, col: usize) -> (f32, f32) {
 		((col as f32) * self.column_width, (row as f32) * self.row_height)
+	}
+
+	/// ## Instance Method
+	/// Get the point on row and column
+	pub fn get_point(&self, row: usize, col: usize) -> Result<Point> {
+		let found_pixel = self.get_pixel(row, col);
+		let altitude = self.get(row, col).ok_or(miette!("Error trying to fetch altitude"))?;
+		Ok(Point {
+			x: found_pixel.0,
+			y: found_pixel.1,
+			z: altitude,
+		})
+	}
+
+	/// ## Instance Method
+	/// Get the (floored) row and column of a given (x, y) coordinate
+	pub fn get_row_col(&self, x: f32, y: f32) -> (usize, usize) {
+		(f32::floor(y / self.row_height) as usize, f32::floor(x / self.column_width) as usize)
 	}
 
 	/// ## Instance Method
