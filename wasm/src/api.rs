@@ -120,6 +120,7 @@ impl ModelConstructionApi {
 	/// If the user of the API wants, the parameters for the algorithm can be changed by calling other methods afterwards.
 	#[wasm_bindgen(constructor)]
 	pub fn new() -> Self {
+		crate::utils::set_panic_hook();
 		// The presented values below are the default values for the different parameters
 		Self {
 			rows: 10,
@@ -311,7 +312,7 @@ impl ModelConstructionApi {
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
-			gltf: generate_gltf(final_points)?,
+			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
 		})
 	}
