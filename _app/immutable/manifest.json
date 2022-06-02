@@ -1,11 +1,11 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-381b3d5e.js",
+    "file": "start-4cd23ae8.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
-      "_index-c536be17.js",
-      "_singletons-6e73de00.js",
+      "_index-27d7f9dd.js",
+      "_singletons-c2cbd8fb.js",
       "_preload-helper-60cab3ee.js"
     ],
     "dynamicImports": [
@@ -13,135 +13,155 @@
       ".svelte-kit/runtime/components/error.svelte",
       "src/routes/index.svelte",
       "src/routes/scan/mapscanning.svelte",
-      "_maptransform-7496af09.js"
+      "src/routes/scan/maptransform.svelte",
+      "src/routes/scan/preview.svelte"
     ]
   },
   ".svelte-kit/runtime/components/layout.svelte": {
-    "file": "layout.svelte-85ccdb43.js",
+    "file": "layout.svelte-548ea11f.js",
     "src": ".svelte-kit/runtime/components/layout.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-c536be17.js"
+      "_index-27d7f9dd.js"
     ]
   },
   ".svelte-kit/runtime/components/error.svelte": {
-    "file": "error.svelte-84e2b8dc.js",
+    "file": "error.svelte-65587629.js",
     "src": ".svelte-kit/runtime/components/error.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-c536be17.js"
+      "_index-27d7f9dd.js"
     ]
   },
   "src/routes/index.svelte": {
-    "file": "pages/index.svelte-38d90bf8.js",
+    "file": "pages/index.svelte-7ea9dad5.js",
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-c536be17.js",
-      "_NavigationButton-0342dfc0.js",
-      "_Button-6fd54a20.js"
+      "_index-27d7f9dd.js",
+      "_NavigationButton-192607c4.js",
+      "_Button-a357ba49.js"
     ],
     "css": [
       "assets/pages/index.svelte-5e3f64ef.css"
     ]
   },
   "src/routes/scan/mapscanning.svelte": {
-    "file": "pages/scan/mapscanning.svelte-07716767.js",
+    "file": "pages/scan/mapscanning.svelte-76f583e8.js",
     "src": "src/routes/scan/mapscanning.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-c536be17.js",
-      "_Button-6fd54a20.js",
-      "_imageStore-56bb4784.js",
-      "_singletons-6e73de00.js"
+      "_index-27d7f9dd.js",
+      "_Button-a357ba49.js",
+      "_imageStore-067e5aab.js",
+      "_singletons-c2cbd8fb.js"
     ],
     "css": [
       "assets/pages/scan/mapscanning.svelte-f3b96e80.css"
     ]
   },
   "src/routes/scan/maptransform.svelte": {
-    "file": "pages/scan/maptransform.svelte-306c2cc8.js",
+    "file": "pages/scan/maptransform.svelte-e4405051.js",
     "src": "src/routes/scan/maptransform.svelte",
     "isEntry": true,
+    "isDynamicEntry": true,
     "imports": [
-      "_index-c536be17.js",
-      "_Button-6fd54a20.js",
-      "_imageStore-56bb4784.js",
-      "_NavigationButton-0342dfc0.js",
-      "_maptransform-7496af09.js",
-      "_singletons-6e73de00.js",
+      "_index-27d7f9dd.js",
+      "_Button-a357ba49.js",
+      "_imageStore-067e5aab.js",
+      "_NavigationButton-192607c4.js",
+      "_P5-7e6d50f1.js",
+      "__commonjsHelpers-ee0fe954.js",
+      "_singletons-c2cbd8fb.js",
       "_preload-helper-60cab3ee.js"
+    ],
+    "css": [
+      "assets/pages/scan/maptransform.svelte-25c5ed0a.css"
     ]
   },
-  "_index-c536be17.js": {
-    "file": "chunks/index-c536be17.js"
-  },
-  "_singletons-6e73de00.js": {
-    "file": "chunks/singletons-6e73de00.js",
+  "src/routes/scan/preview.svelte": {
+    "file": "pages/scan/preview.svelte-f6f8895c.js",
+    "src": "src/routes/scan/preview.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
     "imports": [
-      "_index-c536be17.js"
+      "_index-27d7f9dd.js",
+      "_Button-a357ba49.js",
+      "_NavigationButton-192607c4.js",
+      "_imageStore-067e5aab.js",
+      "_P5-7e6d50f1.js",
+      "_singletons-c2cbd8fb.js",
+      "_preload-helper-60cab3ee.js"
+    ],
+    "css": [
+      "assets/pages/scan/preview.svelte-277aa834.css"
+    ]
+  },
+  "_index-27d7f9dd.js": {
+    "file": "chunks/index-27d7f9dd.js"
+  },
+  "_singletons-c2cbd8fb.js": {
+    "file": "chunks/singletons-c2cbd8fb.js",
+    "imports": [
+      "_index-27d7f9dd.js"
     ]
   },
   "_preload-helper-60cab3ee.js": {
     "file": "chunks/preload-helper-60cab3ee.js"
   },
-  "_NavigationButton-0342dfc0.js": {
-    "file": "chunks/NavigationButton-0342dfc0.js",
+  "_NavigationButton-192607c4.js": {
+    "file": "chunks/NavigationButton-192607c4.js",
     "imports": [
-      "_index-c536be17.js",
-      "_Button-6fd54a20.js"
+      "_index-27d7f9dd.js",
+      "_Button-a357ba49.js"
     ],
     "css": [
       "assets/NavigationButton-7253cb1c.css"
     ]
   },
-  "_Button-6fd54a20.js": {
-    "file": "chunks/Button-6fd54a20.js",
+  "_Button-a357ba49.js": {
+    "file": "chunks/Button-a357ba49.js",
     "imports": [
-      "_index-c536be17.js"
+      "_index-27d7f9dd.js"
     ],
     "css": [
       "assets/Button-57eef758.css"
     ]
   },
-  "_imageStore-56bb4784.js": {
-    "file": "chunks/imageStore-56bb4784.js",
+  "_imageStore-067e5aab.js": {
+    "file": "chunks/imageStore-067e5aab.js",
     "imports": [
-      "_index-c536be17.js",
-      "_Button-6fd54a20.js",
-      "_singletons-6e73de00.js"
+      "_index-27d7f9dd.js",
+      "_Button-a357ba49.js",
+      "_singletons-c2cbd8fb.js"
     ],
     "css": [
       "assets/imageStore-fd802cc1.css"
     ]
   },
-  "_maptransform-7496af09.js": {
-    "file": "chunks/maptransform-7496af09.js",
-    "isDynamicEntry": true,
+  "_P5-7e6d50f1.js": {
+    "file": "chunks/P5-7e6d50f1.js",
     "imports": [
-      "_index-c536be17.js",
-      "_Button-6fd54a20.js",
-      "_imageStore-56bb4784.js",
-      "_NavigationButton-0342dfc0.js",
-      "_singletons-6e73de00.js",
-      "_preload-helper-60cab3ee.js"
+      "_singletons-c2cbd8fb.js",
+      "_preload-helper-60cab3ee.js",
+      "_index-27d7f9dd.js"
     ],
     "dynamicImports": [
-      "_p5.min-ab721f7a.js"
-    ],
-    "css": [
-      "assets/maptransform-8bc1af60.css"
+      "_p5.min-4a37dac4.js"
     ]
   },
-  "_p5.min-ab721f7a.js": {
-    "file": "chunks/p5.min-ab721f7a.js",
+  "__commonjsHelpers-ee0fe954.js": {
+    "file": "chunks/_commonjsHelpers-ee0fe954.js"
+  },
+  "_p5.min-4a37dac4.js": {
+    "file": "chunks/p5.min-4a37dac4.js",
     "isDynamicEntry": true,
     "imports": [
-      "_maptransform-7496af09.js"
+      "__commonjsHelpers-ee0fe954.js"
     ]
   }
 }
