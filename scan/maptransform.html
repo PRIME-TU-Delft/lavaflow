@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="../favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<style>
+			body {
+				background: #1a1717;
+				color: white;
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
+					Cantarell, 'Helvetica Neue', sans-serif;
+			}
+
+			:root {
+				--primary-color: rgb(225 95 85 / 90%);
+				--secondary-color: rgb(144 53 44 / 90%);
+				--text-color: rgba(94, 14, 14, 100%);
+				--text-color-secondary: rgb(230 223 223);
+			}
+		</style>
+
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+
+		<meta http-equiv="content-security-policy" content="">
+	<link rel="stylesheet" href="/_app/immutable/assets/Button-57eef758.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/imageStore-fd802cc1.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/NavigationButton-7253cb1c.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/maptransform-8bc1af60.css">
+	<link rel="modulepreload" href="/_app/immutable/start-381b3d5e.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-c536be17.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/singletons-6e73de00.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-60cab3ee.js">
+	<link rel="modulepreload" href="/_app/immutable/layout.svelte-85ccdb43.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/scan/maptransform.svelte-306c2cc8.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Button-6fd54a20.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/imageStore-56bb4784.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/NavigationButton-0342dfc0.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/maptransform-7496af09.js">
+	</head>
+	<body>
+		<div>
+
+
+<div class="page svelte-jvq22j"><div class="background svelte-jvq22j"><div slot="background"><img id="backgroundImage" alt="background" class="svelte-uv7er1"></div>
+		<div class="backdrop svelte-jvq22j"></div></div>
+
+	<div class="foreground svelte-jvq22j"><header class="svelte-jvq22j"><a href="/scan/mapscanning"><button  class="svelte-1a4u0zu"><div class="title svelte-1a4u0zu">
+			<div class="button svelte-1u9nil5"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:var(--text-color);" class="svelte-z4mprv"><path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"></path></svg>
+
+			<div class="text svelte-1u9nil5">Rescan image</div>
+
+			</div></div>
+
+		
+</button>
+</a>
+			<div class="title svelte-jvq22j">Image transformation</div></header>
+
+		<main class="svelte-jvq22j"><div class="sketch svelte-uv7er1"><div style="display: block;" class="m-0"></div></div>
+
+	<img style="display:none" id="foregroundImage" alt="background">
+
+	<canvas id="canvasOutput"></canvas></main>
+
+		<footer class="svelte-jvq22j"><div slot="footer"><button  class="svelte-1a4u0zu   secondary"><div class="title svelte-1a4u0zu"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"></path></svg>
+			Drag each marker to the correct corner on the map
+		</div>
+
+		
+</button>
+
+		<button  class="svelte-1a4u0zu"><div class="title svelte-1a4u0zu">
+			<span>Preview transformation</span>
+			<svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"></path></svg></div>
+
+		
+</button></div></footer></div>
+</div>
+
+
+		<script type="module" data-sveltekit-hydrate="1b8w7vd">
+		import { start } from "/_app/immutable/start-381b3d5e.js";
+		start({
+			target: document.querySelector('[data-sveltekit-hydrate="1b8w7vd"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: false,
+			trailing_slash: "never",
+			hydrate: {
+				status: 200,
+				error: null,
+				nodes: [0, 4],
+				params: {},
+				routeId: "scan/maptransform"
+			}
+		});
+	</script></div>
+	</body>
+</html>
