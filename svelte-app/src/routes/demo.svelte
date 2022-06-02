@@ -430,14 +430,14 @@
 	<a-draw-curve curveref="#track2" material="shader: line; color: red;"></a-draw-curve> -->
 
 
-    <a-entity
+    <!-- <a-entity
       clone-along-curve="curve: #track1; spacing: 0.2; rotation: 90 0 0;"
       geometry="primitive:cylinder; height:0.33; radius:0.2; color:red"
     ></a-entity>
     <a-entity
       clone-along-curve="curve: #track2; spacing: 0.2; rotation: 90 0 0;"
       geometry="primitive:cylinder; height:0.33; radius:0.2; color:red"
-    ></a-entity>
+    ></a-entity> -->
 
 		<a-camera look-controls />
 	</a-scene>
@@ -458,32 +458,39 @@
 
 				for(let j = 0; j < curves.length; j++){
 				    //get points on curve
-					var pointz = curves[j];
+					var points = curves[j];
 					
 				    //create curve element
 					var curve = document.createElement('a-curve');
 					curve.setAttribute('id' , "track" + j);
+					
 
-				for (let i = 0; i < pointz.length; i++) {
-					
-					var v = pointz[i];
-					var x = v[0];
-					var y = v[1];
-					var z = v[2];
-					
-					var p = document.createElement('a-curve-point');
+					//add points per curve
+					for (let i = 0; i < points.length; i++) {
+						
+						var v = points[i];
+						var x = v[0];
+						var y = v[1];
+						var z = v[2];
+						
+						var p = document.createElement('a-curve-point');
 
-						p.setAttribute('position', { x: x , y: z, z: -13 + y });
-						curve.appendChild(p);
-					
+							p.setAttribute('position', { x: x , y: z, z: y });
+							
+							curve.appendChild(p);
+						
 					}
+
 					//add curve element to scene
 					sceneEl.appendChild(curve);
 					
 					//generate cylinders on curve add cylinder along track
 					var track = document.createElement('a-entity');
 					track.setAttribute('clone-along-curve',"curve: #track" + j + "; spacing: 0.2; rotation: 90 0 0;" );
-					track.setAttribute('geometry',"primitive:cylinder; height:0.33; radius:0.2; color:red" );
+					track.setAttribute('geometry',"primitive:cylinder; height:0.33; radius:0.2" );
+					track.setAttribute('material', 'color: crimson; transparency: true; opacity: 0.01');
+					//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
+					track.setAttribute('animation', "property: material.opacity; to: 1; dur: 10000; loop: false; delay: " + j * 5000 + ";"  ) ;
 
 					sceneEl.appendChild(track);
 
