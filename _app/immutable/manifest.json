@@ -1,10 +1,11 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-1584ecac.js",
+    "file": "start-52804876.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
-      "_index-1a435db1.js"
+      "_index-7639d708.js",
+      "_index-e5da0ab5.js"
     ],
     "dynamicImports": [
       ".svelte-kit/runtime/components/layout.svelte",
@@ -14,45 +15,61 @@
     ]
   },
   ".svelte-kit/runtime/components/layout.svelte": {
-    "file": "layout.svelte-a8f8f4e2.js",
+    "file": "layout.svelte-50143110.js",
     "src": ".svelte-kit/runtime/components/layout.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-1a435db1.js"
+      "_index-7639d708.js"
     ]
   },
   ".svelte-kit/runtime/components/error.svelte": {
-    "file": "error.svelte-b1bc44a0.js",
+    "file": "error.svelte-67e21893.js",
     "src": ".svelte-kit/runtime/components/error.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-1a435db1.js"
+      "_index-7639d708.js"
     ]
   },
   "src/routes/about.svelte": {
-    "file": "pages/about.svelte-e1f60ac7.js",
+    "file": "pages/about.svelte-0c719a52.js",
     "src": "src/routes/about.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-1a435db1.js"
+      "_index-7639d708.js",
+      "_gltfStore-32a109f2.js",
+      "_index-e5da0ab5.js"
     ]
   },
   "src/routes/index.svelte": {
-    "file": "pages/index.svelte-496eeb2e.js",
+    "file": "pages/index.svelte-cddb5a6e.js",
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
-      "_index-1a435db1.js"
+      "_index-7639d708.js",
+      "_gltfStore-32a109f2.js",
+      "_index-e5da0ab5.js"
     ],
     "css": [
       "assets/pages/index.svelte-90c293a4.css"
     ]
   },
-  "_index-1a435db1.js": {
-    "file": "chunks/index-1a435db1.js"
+  "_index-7639d708.js": {
+    "file": "chunks/index-7639d708.js"
+  },
+  "_index-e5da0ab5.js": {
+    "file": "chunks/index-e5da0ab5.js",
+    "imports": [
+      "_index-7639d708.js"
+    ]
+  },
+  "_gltfStore-32a109f2.js": {
+    "file": "chunks/gltfStore-32a109f2.js",
+    "imports": [
+      "_index-e5da0ab5.js"
+    ]
   }
 }
