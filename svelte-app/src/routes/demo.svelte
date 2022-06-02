@@ -30,11 +30,12 @@
 		</div>
 
 		<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
+		<a-entity light="color: #AFA; intensity: 1.5" position="-1 1 0"></a-entity>
 
 		<a-entity
 			gltf-model="url({$gltfStore})"
-			position="3 0 -5"
-			scale="0.00038 0.1 0.00038"
+			scale="0.01 0.1 0.01"
+			position="5 0 5"
 			rotation="0 -90 0"
 			id="model"
 		/>

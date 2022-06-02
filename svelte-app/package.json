@@ -2,6 +2,7 @@
 	"name": "svelte-app",
 	"version": "0.0.1",
 	"scripts": {
+		"wasm": "wasm-pack build ./wasm --target web",
 		"dev": "svelte-kit dev --host",
 		"build": "svelte-kit build",
 		"package": "svelte-kit package",

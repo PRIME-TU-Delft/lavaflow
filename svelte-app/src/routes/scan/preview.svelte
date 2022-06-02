@@ -9,10 +9,13 @@
 
 	import { demoPerspectiveImage, perspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
+	import { gltfUrl } from '$lib/stores/gltfStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
+
+	import init, * as wasm from 'wasm';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
