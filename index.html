@@ -4,58 +4,79 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="./favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta http-equiv="content-security-policy" content=""><title>Home</title><meta name="description" content="Svelte demo app" data-svelte="svelte-t32ptj">
-	<link rel="stylesheet" href="/_app/immutable/assets/pages/__layout.svelte-da7c5ce3.css">
-	<link rel="stylesheet" href="/_app/immutable/assets/pages/index.svelte-d0605c9c.css">
-	<link rel="modulepreload" href="/_app/immutable/start-adb636f4.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-9fe72fd8.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-92d65ea7.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/singletons-d1fb5791.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-cc040118.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/index.svelte-2d1d36cd.js">
+
+		<style>
+			body {
+				background: #1a1717;
+				color: white;
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
+					Cantarell, 'Helvetica Neue', sans-serif;
+			}
+
+			:root {
+				--primary-color: rgb(225 95 85 / 90%);
+				--secondary-color: rgb(144 53 44 / 90%);
+				--text-color: rgba(94, 14, 14, 100%);
+				--text-color-secondary: rgb(230 223 223);
+			}
+		</style>
+
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+
+		<meta http-equiv="content-security-policy" content="">
+	<link rel="stylesheet" href="/_app/immutable/assets/pages/index.svelte-90c293a4.css">
+	<link rel="modulepreload" href="/_app/immutable/start-1584ecac.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-1a435db1.js">
+	<link rel="modulepreload" href="/_app/immutable/layout.svelte-a8f8f4e2.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/index.svelte-496eeb2e.js">
 	</head>
 	<body>
 		<div>
 
 
-<header class="svelte-t2wq17"><div class="corner svelte-t2wq17"><a href="https://kit.svelte.dev" class="svelte-t2wq17"><img src="/_app/immutable/assets/svelte-logo-87df40b8.svg" alt="SvelteKit" class="svelte-t2wq17"></a></div>
+<div class="tudelftLogo svelte-1ibkp2f"></div>
 
-	<nav class="svelte-t2wq17"><svg viewBox="0 0 2 3" aria-hidden="true" class="svelte-t2wq17"><path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" class="svelte-t2wq17"></path></svg>
-		<ul class="svelte-t2wq17"><li class="svelte-t2wq17 active"><a sveltekit:prefetch href="/" class="svelte-t2wq17">Home</a></li>
-			<li class="svelte-t2wq17"><a sveltekit:prefetch href="/about" class="svelte-t2wq17">About</a></li>
-			<li class="svelte-t2wq17"><a sveltekit:prefetch href="/todos" class="svelte-t2wq17">Todos</a></li></ul>
-		<svg viewBox="0 0 2 3" aria-hidden="true" class="svelte-t2wq17"><path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" class="svelte-t2wq17"></path></svg></nav>
+<header class="svelte-1ibkp2f"><div class="img svelte-1ibkp2f"></div>
+	<div class="img backdrop svelte-1ibkp2f"></div>
+	<div class="title svelte-1ibkp2f"><div class="logo svelte-1ibkp2f"></div>
+		<h2 class="svelte-1ibkp2f">AR lavaFlow</h2></div></header>
 
-	<div class="corner svelte-t2wq17"></div>
-</header>
+<main class="svelte-1ibkp2f"><div class="introduction svelte-1ibkp2f">When a volcano erupts, the lava produced is unstoppable. It moves so slowly you can outrun it,
+		but with the density of molten rock, and a temperature of over 1000 degrees Celsius, it will
+		destroy everything in its path. This path being the steepest possible down a mountain. Your goal
+		is to draw a mountain on a piece of paper. Scan it and place targets on the map where you
+		predict the lava will reach.
+	</div>
 
-<main class="svelte-1izrdc8">
+	<a href="/"><button  class="svelte-1a4u0zu  large"><div class="title svelte-1a4u0zu">
+			<div class="button svelte-1u9nil5">
 
-<section class="svelte-mjk9ig"><h1 class="svelte-mjk9ig"><div class="welcome svelte-mjk9ig"><picture><source srcset="svelte-welcome.webp" type="image/webp">
-				<img src="svelte-welcome.png" alt="Welcome" class="svelte-mjk9ig"></picture></div>
+			<div class="text svelte-1u9nil5">Start flowing</div>
 
-		to your new<br>SvelteKit app
-	</h1>
+			<svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:var(--text-color);" class="svelte-z4mprv"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"></path></svg></div></div>
 
-	<h2>try editing <strong>src/routes/index.svelte</strong></h2>
-
-	<div class="counter svelte-sx9eo4"><button aria-label="Decrease the counter by one" class="svelte-sx9eo4"><svg aria-hidden="true" viewBox="0 0 1 1" class="svelte-sx9eo4"><path d="M0,0.5 L1,0.5" class="svelte-sx9eo4"></path></svg></button>
-
-	<div class="counter-viewport svelte-sx9eo4"><div class="counter-digits svelte-sx9eo4" style="transform: translate(0, 0%)"><strong class="hidden svelte-sx9eo4" aria-hidden="true">1</strong>
-			<strong class="svelte-sx9eo4">0</strong></div></div>
-
-	<button aria-label="Increase the counter by one" class="svelte-sx9eo4"><svg aria-hidden="true" viewBox="0 0 1 1" class="svelte-sx9eo4"><path d="M0,0.5 L1,0.5 M0.5,0 L0.5,1" class="svelte-sx9eo4"></path></svg></button>
-</div>
-</section></main>
-
-<footer class="svelte-1izrdc8"><p>visit <a href="https://kit.svelte.dev" class="svelte-1izrdc8">kit.svelte.dev</a> to learn SvelteKit</p>
-</footer>
+		
+</button>
+</a>
+	
+</main>
 
 
-		<script type="module" data-sveltekit-hydrate="anscbu">
-		import { start } from "/_app/immutable/start-adb636f4.js";
+		<script type="module" data-sveltekit-hydrate="1bk136y">
+		import { start } from "/_app/immutable/start-1584ecac.js";
 		start({
-			target: document.querySelector('[data-sveltekit-hydrate="anscbu"]').parentNode,
+			target: document.querySelector('[data-sveltekit-hydrate="1bk136y"]').parentNode,
 			paths: {"base":"","assets":""},
 			session: {},
 			route: true,
