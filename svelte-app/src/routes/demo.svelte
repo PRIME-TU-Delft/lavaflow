@@ -1,7 +1,7 @@
 <script lang="ts">
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import {gltfUrl} from "$lib/stores/gltfStore"
+	import {gltfStore, targetLocations} from "$lib/stores/gltfStore"
 	import { onMount } from 'svelte';
 
 	let mounted: boolean;
@@ -25,14 +25,14 @@
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
 
-		<div class="button placeHouses">
-			<NavigationButton to="/houseplacement">Place houses</NavigationButton>
+		<div class="button placeTargets">
+			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 		</div>
 
 		<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
 
 		<a-entity
-			gltf-model="url({$gltfUrl})"
+			gltf-model="url({$gltfStore})"
 			position="3 0 -5"
 			scale="0.00038 0.1 0.00038"
 			rotation="0 -90 0"
@@ -56,7 +56,7 @@
 		left: 1rem;
 	}
 
-	.placeHouses {
+	.placeTargets {
 		top: 1rem;
 		right: 1rem;
 	}

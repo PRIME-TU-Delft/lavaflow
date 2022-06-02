@@ -7,7 +7,7 @@
 
 import { writable } from 'svelte/store';
 
-type CurveTree = {
+export type CurveTree = {
 	curves: [number, number][][];
 	hierarchy: number[];
 };

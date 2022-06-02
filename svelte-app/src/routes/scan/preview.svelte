@@ -7,16 +7,15 @@
 	import Image from '$lib/components/Image.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import { perspectiveImage } from '$lib/stores/imageStore';
+	import { demoPerspectiveImage, perspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { gltfStore } from '$lib/stores/gltfStore';
 	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
-
-	import init, * as wasm from 'wasm';
 
 	let gltfLoaded = false;
 
@@ -26,22 +25,12 @@
 
 	onMount(async () => {
 		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
-			return goto('/scan/mapscanning');
+			// return goto('/scan/mapscanning'); // TODO: Set this back
+			perspectiveImage.set(demoPerspectiveImage);
 		}
 
-		await init();
-
-		const tree = new wasm.OpenCVTree({
-			pixels_per_curve: $contourLines.curves,
-			parent_relations: $contourLines.hierarchy
-		});
-
-		// const api = new wasm.ModelConstructionApi();
-		// api.base(tree);
-
-		// const model_construction_result = api.build();
-
-		// console.log(model_construction_result);
+		await gltfStore.setup($contourLines);
+		gltfStore.build();
 
 		gltfLoaded = true;
 	});
