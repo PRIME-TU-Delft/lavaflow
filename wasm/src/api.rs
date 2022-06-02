@@ -120,7 +120,6 @@ impl ModelConstructionApi {
 	/// If the user of the API wants, the parameters for the algorithm can be changed by calling other methods afterwards.
 	#[wasm_bindgen(constructor)]
 	pub fn new() -> Self {
-		crate::utils::set_panic_hook();
 		// The presented values below are the default values for the different parameters
 		Self {
 			rows: 10,
