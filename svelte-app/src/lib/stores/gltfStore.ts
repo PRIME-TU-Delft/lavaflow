@@ -59,9 +59,12 @@ function createGltfStore() {
 			api.base(tree);
 		},
 		build: () => {
-			const model = api.build().to_json() as Model;
+			const model = api.build().to_js() as Model;
 			console.log(model);
 			set(model.gltf);
+		},
+		getAlitituteAndGradient: (x: number, y: number) => {
+			const altitudeGradientPair = api.get_altitude_and_gradient_for_point(x, y);
 		}
 	};
 }
