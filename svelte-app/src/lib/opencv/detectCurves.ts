@@ -86,7 +86,7 @@ function getLevels(hierarchy_array: number[]): number[] {
  *
  * @param contours JavaScript (not OpenCV!) array of contours
  * @param hierarchy List of parent nodes for every node
- * @returns De-duplicated version of the tree
+ * @returns *Scientifically* de-duplicated version of the tree
  */
 function removeDoubleContours(contours: number[][], hierarchy: number[]): ContourTreeObject {
 	const levels = getLevels(hierarchy);
