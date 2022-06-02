@@ -9,6 +9,8 @@
 	export let foregroundHeight: number; // Height of the foreground canvas
 	export let targetSelected: number;
 
+	console.log({ foregroundWidth, foregroundHeight });
+
 	let image: p5.Image;
 
 	function sketch(p5: p5) {

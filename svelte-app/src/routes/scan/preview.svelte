@@ -9,13 +9,11 @@
 
 	import { demoPerspectiveImage, perspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
-	import { gltfUrl } from '$lib/stores/gltfStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
-
-	import init, * as wasm from 'wasm';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
@@ -28,10 +26,8 @@
 
 	onMount(async () => {
 		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
-			// return goto('/scan/mapscanning'); // TODO: Set this back
-			perspectiveImage.set(demoPerspectiveImage);
+			return goto('/scan/mapscanning'); // TODO: Set this back
 		}
-
 		await gltfStore.setup($contourLines);
 		gltfStore.build();
 

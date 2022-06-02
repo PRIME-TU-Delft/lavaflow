@@ -20,8 +20,6 @@
 	function addTarget(x: number, y: number) {
 		const newTarget = new Draggable(x, y, 20);
 		targetLocations.add(newTarget);
-
-		console.log($targetLocations);
 	}
 
 	function removeTarget() {
