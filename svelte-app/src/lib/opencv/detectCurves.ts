@@ -80,31 +80,43 @@ function getLevels(hierarchy_array: number[]): number[] {
 	return levels;
 }
 
+
 /**
  * Remove every odd-leveled node from the contours tree
  *
  * @param contours JavaScript (not OpenCV!) array of contours
  * @param hierarchy List of parent nodes for every node
- * @returns Magically de-duplicated version of the tree
+ * @returns *Scientifically* de-duplicated version of the tree
  */
 function removeDoubleContours(contours: number[][], hierarchy: number[]): ContourTreeObject {
 	const levels = getLevels(hierarchy);
 
-	let contours_dedup: number[][] = [];
+	let contours_dedup: number[][] = []; 
 	let hierarchy_dedup: number[] = [];
-	let parent_of_parents: number[] = Array(hierarchy.length);
+	let new_indices: number[] = []; // this array will hold the indices of the contours in the deduplicated array
 
-	// For every odd-leveled node: keep track of their parent
-	// For every level-leveled node (which is a child of an odd-leveled node), look up its parent's parent, and set that as its own parent
+	// For every even-leveled node, add its contour and parent index to the deduplicated arrays
+	// Also add the index where it is added to the new_indices array
+	// For every odd-leveled node, add the index of its parent in new_indices to the array
 	levels.forEach((level, i) => {
-		if (level % 2 == 1) {
-			parent_of_parents[i] = hierarchy[i];
-		} else {
+		if (level % 2 == 0) {
+			new_indices.push(contours_dedup.length);
 			contours_dedup.push(contours[i]);
-			let new_parent_index = i == 0 ? -1 : Math.floor(parent_of_parents[hierarchy[i]] / 2); // Root node keeps -1 as index
-			hierarchy_dedup.push(new_parent_index);
+			hierarchy_dedup.push(hierarchy[i]);
+		} else {
+			new_indices.push(new_indices[hierarchy[i]]);
 		}
 	});
+
+	// update the hierarchy to correspond to the deduplicated array
+	hierarchy_dedup.forEach((parent, i) => {
+		console.log(hierarchy_dedup[i])
+		if(hierarchy_dedup[i] == -1) {
+			hierarchy_dedup[i] = -1; // root node has index -1
+		} else {
+			hierarchy_dedup[i] = new_indices[hierarchy_dedup[i]];
+		}
+	})
 
 	return { curves: contours_dedup, hierarchy: hierarchy_dedup };
 }
