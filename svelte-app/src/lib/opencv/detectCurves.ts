@@ -25,8 +25,11 @@ export function detectCurves(image: Mat): [MatVector, Mat] {
 	let hierarchy = new cv.Mat(); // this will be used to hold the hierarchy of the contours
 	cv.findContours(thresholded, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE); // get contours out of the image
 
+	// delete Mats to prevent memory leaks
 	gray.delete();
-	threshold.delete();
+	blurred.delete();
+	sharpened.delete();
+	thresholded.delete();
 
 	return [contours, hierarchy];
 }
