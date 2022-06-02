@@ -311,7 +311,7 @@ impl ModelConstructionApi {
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
-			gltf: generate_gltf(final_points)?,
+			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
 		})
 	}
