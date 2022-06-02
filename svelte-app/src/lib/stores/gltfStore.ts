@@ -6,18 +6,17 @@
  */
 
 import { writable } from 'svelte/store';
-import type Draggable from '$lib/data/draggable';
+import Draggable from '$lib/data/draggable';
 import type { CurveTree } from '$lib/stores/contourLineStore';
 
 import init, * as wasm from 'wasm';
-import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 /**
  *  Factory for creating a target store
  * @returns target store with method subscribe, add and remove
  */
 function createTargetLocations() {
-	const { subscribe, update } = writable<Draggable[]>([]);
+	const { subscribe, update } = writable<Draggable[]>([new Draggable(500, 500, 0)]);
 
 	return {
 		subscribe,
@@ -32,39 +31,69 @@ export interface Model {
 	lavapath: [number, number, number][][];
 }
 
+export interface AltitudeGradientPair {
+	x: number;
+	y: number;
+	altitude: number;
+	gradient: [number, number, number];
+}
+
+export function gltfStringToUrl(gltf: string): string {
+	const gltfBlob = new Blob([gltf], { type: 'application/json' });
+	const gltfUrl = URL.createObjectURL(gltfBlob);
+	return gltfUrl;
+}
+
 /**
  *  Factory for creating a gltf store
  * @returns target store with method subscribe, add and remove
  */
 function createGltfStore() {
-	const { subscribe, set } = writable<string>('/output20.gltf');
+	const { subscribe, set } = writable<string>('');
 	let api: wasm.ModelConstructionApi;
 	let isSetup = false;
+	let model: Model;
 
 	return {
 		subscribe,
+		set,
 		setup: async (curveTree: CurveTree) => {
 			if (!isSetup) {
 				await init();
 				isSetup = true;
 			}
 
-			// TODO: Remove hardcoded data
 			const tree = new wasm.OpenCVTree({
-				pixels_per_curve: hc_curves,
-				parent_relations: hc_hierarchy
+				pixels_per_curve: curveTree.curves,
+				parent_relations: curveTree.hierarchy
 			});
 
+			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
 			api.base(tree);
+			api.set_basic_parameters(100, 100, 0);
+			api.correct_for_altitude_constraints_to_all_layers();
+			api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
+			api.increase_altitude_for_mountain_tops(0.3, false);
+			api.apply_smooth_to_mountain_tops(0.2, 2, 5, false);
+			// api.set_catmull_clark_parameters(1);
 		},
 		build: () => {
-			const model = api.build().to_js() as Model;
-			console.log(model);
-			set(model.gltf);
+			model = api.build().to_js() as Model;
+			const gltfUrl = gltfStringToUrl(model.gltf);
+
+			set(gltfUrl);
+			console.log(gltfUrl);
 		},
 		getAlitituteAndGradient: (x: number, y: number) => {
-			const altitudeGradientPair = api.get_altitude_and_gradient_for_point(x, y);
+			if (!api) return console.warn('no api initialized');
+
+			const altitudeGradientPair = api
+				.get_altitude_and_gradient_for_point(x, y)
+				.to_js() as AltitudeGradientPair;
+
+			console.log(altitudeGradientPair);
+			return altitudeGradientPair;
 		}
 	};
 }
