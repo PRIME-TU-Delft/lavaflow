@@ -72,8 +72,8 @@ function createGltfStore() {
 
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
-			api.base(tree);
-			api.set_basic_parameters(100, 100, 0);
+			api.base(tree, 10);
+			api.set_basic_parameters(100, 100, 800, 900);
 			api.correct_for_altitude_constraints_to_all_layers();
 			api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
 			api.increase_altitude_for_mountain_tops(0.3, false);
