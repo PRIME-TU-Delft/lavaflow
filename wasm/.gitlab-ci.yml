@@ -9,7 +9,6 @@ wasm-rustfmt:
   script:
     - cd wasm
     - cargo fmt --check
-  allow_failure: true
 
 
 wasm-clippy:
@@ -24,7 +23,6 @@ wasm-clippy:
     paths:
       - wasm/target/
       - $CARGO_HOME
-  allow_failure: true
 
 
 wasm-test:
