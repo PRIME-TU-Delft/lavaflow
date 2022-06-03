@@ -12,7 +12,7 @@ import type { CurveTree } from '$lib/stores/contourLineStore';
 import init, * as wasm from 'wasm';
 
 /**
- *  Factory for creating a target store
+ * Factory for creating a target store
  * @returns target store with method subscribe, add and remove
  */
 function createTargetLocations() {
@@ -58,11 +58,13 @@ function createGltfStore() {
 		subscribe,
 		set,
 		setup: async (curveTree: CurveTree) => {
+			// if wasm is not yet setup, do so
 			if (!isSetup) {
 				await init();
 				isSetup = true;
 			}
 
+			// Create a wasm tree out of openCV contour tree
 			const tree = new wasm.OpenCVTree({
 				pixels_per_curve: curveTree.curves,
 				parent_relations: curveTree.hierarchy
@@ -79,15 +81,18 @@ function createGltfStore() {
 			// api.set_catmull_clark_parameters(1);
 		},
 		build: () => {
+			// Call the wasm api to build the model
 			model = api.build().to_js() as Model;
 			const gltfUrl = gltfStringToUrl(model.gltf);
 
+			// set the gltf store to the gltf string
 			set(gltfUrl);
 			console.log(gltfUrl);
 		},
 		getAlitituteAndGradient: (x: number, y: number) => {
 			if (!api) return console.warn('no api initialized');
 
+			// ask api to get altitude and gradient for a certain point
 			const altitudeGradientPair = api
 				.get_altitude_and_gradient_for_point(x, y)
 				.to_js() as AltitudeGradientPair;
