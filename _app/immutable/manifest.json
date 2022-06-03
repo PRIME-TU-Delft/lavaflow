@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-df9c01c4.js",
+    "file": "start-bccd45c6.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -69,14 +69,14 @@
     ]
   },
   "src/routes/scan/mapscanning.svelte": {
-    "file": "pages/scan/mapscanning.svelte-69271262.js",
+    "file": "pages/scan/mapscanning.svelte-cfbd857e.js",
     "src": "src/routes/scan/mapscanning.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-7d13a48d.js",
       "_Button-e0deb53f.js",
-      "_imageStore-801aaa81.js",
+      "_imageStore-86a81731.js",
       "_singletons-d1fb5791.js",
       "_index-aa581d55.js"
     ],
@@ -85,14 +85,14 @@
     ]
   },
   "src/routes/scan/maptransform.svelte": {
-    "file": "pages/scan/maptransform.svelte-b758e004.js",
+    "file": "pages/scan/maptransform.svelte-2f7ea647.js",
     "src": "src/routes/scan/maptransform.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-7d13a48d.js",
       "_Button-e0deb53f.js",
-      "_imageStore-801aaa81.js",
+      "_imageStore-86a81731.js",
       "_NavigationButton-3046b84a.js",
       "_draggable-10e2ef03.js",
       "__commonjsHelpers-ee0fe954.js",
@@ -106,7 +106,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-20407252.js",
+    "file": "pages/scan/preview.svelte-fb1dd025.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -114,7 +114,7 @@
       "_index-7d13a48d.js",
       "_Button-e0deb53f.js",
       "_NavigationButton-3046b84a.js",
-      "_imageStore-801aaa81.js",
+      "_imageStore-86a81731.js",
       "_P5-59b76c1c.js",
       "_draggable-10e2ef03.js",
       "_gltfStore-c11dc8ca.js",
@@ -173,8 +173,8 @@
       "assets/Button-57eef758.css"
     ]
   },
-  "_imageStore-801aaa81.js": {
-    "file": "chunks/imageStore-801aaa81.js",
+  "_imageStore-86a81731.js": {
+    "file": "chunks/imageStore-86a81731.js",
     "imports": [
       "_index-7d13a48d.js",
       "_Button-e0deb53f.js",
@@ -182,7 +182,7 @@
       "_index-aa581d55.js"
     ],
     "css": [
-      "assets/imageStore-fd802cc1.css"
+      "assets/imageStore-9d8c8678.css"
     ]
   },
   "__commonjsHelpers-ee0fe954.js": {
