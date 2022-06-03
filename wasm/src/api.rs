@@ -243,6 +243,9 @@ impl ModelConstructionApi {
 			operation.apply(&mut smoother).map_err(|e| e.to_string())?;
 		}
 
+		// Apply raster normalisation, so it will be contained within a 100x100x100 pixel box
+		smoother.raster.normalise().map_err(|e| e.to_string())?;
+
 		//
 		// All smoothing operations have been applied, thereofore the final raster has been computed.
 		// Store it as a state-variable.
