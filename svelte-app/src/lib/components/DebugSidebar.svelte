@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import EmitInput from '$lib/components/EmitInput.svelte';
-	import Range from '$lib/components/Range.svelte';
+	import Dropdown from '$lib/components/input/Dropdown.svelte';
+	import EmitInput from '$lib/components/input/EmitInput.svelte';
+	import Range from '$lib/components/input/Range.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 
 	import SortableList from 'svelte-sortable-list';
@@ -9,7 +10,6 @@
 	import type { Options, Entries } from '$lib/types/Options';
 	import { hc_smooth_parameters, hc_smooth_parameter_types } from '$lib/data/hardCoded';
 	import { SmoothParameters } from '$lib/data/smoothParameters';
-	import Dropdown from './Dropdown.svelte';
 
 	interface GeneralSettings {
 		rows: number;

@@ -6,13 +6,13 @@ import wasmPack from 'vite-plugin-wasm-pack';
 const config = {
 	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
-	preprocess: [preprocess()],
+	preprocess: preprocess(),
 
 	kit: {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: null
+			fallback: 'index.html'
 		}),
 
 		vite: {
@@ -20,10 +20,6 @@ const config = {
 			optimizeDeps: {
 				exclude: ['./../wasm']
 			}
-		},
-
-		paths: {
-			base: process.env.NODE_ENV === "production" ? "/lavaflow" : ""
 		}
 	}
 };
