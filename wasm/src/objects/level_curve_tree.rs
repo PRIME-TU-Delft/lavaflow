@@ -155,7 +155,7 @@ impl<'a> LevelCurveTree<'a> {
 	///
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveMap(&'a self, altitude_step: f32, mut desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
+	pub fn transform_to_LevelCurveSet(&'a self, altitude_step: f32, mut desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
 		let mut result: LevelCurveSet = LevelCurveSet::new(altitude_step);
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
 
@@ -205,7 +205,7 @@ impl<'a> LevelCurveTree<'a> {
 
 		//if current node has children find their level curves recursively
 		for child in &self.get_children() {
-			let child_set = child.transform_to_LevelCurveMap(altitude_step, desired_dist, current_height + 1)?;
+			let child_set = child.transform_to_LevelCurveSet(altitude_step, desired_dist, current_height + 1)?;
 			//TODO: is this bad space wise?
 			for curve in child_set.level_curves {
 				result.add_level_curve(curve);

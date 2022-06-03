@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 // Internal imports
 use crate::gltf_conversion::generate_gltf;
+use crate::model_construction::constructor::ModelConstructor;
 use crate::model_construction::smoother::Smoother;
 use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
@@ -106,8 +107,10 @@ pub struct ModelConstructionApi {
 	// API properties
 	pub rows: usize,
 	pub columns: usize,
-	pub border_size: f32,
+	pub width: f32,
+	pub height: f32,
 	pub altitude_step: f32,
+	pub curve_point_separation: f32,
 	pub svc_distance: f32,
 	pub catmull_clark_iterations: usize,
 	pub lava_path_length: usize,
@@ -141,8 +144,10 @@ impl ModelConstructionApi {
 		Self {
 			rows: 10,
 			columns: 10,
-			border_size: 10.0,
+			width: 100.0,
+			height: 100.0,
 			altitude_step: 10.0,
+			curve_point_separation: 10.0,
 			svc_distance: 10.0,
 			catmull_clark_iterations: 0,
 			lava_path_length: 10,
@@ -162,11 +167,13 @@ impl ModelConstructionApi {
 	/// The parameters that are of interest for this algorithm are:
 	/// - The number of raster rows
 	/// - The number of raster columns
-	/// - The size of the border around the mountain
-	pub fn set_basic_parameters(&mut self, rows: usize, columns: usize, border_size: f32) {
+	/// - The width in pixels of the raster
+	/// - The height in pixels of the raster
+	pub fn set_basic_parameters(&mut self, rows: usize, columns: usize, width: f32, height: f32) {
 		self.rows = rows;
 		self.columns = columns;
-		self.border_size = border_size;
+		self.width = width;
+		self.height = height;
 	}
 
 	/// # API Function
@@ -200,8 +207,9 @@ impl ModelConstructionApi {
 
 	/// # API Function
 	/// ## Base: The API-user passes the OpenCV tree from the web-application
-	pub fn base(&mut self, open_cv_tree: OpenCVTree) {
+	pub fn base(&mut self, open_cv_tree: OpenCVTree, curve_point_separation: f32) {
 		self.open_cv_tree = open_cv_tree;
+		self.curve_point_separation = curve_point_separation;
 	}
 
 	/// # API Function
@@ -216,23 +224,13 @@ impl ModelConstructionApi {
 		let level_curve_tree = LevelCurveTree::from_open_cv(&self.open_cv_tree.pixels_per_curve, transformed_parent_relations);
 
 		// Transform this LevelCurveTree into a LevelCurveSet
-		let mut level_curve_map = LevelCurveTree::transform_to_LevelCurveMap(&level_curve_tree, self.altitude_step, 2.0 * self.svc_distance, 1).map_err(|e| e.to_string())?;
-
-		//find maximum and minimum cooridinates in level curve model
-		let (min, max) = level_curve_map.get_bounding_points();
-
-		// keep desired border of each axis around model
-		let border_x = self.border_size * (max.x - min.x);
-		let border_y = self.border_size * (max.y - min.y);
-
-		//ensure none of the level curve points have negative coordinates , and have a 'border' distance from the axes
-		level_curve_map.align_with_origin(&min, border_x, border_y);
+		let level_curve_set = LevelCurveTree::transform_to_LevelCurveSet(&level_curve_tree, self.altitude_step, self.curve_point_separation, 1).map_err(|e| e.to_string())?;
 
 		//create raster based on level curve model and desired rows and columns
-		let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0), (max.y - min.y) + (border_y * 2.0), self.rows, self.columns);
+		let mut raster = Raster::new(self.width, self.height, self.rows, self.columns);
 
 		// create new modelConstructor (module containing 3D-model construction algorithm)
-		let mut model_constructor = crate::model_construction::constructor::ModelConstructor::new(&mut raster, self.svc_distance, &level_curve_map);
+		let mut model_constructor = ModelConstructor::new(&mut raster, self.svc_distance, &level_curve_set);
 
 		// determine heights
 		model_constructor.construct().map_err(|e| e.to_string())?;
@@ -244,6 +242,9 @@ impl ModelConstructionApi {
 		for operation in &self.smoothing_operations_queue {
 			operation.apply(&mut smoother).map_err(|e| e.to_string())?;
 		}
+
+		// Apply raster normalisation, so it will be contained within a 100x100x100 pixel box
+		smoother.raster.normalise().map_err(|e| e.to_string())?;
 
 		//
 		// All smoothing operations have been applied, thereofore the final raster has been computed.
@@ -257,7 +258,7 @@ impl ModelConstructionApi {
 		//for lava path generation : find point index of the highest point in the model
 
 		let mut top_height = f32::MIN;
-		for curve in &level_curve_map.level_curves {
+		for curve in &level_curve_set.level_curves {
 			if curve.altitude > top_height {
 				top_height = curve.altitude;
 			}
@@ -274,7 +275,7 @@ impl ModelConstructionApi {
 
 		//find lava path from the highest point of the model
 		//min alt determines at which alitude a lava path stops
-		let min_altitude = level_curve_map.altitude_step / 2.0;
+		let min_altitude = level_curve_set.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
 		let computed_lava_paths: Vec<Vec<&Point>> = Vec::new();
