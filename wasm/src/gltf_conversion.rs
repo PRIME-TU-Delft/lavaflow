@@ -2,8 +2,8 @@ use gltf_json as json;
 
 use std::mem;
 
-use miette::{Result, miette, IntoDiagnostic};
 use json::validation::Checked::Valid;
+use miette::{miette, IntoDiagnostic, Result};
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
@@ -15,7 +15,7 @@ pub struct Vertex {
 #[derive(Copy, Clone)]
 struct BoundingCoords {
 	min: [f32; 3],
-	max: [f32; 3]
+	max: [f32; 3],
 }
 
 impl BoundingCoords {
@@ -25,7 +25,10 @@ impl BoundingCoords {
 			return Err(miette!("At least one point needs to be given to calculate bounding coordinates"));
 		}
 
-		let mut bounding_coords = BoundingCoords{ min: points[0].position, max: points[0].position };
+		let mut bounding_coords = BoundingCoords {
+			min: points[0].position,
+			max: points[0].position,
+		};
 
 		// Loop through the coordinates of all points, and update the minimum and maximum x, y, and z values
 		for point in points {
