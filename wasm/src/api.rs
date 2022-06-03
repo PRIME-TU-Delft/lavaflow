@@ -72,11 +72,28 @@ impl ModelConstructionResult {
 /// This API struct is used to return the result of the get_altitude_and_gradient_for_point function,
 /// that is implemented in the ModelConstructionApi struct.
 #[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AltitudeGradientPair {
 	x: f32,
 	y: f32,
 	altitude: f32,
 	gradient: (f32, f32, f32),
+}
+
+#[wasm_bindgen]
+impl AltitudeGradientPair {
+	#[wasm_bindgen(constructor)]
+	pub fn new(val: JsValue) -> Result<AltitudeGradientPair, JsValue> {
+		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid AltitudeGradientPair"))
+	}
+
+	pub fn debug(&self) -> String {
+		format!("{self:?}")
+	}
+
+	pub fn to_js(&self) -> Result<JsValue, JsValue> {
+		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize AltitudeGradientPair"))
+	}
 }
 
 /// Main API

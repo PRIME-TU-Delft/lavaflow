@@ -45,9 +45,7 @@
 		{#if instructionVisible}
 			<Instructions />
 		{:else}
-			<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream}>
-				<h1>loading...</h1>
-			</Video>
+			<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream} />
 		{/if}
 
 		<div slot="footer">

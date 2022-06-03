@@ -7,14 +7,13 @@
 	import Image from '$lib/components/Image.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import { perspectiveImage } from '$lib/stores/imageStore';
+	import { demoPerspectiveImage, perspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
-	import { gltfUrl } from '$lib/stores/gltfStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { gltfStore } from '$lib/stores/gltfStore';
 	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
-
-	import init, * as wasm from 'wasm';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
@@ -27,31 +26,10 @@
 
 	onMount(async () => {
 		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
-			return goto('/scan/mapscanning');
+			return goto('/scan/mapscanning'); // TODO: Set this back
 		}
-
-		await init();
-
-		const tree = new wasm.OpenCVTree({
-			pixels_per_curve: $contourLines.curves,
-			parent_relations: $contourLines.hierarchy
-		});
-
-		const api = new wasm.ModelConstructionApi();
-		api.base(tree);
-		api.set_basic_parameters(30, 30, 0.2);
-		api.set_svc_parameters(15);
-		api.set_catmull_clark_parameters(1);
-		api.set_lava_path_parameters(30, 0.1);
-		api.apply_smooth_to_layer(0, 0.7, 4, 10, false);  // Smooth foot of the mountain
-		api.increase_altitude_for_mountain_tops(0.3, false);
-		api.apply_smooth_to_all(0.3, 6, 10, false);
-
-		const model_construction_result = api.build().to_js();
-		const gltfBlob = new Blob([model_construction_result.gltf], { type: 'application/json' });
-		gltfUrl.set(URL.createObjectURL(gltfBlob));
-
-		console.log(model_construction_result);
+		await gltfStore.setup($contourLines);
+		gltfStore.build();
 
 		gltfLoaded = true;
 	});
@@ -68,7 +46,7 @@
 
 	<Image src={$perspectiveImage} alt="foreground" />
 
-	{#if $contourLines.curves && $contourLines.hierarchy}
+	{#if $contourLines?.curves && $contourLines?.hierarchy}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 			<P5CurvesDebugView
 				curves={$contourLines.curves}

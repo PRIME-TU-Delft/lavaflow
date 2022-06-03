@@ -35,8 +35,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@ar-js-org/ar.js": "^3.4.0",
-		"@js-temporal/polyfill": "^0.4.1",
 		"@mdi/js": "^6.6.96",
 		"@types/p5": "^1.4.2",
 		"@types/three": "^0.140.0",
