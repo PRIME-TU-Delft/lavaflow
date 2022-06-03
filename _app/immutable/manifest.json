@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-84966f1d.js",
+    "file": "start-598e83ad.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -38,19 +38,20 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-8d0d09dd.js",
+    "file": "pages/demo.svelte-2153cf7c.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-7d13a48d.js",
       "_NavigationButton-3046b84a.js",
-      "_gltfStore-db91c240.js",
+      "_draggable-10e2ef03.js",
+      "_gltfStore-c11dc8ca.js",
       "_Button-e0deb53f.js",
       "_index-aa581d55.js"
     ],
     "css": [
-      "assets/pages/demo.svelte-d352888f.css"
+      "assets/pages/demo.svelte-cf86e0de.css"
     ]
   },
   "src/routes/index.svelte": {
@@ -84,7 +85,7 @@
     ]
   },
   "src/routes/scan/maptransform.svelte": {
-    "file": "pages/scan/maptransform.svelte-05054b45.js",
+    "file": "pages/scan/maptransform.svelte-b758e004.js",
     "src": "src/routes/scan/maptransform.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -93,8 +94,9 @@
       "_Button-e0deb53f.js",
       "_imageStore-801aaa81.js",
       "_NavigationButton-3046b84a.js",
-      "_P5-841000ea.js",
+      "_draggable-10e2ef03.js",
       "__commonjsHelpers-ee0fe954.js",
+      "_P5-59b76c1c.js",
       "_singletons-d1fb5791.js",
       "_index-aa581d55.js",
       "_preload-helper-60cab3ee.js"
@@ -104,7 +106,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-ced18c45.js",
+    "file": "pages/scan/preview.svelte-20407252.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -113,8 +115,9 @@
       "_Button-e0deb53f.js",
       "_NavigationButton-3046b84a.js",
       "_imageStore-801aaa81.js",
-      "_P5-841000ea.js",
-      "_gltfStore-db91c240.js",
+      "_P5-59b76c1c.js",
+      "_draggable-10e2ef03.js",
+      "_gltfStore-c11dc8ca.js",
       "_singletons-d1fb5791.js",
       "_index-aa581d55.js",
       "_preload-helper-60cab3ee.js"
@@ -148,10 +151,17 @@
       "assets/NavigationButton-7253cb1c.css"
     ]
   },
-  "_gltfStore-db91c240.js": {
-    "file": "chunks/gltfStore-db91c240.js",
+  "_draggable-10e2ef03.js": {
+    "file": "chunks/draggable-10e2ef03.js",
     "imports": [
       "_index-aa581d55.js"
+    ]
+  },
+  "_gltfStore-c11dc8ca.js": {
+    "file": "chunks/gltfStore-c11dc8ca.js",
+    "imports": [
+      "_index-aa581d55.js",
+      "_draggable-10e2ef03.js"
     ]
   },
   "_Button-e0deb53f.js": {
@@ -175,19 +185,18 @@
       "assets/imageStore-fd802cc1.css"
     ]
   },
-  "_P5-841000ea.js": {
-    "file": "chunks/P5-841000ea.js",
+  "__commonjsHelpers-ee0fe954.js": {
+    "file": "chunks/_commonjsHelpers-ee0fe954.js"
+  },
+  "_P5-59b76c1c.js": {
+    "file": "chunks/P5-59b76c1c.js",
     "imports": [
-      "_index-aa581d55.js",
       "_preload-helper-60cab3ee.js",
       "_index-7d13a48d.js"
     ],
     "dynamicImports": [
       "_p5.min-4a37dac4.js"
     ]
-  },
-  "__commonjsHelpers-ee0fe954.js": {
-    "file": "chunks/_commonjsHelpers-ee0fe954.js"
   },
   "_p5.min-4a37dac4.js": {
     "file": "chunks/p5.min-4a37dac4.js",
