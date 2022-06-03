@@ -1,0 +1,249 @@
+<script lang="ts">
+	import Button from '$lib/components/Button.svelte';
+	import Dropdown from '$lib/components/input/Dropdown.svelte';
+	import EmitInput from '$lib/components/input/EmitInput.svelte';
+	import Range from '$lib/components/input/Range.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+
+	import SortableList from 'svelte-sortable-list';
+
+	import type { Options, Entries } from '$lib/types/Options';
+	import { hc_smooth_parameters, hc_smooth_parameter_types } from '$lib/data/hardCoded';
+	import { SmoothParameters } from '$lib/data/smoothParameters';
+
+	interface GeneralSettings {
+		rows: number;
+		columns: number;
+		border_size: number;
+		svc_distance: number;
+		catmull_clark_iterations: number;
+	}
+
+	let sidebarOpen = true;
+	let newSmoothModalOpen = false;
+	let newSmoothParameterType: string = hc_smooth_parameter_types[0];
+	let editSmoothModalOpen = false;
+	let smoothParametersOpen: SmoothParameters;
+	let indexEditing: number;
+
+	let generalSettingsOptions: Options<GeneralSettings> = {
+		rows: {
+			default: 5,
+			from: 1,
+			to: 10,
+			step: 1
+		},
+		columns: {
+			default: 5,
+			from: 1,
+			to: 10,
+			step: 1
+		},
+		border_size: {
+			default: 5,
+			from: 1,
+			to: 10,
+			step: 1
+		},
+		svc_distance: {
+			default: 5,
+			from: 1,
+			to: 10,
+			step: 1
+		},
+		catmull_clark_iterations: {
+			default: 5,
+			from: 1,
+			to: 10,
+			step: 1
+		}
+	};
+
+	let smoothLayers: SmoothParameters[] = hc_smooth_parameters;
+
+	/**
+	 * Sort the smooth parameters when dragging one over another
+	 * @param ev - Custom event with a list new SmoothParameters ordered by new index
+	 */
+	function sortSmoothLayers(ev: CustomEvent<SmoothParameters[]>) {
+		smoothLayers = ev.detail;
+	}
+
+	/**
+	 * Open the create parameter modal to add a new smooth parameter
+	 */
+	function openCreateModal() {
+		newSmoothParameterType = hc_smooth_parameter_types[0];
+		newSmoothModalOpen = true;
+	}
+
+	/**
+	 * Add new parameters to list of other paremeters. then Close the create parameter modal and reset it.
+	 */
+	function addParameters() {
+		smoothLayers = [...smoothLayers, smoothParametersOpen];
+		newSmoothModalOpen = false;
+		newSmoothParameterType = hc_smooth_parameter_types[0];
+	}
+
+	/**
+	 * Remove a parameter from the list of parameters
+	 */
+	function removeParameter() {
+		smoothLayers = smoothLayers.filter((_, i) => i !== indexEditing);
+		editSmoothModalOpen = false;
+	}
+
+	/**
+	 * Initialize the new smooth parameters
+	 */
+	function setNewParametersForType() {
+		// If the `newSmoothParameterType` is not set
+		if (newSmoothParameterType == hc_smooth_parameter_types[0]) return;
+
+		smoothParametersOpen = SmoothParameters.create(newSmoothParameterType);
+
+		console.log(smoothParametersOpen);
+	}
+
+	/**
+	 * Open the edit parameter modal to edit a smooth parameter
+	 * @param smoothLayer
+	 * @param index
+	 */
+	function openEditModalWith(smoothLayer: SmoothParameters, index: number) {
+		indexEditing = index;
+		editSmoothModalOpen = true;
+		smoothParametersOpen = smoothLayer;
+	}
+
+	/**
+	 * Set a certain value of a smooth parameter
+	 */
+	function setParameter(key: string, value: any) {
+		smoothParametersOpen.setValue(key, value);
+	}
+
+	/**
+	 * Extends the function above with for a boolean value
+	 */
+	function toggleBooleanParameter(key: string) {
+		setParameter(key, !smoothParametersOpen.getValue(key));
+	}
+
+	/**
+	 * Set the smooth parameter for a certain smooth layer index
+	 */
+	function editParametersForIndex() {
+		smoothLayers[indexEditing] = smoothParametersOpen;
+		editSmoothModalOpen = false;
+	}
+
+	/**
+	 * Helper function to set the type of Object.entries
+	 */
+	function objToArr(obj: Options<GeneralSettings>) {
+		return Object.entries(obj) as Entries<Options<GeneralSettings>>;
+	}
+</script>
+
+{#if !sidebarOpen}
+	<div class="openSidebar">
+		<Button on:click={() => (sidebarOpen = !sidebarOpen)}>Open sidebar</Button>
+	</div>
+{/if}
+
+<aside class="sideBar" class:sidebarOpen>
+	<Button secondary on:click={() => (sidebarOpen = !sidebarOpen)}>Close sidebar</Button>
+
+	<h3>General Settings</h3>
+	{#each objToArr(generalSettingsOptions) as [key, option]}
+		{#if 'from' in option}
+			<Range
+				label={key}
+				from={option.from}
+				to={option.to}
+				step={option.step}
+				bind:value={generalSettingsOptions[key].default}
+			/>
+		{:else}
+			test: {key} {option}
+		{/if}
+	{/each}
+
+	<SortableList list={smoothLayers} key="id" on:sort={sortSmoothLayers} let:item let:index>
+		<Button on:click={() => openEditModalWith(item, index)}>
+			{item.toString()}
+		</Button>
+	</SortableList>
+
+	<Button secondary on:click={openCreateModal}>New smooth layer</Button>
+
+	<Button secondary on:click={() => console.log('Regenerate model')}>Regenerate model</Button>
+</aside>
+
+<!-- EDIT SMOOTH ITEM-->
+<Modal bind:visible={editSmoothModalOpen}>
+	{#each smoothParametersOpen.toArray() as [key, value]}
+		{#if typeof value == 'number'}
+			<EmitInput label={key} {value} on:input={(e) => setParameter(key, e.detail.value)} />
+		{:else if typeof value == 'boolean'}
+			<Dropdown options={[true, false]} {value} on:change={() => toggleBooleanParameter(key)} />
+		{/if}
+	{/each}
+
+	<Button secondary on:click={removeParameter}>Remove smooth layer</Button>
+	<Button on:click={editParametersForIndex}>Set parameters</Button>
+</Modal>
+
+<!-- CREATE NEW SMOOTH ITEM -->
+<Modal bind:visible={newSmoothModalOpen}>
+	<Dropdown
+		options={hc_smooth_parameter_types}
+		bind:value={newSmoothParameterType}
+		on:change={setNewParametersForType}
+	/>
+
+	{#if newSmoothParameterType != 'None' && smoothParametersOpen?.toArray()}
+		{#each smoothParametersOpen.toArray() as [key, value]}
+			{#if typeof value == 'number'}
+				<EmitInput label={key} {value} on:input={(e) => setParameter(key, e.detail.value)} />
+			{:else if typeof value == 'boolean'}
+				<Dropdown options={[true, false]} {value} on:change={() => toggleBooleanParameter(key)} />
+			{/if}
+		{/each}
+
+		<Button on:click={addParameters}>Set parameters</Button>
+	{/if}
+</Modal>
+
+<style lang="scss">
+	.openSidebar {
+		width: 20rem;
+		max-width: calc(100vw - 2rem);
+		right: 1rem;
+		top: 0.75rem;
+		position: fixed;
+	}
+
+	aside {
+		box-sizing: border-box;
+		position: fixed;
+		top: 0;
+		right: 0;
+		margin: 1rem;
+		padding: 0.5rem;
+		width: min(30rem, 100vw - 2rem);
+		max-width: 90vw;
+		height: calc(max(100vh, var(--vh)) - 2rem);
+		border-radius: 0.75rem;
+		background: var(--primary-color);
+		z-index: 10;
+		transform: translateX(calc(100% + 2rem));
+		transition: transform 0.5s ease-in-out;
+
+		&.sidebarOpen {
+			transform: translateX(0);
+		}
+	}
+</style>

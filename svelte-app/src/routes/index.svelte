@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+</script>
+
 <script>
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 </script>
@@ -23,7 +27,7 @@
 	</div>
 
 	<NavigationButton large to="scan/mapscanning">Start flowing</NavigationButton>
-	<NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton>
+	<!-- <NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton> -->
 </main>
 
 <style lang="scss">
@@ -36,6 +40,7 @@
 		background-repeat: no-repeat;
 		height: 4rem;
 		width: 100%;
+		z-index: 1000;
 	}
 
 	header {
@@ -68,7 +73,7 @@
 		}
 
 		.backdrop {
-			background: rgba(220, 73, 73, 21%);
+			background: #dc494936;
 			backdrop-filter: blur(1px) saturate(120%);
 		}
 

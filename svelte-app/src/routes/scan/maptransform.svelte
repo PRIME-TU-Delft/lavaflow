@@ -1,30 +1,33 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+</script>
+
 <script lang="ts">
 	/**
 	 * Page for dragging markers on document edges
 	 */
 	import Button from '$lib/components/Button.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import Page from '$lib/components/Page.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
 	import type Draggable from '$lib/data/draggable';
 	import { rawImage, perspectiveImage } from '$lib/stores/imageStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import removePerspective from '$lib/opencv/removePerspective';
+	import { getCurves } from '$lib/opencv/detectCurves';
 
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
-	import P5Transform from '$lib/components/P5Transform.svelte';
+	import P5Transform from '$lib/components/p5/P5Transform.svelte';
+	import { mdiInformation, mdiChevronRight } from '@mdi/js';
 
-	let foregroundWidth: number;
-	let foregroundHeight: number;
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
 
-	function gotoPreview() {
-		// TODO: move this to seperate file
-		let mat = cv.imread('foregroundImage');
-
-		console.log(points);
+	function gotoPreview(width: number, height: number) {
+		const mat = cv.imread('foregroundImage');
 
 		// Fetch the marker coordinates of the draggable buttons
 		let markerCoords: number[] = [];
@@ -34,9 +37,35 @@
 		}
 
 		// Apply the perspective transformation using the selected marker coords
-		let result = removePerspective(mat, markerCoords, foregroundWidth, foregroundHeight);
+		const result = removePerspective(mat, markerCoords, width, height);
+
+		// Set contour line store to the detected contour lines with hirarchy
+		const { curves, hierarchy } = getCurves(result);
+
+		if (curves.length == 0 || hierarchy.length == 0) {
+			alert('No contours found');
+			return;
+		}
+
+		// Convert the OpenCV Mat to a array of tuples for mountain model construction
+		const contourTuples: [number, number][][] = curves.map((contour) => {
+			let contourTuple: [number, number][] = [];
+
+			for (let i = 0; i < contour.length - 1; i += 2) {
+				contourTuple.push([contour[i], contour[i + 1]]);
+			}
+
+			return contourTuple;
+		});
+
+		contourLines.set({
+			curves: contourTuples,
+			hierarchy: hierarchy
+		});
+
 		cv.imshow('canvasOutput', result);
 
+		// set the output image to a store
 		perspectiveImage.set(outputCanvas.toDataURL());
 
 		result.delete();
@@ -46,18 +75,19 @@
 	}
 
 	onMount(() => {
+		// If no raw image in cache, go back to scan/mapscanning
 		if (!$rawImage) goto('/scan/mapscanning');
 	});
 </script>
 
-<Page title="Image transformation">
+<Page title="Image transformation" let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="/scan/mapscanning" back>Rescan image</NavigationButton>
 
 	<div slot="background">
 		<img id="backgroundImage" src={$rawImage} alt="background" />
 	</div>
 
-	<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
+	<div class="sketch">
 		<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
 	</div>
 
@@ -73,8 +103,13 @@
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
 	<div slot="footer">
-		<Button on:click={gotoPreview}>
-			<span>Proceed</span>
+		<Button secondary icon={mdiInformation}>
+			Drag each marker to the correct corner on the map
+		</Button>
+
+		<Button on:click={() => gotoPreview(foregroundWidth, foregroundHeight)}>
+			<span>Preview transformation</span>
+			<Icon path={mdiChevronRight} />
 		</Button>
 	</div>
 </Page>

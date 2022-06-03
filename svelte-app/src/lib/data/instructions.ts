@@ -4,7 +4,7 @@ export interface Instruction {
 }
 
 /**
- * List of requirements for the best experience with scanning the contour lines and houses
+ * List of requirements for the best experience with scanning the contour lines and targets
  */
 export const instructions: Instruction[] = [
 	{

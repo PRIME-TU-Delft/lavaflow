@@ -17,7 +17,7 @@ export default class Draggable {
 	 *
 	 * @param {number} x initial x coordinate of the marker
 	 * @param {number} y initial y coordinate of the marker
-	 * @param {number} size height/width of the marker in pixels
+	 * @param {number} size height/width of the draggable surface in pixels
 	 */
 	constructor(x: number, y: number, size: number) {
 		this.x = x;
@@ -41,20 +41,95 @@ export default class Draggable {
 	}
 
 	/**
+	 * Moves the point to the input x and y coordinates
+	 *
+	 * @param x  The x position the point should be moved to
+	 * @param y  The y position the point should be moved to
+	 */
+	setPosition(x: number, y: number) {
+		this.x = x;
+		this.y = y;
+	}
+
+	/**
 	 * Visualize the marker, by drawing a rectangle at the marker's current position
 	 *
 	 * @param p5 Instance of a p5 sketch
 	 */
-	draw(p5: p5) {
-		p5.stroke(0);
-		p5.fill(50);
-		const indicatorSize = 20;
+	drawRect(p5: p5, markerSize: number) {
+		p5.stroke(0, 127);
+		p5.fill(50, 127);
+		p5.strokeWeight(1);
+		p5.rectMode(p5.CENTER);
 
-		p5.rect(
-			this.x + (this.size - indicatorSize) / 2,
-			this.y + (this.size - indicatorSize) / 2,
-			indicatorSize,
-			indicatorSize
+		p5.rect(this.x + this.size / 2, this.y + this.size / 2, markerSize, markerSize);
+	}
+
+	/**
+	 * Visualize the marker by drawing a circle at the marker's current position
+	 *
+	 * @param p5 Instance of a p5 sketch
+	 * @param markerSize The size in pixels of the marker to be drawn
+	 */
+	drawCircle(p5: p5, markerSize: number, index?: number) {
+		p5.stroke(0, 12);
+		p5.fill(50, 127);
+		p5.strokeWeight(1);
+
+		if (index != undefined) {
+			p5.text('#' + index, this.x + this.size / 2, this.y + this.size / 2);
+		}
+
+		p5.circle(this.x + this.size / 2, this.y + this.size / 2, markerSize);
+	}
+
+	/**
+	 * Visualize the marker by drawing a triangle at the marker's current position
+	 *
+	 * @param p5 Instance of a p5 sketch
+	 * @param markerSize The size in pixels of the marker to be drawn
+	 */
+	drawTriangle(p5: p5, markerSize: number) {
+		p5.stroke(0, 127);
+		p5.fill(50, 127);
+		p5.strokeWeight(1);
+
+		// corners in order: bottom left corner, bottom right corner, top corner in the center
+		p5.triangle(
+			this.x + (this.size - markerSize) / 2,
+			this.y + (this.size + markerSize) / 2,
+			this.x + (this.size + markerSize) / 2,
+			this.y + (this.size + markerSize) / 2,
+			this.x + this.size / 2,
+			this.y + (this.size - markerSize) / 2
+		);
+	}
+
+	/**
+	 * Visualize the marker by drawing a cross at the marker's current position
+	 *
+	 * @param p5 Instance of a p5 sketch
+	 * @param markerSize The size in pixels of the marker to be drawn
+	 */
+	drawCross(p5: p5, markerSize: number) {
+		p5.stroke(0, 127);
+		p5.strokeWeight(7);
+		// cross is drawn using two thick lines
+
+		// draw line from top left to bottom right
+		p5.line(
+			this.x + (this.size - markerSize) / 2,
+			this.y + (this.size + markerSize) / 2,
+			this.x + (this.size + markerSize) / 2,
+			this.y + (this.size - markerSize) / 2
+		);
+
+		// draw line from top right to bottom left
+		p5.line(
+			this.x + (this.size + markerSize) / 2,
+			this.y + (this.size + markerSize) / 2,
+			this.x + (this.size - markerSize) / 2,
+			this.y + (this.size - markerSize) / 2
 		);
 	}
 
@@ -72,7 +147,11 @@ export default class Draggable {
 			this.dragging = true;
 			this.offsetX = this.x - p5.mouseX;
 			this.offsetY = this.y - p5.mouseY;
+
+			return true;
 		}
+
+		return false;
 	}
 
 	/**

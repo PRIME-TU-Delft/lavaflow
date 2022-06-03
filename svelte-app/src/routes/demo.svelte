@@ -1,121 +1,85 @@
 <script lang="ts">
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import init, * as wasm from 'wasm';
+	import { contourLines } from '$lib/stores/contourLineStore';
 
-	import { onMount, onDestroy } from 'svelte';
-
-	import { hc_level_curves, hc_parent_relations } from '$lib/data/hardCoded';
-	import type { BufferGeometry, Material, Mesh } from 'three';
-	import { DoubleSide } from 'three';
+	import {gltfStore, targetLocations, gltfStringToUrl} from "$lib/stores/gltfStore"
+	import {hc_curves, hc_hierarchy} from "$lib/data/hardCoded"
+	import { onMount } from 'svelte';
 
 	let mounted: boolean;
 	let aframe: boolean;
-	let ar: boolean;
-	let gltfUrl: string;
-	$: ready = aframe && ar && mounted;
-
-	const arLoaded = () => (ar = true);
-	const aframeLoaded = () => {
-		aframe = true;
-
-		AFRAME.registerComponent('double-render', {
-			schema: { opacityFactor: { default: 0.5 } },
-			init: function () {
-				this.traverseMesh.bind(this);
-
-				this.el.addEventListener('model-loaded', () => {
-					this.traverseMesh();
-				});
-			},
-			traverseMesh: function () {
-				const mesh = this.el.getObject3D('mesh');
-
-				if (!mesh) return;
-
-				mesh.traverse((node) => {
-					if (node.type == 'Mesh') {
-						(node as Mesh<BufferGeometry, Material>).material.side = DoubleSide;
-						// (node as Mesh<BufferGeometry, Material>).material.opacity = 0.8;
-					}
-				});
-			}
-		});
-	};
+	$: ready = (aframe || window.AFRAME) && mounted;
 
 	onMount(async () => {
-		await init();
+		console.log($targetLocations)
 
-		const tree = new wasm.OpenCVTree({
-			pixels_per_curve: hc_level_curves,
-			parent_relations: hc_parent_relations
-		});
+		if (!$gltfStore) {
+			contourLines.set({
+				curves: hc_curves,
+				hierarchy: hc_hierarchy
+			});
+			
+			await gltfStore.setup($contourLines);
+			gltfStore.build();
+			console.warn('gltf is loaded from hardcoded data', $gltfStore);
+		}
 
-		const settings = new wasm.ModelGenerationSettings(5, 50, 50, 50, 1.0);
-		const gltf = wasm.generate_3d_model(tree, settings, 2, 0.7, 0.7, 4, 1, 30, 30, 10);
-		const gltfBlob = new Blob([gltf], { type: 'application/json' });
-		gltfUrl = URL.createObjectURL(gltfBlob);
 		mounted = true;
-	});
-
-	onDestroy(() => {
-		delete AFRAME.components['double-render'];
 	});
 </script>
 
 <svelte:head>
-	{#if mounted}
-		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={aframeLoaded}></script>
-		<script
-			src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"
-			on:load={arLoaded}></script>
+	{#if mounted && !window.AFRAME}
+		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={() => (aframe = true)}></script>
 	{/if}
 </svelte:head>
 
 {#if ready}
-	<a-scene
-		embedded
-		arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-	>
-		<div class="backButton">
+	<a-scene embedded>
+		<div class="button backButton">
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
-		<!-- <a-entity light="type: ambient; color: #CCC" /> -->
 
-		<a-marker type="barcode" value="1">
-			<a-light position="0 3 0" intensity="2" type="point" />
-			<a-light position="-3 3 4" intensity="2" type="point" />
+		<div class="button placeTargets">
+			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+		</div>
 
-			<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
+		<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
+		<a-entity light="color: #AFA; intensity: 1.5" position="-1 1 0"></a-entity>
 
-			<a-entity
-				double-render
-				gltf-model="url({gltfUrl})"
-				position="1 0 -1"
-				scale="0.0038 0.0038 0.0038"
-				rotation="0 -90 0"
-				id="model"
-			/>
-		</a-marker>
-		<a-entity camera />
+		<a-entity position="7 -1 -5" scale="0.005 0.05 0.005" rotation="0 -90 0">
+			<a-entity gltf-model="url({$gltfStore})"/>
+
+			{#each $targetLocations as target}
+				{console.log(target, gltfStore.getAlitituteAndGradient(target.x, target.y) )}
+				
+				<a-box depth="18" width="18" height="100" position="{target.x} 75 {target.y}" color="yellow" /> 
+			{/each}
+		</a-entity>
+		
+
+		
+
+		<a-camera look-controls />
 	</a-scene>
 {/if}
 
 <style>
-	:global(.a-canvas, #arjs-video) {
-		display: block;
-		width: 100% !important;
-		height: 100% !important;
-		margin: 0 !important;
-		object-fit: contain !important;
+	.button {
+		position: absolute;
+		width: 15rem;
+		max-width: calc(50vw - 2rem);
+		z-index: 1;
 	}
 
 	.backButton {
-		position: absolute;
 		top: 1rem;
 		left: 1rem;
-		z-index: 1;
-		width: 15rem;
-		max-width: calc(100vw - 2rem);
+	}
+
+	.placeTargets {
+		top: 1rem;
+		right: 1rem;
 	}
 </style>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	/**
 	 * This is where the user inspects the level curves that are drawn, to check if the user wants to rescan the image or not
 	 */
@@ -8,13 +8,31 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
 	import { perspectiveImage } from '$lib/stores/imageStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { gltfStore } from '$lib/stores/gltfStore';
+	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
+
+	let foregroundWidth: number;
+	let foregroundHeight: number;
+
+	let gltfLoaded = false;
 
 	function gotoVisualise() {
-		// TODO: take the positions of the markers and transform image
-
 		goto('/demo');
 	}
+
+	onMount(async () => {
+		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
+			return goto('/scan/mapscanning');
+		}
+		await gltfStore.setup($contourLines);
+		gltfStore.build();
+
+		gltfLoaded = true;
+	});
 </script>
 
 <Page title="image transformation">
@@ -28,9 +46,30 @@
 
 	<Image src={$perspectiveImage} alt="foreground" />
 
+	{#if $contourLines?.curves && $contourLines?.hierarchy}
+		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
+			<P5CurvesDebugView
+				curves={$contourLines.curves}
+				hierarchy={$contourLines.hierarchy}
+				{foregroundHeight}
+				{foregroundWidth}
+			/>
+		</div>
+	{/if}
+
 	<div slot="footer">
-		<Button on:click={gotoVisualise}>
+		<Button loading={!gltfLoaded} on:click={gotoVisualise}>
 			<span>Visualise</span>
 		</Button>
 	</div>
 </Page>
+
+<style>
+	.sketch {
+		height: 100%;
+		width: 100%;
+		position: absolute;
+		top: 0;
+		touch-action: none;
+	}
+</style>

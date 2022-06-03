@@ -18,20 +18,30 @@ init().then(() => {
 	//console.log(tree.debug());
 	//console.log(settings.debug());
 
-	let repetitions = 9;
+	//settings for smoothing
+	let smoothing_repetitions = 9;
 	let strength_positive = 0.7;
 	let strength_negative = 0.7;
 	let coverage = 4;
 	let svc_weight = 100;
 
+	//setting for raster
 	let rows = 60;
 	let columns = 60;
 	let contour_margin = 15.0;
+	let border = 0.2;
+
+	//settings for lava path
+	let path_length = 50;
+	let fork_val = 0.02;
+
+	//setting for subdivisions
+	let subdivision_steps = 1;
 
 	// Measure the performance
 	let start = performance.now();
 
-	let gltf = wasm.generate_3d_model(tree, settings, repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin);
+	let gltf = wasm.generate_3d_model(tree, settings, smoothing_repetitions, strength_positive, strength_negative, coverage, svc_weight, rows, columns, contour_margin, border, path_length, fork_val, subdivision_steps);
 	//console.log(gltf);
 
 	let end = performance.now();
