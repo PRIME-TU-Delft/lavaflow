@@ -31,7 +31,16 @@
 	<slot />
 {:else}
 	<!-- svelte-ignore a11y-media-has-caption -->
-	<video {style} bind:this={videoSource} />
+	<video
+		{style}
+		loop
+		playsInline
+		autoPlay={false}
+		controls={false}
+		preload="auto"
+		type="video/mp4"
+		bind:this={videoSource}
+	/>
 {/if}
 
 <style lang="scss">
@@ -40,6 +49,7 @@
 		width: 100%;
 		object-fit: cover;
 		border-radius: var(--corner-radius, 0);
+		// display: none;
 	}
 
 	.loadingVideo {

@@ -7,12 +7,12 @@
 	import Image from '$lib/components/Image.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import { demoPerspectiveImage, perspectiveImage } from '$lib/stores/imageStore';
+	import { perspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { gltfStore } from '$lib/stores/gltfStore';
-	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
+	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 	let foregroundWidth: number;
@@ -26,7 +26,7 @@
 
 	onMount(async () => {
 		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
-			return goto('/scan/mapscanning'); // TODO: Set this back
+			return goto('/scan/mapscanning');
 		}
 		await gltfStore.setup($contourLines);
 		gltfStore.build();

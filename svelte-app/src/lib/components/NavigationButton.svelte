@@ -1,9 +1,8 @@
 <script>
-	import Button from './Button.svelte';
-
-	import { mdiChevronRight } from '@mdi/js';
-	import { mdiChevronLeft } from '@mdi/js';
+	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+
+	import { mdiChevronRight, mdiChevronLeft } from '@mdi/js';
 
 	export let to = '/';
 	export let secondary = false;
@@ -19,9 +18,9 @@
 				<Icon path={mdiChevronLeft} color="var(--text-color)" />
 			{/if}
 
-			<span class="text">
+			<div class="text">
 				<slot />
-			</span>
+			</div>
 
 			{#if !back}
 				<Icon path={mdiChevronRight} color="var(--text-color)" />
@@ -35,7 +34,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		width: 100%;
 	}
 
 	.text {

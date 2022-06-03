@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+</script>
+
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import Instructions from '$lib/components/Instructions.svelte';
@@ -23,13 +27,16 @@
 	async function gotoTransform() {
 		loadingNextPage = true;
 
+		// Create an atificial canvas element
 		const context = canvas.getContext('2d');
 		canvas.height = videoSource.videoHeight;
 		canvas.width = videoSource.videoWidth;
 
+		// Take screenshot of video
 		if (context) context.drawImage(videoSource, 0, 0, canvas.width, canvas.height);
 		const image = canvas.toDataURL('image/png');
 
+		// Set image in (raw)image store
 		rawImage.set(image);
 
 		goto('/scan/maptransform');

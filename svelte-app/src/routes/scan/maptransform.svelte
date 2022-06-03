@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+</script>
+
 <script lang="ts">
 	/**
 	 * Page for dragging markers on document edges
@@ -16,14 +20,14 @@
 
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
-	import P5Transform from '$lib/components/P5Transform.svelte';
+	import P5Transform from '$lib/components/p5/P5Transform.svelte';
 	import { mdiInformation, mdiChevronRight } from '@mdi/js';
 
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
 
 	function gotoPreview(width: number, height: number) {
-		let mat = cv.imread('foregroundImage');
+		const mat = cv.imread('foregroundImage');
 
 		// Fetch the marker coordinates of the draggable buttons
 		let markerCoords: number[] = [];

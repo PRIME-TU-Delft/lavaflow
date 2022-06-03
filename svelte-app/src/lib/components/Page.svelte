@@ -57,7 +57,6 @@
 		display: grid;
 		align-items: center;
 		justify-items: center;
-		padding-block: 1.5rem 1rem;
 	}
 
 	.background,
