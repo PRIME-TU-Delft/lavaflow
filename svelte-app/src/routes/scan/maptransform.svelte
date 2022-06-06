@@ -60,7 +60,8 @@
 
 		contourLines.set({
 			curves: contourTuples,
-			hierarchy: hierarchy
+			hierarchy: hierarchy,
+			size: { width, height }
 		});
 
 		cv.imshow('canvasOutput', result);

@@ -10,6 +10,7 @@ import { writable } from 'svelte/store';
 export type CurveTree = {
 	curves: [number, number][][];
 	hierarchy: number[];
+	size: { width: number; height: number };
 };
 
 function contourLineStore() {

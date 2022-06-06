@@ -13,7 +13,6 @@
 	import { onMount } from 'svelte';
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
-	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
