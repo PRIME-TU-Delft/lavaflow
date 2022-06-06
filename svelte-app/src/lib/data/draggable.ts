@@ -1,5 +1,7 @@
 import type p5 from 'p5';
 
+const STROKE_WIDTH = 4;
+
 export default class Draggable {
 	dragging: boolean = false;
 	x: number;
@@ -57,11 +59,11 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 */
 	drawRect(p5: p5, markerSize: number) {
-		p5.stroke(0, 127);
-		p5.fill(50, 127);
-		p5.strokeWeight(1);
-		p5.rectMode(p5.CENTER);
+		p5.stroke(0);
+		p5.fill(255);
+		p5.strokeWeight(STROKE_WIDTH);
 
+		p5.rectMode(p5.CENTER);
 		p5.rect(this.x + this.size / 2, this.y + this.size / 2, markerSize, markerSize);
 	}
 
@@ -72,9 +74,9 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawCircle(p5: p5, markerSize: number, index?: number) {
-		p5.stroke(0, 12);
-		p5.fill(50, 127);
-		p5.strokeWeight(1);
+		p5.stroke(0);
+		p5.fill(255);
+		p5.strokeWeight(STROKE_WIDTH);
 
 		if (index != undefined) {
 			p5.text('#' + index, this.x + this.size / 2, this.y + this.size / 2);
@@ -90,9 +92,9 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawTriangle(p5: p5, markerSize: number) {
-		p5.stroke(0, 127);
-		p5.fill(50, 127);
-		p5.strokeWeight(1);
+		p5.stroke(0);
+		p5.fill(255);
+		p5.strokeWeight(STROKE_WIDTH);
 
 		// corners in order: bottom left corner, bottom right corner, top corner in the center
 		p5.triangle(
@@ -112,8 +114,8 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawCross(p5: p5, markerSize: number) {
-		p5.stroke(0, 127);
-		p5.strokeWeight(7);
+		p5.stroke(0);
+		p5.strokeWeight(STROKE_WIDTH * 2);
 		// cross is drawn using two thick lines
 
 		// draw line from top left to bottom right
