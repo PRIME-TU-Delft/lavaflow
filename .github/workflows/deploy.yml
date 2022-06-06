@@ -42,7 +42,9 @@ jobs:
 
       - name: Build (Svelte)
         working-directory: svelte-app
-        run: yarn build
+        run: |
+          echo -e "$${ github.sha }\n$(date)" > static/version.txt && \
+          yarn build
 
       - name: Deploy to GitHub pages
         uses: peaceiris/actions-gh-pages@v3
