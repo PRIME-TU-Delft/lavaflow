@@ -43,7 +43,7 @@ jobs:
       - name: Build (Svelte)
         working-directory: svelte-app
         run: |
-          echo -e "$${ github.sha }\n$(date)" > static/version.txt && \
+          echo -e "${{ github.sha }}\n$(date)" > static/version.txt && \
           yarn build
 
       - name: Deploy to GitHub pages
