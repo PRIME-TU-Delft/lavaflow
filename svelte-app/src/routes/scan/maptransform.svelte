@@ -119,6 +119,7 @@
 	.sketch {
 		height: 100%;
 		touch-action: none;
+		user-select: none;
 	}
 
 	#backgroundImage {
@@ -126,5 +127,6 @@
 		width: 100%;
 		object-fit: cover;
 		touch-action: none;
+		user-select: none;
 	}
 </style>

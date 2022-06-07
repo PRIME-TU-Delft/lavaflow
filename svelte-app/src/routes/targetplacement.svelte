@@ -61,3 +61,11 @@
 		{/if}
 	</div>
 </Page>
+
+<style>
+	.sketch {
+		height: 100%;
+		touch-action: none;
+		user-select: none;
+	}
+</style>
