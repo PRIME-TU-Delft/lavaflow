@@ -263,7 +263,8 @@ impl ModelConstructionApi {
 				top_height = curve.altitude;
 			}
 		}
-		//top_height -= level_curve_map.altitude_step;
+		//TODO REMOVE ONCE PEAKS ARE CORRECT
+		top_height -= level_curve_map.altitude_step;
 
 		//for lava path generation : get list of indexes of points above or on highest level curve
 		let mut highest_points = Vec::new();
@@ -278,8 +279,7 @@ impl ModelConstructionApi {
 		let min_altitude = level_curve_set.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let computed_lava_paths: Vec<Vec<&Point>> = Vec::new();
-		// crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+		let computed_lava_paths: Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
 		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
