@@ -3,6 +3,7 @@ variables:
 
 
 stages:
+  - toolchain
   - build
   - test
 
@@ -14,10 +15,23 @@ stages:
     paths:
       - wasm/target/
       - $CARGO_HOME
-    policy: pull-push
+    policy: pull
   before_script:
-    - du -sh wasm/target
-    - du -sh $CARGO_HOME
+    # Show cache size, but if dirs not found just show the error without crashing the CI job
+    - du -sh wasm/target $CARGO_HOME || true
+
+
+wasm-toolchain:
+  extends: .rust_cached
+  stage: toolchain
+  script:
+    - rustup component add clippy
+    - wget -qO- https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-gnu.tgz | tar -xz -C /usr/bin
+    - mkdir -p $CARGO_HOME/bin
+    - if [ ! -e "$CARGO_HOME/bin/cargo-tarpaulin" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-tarpaulin; fi
+    - if [ ! -e "$CARGO_HOME/bin/cargo-nextest" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-nextest; fi
+  cache:
+    policy: pull-push
 
 
 wasm-build:
@@ -26,6 +40,8 @@ wasm-build:
   script:
     - cd wasm
     - cargo build
+  cache:
+    policy: pull-push
 
 
 wasm-rustfmt:
