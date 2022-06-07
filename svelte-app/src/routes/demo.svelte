@@ -4,55 +4,24 @@
 	import { contourLines } from '$lib/stores/contourLineStore';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
+
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { lavapaths } from '$lib/stores/gltfStore';
+
 
 	let mounted: boolean;
 	let aframeLoaded: boolean;
+	
 	$: ready = (aframeLoaded || window.AFRAME) && mounted;
 
 	function loadAframe() {
 		aframeLoaded = true;
 		console.warn('aframe loaded for first time');
-	}
 
-	onMount(async () => {
-		if (aframeLoaded) console.warn('aframe already loaded');
-
-		if (!$gltfStore) {
-			contourLines.set({
-				curves: hc_curves,
-				hierarchy: hc_hierarchy,
-				size: { width: 850, height: 950 }
-			});
-
-			await gltfStore.setup($contourLines);
-			gltfStore.build();
-			console.warn('gltf is loaded from hardcoded data', $gltfStore);
-		}
-
-		mounted = true;
-	});
-</script>
-
-<svelte:head>
-	{#if mounted && !window.AFRAME}
-		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={loadAframe}></script>
-	{/if}
-
-	<!-- {#if ready}
-		<script src="https://rawgit.com/protyze/aframe-curve-component/master/dist/aframe-curve-component.min.js"></script>
-	{/if} -->
-</svelte:head>
-
-{#if ready}
-	<!-- MAKING COMPONENT FOR LAVA FLOW : (copied from the repo)-->>
-<script>
-	/**
-	 * Curve component for A-Frame to deal with spline curves
-	 */
-	 var zAxis = new THREE.Vector3(0, 0, 1);
-	var degToRad = THREE.Math.degToRad;
+		
+		const zAxis = new THREE.Vector3(0, 0, 1);
+	const degToRad = THREE.Math.degToRad;
 
 	AFRAME.registerComponent('curve-point', {
 
@@ -105,7 +74,7 @@
 	            this.curve = null;
 	        } else {
 	            // Get Array of Positions from Curve-Points
-	            var pointsArray = this.points.map(function (point) {
+	            let pointsArray = this.points.map(function (point) {
 
 	                if (point.x !== undefined && point.y !== undefined && point.z !== undefined) {
 	                    return point;
@@ -168,16 +137,16 @@
 	        currentRes = currentRes || 0.5;
 	        testPoint = testPoint || 0.5;
 	        currentRes /= 2;
-	        var aTest = testPoint + currentRes;
-	        var bTest = testPoint - currentRes;
-	        var a = this.curve.getPointAt(aTest);
-	        var b = this.curve.getPointAt(bTest);
-	        var aDistance = a.distanceTo(point);
-	        var bDistance = b.distanceTo(point);
-	        var aSmaller = aDistance < bDistance;
+	        let aTest = testPoint + currentRes;
+	        let bTest = testPoint - currentRes;
+	        let a = this.curve.getPointAt(aTest);
+	        let b = this.curve.getPointAt(bTest);
+	        let aDistance = a.distanceTo(point);
+	        let bDistance = b.distanceTo(point);
+	        let aSmaller = aDistance < bDistance;
 	        if (currentRes < resolution) {
 
-	            var tangent = this.curve.getTangentAt(aSmaller ? aTest : bTest);
+	            let tangent = this.curve.getTangentAt(aSmaller ? aTest : bTest);
 	            if (currentRes < resolution) return {
 	                result: aSmaller ? aTest : bTest,
 	                location: aSmaller ? a : b,
@@ -195,10 +164,10 @@
 	});
 
 
-	var tempQuaternion = new THREE.Quaternion();
+	const tempQuaternion = new THREE.Quaternion();
 
 	function normalFromTangent(tangent) {
-	    var lineEnd = new THREE.Vector3(0, 1, 0);
+	    let lineEnd = new THREE.Vector3(0, 1, 0);
 	    tempQuaternion.setFromUnitVectors(zAxis, tangent);
 	    lineEnd.applyQuaternion(tempQuaternion);
 	    return lineEnd;
@@ -236,8 +205,8 @@
 	        }
 
 	        if (this.curve && this.curve.curve) {
-	            var lineGeometry = new THREE.BufferGeometry().setFromPoints(this.curve.curve.getPoints(this.curve.curve.getPoints().length * 10));
-	            var mesh = this.el.getOrCreateObject3D('mesh', THREE.Line);
+	            let lineGeometry = new THREE.BufferGeometry().setFromPoints(this.curve.curve.getPoints(this.curve.curve.getPoints().length * 10));
+	            let mesh = this.el.getOrCreateObject3D('mesh', THREE.Line);
 	            lineMaterial = mesh.material ? mesh.material : new THREE.LineBasicMaterial({
 	                color: "#ff0000"
 	            });
@@ -283,15 +252,15 @@
 	        }
 
 	        if (!this.el.getObject3D('clones') && this.curve && this.curve.curve) {
-	            var mesh = this.el.getObject3D('mesh');
+	            let mesh = this.el.getObject3D('mesh');
+ 
+	            let length = this.curve.curve.getLength();
+	            let start = 0;
+	            let counter = start;
 
-	            var length = this.curve.curve.getLength();
-	            var start = 0;
-	            var counter = start;
+	            let cloneMesh = this.el.getOrCreateObject3D('clones', THREE.Group);
 
-	            var cloneMesh = this.el.getOrCreateObject3D('clones', THREE.Group);
-
-	            var parent = new THREE.Object3D();
+	            let parent = new THREE.Object3D();
 	            mesh.scale.set(this.data.scale.x, this.data.scale.y, this.data.scale.z);
 	            mesh.rotation.set(degToRad(this.data.rotation.x), degToRad(this.data.rotation.y), degToRad(this.data.rotation.z));
 	            mesh.rotation.order = 'YXZ';
@@ -299,11 +268,11 @@
 	            parent.add(mesh);
 
 	            while (counter <= length) {
-	                var child = parent.clone(true);
+	                let child = parent.clone(true);
 
 	                child.position.copy(this.curve.curve.getPointAt(counter / length));
 
-	                tangent = this.curve.curve.getTangentAt(counter / length).normalize();
+	                const tangent = this.curve.curve.getTangentAt(counter / length).normalize();
 
 	                child.quaternion.setFromUnitVectors(zAxis, tangent);
 
@@ -349,11 +318,95 @@
 	    }
 	});
 
+	AFRAME.registerComponent('lava-path', {
+		init: function () {
+			console.log("lava path:")
+			console.log($lavapaths)
 
-  </script>
+			if (!$lavapaths?.length) return
 
+				 for (let j = 0; j < $lavapaths.length; j++) {
+					 const points = $lavapaths[j];
+					
+						//create curve element
+					const curve = document.createElement('a-curve');
+					curve.setAttribute('id' , "track" + j);
+					
 
-	<a-scene embedded>
+					//add points per curve
+					for (let i = 0; i < points.length; i++) {
+						
+						const v = points[i];
+						const x = v[0];
+						const y = v[1];
+						const z = v[2];
+						
+						const p = document.createElement('a-curve-point');
+
+							p.setAttribute('position', { x: x , y: z, z: y });
+							
+							curve.appendChild(p);
+						
+					}
+
+					//add curve element to scene
+					this.el.appendChild(curve);
+					
+					//generate cylinders on curve add cylinder along track
+					const track = document.createElement('a-entity');
+					track.setAttribute('clone-along-curve',"curve: #track" + j + "; spacing: 0.2; rotation: 90 0 0;" );
+					track.setAttribute('geometry',"primitive:cylinder; height:0.33; radius:0.2 ;" );
+					track.setAttribute('material', 'color: crimson; transparency: true; opacity: 0.01');
+					//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
+					track.setAttribute('animation', "property: material.opacity; to: 1; dur: 10000; loop: false; delay: " + j * 5000 + ";"  ) ;
+
+					this.el.appendChild(track);
+				}
+		}
+	})
+	}
+
+	onMount(async () => {
+		if (aframeLoaded) console.warn('aframe already loaded');
+		if (!$gltfStore) {
+			contourLines.set({
+				curves: hc_curves,
+				hierarchy: hc_hierarchy,
+				size: { width: 850, height: 950 }
+			});
+
+			await gltfStore.setup($contourLines);
+			gltfStore.build();
+			console.warn('gltf is loaded from hardcoded data', $gltfStore);			
+		}
+		console.log("lava path empty :")
+		console.log($lavapaths)
+
+		if (!$lavapaths) {
+			lavapaths.set([  [ [4, 4, 7], [1, 1, 3], [4, 2, 2], [3, 3, -1] ],
+								[ [1, 1, 3], [0,-2, -4], [1, 1, -2], [1, 2, -1] , [2, 2, 0] , ],           
+								[ [1, 1, -2], [1, 4, -2], [12, 1, -1] ]
+							]);
+		}
+
+		mounted = true;
+	});
+
+	onDestroy(() => {
+		delete AFRAME.components['curve-point']
+		delete AFRAME.components['curve']
+		delete AFRAME.components['lava-path']
+	})
+</script>
+
+<svelte:head>
+	{#if mounted && !window.AFRAME}
+		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={loadAframe}></script>
+	{/if}
+</svelte:head>
+
+{#if ready}
+	<a-scene lava-path embedded>
 		<div class="button backButton">
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
@@ -378,92 +431,8 @@
 			/>
 		{/if}
 
-	<!-- <a-curve id="track1">
-      <a-curve-point position="-1 1 -3"></a-curve-point>
-      <a-curve-point position="0 2 -3"></a-curve-point>
-      <a-curve-point position="1 1 -3"></a-curve-point>
-    </a-curve> -->
-
-    <!-- <a-curve id="track2">
-      <a-curve-point position="-3 2 -3"></a-curve-point>
-      <a-curve-point position="0 5 -3"></a-curve-point>
-      <a-curve-point position="1 1 -3"></a-curve-point>
-    </a-curve> -->
-
-	
-
-    <!-- Clone a Box along the Curve -->
-	<!-- <a-draw-curve curveref="#track1" material="shader: line; color: red;"></a-draw-curve>
-	<a-draw-curve curveref="#track2" material="shader: line; color: red;"></a-draw-curve> -->
-
-
-    <!-- <a-entity
-      clone-along-curve="curve: #track1; spacing: 0.2; rotation: 90 0 0;"
-      geometry="primitive:cylinder; height:0.33; radius:0.2; color:red"
-    ></a-entity>
-    <a-entity
-      clone-along-curve="curve: #track2; spacing: 0.2; rotation: 90 0 0;"
-      geometry="primitive:cylinder; height:0.33; radius:0.2; color:red"
-    ></a-entity> -->
-
 		<a-camera look-controls />
 	</a-scene>
-	<!-- var sceneEl = document.querySelector('a-scene'); -->
-	<script>
-		       
-    
-   
-				var sceneEl = document.querySelector('a-scene');
-	
-				var curves = [  [ [4, 4, 7], [1, 1, 3], [4, 2, 2], [3, 3, -1] ],
-								[ [1, 1, 3], [0,-2, -4], [1, 1, -2], [1, 2, -1] , [2, 2, 0] , ],           
-								[ [1, 1, -2], [1, 4, -2], [12, 1, -1] ]
-							];
-
-				//mult curve, mult points 
-						//add curves with point
-
-				for(let j = 0; j < curves.length; j++){
-				    //get points on curve
-					var points = curves[j];
-					
-				    //create curve element
-					var curve = document.createElement('a-curve');
-					curve.setAttribute('id' , "track" + j);
-					
-
-					//add points per curve
-					for (let i = 0; i < points.length; i++) {
-						
-						var v = points[i];
-						var x = v[0];
-						var y = v[1];
-						var z = v[2];
-						
-						var p = document.createElement('a-curve-point');
-
-							p.setAttribute('position', { x: x , y: z, z: y });
-							
-							curve.appendChild(p);
-						
-					}
-
-					//add curve element to scene
-					sceneEl.appendChild(curve);
-					
-					//generate cylinders on curve add cylinder along track
-					var track = document.createElement('a-entity');
-					track.setAttribute('clone-along-curve',"curve: #track" + j + "; spacing: 0.2; rotation: 90 0 0;" );
-					track.setAttribute('geometry',"primitive:cylinder; height:0.33; radius:0.2" );
-					track.setAttribute('material', 'color: crimson; transparency: true; opacity: 0.01');
-					//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
-					track.setAttribute('animation', "property: material.opacity; to: 1; dur: 10000; loop: false; delay: " + j * 5000 + ";"  ) ;
-
-					sceneEl.appendChild(track);
-
-				}
-
-		</script>
 {/if}
 
 <style>

@@ -16,6 +16,7 @@ use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
+use crate::utils::log;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
 pub trait SmoothingOperation {
@@ -263,8 +264,9 @@ impl ModelConstructionApi {
 				top_height = curve.altitude;
 			}
 		}
-		//TODO REMOVE ONCE PEAKS ARE CORRECT
-		top_height -= level_curve_map.altitude_step;
+
+		//TODO: REMOVE ONCE PEAKS ARE CORRECT
+		top_height -= level_curve_set.altitude_step;
 
 		//for lava path generation : get list of indexes of points above or on highest level curve
 		let mut highest_points = Vec::new();
@@ -275,10 +277,11 @@ impl ModelConstructionApi {
 		}
 
 		//find lava path from the highest point of the model
-		//min alt determines at which alitude a lava path stops
+
+			//min alt determines at which alitude a lava path stops
 		let min_altitude = level_curve_set.altitude_step / 2.0;
-		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+			//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
+			// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
 		let computed_lava_paths: Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
@@ -327,6 +330,12 @@ impl ModelConstructionApi {
 			final_points.push(tri10);
 		}
 
+		// //TODO REMOVE
+		if lava_path_triples.len() <= 0 {
+			return Err(JsValue::from("no lava paths?"));
+		}
+		log!("triples:");
+		log!("{:?}", lava_path_triples);
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
 			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
