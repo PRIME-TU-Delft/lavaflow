@@ -11,12 +11,11 @@
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import P5CurvesDebugView from '$lib/components/P5CurvesDebugView.svelte';
+	import { gltfStore } from '$lib/stores/gltfStore';
+	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
-
-	import init, * as wasm from 'wasm';
 
 	let gltfLoaded = false;
 
@@ -28,20 +27,8 @@
 		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
 			return goto('/scan/mapscanning');
 		}
-
-		await init();
-
-		const tree = new wasm.OpenCVTree({
-			pixels_per_curve: $contourLines.curves,
-			parent_relations: $contourLines.hierarchy
-		});
-
-		const api = new wasm.ModelConstructionApi();
-		api.base(tree);
-
-		const model_construction_result = api.build();
-
-		console.log(model_construction_result);
+		await gltfStore.setup($contourLines);
+		gltfStore.build();
 
 		gltfLoaded = true;
 	});
@@ -58,7 +45,7 @@
 
 	<Image src={$perspectiveImage} alt="foreground" />
 
-	{#if $contourLines.curves && $contourLines.hierarchy}
+	{#if $contourLines?.curves && $contourLines?.hierarchy}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 			<P5CurvesDebugView
 				curves={$contourLines.curves}

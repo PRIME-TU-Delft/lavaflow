@@ -25,10 +25,10 @@
 
 			const size = 100; // size of draggble surface
 
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // []
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // ()
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // []
 			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // ><
-			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.8, size)); // /\
+			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.7, size)); // /\
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.7, size)); // ()
 		};
 
 		/**
@@ -37,6 +37,7 @@
 		 * @param p2 - point2 with x and y coordinates and width and height
 		 */
 		function drawLine(p1: Draggable, p2: Draggable) {
+			p5.strokeWeight(10);
 			p5.line(p1.x + p1.size / 2, p1.y + p1.size / 2, p2.x + p2.size / 2, p2.y + p2.size / 2);
 		}
 
@@ -53,10 +54,10 @@
 			}
 
 			let markerSize = 20;
-			points[0].drawCircle(p5, markerSize);
-			points[1].drawRect(p5, markerSize);
-			points[2].drawCross(p5, markerSize);
-			points[3].drawTriangle(p5, markerSize);
+			points[0].drawRect(p5, markerSize);
+			points[1].drawCross(p5, markerSize);
+			points[2].drawTriangle(p5, markerSize);
+			points[3].drawCircle(p5, markerSize);
 		};
 
 		// If the user presses/releases their mouse, signal this to all Draggable points

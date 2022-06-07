@@ -84,6 +84,8 @@ impl<'a> Triangle<'a> {
 
 	/// ## Instance Method
 	/// Check whether the area of this triangle contains a certain point.
+	/// Important: This method only considers the x- and y-directions. The altitude of a specific point is
+	/// not incorportated in the computation that determines whether p lies in- or outside this triangle.
 	///
 	/// ### Parameters
 	/// - `self`: The referenced instance to apply this method to.

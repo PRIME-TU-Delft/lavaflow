@@ -3,12 +3,45 @@ use gltf_json as json;
 use std::mem;
 
 use json::validation::Checked::Valid;
+use miette::{miette, IntoDiagnostic, Result};
 
 #[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Vertex {
 	position: [f32; 3],
 	color: [f32; 3],
+}
+
+#[derive(Copy, Clone)]
+struct BoundingCoords {
+	min: [f32; 3],
+	max: [f32; 3],
+}
+
+impl BoundingCoords {
+	/// Calculate bounding coordinates of a model, used for determining the clipping planes
+	fn from_points(points: &[Vertex]) -> Result<BoundingCoords> {
+		if points.is_empty() {
+			return Err(miette!("At least one point needs to be given to calculate bounding coordinates"));
+		}
+
+		let mut bounding_coords = BoundingCoords {
+			min: points[0].position,
+			max: points[0].position,
+		};
+
+		// Loop through the coordinates of all points, and update the minimum and maximum x, y, and z values
+		for point in points {
+			let p = point.position;
+			bounding_coords.min[0] = f32::min(bounding_coords.min[0], p[0]);
+			bounding_coords.min[1] = f32::min(bounding_coords.min[1], p[1]);
+			bounding_coords.min[2] = f32::min(bounding_coords.min[2], p[2]);
+			bounding_coords.max[0] = f32::max(bounding_coords.max[0], p[0]);
+			bounding_coords.max[1] = f32::max(bounding_coords.max[1], p[1]);
+			bounding_coords.max[2] = f32::max(bounding_coords.max[2], p[2]);
+		}
+		Ok(bounding_coords)
+	}
 }
 
 fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
@@ -23,9 +56,11 @@ fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
 	new_vec
 }
 
-pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<String, String> {
+pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<String> {
 	let triangle_vertices: Vec<Vertex> = triangle_vertices.iter().map(|v| Vertex { position: v.0, color: v.1 }).collect();
 	let triangle_vertices_len = triangle_vertices.len();
+
+	let bounding_coords = BoundingCoords::from_points(&triangle_vertices)?;
 
 	let bin_content = to_padded_byte_vector(triangle_vertices);
 	let mut bin_content_b64 = String::from("data:application/octet-stream;base64,");
@@ -57,8 +92,8 @@ pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<Str
 		extensions: Default::default(),
 		extras: Default::default(),
 		type_: Valid(json::accessor::Type::Vec3),
-		min: Some(json::Value::from(vec![-0.5f32, -0.5f32, 0.0f32])),
-		max: Some(json::Value::from(vec![0.5f32, 0.5f32, 0.0f32])),
+		min: Some(json::Value::from(Vec::from(bounding_coords.min))),
+		max: Some(json::Value::from(Vec::from(bounding_coords.max))),
 		name: None,
 		normalized: false,
 		sparse: None,
@@ -131,5 +166,5 @@ pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<Str
 		..Default::default()
 	};
 
-	json::serialize::to_string_pretty(&root).map_err(|_| String::from("Serialization error"))
+	json::serialize::to_string_pretty(&root).into_diagnostic()
 }

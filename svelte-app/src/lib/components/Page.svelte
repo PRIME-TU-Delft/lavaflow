@@ -8,6 +8,9 @@
 	export let title = '';
 	export let closeButton = false;
 
+	let foregroundWidth: number;
+	let foregroundHeight: number;
+
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -17,7 +20,7 @@
 		<div class="backdrop" />
 	</div>
 
-	<div class="foreground">
+	<div class="foreground" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 		<header>
 			<slot name="headerButton">
 				{#if closeButton}
@@ -37,7 +40,7 @@
 			</div>
 		</header>
 
-		<main><slot /></main>
+		<main><slot {foregroundWidth} {foregroundHeight} /></main>
 
 		<footer>
 			<slot name="footer" />
@@ -54,7 +57,6 @@
 		display: grid;
 		align-items: center;
 		justify-items: center;
-		padding-block: 1.5rem 1rem;
 	}
 
 	.background,
@@ -123,6 +125,9 @@
 		height: 100%;
 		border-radius: 1rem;
 		overflow: hidden;
+		display: grid;
+		justify-content: center;
+		align-items: center;
 	}
 
 	footer {

@@ -10,4 +10,4 @@ fix #(link to number of issue)
 
 Are there any bugs in the code
 
-/assign @Abel @jonasvanmarrew @svanderkris @rcmdur @phengst
+/assign_reviewer @Abel @jonasvanmarrew @svanderkris @rcmdur @phengst

@@ -10,10 +10,12 @@ use serde::{Deserialize, Serialize};
 
 // Internal imports
 use crate::gltf_conversion::generate_gltf;
+use crate::model_construction::constructor::ModelConstructor;
 use crate::model_construction::smoother::Smoother;
 use crate::objects::level_curve_tree::LevelCurveTree;
-use crate::objects::point::Point;
+use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
+use crate::objects::triangle::Triangle;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
 pub trait SmoothingOperation {
@@ -36,8 +38,8 @@ impl OpenCVTree {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
 	}
 
-	pub fn debug(&self) -> String {
-		format!("{self:?}")
+	pub fn debug(&self) -> Result<JsValue, JsValue> {
+		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize OpenCVTree"))
 	}
 }
 
@@ -62,9 +64,36 @@ impl ModelConstructionResult {
 		format!("{self:?}")
 	}
 
-	pub fn to_json(&self) -> Result<JsValue, JsValue> {
-		// serde_json::to_string(self).map_err(|_| String::from("Could not serialize ModelConstructionResult"))
+	pub fn to_js(&self) -> Result<JsValue, JsValue> {
 		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize ModelConstructionResult"))
+	}
+}
+
+/// API Struct: AltitudeGradientPair
+/// This API struct is used to return the result of the get_altitude_and_gradient_for_point function,
+/// that is implemented in the ModelConstructionApi struct.
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AltitudeGradientPair {
+	x: f32,
+	y: f32,
+	altitude: f32,
+	gradient: (f32, f32, f32),
+}
+
+#[wasm_bindgen]
+impl AltitudeGradientPair {
+	#[wasm_bindgen(constructor)]
+	pub fn new(val: JsValue) -> Result<AltitudeGradientPair, JsValue> {
+		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid AltitudeGradientPair"))
+	}
+
+	pub fn debug(&self) -> String {
+		format!("{self:?}")
+	}
+
+	pub fn to_js(&self) -> Result<JsValue, JsValue> {
+		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize AltitudeGradientPair"))
 	}
 }
 
@@ -78,8 +107,10 @@ pub struct ModelConstructionApi {
 	// API properties
 	pub rows: usize,
 	pub columns: usize,
-	pub border_size: f32,
+	pub width: f32,
+	pub height: f32,
 	pub altitude_step: f32,
+	pub curve_point_separation: f32,
 	pub svc_distance: f32,
 	pub catmull_clark_iterations: usize,
 	pub lava_path_length: usize,
@@ -88,6 +119,7 @@ pub struct ModelConstructionApi {
 	// Private properties
 	open_cv_tree: OpenCVTree,
 	smoothing_operations_queue: Vec<Box<dyn SmoothingOperation>>,
+	computed_model_raster: Option<Raster>,
 }
 
 /// Main API
@@ -112,8 +144,10 @@ impl ModelConstructionApi {
 		Self {
 			rows: 10,
 			columns: 10,
-			border_size: 10.0,
+			width: 100.0,
+			height: 100.0,
 			altitude_step: 10.0,
+			curve_point_separation: 10.0,
 			svc_distance: 10.0,
 			catmull_clark_iterations: 0,
 			lava_path_length: 10,
@@ -123,6 +157,7 @@ impl ModelConstructionApi {
 				parent_relations: Vec::new(),
 			},
 			smoothing_operations_queue: Vec::new(),
+			computed_model_raster: None,
 		}
 	}
 
@@ -132,11 +167,13 @@ impl ModelConstructionApi {
 	/// The parameters that are of interest for this algorithm are:
 	/// - The number of raster rows
 	/// - The number of raster columns
-	/// - The size of the border around the mountain
-	pub fn set_basic_parameters(&mut self, rows: usize, columns: usize, border_size: f32) {
+	/// - The width in pixels of the raster
+	/// - The height in pixels of the raster
+	pub fn set_basic_parameters(&mut self, rows: usize, columns: usize, width: f32, height: f32) {
 		self.rows = rows;
 		self.columns = columns;
-		self.border_size = border_size;
+		self.width = width;
+		self.height = height;
 	}
 
 	/// # API Function
@@ -170,15 +207,16 @@ impl ModelConstructionApi {
 
 	/// # API Function
 	/// ## Base: The API-user passes the OpenCV tree from the web-application
-	pub fn base(&mut self, open_cv_tree: OpenCVTree) {
+	pub fn base(&mut self, open_cv_tree: OpenCVTree, curve_point_separation: f32) {
 		self.open_cv_tree = open_cv_tree;
+		self.curve_point_separation = curve_point_separation;
 	}
 
 	/// # API Function
 	/// ## Build: Perform the complete 3D model construction and return the GLTF file as result.
 	///
 	/// Before calling this method, the user should have setup all the desired parameters already.
-	pub fn build(&self) -> Result<ModelConstructionResult, JsValue> {
+	pub fn build(&mut self) -> Result<ModelConstructionResult, JsValue> {
 		// Transform the array of parent relations from <isize> into Option<usize>
 		let transformed_parent_relations = &self.open_cv_tree.parent_relations.iter().map(|&e| if e < 0 { None } else { Some(e as usize) }).collect();
 
@@ -186,23 +224,13 @@ impl ModelConstructionApi {
 		let level_curve_tree = LevelCurveTree::from_open_cv(&self.open_cv_tree.pixels_per_curve, transformed_parent_relations);
 
 		// Transform this LevelCurveTree into a LevelCurveSet
-		let mut level_curve_map = LevelCurveTree::transform_to_LevelCurveMap(&level_curve_tree, self.altitude_step, 2.0 * self.svc_distance, 1).map_err(|e| e.to_string())?;
-
-		//find maximum and minimum cooridinates in level curve model
-		let (min, max) = level_curve_map.get_bounding_points();
-
-		// keep desired border of each axis around model
-		let border_x = self.border_size * (max.x - min.x);
-		let border_y = self.border_size * (max.y - min.y);
-
-		//ensure none of the level curve points have negative coordinates , and have a 'border' distance from the axes
-		level_curve_map.align_with_origin(&min, border_x, border_y);
+		let level_curve_set = LevelCurveTree::transform_to_LevelCurveSet(&level_curve_tree, self.altitude_step, self.curve_point_separation, 1).map_err(|e| e.to_string())?;
 
 		//create raster based on level curve model and desired rows and columns
-		let mut raster = Raster::new((max.x - min.x) + (border_x * 2.0), (max.y - min.y) + (border_y * 2.0), self.rows, self.columns);
+		let mut raster = Raster::new(self.width, self.height, self.rows, self.columns);
 
 		// create new modelConstructor (module containing 3D-model construction algorithm)
-		let mut model_constructor = crate::model_construction::constructor::ModelConstructor::new(&mut raster, self.svc_distance, &level_curve_map);
+		let mut model_constructor = ModelConstructor::new(&mut raster, self.svc_distance, &level_curve_set);
 
 		// determine heights
 		model_constructor.construct().map_err(|e| e.to_string())?;
@@ -215,13 +243,22 @@ impl ModelConstructionApi {
 			operation.apply(&mut smoother).map_err(|e| e.to_string())?;
 		}
 
+		// Apply raster normalisation, so it will be contained within a 100x100x100 pixel box
+		smoother.raster.normalise().map_err(|e| e.to_string())?;
+
+		//
+		// All smoothing operations have been applied, thereofore the final raster has been computed.
+		// Store it as a state-variable.
+		//
+		self.computed_model_raster = Some(smoother.raster.clone());
+
 		//apply surface subdivision
 		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, &model_constructor.is_svc, model_constructor.raster, false)?;
 
 		//for lava path generation : find point index of the highest point in the model
 
 		let mut top_height = f32::MIN;
-		for curve in &level_curve_map.level_curves {
+		for curve in &level_curve_set.level_curves {
 			if curve.altitude > top_height {
 				top_height = curve.altitude;
 			}
@@ -238,7 +275,7 @@ impl ModelConstructionApi {
 
 		//find lava path from the highest point of the model
 		//min alt determines at which alitude a lava path stops
-		let min_altitude = level_curve_map.altitude_step / 2.0;
+		let min_altitude = level_curve_set.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
 		let computed_lava_paths: Vec<Vec<&Point>> = Vec::new();
@@ -292,8 +329,130 @@ impl ModelConstructionApi {
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
-			gltf: generate_gltf(final_points)?,
+			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
+		})
+	}
+
+	/// # API Function
+	/// ## After Build: get the altitude and gradient of a specified x and y in pixels.
+	///
+	/// This function will use the raster that was created after the smoothing operations were completed.
+	/// This means that any effect on the altitude and gradient, due to catmull clark, will **not** be incorportated
+	/// in this computation. The reason for this is that having to compute a continuous altitude/gradient on a set of
+	/// faces and vertices is much harder than to interpolate the points on a raster.
+	///
+	/// ### Parameters
+	/// - `x` (f32): The x-coordinate of the point
+	/// - `y` (f32): The y-coordinate of the point
+	///
+	/// ### Returns
+	/// This method returns a tuple (f32, f32). The first entry is the altitude and the second the gradient.
+	///
+	/// ### Methodology
+	///	We distinguish two triangles in each rectangle in the raster:
+	///
+	///	A --- B
+	///	|   / |
+	///	| /   |
+	///	C --- D
+	///
+	///	As you can see in the shape above, we have the two triangles:
+	///	1. ABC
+	///	2. DCB
+	///
+	///	We need to take two vectors a and b that describe the plane that the triangle lies on, in such
+	///	a way that the normal of this plane is always pointing outwards/upwards.
+	///
+	///	In the case of triangle ABC:
+	///	- vector a = vector AC
+	///	- vector b = vector AB
+	///
+	///	In the case of triangle DCB:
+	///	- vector a = vector DB
+	///	- vector b = vector DC
+	///
+	///	The normal vector of this plane can now be computed with a cross-product a x b
+	pub fn get_altitude_and_gradient_for_point(&self, x: f32, y: f32) -> Result<AltitudeGradientPair, JsValue> {
+		// Prebase: convert (x, y) to a Point instance, with z=0
+		let query_point = Point { x, y, z: 0.0 };
+
+		// 1. If the model has not yet been computed, return an error
+		let raster = self
+			.computed_model_raster
+			.as_ref()
+			.ok_or_else(|| JsValue::from("Cannot compute altitude and gradient before rendering the model"))?;
+
+		// 2. Determine in which raster-rectangle this point lies
+		let (a_row, a_col) = raster.get_row_col(x, y);
+		let (b_row, b_col) = (a_row, a_col + 1);
+		let (c_row, c_col) = (a_row + 1, a_col);
+		let (d_row, d_col) = (a_row + 1, a_col + 1);
+
+		// Transform these indices to points
+		let a_point = raster.get_point(a_row, a_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
+		let b_point = raster.get_point(b_row, b_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
+		let c_point = raster.get_point(c_row, c_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
+		let d_point = raster.get_point(d_row, d_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
+
+		// Construct the two triangles ABC and DCB
+		let abc_triangle = Triangle::new(&a_point, &b_point, &c_point);
+		let dcb_triangle = Triangle::new(&d_point, &c_point, &b_point);
+
+		// 3. Determine in which triangle of this rectangle this point lies
+		// 4. Compute vectors a and b, as described above the signature of this function
+		let a_vector: Vector;
+		let b_vector: Vector;
+
+		// Also create three vectors that reference the three corners of the triangle.
+		// These are later needed to determine the altitude of this point, using barycentric coordinates
+		let v0: &Point;
+		let v1: &Point;
+		let v2: &Point;
+
+		// Determine which triangle contains the query point and set a and b according to the RustDoc above this function
+		if abc_triangle.contains_point(&query_point) {
+			a_vector = Vector::from_point_to_point(&a_point, &c_point);
+			b_vector = Vector::from_point_to_point(&a_point, &b_point);
+
+			v0 = &a_point;
+			v1 = &b_point;
+			v2 = &c_point;
+		} else {
+			a_vector = Vector::from_point_to_point(&d_point, &b_point);
+			b_vector = Vector::from_point_to_point(&d_point, &c_point);
+
+			v0 = &d_point;
+			v1 = &c_point;
+			v2 = &b_point;
+		}
+
+		// 5. Compute the normal vector of the plane through this triangle, by computing
+		//	  The cross product a x b
+		let a_cross_b = Vector::cross_product(&a_vector, &b_vector);
+
+		// 6. Determine the angle of rotation, according to this normal vector (rot-x, rot-y, rot-z)
+		let rotation_angle_x = f32::atan(a_cross_b.y / a_cross_b.z);
+		let rotation_angle_y = f32::atan(a_cross_b.z / a_cross_b.x);
+		let rotation_angle_z = f32::atan(a_cross_b.y / a_cross_b.x);
+
+		// 7. Use vectors a and b to determine the altitude at point (x, y)
+		// Reference 'query_point' to make the formulas easier to understand
+		let p = &query_point;
+
+		let triangle_area = Vector::cross_product(&a_vector, &b_vector).len() / 2.0;
+		let factor_a = Vector::cross_product(&Vector::from_point_to_point(p, v1), &Vector::from_point_to_point(p, v2)).len() / (2.0 * triangle_area);
+		let factor_b = Vector::cross_product(&Vector::from_point_to_point(p, v2), &Vector::from_point_to_point(p, v0)).len() / (2.0 * triangle_area);
+		let factor_c = Vector::cross_product(&Vector::from_point_to_point(p, v1), &Vector::from_point_to_point(p, v0)).len() / (2.0 * triangle_area);
+
+		// Compute the altitude: weighted average of these three weights and the altitudes of the three points
+		let altitude = (v0.z * factor_a + v1.z * factor_b + v2.z * factor_b) / (factor_a + factor_b + factor_c);
+
+		Ok(AltitudeGradientPair {
+			x,
+			y,
+			altitude,
+			gradient: (rotation_angle_x, rotation_angle_y, rotation_angle_z),
 		})
 	}
 

@@ -1,9 +1,8 @@
 <script>
-	import Button from './Button.svelte';
-
-	import { mdiChevronRight } from '@mdi/js';
-	import { mdiChevronLeft } from '@mdi/js';
+	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+
+	import { mdiChevronRight, mdiChevronLeft } from '@mdi/js';
 
 	export let to = '/';
 	export let secondary = false;

@@ -23,7 +23,7 @@ export function convertToObject<N extends string>(arr: Option<N>[]): OptionObj<N
 	}, {} as OptionObj<N>);
 }
 
-export const hc_curves = [
+export const hc_curves: [number, number][][] = [
 	[
 			[
 					41,

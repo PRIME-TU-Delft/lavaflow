@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+</script>
+
 <script>
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 </script>
@@ -69,7 +73,7 @@
 		}
 
 		.backdrop {
-			background: rgba(220, 73, 73, 21%);
+			background: #dc494936;
 			backdrop-filter: blur(1px) saturate(120%);
 		}
 

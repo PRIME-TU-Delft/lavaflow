@@ -1,85 +1,43 @@
 <script lang="ts">
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import { gltfUrl } from '$lib/stores/gltfStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
+
+	import { gltfStore } from '$lib/stores/gltfStore';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 	import { onMount } from 'svelte';
 
 	let mounted: boolean;
-	let aframe: boolean;
-	let curveComponent: boolean
-	let sceneEl: HTMLElement;
-	$: ready = ((aframe && curveComponent) || window?.AFRAME) && mounted;
+	let aframeLoaded: boolean;
+	$: ready = (aframeLoaded || window.AFRAME) && mounted;
 
-	function aframeLoaded() {
-		aframe = true;
-
-		console.log(window.AFRAME);
-		// window.AFRAME.registerComponent('lava-paths', {
-		// 	init: function () {
-		// 		const lavaPaths: [number, number, number][][] = [
-		// 			[
-		// 				[3, 0, -5],
-		// 				[-3, 2, 5],
-		// 				[3, 0, -5]
-		// 			],
-		// 			[
-		// 				[4, 4, 7],
-		// 				[1, 1, 3],
-		// 				[4, 2, 2],
-		// 				[3, 3, -1]
-		// 			],
-		// 			[
-		// 				[1, 1, 3],
-		// 				[0, -2, -4],
-		// 				[1, 1, -2],
-		// 				[1, 2, -1],
-		// 				[2, 2, 0]
-		// 			],
-		// 			[
-		// 				[1, 1, -2],
-		// 				[1, 4, -2],
-		// 				[12, 1, -1]
-		// 			]
-		// 		];
-
-		// 		for (let i = 0; i < lavaPaths.length; i++) {
-		// 			const points = lavaPaths[i];
-
-		// 			const curve = document.createElement('a-curve');
-		// 			curve.setAttribute('id', 'track' + i);
-
-		// 			points.forEach((point) => {
-		// 				const [x, y, z] = point;
-
-		// 				const aPoint = document.createElement('a-curve-point');
-		// 				aPoint.setAttribute('position', x + ' ' + z + ' ' + y);
-		// 				curve.appendChild(aPoint);
-		// 			});
-
-		// 			// Create track following each curve
-		// 			const track = document.createElement('a-entity');
-		// 			track.setAttribute('id', 'lava' + i);
-		// 			track.setAttribute(
-		// 				'clone-along-curve',
-		// 				'curve: #track' + i + '; spacing: 0.2; rotation: 90 0 0;'
-		// 			);
-		// 			track.setAttribute('geometry', 'primitive:cylinder; height:0.33; radius:0.2; color:red');
-
-		// 			this.el.appendChild(curve);
-		// 			this.el.appendChild(track);
-		// 		}
-		// 	}
-		// });
+	function loadAframe() {
+		aframeLoaded = true;
+		console.warn('aframe loaded for first time');
 	}
 
 	onMount(async () => {
+		if (aframeLoaded) console.warn('aframe already loaded');
+
+		if (!$gltfStore) {
+			contourLines.set({
+				curves: hc_curves,
+				hierarchy: hc_hierarchy,
+				size: { width: 850, height: 950 }
+			});
+
+			await gltfStore.setup($contourLines);
+			gltfStore.build();
+			console.warn('gltf is loaded from hardcoded data', $gltfStore);
+		}
+
 		mounted = true;
 	});
 </script>
 
 <svelte:head>
-	{#if mounted && !window?.AFRAME}
-		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={aframeLoaded} ></script>
+	{#if mounted && !window.AFRAME}
+		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={loadAframe}></script>
 	{/if}
 
 	<!-- {#if ready}
@@ -396,20 +354,29 @@
 
 
 	<a-scene embedded>
-		<div class="backButton">
+		<div class="button backButton">
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
 
-		<a-box position="0 1 0" material="opacity: 0.5;" color="red" />
+		<div class="button placeTargets">
+			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+		</div>
 
-		<a-entity
-			gltf-model="url({$gltfUrl})"
-			position="3 0 -5"
-			scale="0.00038 0.1 0.00038"
-			rotation="0 -90 0"
-			material="opacity: 0.5;"
-			id="model"
-		/>
+		<a-entity light="color: #AFA; intensity: 1.5" position="-1 1 0" />
+		<a-entity light="color: #AFA; intensity: 1.5" position="3 1 -4" />
+
+		{#if $gltfStore}
+			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
+				<a-entity gltf-model="url({$gltfStore})" />
+			</a-entity>
+		{:else}
+			<a-entity
+				gltf-model="url(output20.gltf)"
+				scale="0.0001 0.04 0.0001"
+				position="1 1 -3"
+				rotation="0 -90 0"
+			/>
+		{/if}
 
 	<!-- <a-curve id="track1">
       <a-curve-point position="-1 1 -3"></a-curve-point>
@@ -500,12 +467,20 @@
 {/if}
 
 <style>
-	.backButton {
+	.button {
 		position: absolute;
+		width: 15rem;
+		max-width: calc(50vw - 2rem);
+		z-index: 1;
+	}
+
+	.backButton {
 		top: 1rem;
 		left: 1rem;
-		z-index: 1;
-		width: 15rem;
-		max-width: calc(100vw - 2rem);
+	}
+
+	.placeTargets {
+		top: 1rem;
+		right: 1rem;
 	}
 </style>
