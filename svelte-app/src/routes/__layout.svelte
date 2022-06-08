@@ -2,10 +2,13 @@
 	import { konami } from 'konami.js';
 
 	import { debugMode } from '$lib/stores/debugStore';
+	import { onMount } from 'svelte';
 
-	konami(() => {
-		debugMode.update((mode) => !mode);
-		console.log($debugMode);
+	onMount(() => {
+		konami(() => {
+			debugMode.update((mode) => !mode);
+			console.log($debugMode);
+		});
 	});
 </script>
 
