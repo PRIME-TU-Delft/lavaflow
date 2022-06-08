@@ -4,6 +4,7 @@
 
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
+	import Dropdown from '$lib/components/input/Dropdown.svelte';
 	import Instructions from '$lib/components/Instructions.svelte';
 	import Page from '$lib/components/Page.svelte';
 	import VideoStream from '$lib/components/VideoStream.svelte';
@@ -12,9 +13,12 @@
 	import { mdiCamera, mdiBookOpenVariant } from '@mdi/js';
 	import { goto } from '$app/navigation';
 	import { rawImage } from '$lib/stores/imageStore';
+	import { onMount } from 'svelte';
 
 	let instructionVisible = false;
 	let videoSource: HTMLVideoElement;
+	let cameraSelected: MediaDeviceInfo;
+	let cameraOptions: MediaDeviceInfo[] = [];
 	let canvas: HTMLCanvasElement;
 	let loadingNextPage: boolean = false;
 	$: title = instructionVisible ? 'Instructions' : 'Map Scanning';
@@ -41,12 +45,50 @@
 
 		goto('/scan/maptransform');
 	}
+
+	export async function getStream() {
+		const deviceId = cameraSelected
+			? { deviceId: cameraSelected.deviceId }
+			: { facingMode: 'environment' };
+
+		const constraints = {
+			video: deviceId
+		};
+
+		console.log(JSON.stringify(constraints));
+
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia(constraints);
+			videoSource.srcObject = stream;
+			videoSource.play();
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
+
+	onMount(async () => {
+		await getStream();
+		const devices = await navigator.mediaDevices.enumerateDevices();
+		cameraOptions = devices.filter((device) => device.kind == 'videoinput');
+
+		// if (cameraOptions?.length) {
+		// 	cameraSelected = cameraOptions[0];
+		// }
+	});
 </script>
 
 <VideoStream let:loading let:stream let:error>
 	<Page {title} closeButton={instructionVisible} on:close={toggleInstuction}>
 		<div slot="background">
 			<Video {loading} {stream} />
+		</div>
+
+		<div slot="options">
+			{#if !instructionVisible && cameraOptions?.length > 1}
+				<Dropdown value={cameraSelected} options={cameraOptions} let:option let:index>
+					{option.label || 'Camera ' + (index + 1)}
+				</Dropdown>
+			{/if}
 		</div>
 
 		{#if instructionVisible}

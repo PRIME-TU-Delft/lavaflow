@@ -24,12 +24,12 @@
 		<header>
 			<slot name="headerButton">
 				{#if closeButton}
-					<Button on:click={() => dispatch('close')}>
+					<Button noMargin on:click={() => dispatch('close')}>
 						<Icon path={mdiClose} color="var(--text-color)" />
 						Close
 					</Button>
 				{:else}
-					<Button on:click={() => history.back()}>
+					<Button noMargin on:click={() => history.back()}>
 						<Icon path={mdiChevronLeft} color="var(--text-color)" />
 						Back
 					</Button>
@@ -38,6 +38,8 @@
 			<div class="title">
 				{title}
 			</div>
+
+			<slot name="options" />
 		</header>
 
 		<main><slot {foregroundWidth} {foregroundHeight} /></main>
@@ -96,14 +98,14 @@
 		width: calc(100% - 1rem);
 		top: -2rem;
 		left: 0.5rem;
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
 		z-index: 10;
 	}
 
 	:global(.page header button) {
-		width: initial;
+		width: 15rem;
 	}
 
 	.title {
@@ -112,11 +114,13 @@
 		width: 100%;
 		max-width: 20rem;
 		padding: 0.75rem 1.1rem;
+		display: grid;
+		align-items: center;
 
 		font-size: 1rem;
 		text-align: left;
 		border: none;
-		margin-block: 0.5rem;
+		margin: 0 0 0 auto;
 		border-radius: 0.3rem;
 		cursor: pointer;
 	}
