@@ -7,6 +7,7 @@
 
 	export let title = '';
 	export let closeButton = false;
+	export let fullscreen = false;
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
@@ -42,7 +43,7 @@
 			<slot name="options" />
 		</header>
 
-		<main><slot {foregroundWidth} {foregroundHeight} /></main>
+		<main class:fullscreen><slot {foregroundWidth} {foregroundHeight} /></main>
 
 		<footer>
 			<slot name="footer" />
@@ -72,8 +73,7 @@
 		z-index: -1;
 	}
 	.backdrop {
-		backdrop-filter: blur(4rem);
-		-webkit-backdrop-filter: blur(4rem);
+		background: rgba(255, 255, 255, 0.5);
 		z-index: 1;
 	}
 
@@ -134,6 +134,10 @@
 		align-items: center;
 	}
 
+	.fullscreen {
+		display: block;
+	}
+
 	footer {
 		position: absolute;
 		width: calc(100% - 1rem);
@@ -142,5 +146,13 @@
 		left: 50%;
 		transform: translateX(-50%);
 		bottom: -1.5rem;
+	}
+
+	/* if backdrop support: very transparent and blurred */
+	@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+		.backdrop {
+			-webkit-backdrop-filter: blur(2em);
+			backdrop-filter: blur(2em);
+		}
 	}
 </style>
