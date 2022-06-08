@@ -2,6 +2,34 @@ variables:
   CARGO_HOME: $CI_PROJECT_DIR/wasm/.cargo
 
 
+.rust_cached:
+  image: rust:1.61
+  cache:
+    key: "rust-build"
+    paths:
+      - wasm/target/
+      - $CARGO_HOME
+    policy: pull
+  before_script:
+    # Show cache size, but if dirs not found just show the error without crashing the CI job
+    - du -sh wasm/target $CARGO_HOME || true
+
+
+# Build job also installs linting/testing tools used by other jobs
+wasm-build:
+  extends: .rust_cached
+  script:
+    - rustup component add clippy
+    - wget -qO- https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-gnu.tgz | tar -xz -C /usr/bin
+    - mkdir -p $CARGO_HOME/bin
+    - if [ ! -e "$CARGO_HOME/bin/cargo-tarpaulin" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-tarpaulin; fi
+    - if [ ! -e "$CARGO_HOME/bin/cargo-nextest" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-nextest; fi
+    - cd wasm
+    - cargo build
+  cache:
+    policy: pull-push
+
+
 wasm-rustfmt:
   image: rust:1.61
   before_script:
@@ -12,32 +40,19 @@ wasm-rustfmt:
 
 
 wasm-clippy:
-  image: rust:1.61
+  needs: [wasm-build]
+  extends: .rust_cached
   before_script:
     - rustup component add clippy
   script:
     - cd wasm
     - cargo clippy -- -D warnings -D clippy::unwrap_used -D clippy::expect_used
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    paths:
-      - wasm/target/
-      - $CARGO_HOME
 
 
 wasm-test:
-  image: rust:1.61
-  before_script:
-    - wget -qO- https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-gnu.tgz | tar -xz -C /usr/bin
-    - mkdir -p $CARGO_HOME/bin
-    - if [ ! -e "$CARGO_HOME/bin/cargo-tarpaulin" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin --log-level debug cargo-tarpaulin; fi
-    - if [ ! -e "$CARGO_HOME/bin/cargo-nextest" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin --log-level debug cargo-nextest; fi
+  needs: [wasm-build]
+  extends: .rust_cached
   script:
     - cd wasm
     - cargo nextest run
     - cargo tarpaulin --skip-clean
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    paths:
-      - wasm/target/
-      - $CARGO_HOME
