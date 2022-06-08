@@ -14,6 +14,11 @@
 	function loadAframe() {
 		aframeLoaded = true;
 		console.warn('aframe loaded for first time');
+
+		// WARNING: THIS LIBRARY HAS NOT BEEN IMPORTED CORRECTLY (~Rens)
+		let aframe_extras = document.createElement("script");
+		aframe_extras.setAttribute("src", "https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js");
+		document.head.appendChild(aframe_extras);
 	}
 
 	onMount(async () => {
@@ -42,7 +47,7 @@
 </svelte:head>
 
 {#if ready}
-	<a-scene embedded>
+	<a-scene embedded background="color: grey">
 		<div class="button backButton">
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
@@ -51,10 +56,10 @@
 			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 		</div>
 
-		<a-entity light="color: #AFA; intensity: 1.5" position="-1 1 0" />
-		<a-entity light="color: #AFA; intensity: 1.5" position="3 1 -4" />
+		<a-entity light="color: #FFF; intensity: 1.5" position="-1 1 0" />
+		<a-entity light="color: #FFF; intensity: 1.5" position="3 1 -4" />
 
-		{#if $gltfStore}
+		<!-- {#if $gltfStore}
 			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
 				<a-entity gltf-model="url({$gltfStore})" />
 			</a-entity>
@@ -65,7 +70,17 @@
 				position="1 1 -3"
 				rotation="0 -90 0"
 			/>
-		{/if}
+		{/if} -->
+
+		<a-entity light="type: ambient; color: #BBB"></a-entity>
+
+		<a-entity
+			gltf-model="url(steam_turbine.glb)"
+			scale="0.5 0.5 0.5"
+			position="1 1 -10"
+			rotation="0 -90 0"
+			animation-mixer
+		/>
 
 		<a-camera look-controls />
 	</a-scene>
