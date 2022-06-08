@@ -142,7 +142,7 @@ impl<'a> LevelCurveTree<'a> {
 	pub fn get_pixels_for_curve(&self) -> Option<&Vec<(u64, u64)>> {
 		self.pixels_per_curve.get(self.own_index)
 	}
-	///
+	/// HELPER
 	///
 	/// transforms `levelCurveTree` to `levelCurveSet` structure, while reducing amount of total points from tree structure
 	///
@@ -155,7 +155,7 @@ impl<'a> LevelCurveTree<'a> {
 	///
 	///
 	#[allow(non_snake_case)]
-	pub fn transform_to_LevelCurveSet(&'a self, altitude_step: f32, mut desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
+	pub fn transform_to_LevelCurveSet_helper(&'a self, altitude_step: f32, mut desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
 		let mut result: LevelCurveSet = LevelCurveSet::new(altitude_step);
 		let mut current_level_curve = LevelCurve::new(altitude_step * current_height as f32);
 
@@ -205,10 +205,50 @@ impl<'a> LevelCurveTree<'a> {
 
 		//if current node has children find their level curves recursively
 		for child in &self.get_children() {
-			let child_set = child.transform_to_LevelCurveSet(altitude_step, desired_dist, current_height + 1)?;
+			let child_set = child.transform_to_LevelCurveSet_helper(altitude_step, desired_dist, current_height + 1)?;
 			//TODO: is this bad space wise?
 			for curve in child_set.level_curves {
 				result.add_level_curve(curve);
+			}
+		}
+
+		Ok(result)
+	}
+
+	///
+	///
+	/// transforms `levelCurveTree` to `levelCurveSet` structure, while reducing amount of total points from tree structure
+	///
+	/// # Arguments
+	///
+	/// * `tree` - `levelCurveTree` datastructure containing information from scanning step
+	/// * `altitude_step` - increase in height per contour line
+	/// * `desired_dist` - minimum desired distance between points in final contour map
+	/// * `current_height` - used to track height when traversing tree recursively, initial call should start with 1
+	///
+	///
+	#[allow(non_snake_case)]
+	pub fn transform_to_LevelCurveSet(&'a self, altitude_step: f32, desired_dist: f32, current_height: usize) -> Result<LevelCurveSet> {
+		// 1. Make a collection of all level curves that are a root (parent None)
+		let mut collection_of_roots: Vec<usize> = Vec::new();
+		for (i, relation) in self.parent_relations.iter().enumerate() {
+			if relation.is_none() {
+				// This node has a parent of None, meaning it has no parent (it's a root)
+				collection_of_roots.push(i);
+			}
+		}
+
+		// 2. Run the helper function on all of these roots
+		let mut resulting_level_curve_sets: Vec<LevelCurveSet> = Vec::new();
+		for i in collection_of_roots {
+			resulting_level_curve_sets.push(self.from_perspective_index(i).transform_to_LevelCurveSet_helper(altitude_step, desired_dist, current_height)?);
+		}
+
+		// 3. Combine the level-curves into one level curve set
+		let mut result: LevelCurveSet = LevelCurveSet::new(altitude_step);
+		for (i, lc_set) in resulting_level_curve_sets.iter().enumerate() {
+			for (j, lc) in lc_set.level_curves.iter().enumerate() {
+				result.add_level_curve(lc.clone());
 			}
 		}
 
