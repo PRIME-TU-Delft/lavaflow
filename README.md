@@ -27,12 +27,6 @@ watchexec -cr -w wasm/src/ -- "wasm-pack -v build wasm --target web && yarn dev"
 
 
 ## Deploying to production
-This repository is currently being mirrored to GitHub, where a pipeline is run to deploy it to GitHub pages. But if this changes in the future, this is how the application should be deployed:
-```bash
-cd svelte-app
-yarn
-wasm-pack -v build wasm --target web
-yarn build
-```
+This repository is currently being mirrored to GitHub, where a pipeline is run to deploy it to GitHub pages. But if this changes in the future, you can run follow the instructions for setting up a development server, but run `yarn build` instead of `yarn dev`.
 
 This will build a static website in `svelte-app/build/`, which can be deloyed on a webserver of choice. Though keep in mind that GitHub pages requires some further magic, such as adding a `.nojekyll` file to make sure folders starting with an underscore are served normally.
