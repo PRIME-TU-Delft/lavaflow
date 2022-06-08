@@ -30,7 +30,7 @@ export const targetLocations = createTargetLocations();
 
 export interface Model {
 	gltf: string;
-	lavapath: [number, number, number][][];
+	lava_paths: [number, number, number][][];
 }
 
 export interface AltitudeGradientPair {
@@ -72,18 +72,19 @@ function createGltfStore() {
 				parent_relations: curveTree.hierarchy
 			});
 
-			const svc_dist = curveTree.size.width / 25 / 2;
+			const svc_dist = curveTree.size.width / 20 / 2;
 
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
 			api.base(tree, 10);
 			api.set_basic_parameters(20, 20, curveTree.size.width, curveTree.size.height);
+			api.set_lava_path_parameters(20, 0.01);
 			api.set_svc_parameters(svc_dist);
-			api.correct_for_altitude_constraints_to_all_layers();
-			api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
-			api.increase_altitude_for_mountain_tops(0.3, false);
-			api.apply_smooth_to_mountain_tops(0.2, 2, 5, false);
-			api.set_catmull_clark_parameters(0);
+			//api.correct_for_altitude_constraints_to_all_layers();
+			//api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
+			//api.increase_altitude_for_mountain_tops(0.3, false);
+			//api.apply_smooth_to_mountain_tops(0.2, 2, 5, false);
+			api.set_catmull_clark_parameters(1);
 		},
 		build: () => {
 			// Call the wasm api to build the model
@@ -92,8 +93,8 @@ function createGltfStore() {
 			const gltfUrl = gltfStringToUrl(model.gltf);
 
 			//set lava path
-			lavapaths.set(model.lavapath);
-			console.log(model.lavapath);
+			lavapaths.set(model.lava_paths);
+			console.log(model.lava_paths);
 
 			// set the gltf store to the gltf string
 			set(gltfUrl);
