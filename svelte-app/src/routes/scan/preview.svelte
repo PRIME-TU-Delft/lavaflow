@@ -14,10 +14,17 @@
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
 
+	import { konami } from 'konami.js';
+
 	let foregroundWidth: number;
 	let foregroundHeight: number;
 
 	let gltfLoaded = false;
+
+	let debugMode = false;
+	konami(() => {
+		debugMode = !debugMode;
+	});
 
 	function gotoVisualise() {
 		goto('/demo');
@@ -45,7 +52,7 @@
 
 	<Image src={$perspectiveImage} alt="foreground" />
 
-	{#if $contourLines?.curves && $contourLines?.hierarchy}
+	{#if $contourLines?.curves && $contourLines?.hierarchy && debugMode}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 			<P5CurvesDebugView
 				curves={$contourLines.curves}
