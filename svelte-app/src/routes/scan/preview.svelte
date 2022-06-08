@@ -12,6 +12,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { gltfStore } from '$lib/stores/gltfStore';
+	import { debugMode } from '$lib/stores/debugStore';
 	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
 
 	let foregroundWidth: number;
@@ -48,6 +49,7 @@
 	{#if $contourLines?.curves && $contourLines?.hierarchy}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 			<P5CurvesDebugView
+				debugMode={$debugMode}
 				curves={$contourLines.curves}
 				hierarchy={$contourLines.hierarchy}
 				{foregroundHeight}

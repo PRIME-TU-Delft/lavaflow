@@ -5,6 +5,8 @@
 	import P5 from 'p5-svelte';
 	import type p5 from 'p5';
 
+	export let debugMode = false;
+
 	export let foregroundWidth: number; // Width of the foreground canvas
 	export let foregroundHeight: number; // Height of the foreground canvas
 
@@ -19,7 +21,8 @@
 			p5.stroke(p5.color(255, 255, 255));
 			curves.forEach((layer, index) => {
 				// Add text to the contour: "index (index of parent)"
-				p5.text(`${index} (${hierarchy[index]})`, layer[0][0], layer[0][1]);
+
+				if (debugMode) p5.text(`${index} (${hierarchy[index]})`, layer[0][0], layer[0][1]);
 
 				for (let curvesPair of layer) {
 					let x = curvesPair[0];
@@ -31,4 +34,6 @@
 	};
 </script>
 
-<P5 {sketch} />
+{#key debugMode}
+	<P5 {sketch} />
+{/key}
