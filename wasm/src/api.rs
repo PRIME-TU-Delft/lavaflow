@@ -16,6 +16,7 @@ use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
+use crate::surface_subdivision::catmull_clark::catmull_clark_super;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
 pub trait SmoothingOperation {
@@ -253,7 +254,7 @@ impl ModelConstructionApi {
 		self.computed_model_raster = Some(smoother.raster.clone());
 
 		//apply surface subdivision
-		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, &model_constructor.is_svc, model_constructor.raster, false)?;
+		let (vs, fs, edge_map) = catmull_clark_super(self.catmull_clark_iterations, &model_constructor.is_svc, model_constructor.raster, false)?;
 
 		//for lava path generation : find point index of the highest point in the model
 
@@ -307,10 +308,10 @@ impl ModelConstructionApi {
 			//rgb green = 0, 153, 51
 			//rgb orange = 255, 153, 51
 
-			let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z));
+			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z));
+			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z));
+			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z));
 
 			// Add the first triangle
 			final_points.push(tri00);

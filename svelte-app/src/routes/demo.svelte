@@ -42,7 +42,7 @@
 </svelte:head>
 
 {#if ready}
-	<a-scene embedded>
+	<a-scene embedded background="color:#445;">
 		<div class="button backButton">
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
@@ -51,11 +51,13 @@
 			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 		</div>
 
-		<a-entity light="color: #AFA; intensity: 1.5" position="-1 1 0" />
-		<a-entity light="color: #AFA; intensity: 1.5" position="3 1 -4" />
+		<a-entity light="color: #AFA; intensity: 1.5; decay:1000" position="-1 1 0" />
+		<a-entity light="color: #AFA; intensity: 1.5; decay:1000" position="3 1 -4" />
+
+		<a-entity light="type: ambient; color: #fff; intensity: 5;"></a-entity>
 
 		{#if $gltfStore}
-			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
+			<a-entity position="5 -2 -5" scale="0.05 0.025 0.05" rotation="0 -90 0">
 				<a-entity gltf-model="url({$gltfStore})" />
 			</a-entity>
 		{:else}
