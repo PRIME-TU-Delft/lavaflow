@@ -254,7 +254,7 @@ impl ModelConstructionApi {
 		self.computed_model_raster = Some(smoother.raster.clone());
 
 		//apply surface subdivision
-		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, &model_constructor.is_svc, model_constructor.raster, false)?;
+		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, &smoother.raster)?;
 
 		//for lava path generation : find point index of the highest point in the model
 

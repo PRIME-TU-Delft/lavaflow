@@ -33,16 +33,14 @@ pub struct Edge {
 /// # Arguments
 ///
 /// * `iterations` - The number of subdivisions you want to occur. Setting to zero returns an unchanged model.
-/// * `is_sharp` -  Matrix of booleans defining 'sharp' points. A point that is sharp will not move in z direction during subdivision.
 /// * `raster` - The raster representing the model to be subdivided.
-/// * `keep_heights` - If set to false sharpness of points will be ignored.
 ///
 /// # Return
 /// * `Result<(Vec<Point>, Vec<Face>), String>` - Result containing point list and face list.
 #[allow(clippy::type_complexity)]
-pub fn catmull_clark_super(iterations: usize, is_sharp: &[Vec<bool>], raster: &Raster, keep_heights: bool) -> Result<(Vec<Point>, Vec<Face>, Vec<Vec<usize>>), String> {
+pub fn catmull_clark_super(iterations: usize, raster: &Raster) -> Result<(Vec<Point>, Vec<Face>, Vec<Vec<usize>>), String> {
 	//transform raster to list of faces and vertices
-	let (mut vs, mut fs) = raster_to_faces(raster, is_sharp, keep_heights);
+	let (mut vs, mut fs) = raster_to_faces(raster);
 
 	// call catmull clark i times
 	for _ in 0..iterations {
@@ -90,13 +88,10 @@ pub fn edge_list_to_map(es: &[Edge], len: usize) -> Result<Vec<Vec<usize>>, Stri
 /// # Arguments
 ///
 /// * `raster` - The raster representing the model to be subdivided.
-/// * `is_sharp` -  Matrix of booleans defining 'sharp' points. A point that is sharp will not move in z direction during subdivision.
-/// * `keep_heights` - If set to false sharpness of points will be ignored, all is_sharp values in vertices is set to zero
-///
 ///
 ///
 #[allow(clippy::unwrap_used)]
-fn raster_to_faces(raster: &Raster, _is_sharp: &[Vec<bool>], _keep_heights: bool) -> (Vec<Point>, Vec<Face>) {
+fn raster_to_faces(raster: &Raster) -> (Vec<Point>, Vec<Face>) {
 	let mut vs = Vec::new();
 	let mut fs = Vec::new();
 
