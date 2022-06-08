@@ -266,7 +266,8 @@ impl ModelConstructionApi {
 		}
 
 		//TODO: REMOVE ONCE PEAKS ARE CORRECT
-		top_height -= level_curve_set.altitude_step;
+		//top_height -= level_curve_set.altitude_step * 0.1;
+		//top_height = 0.0;
 
 		//for lava path generation : get list of indexes of points above or on highest level curve
 		let mut highest_points = Vec::new();
@@ -275,6 +276,9 @@ impl ModelConstructionApi {
 				highest_points.push(i);
 			}
 		}
+		//TODO REMOVE
+		// log!("highest point indeces:");
+		// log!("{:?}", highest_points);
 
 		//find lava path from the highest point of the model
 
@@ -336,6 +340,22 @@ impl ModelConstructionApi {
 		}
 		log!("triples:");
 		log!("{:?}", lava_path_triples);
+
+		for path in &lava_path_triples {
+			for p in path {
+				final_points.push(([p.0, p.2, p.1], [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
+				final_points.push(([p.0 -2.5 , p.2 + 5.0, p.1 -2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
+				final_points.push(([p.0 +2.5 , p.2 + 5.0, p.1 +2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
+
+				
+				final_points.push(([p.0 -2.5 , p.2 + 5.0, p.1 -2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
+				final_points.push(([p.0, p.2, p.1], [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
+				final_points.push(([p.0 +2.5 , p.2 + 5.0, p.1 +2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
+
+			}
+			
+		}
+
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
 			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,

@@ -57,6 +57,8 @@ impl<'a> LavaPathSet<'a> {
 			}
 
 			//per neighbor calculate gradient and find maximum
+				//max = max of nieghbors of cur
+				//max_g = gradient of max 
 			let mut max = cur;
 			let mut max_g = f32::MIN;
 
@@ -75,8 +77,8 @@ impl<'a> LavaPathSet<'a> {
 				}
 			}
 
-			//break loop if next point has low altitude (avoid path going to edge of map)
-			if max.1.z <= min_altitude {
+			//break loop if next point has low altitude (avoid path going to edge of map) or is higher than current point
+			if max.1.z <= min_altitude || max.1.z > cur.1.z {
 				break;
 			}
 			//add steepest neighbor to path
@@ -132,22 +134,28 @@ fn get_start(highest_points: &[usize], vs: &[Point], es: &[Vec<usize>]) -> Resul
 	let mut store = (0, f32::MIN);
 
 	for i in highest_points {
-		let mut neighbors: Vec<(usize, &Point)> = Vec::new();
+		//TODO change back once lava path visualization works
+		// let mut neighbors: Vec<(usize, &Point)> = Vec::new();
 
-		//per neighbor calculate gradient and find maximum
+		// //per neighbor calculate gradient and find maximum
 
-		for j in &es[*i] {
-			neighbors.push((*j, vs.get(*j).ok_or(format!("lava_path: index {i} not found in point list"))?));
+		// for j in &es[*i] {
+		// 	neighbors.push((*j, vs.get(*j).ok_or(format!("lava_path: index {i} not found in point list"))?));
+		// }
+
+		// let cur: (&usize, &Point) = (i, &vs[*i]);
+
+		// for n in neighbors {
+		// 	let new_g = gradient_between_points(cur.1, n.1);
+		// 	if store.1 < new_g {
+		// 		store = (*cur.0, new_g);
+		// 	}
+		// }
+		let point = vs.get(*i).ok_or(format!("lava_path: index {i} not found in point list"))?;
+		if point.z > store.1 {
+			store = (*i, point.z);
 		}
-
-		let cur: (&usize, &Point) = (i, &vs[*i]);
-
-		for n in neighbors {
-			let new_g = gradient_between_points(cur.1, n.1);
-			if store.1 < new_g {
-				store = (*cur.0, new_g);
-			}
-		}
+		
 	}
 
 	Ok(store.0)
