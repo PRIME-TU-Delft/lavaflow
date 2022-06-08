@@ -15,15 +15,9 @@ variables:
     - du -sh wasm/target $CARGO_HOME || true
 
 
-# Build job also installs linting/testing tools used by other jobs
 wasm-build:
   extends: .rust_cached
   script:
-    - rustup component add clippy
-    - wget -qO- https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-gnu.tgz | tar -xz -C /usr/bin
-    - mkdir -p $CARGO_HOME/bin
-    - if [ ! -e "$CARGO_HOME/bin/cargo-tarpaulin" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-tarpaulin; fi
-    - if [ ! -e "$CARGO_HOME/bin/cargo-nextest" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-nextest; fi
     - cd wasm
     - cargo build
   cache:
@@ -52,6 +46,11 @@ wasm-clippy:
 wasm-test:
   needs: [wasm-build]
   extends: .rust_cached
+  before_script:
+    - wget -qO- https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-gnu.tgz | tar -xz -C /usr/bin
+    - mkdir -p $CARGO_HOME/bin
+    - if [ ! -e "$CARGO_HOME/bin/cargo-tarpaulin" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-tarpaulin; fi
+    - if [ ! -e "$CARGO_HOME/bin/cargo-nextest" ]; then cargo binstall --no-confirm --install-path $CARGO_HOME/bin cargo-nextest; fi
   script:
     - cd wasm
     - cargo nextest run
