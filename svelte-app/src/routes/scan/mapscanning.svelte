@@ -71,14 +71,14 @@
 		const devices = await navigator.mediaDevices.enumerateDevices();
 		cameraOptions = devices.filter((device) => device.kind == 'videoinput');
 
-		// if (cameraOptions?.length) {
-		// 	cameraSelected = cameraOptions[0];
-		// }
+		if (cameraOptions?.length) {
+			cameraSelected = cameraOptions[0];
+		}
 	});
 </script>
 
 <VideoStream let:loading let:stream let:error>
-	<Page {title} closeButton={instructionVisible} on:close={toggleInstuction}>
+	<Page fullscreen={!loading} {title} closeButton={instructionVisible} on:close={toggleInstuction}>
 		<div slot="background">
 			<Video {loading} {stream} />
 		</div>
