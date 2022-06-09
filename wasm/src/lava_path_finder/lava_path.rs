@@ -16,7 +16,6 @@ use crate::{objects::point::Point, utils::log};
 pub fn get_lava_paths_super<'a>(highest_points: &[usize], length: usize, fork_val: f32, min_altitude: f32, vs: &'a [Point], es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Point>>, String> {
 	let mut paths = LavaPathSet { all_paths: Vec::new() };
 	let start_point = get_start(highest_points, vs, es)?;
-	log!("todo remove : lava start found");
 	paths.get_lava_path(start_point, length, fork_val, min_altitude, vs, es)?;
 	Ok(paths.all_paths)
 }
@@ -41,7 +40,6 @@ impl<'a> LavaPathSet<'a> {
 	///
 	fn get_lava_path(&mut self, start_index: usize, length: usize, fork_val: f32, min_altitude: f32, vs: &'a [Point], es: &'a Vec<Vec<usize>>) -> Result<(), String> {
 		let mut path = Vec::with_capacity(length);
-		log!("todo remove : making new path");
 		let start_point = vs.get(start_index).ok_or_else(|| String::from("start point for lava does not exist in point list"))?;
 		path.push(start_point);
 
@@ -89,8 +87,8 @@ impl<'a> LavaPathSet<'a> {
 			if (max_g - second_best_g) < fork_val {
 				self.get_lava_path(second_best.0, length / 2, fork_val, min_altitude, vs, es)?;
 				//add current point to start of new lava path made
-				//TODO: SET CUR AS START POINT OF NEW LAVA PATH
-				self.all_paths.last_mut().unwrap().insert(0, cur.1);
+				let mut default: Vec<&Point> = Vec::new();
+				self.all_paths.last_mut().get_or_insert(&mut default).insert(0, cur.1);
 			}
 
 			//mark steepest neighbor as next point
@@ -138,7 +136,6 @@ fn get_start(highest_points: &[usize], vs: &[Point], edges: &[Vec<usize>]) -> Re
 	let mut store = (0, f32::MIN);
 
 	for i in highest_points {
-		//TODO change back once lava path visualization works
 		let mut neighbors: Vec<(usize, &Point)> = Vec::new();
 
 		//per neighbor calculate gradient and find maximum
