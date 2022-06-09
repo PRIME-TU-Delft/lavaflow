@@ -74,18 +74,17 @@ function createGltfStore() {
 				parent_relations: curveTree.hierarchy
 			});
 
-			const svc_dist = curveTree.size.width / 25 / 3;
-
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
-			api.base(tree, 10);
-			api.set_basic_parameters(25, 25, curveTree.size.width, curveTree.size.height);
-			api.set_svc_parameters(svc_dist);
-			api.correct_for_altitude_constraints_to_all_layers();
+			api.base(tree, 5);
+			api.set_basic_parameters(50, 50, curveTree.size.width, curveTree.size.height);
+			api.set_svc_parameters(50);
+			//api.correct_for_altitude_constraints_to_all_layers();
 			api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
-			api.increase_altitude_for_mountain_tops(0.3, false);
-			api.apply_smooth_to_mountain_tops(0.2, 2, 5, false);
-			api.set_catmull_clark_parameters(0);
+			api.apply_smooth_to_middle_layers(0.4, 4, 10, false);
+			api.increase_altitude_for_mountain_tops(1, false);
+			api.apply_smooth_to_mountain_tops(0.3, 5, 10, false);
+			api.set_catmull_clark_parameters(1);
 		},
 		build: () => {
 			// Call the wasm api to build the model

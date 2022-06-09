@@ -1,14 +1,18 @@
 <script lang="ts">
+	type T = $$Generic;
+
 	/**
 	 * This component is a dropdown input
 	 */
-	export let value: any;
-	export let options: any[];
+	export let value: T;
+	export let options: T[];
 </script>
 
 <select bind:value on:change>
-	{#each options as option}
-		<option value={option}>{option}</option>
+	{#each options as option, index}
+		<option value={option}>
+			<slot {option} {index}>{option}</slot>
+		</option>
 	{/each}
 </select>
 

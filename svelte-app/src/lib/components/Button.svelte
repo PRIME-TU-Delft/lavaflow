@@ -7,11 +7,13 @@
 	export let large = false;
 	export let secondary = false;
 	export let icon: string = '';
+	export let noMargin = false;
 </script>
 
 <button
 	disabled={disabled || loading}
 	class:disabled={disabled || loading}
+	class:noMargin
 	class:large
 	class:secondary
 	on:click
@@ -50,6 +52,10 @@
 		margin-block: 0.5rem;
 		border-radius: 0.3rem;
 		cursor: pointer;
+	}
+
+	button.noMargin {
+		margin-block: 0;
 	}
 
 	button.disabled {
