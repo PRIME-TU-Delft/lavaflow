@@ -8,9 +8,6 @@
 
 	import { onMount } from 'svelte';
 
-	let i = 10;
-	let j = 10;
-
 	onMount(async () => {
 		console.log($targetLocations);
 
@@ -49,26 +46,26 @@
 		<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
 			<a-entity gltf-model="url({$gltfStore})" />
 
-			{#await gltfStore.getAlitituteAndGradient($targetLocations[0]) then altAndGrad}
+			{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
 				<a-entity
 					gltf-model="url(steam_turbine.glb)"
 					scale="0.1 0.2 0.1"
-					position="{altAndGrad.x} {gltfStore.altitude_adjusted_to_gradient(
-						altAndGrad
-					)} {altAndGrad.y}"
+					position="{altAndGrad.x} {altAndGrad.altitude} {altAndGrad.y}"
 					rotation="0 0 0"
 					animation-mixer
 				/>
 				<a-box
 					width="2"
 					depth="2"
-					height={gltfStore.altitude_adjusted_to_gradient(altAndGrad) / 2}
-					position="{altAndGrad.x} {gltfStore.altitude_adjusted_to_gradient(altAndGrad) /
-						2} {altAndGrad.y}"
+					height={altAndGrad.altitude / 2}
+					position="
+						{altAndGrad.x} 
+						{altAndGrad.altitude / 2} 
+						{altAndGrad.y}"
 					color="gray"
 					scale="1 2 1"
 				/>
-			{/await}
+			{/each}
 		</a-entity>
 	{:else}
 		<a-entity
