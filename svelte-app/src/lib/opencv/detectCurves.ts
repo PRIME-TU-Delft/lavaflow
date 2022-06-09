@@ -65,9 +65,7 @@ export function getCurves(img: Mat): ContourTreeObject {
 	// remove the root, which is a rectangle around the entire image
 	[contours_array, hierarchy_array] = removeRootContour(contours_array, hierarchy_array);
 
-	[curves, hierarchy] = removeRootContour(contours_array, hierarchy_array);
-
-	return {curves, hierarchy};
+	return {curves: contours_array, hierarchy: hierarchy_array};
 	
 }
 
