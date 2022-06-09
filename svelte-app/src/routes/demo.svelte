@@ -360,9 +360,10 @@
 					const track = document.createElement('a-entity');
 					track.setAttribute('clone-along-curve',"curve: #track" + j + "; spacing: 0.035; rotation: 90 0 0;" );
 					track.setAttribute('geometry',"primitive:cylinder; height:0.04; radius:0.04 ;" );
-					track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.91');
+					track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.001');
 					//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
-					//track.setAttribute('animation', "property: material.opacity; to: 1; dur: 10000; loop: false; delay: " + j * 5000 + ";"  ) ;
+					const total_time = $lavapaths.length * 2000;
+					track.setAttribute('animation', "property: material.opacity; to: 1; dur: 2000; loop: false; delay: " + (total_time - ( j * 2000 ))+ ";"  ) ;
 
 					this.el.appendChild(track);
 				}
