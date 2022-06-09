@@ -45,8 +45,7 @@ export const targetLocations = createTargetLocations();
  * @param radian - radian in range [-inf, inf]
  */
 function radToDeg(radians: number) {
-	var pi = Math.PI;
-	return radians * (180 / pi);
+	return radians * (180 / Math.PI);
 }
 
 function adjustAlititude(altAndgrad: AltitudeGradientPair) {
@@ -56,9 +55,7 @@ function adjustAlititude(altAndgrad: AltitudeGradientPair) {
 	altitude += 0.02 * altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
 
 	// Increment by 1 to prevent the altitude from being under the model
-	altitude += 1;
-
-	return altitude;
+	return altitude + 1;
 }
 
 export function gltfStringToUrl(gltf: string): string {
