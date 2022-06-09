@@ -6,6 +6,8 @@
 	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
+	import Draggable from '$lib/data/draggable';
+
 	import { onMount } from 'svelte';
 
 	onMount(async () => {
@@ -44,7 +46,20 @@
 
 	{#if $gltfStore}
 		<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
-			<a-entity gltf-model="url({$gltfStore})" />
+			<a-entity gltf-model="url({$gltfStore.gltf_url})" />
+
+			{#each $gltfStore.craters.map((l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20))) as altAndGrad}
+				<a-cylinder
+					radius="3"
+					height={altAndGrad.altitude / 2}
+					position="
+						{altAndGrad.x} 
+						{altAndGrad.altitude / 2} 
+						{altAndGrad.y}"
+					color="#ff4025"
+					scale="1 2 1"
+				/>
+			{/each}
 
 			{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
 				<a-entity
@@ -62,8 +77,8 @@
 						{altAndGrad.x} 
 						{altAndGrad.altitude / 2} 
 						{altAndGrad.y}"
-					color="#90352C"
-					scale="1 2 1"
+					color="#454545"
+					scale="0.8 2 1.3"
 				/>
 			{/each}
 		</a-entity>
