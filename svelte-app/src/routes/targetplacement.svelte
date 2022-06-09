@@ -34,6 +34,7 @@
 </script>
 
 <Page title="image transformation" let:foregroundHeight let:foregroundWidth>
+	<!-- TODO: have a genuine back button -->
 	<NavigationButton slot="headerButton" to="demo" back>Back to visualise</NavigationButton>
 
 	<div slot="background">
