@@ -147,6 +147,22 @@ impl LevelCurve {
 	}
 }
 
+impl Clone for LevelCurve {
+	fn clone(&self) -> LevelCurve {
+		let mut points_clone: Vec<Point> = Vec::new();
+
+		for p in &self.points {
+			points_clone.push(Point { x: p.x, y: p.y, z: p.z });
+		}
+
+		LevelCurve {
+			altitude: self.altitude,
+			points: points_clone,
+			is_mountain_top: self.is_mountain_top,
+		}
+	}
+}
+
 //
 // Class: LevelCurveMap
 // This class gathers multiple level curves and provides functionality for working with
