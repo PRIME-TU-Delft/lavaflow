@@ -397,7 +397,7 @@ impl ModelConstructionApi {
 
 		for i in -dx..dx {
 			for j in -dy..dy {
-				neighbour_results.push(self.get_altitude_and_gradient_for_point_helper(col+i, row+j, &query_point)?);
+				neighbour_results.push(self.get_altitude_and_gradient_for_point_helper(col + i, row + j, &query_point)?);
 			}
 		}
 
@@ -412,22 +412,15 @@ impl ModelConstructionApi {
 			gradient.2 += n.gradient.2;
 		}
 
-		altitude /=   neighbour_results.len() as f32;
+		altitude /= neighbour_results.len() as f32;
 		gradient.0 /= neighbour_results.len() as f32;
 		gradient.1 /= neighbour_results.len() as f32;
 		gradient.2 /= neighbour_results.len() as f32;
-		
-		// Return the obtained result
-		Ok(AltitudeGradientPair {
-			x,
-			y,
-			altitude,
-			gradient,
-		})
 
+		// Return the obtained result
+		Ok(AltitudeGradientPair { x, y, altitude, gradient })
 	}
 	fn get_altitude_and_gradient_for_point_helper(&self, col: isize, row: isize, query_point: &Point) -> Result<AltitudeGradientPair, JsValue> {
-
 		// 1. If the model has not yet been computed, return an error
 		let raster = self
 			.computed_model_raster
@@ -435,13 +428,13 @@ impl ModelConstructionApi {
 			.ok_or_else(|| JsValue::from("Cannot compute altitude and gradient before rendering the model"))?;
 
 		// Check: if x or y fall outside of the raster, return all zeroes
-		if col < 0 || row < 0 || col > (raster.columns as isize) || row > (raster.rows as isize)  {
+		if col < 0 || row < 0 || col > (raster.columns as isize) || row > (raster.rows as isize) {
 			return Ok(AltitudeGradientPair {
 				x: 0.0,
 				y: 0.0,
 				altitude: 0.0,
 				gradient: (0.0, 0.0, 0.0),
-			})
+			});
 		}
 
 		// 2. Determine in which raster-rectangle this point lies
@@ -472,7 +465,7 @@ impl ModelConstructionApi {
 		let v2: &Point;
 
 		// Determine which triangle contains the query point and set a and b according to the RustDoc above this function
-		if abc_triangle.contains_point(&query_point) {
+		if abc_triangle.contains_point(query_point) {
 			a_vector = Vector::from_point_to_point(&a_point, &c_point);
 			b_vector = Vector::from_point_to_point(&a_point, &b_point);
 

@@ -28,16 +28,16 @@
 			if (i >= 90) {
 				// If i is at the end -> reset to 10 and increase j
 				i = 1;
-				j += 1;
+				j += 10;
 			} else if (i >= 90 && j >= 90) {
 				// stop interval if i and j are at the end
 				i = 1;
 				j = 1;
 				return;
 			}else {
-				i += 1;
+				i += 3;
 			}
-		}, 300);
+		}, 500);
 	});
 </script>
 
