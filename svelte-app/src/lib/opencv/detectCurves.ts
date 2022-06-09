@@ -65,6 +65,8 @@ export function getCurves(img: Mat): ContourTreeObject {
 	// remove the root, which is a rectangle around the entire image
 	[contours_array, hierarchy_array] = removeRootContour(contours_array, hierarchy_array);
 
+	validateContours(contours_array, hierarchy_array); //throw exceptions if something is wrong with the scan
+
 	return {curves: contours_array, hierarchy: hierarchy_array};
 	
 }
@@ -149,4 +151,27 @@ function removeRootContour(contours: number[][], hierarchy: number[]): [number[]
 
 
 	return [contours, hierarchy];
+}
+
+/**
+ * Throws an exception if something is wrong with the level curve tree
+ *
+ * @param contours JavaScript array of contours
+ * @param hierarchy List of parent nodes for every node
+ */
+ function validateContours(contours: number[][], hierarchy: number[]): void {
+	if (contours.length == 0 || hierarchy.length == 0) {
+		throw('No contours found');	
+	}
+
+	contours.forEach((contour, i) => {
+		if(contour.length <= 3) {
+			throw("A detected contour was too small, please try again");
+		}
+
+		if(hierarchy[i] < -1) { // original scan had more than one root
+			console.log(contours, hierarchy)
+			throw("Something went wrong while scanning. Try to not include things other than the level curves in your scan, or take a new picture");
+		}
+	})
 }
