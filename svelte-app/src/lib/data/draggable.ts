@@ -4,11 +4,13 @@ const STROKE_WIDTH = 4;
 
 export default class Draggable {
 	dragging: boolean = false;
+	last_selected: boolean = true;
+	drag_translated: boolean = false;
 	x: number;
 	y: number;
 	old_x: number;
 	old_y: number;
-	too_close_to_crater: boolean;
+	too_close_to_crater: boolean = false;
 	size: number;
 	offsetX: number = 0;
 	offsetY: number = 0;
@@ -29,7 +31,6 @@ export default class Draggable {
 		this.y = y;
 		this.old_x = x;
 		this.old_y = y;
-		this.too_close_to_crater = false;
 		this.size = size;
 	}
 
@@ -38,7 +39,7 @@ export default class Draggable {
 	 *
 	 * @param p5 Instance of a p5 sketch
 	 */
-	update(p5: p5) {
+	update(p5: p5, avoid_points?: [number, number][], with_distance?: number) {
 		if (!this.dragging) return;
 
 		if (p5.mouseX <= 0 || p5.mouseY <= 0) return;
@@ -46,6 +47,23 @@ export default class Draggable {
 
 		this.x = p5.mouseX + this.offsetX;
 		this.y = p5.mouseY + this.offsetY;
+
+		// Translate above the user's finger
+		this.translateForDragging();
+
+		if (avoid_points != undefined && with_distance != undefined) {
+			this.too_close_to_crater = false;
+
+			for (let i = 0; i < avoid_points.length; i++) {
+				let dx = avoid_points[i][0] - this.x;
+				let dy = avoid_points[i][1] - this.y;
+				let dist = Math.sqrt(dx*dx + dy*dy);
+				if (dist <= with_distance) {
+					this.too_close_to_crater = true;
+					break;
+				}
+			}
+		}
 	}
 
 	/**
@@ -59,18 +77,34 @@ export default class Draggable {
 		this.y = y;
 	}
 
+	translateForDragging() {
+		if (this.dragging && !this.drag_translated) {
+			this.y -= 50;
+			this.drag_translated = true;
+		}
+	}
+
+	translateBackAfterDragging() {
+		if (this.drag_translated) {
+			this.drag_translated = false;
+		}
+	}
+
 	/**
 	 * Visualize the marker, by drawing a rectangle at the marker's current position
 	 *
 	 * @param p5 Instance of a p5 sketch
 	 */
 	drawRect(p5: p5, markerSize: number) {
+
+		this.translateForDragging();
+
 		p5.stroke(0);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
+		p5.rect(this.x - markerSize/2, this.y - markerSize/2, markerSize, markerSize);
 
-		p5.rectMode(p5.CENTER);
-		p5.rect(this.x + this.size / 2, this.y + this.size / 2, markerSize, markerSize);
+		this.translateBackAfterDragging();
 	}
 
 	/**
@@ -79,42 +113,50 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
-	drawCircle(p5: p5, avoid_points: [number, number][], with_distance: number, markerSize: number, index?: number) {
-		p5.fill(255);
+	drawCircle(p5: p5, markerSize: number, index?: number) {
 
-		this.too_close_to_crater = false;
+		this.translateForDragging();
 
-		for (let i = 0; i < avoid_points.length; i++) {
-			let dx = avoid_points[i][0] - this.x;
-			let dy = avoid_points[i][1] - this.y;
-			let dist = Math.sqrt(dx*dx + dy*dy);
-			if (dist <= with_distance) {
+		if (index != undefined) {
+			p5.strokeWeight(0.5);
+			p5.stroke(0);
+			p5.fill(200);
+			p5.rect(this.x, this.y - markerSize/2, 50, markerSize);
 
-				p5.noStroke();
-				p5.fill(51);
-				p5.rect(this.x - 80, this.y - 35, 160, 20);
-
-				p5.strokeWeight(1);
-				p5.fill(255);
-				p5.textSize(15);
-				p5.textAlign(p5.CENTER);
-				p5.text("Too close to the crater", this.x, this.y - 20);
-
-				p5.fill(255, 0, 0);
-				
-				this.too_close_to_crater = true;
-				break;
-			}
+			p5.fill(0);
+			p5.textAlign(p5.CENTER);
+			p5.textSize(15);
+			p5.text("#" + index, this.x + 30, this.y + 5);
 		}
 
+		// Set a white background
+		p5.fill(255);
+
+		// Draw a different color if this is the selected point
+		if (this.last_selected) {
+			p5.fill(0, 140, 220);
+		}
+
+		// Draw a red color if this point is too close to one of the avoid_points
+		if (this.too_close_to_crater) {
+			p5.noStroke();
+			p5.fill(51);
+			p5.rect(this.x - 80, this.y - 35, 160, 20);
+			p5.strokeWeight(1);
+			p5.fill(255);
+			p5.textSize(15);
+			p5.textAlign(p5.CENTER);
+			p5.text("Too close to the crater", this.x, this.y - 20);
+
+			p5.fill(255, 0, 0);
+		}
+				
 		p5.stroke(0);
 		p5.strokeWeight(STROKE_WIDTH);
 
-		// if (index != undefined) {
-		// 	p5.text('#' + index, this.x, this.y);
-		// }
+		p5.ellipse(this.x, this.y, markerSize);
 
-		p5.circle(this.x, this.y, markerSize);
+		this.translateBackAfterDragging();
 	}
 
 	/**
@@ -124,19 +166,24 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawTriangle(p5: p5, markerSize: number) {
+
+		this.translateForDragging();
+
 		p5.stroke(0);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 
 		// corners in order: bottom left corner, bottom right corner, top corner in the center
 		p5.triangle(
-			this.x + (this.size - markerSize) / 2,
-			this.y + (this.size + markerSize) / 2,
-			this.x + (this.size + markerSize) / 2,
-			this.y + (this.size + markerSize) / 2,
-			this.x + this.size / 2,
-			this.y + (this.size - markerSize) / 2
+			this.x - markerSize/2,
+			this.y - markerSize/2,
+			this.x + markerSize/2,
+			this.y - markerSize/2,
+			this.x,
+			this.y + markerSize/2
 		);
+
+		this.translateBackAfterDragging();
 	}
 
 	/**
@@ -146,25 +193,34 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawCross(p5: p5, markerSize: number) {
+
+		this.translateForDragging();
+
 		p5.stroke(0);
 		p5.strokeWeight(STROKE_WIDTH * 2);
 		// cross is drawn using two thick lines
 
 		// draw line from top left to bottom right
 		p5.line(
-			this.x + (this.size - markerSize) / 2,
-			this.y + (this.size + markerSize) / 2,
-			this.x + (this.size + markerSize) / 2,
-			this.y + (this.size - markerSize) / 2
+			this.x - markerSize/2,
+			this.y - markerSize/2,
+			this.x + markerSize/2,
+			this.y + markerSize/2
 		);
 
 		// draw line from top right to bottom left
 		p5.line(
-			this.x + (this.size + markerSize) / 2,
-			this.y + (this.size + markerSize) / 2,
-			this.x + (this.size - markerSize) / 2,
-			this.y + (this.size - markerSize) / 2
+			this.x + markerSize/2,
+			this.y - markerSize/2,
+			this.x - markerSize/2,
+			this.y + markerSize/2
 		);
+
+		this.translateBackAfterDragging();
+	}
+
+	deselect() {
+		this.last_selected = false;
 	}
 
 	/**
@@ -183,6 +239,7 @@ export default class Draggable {
 			this.offsetY = this.y - p5.mouseY;
 			this.old_x = this.x;
 			this.old_y = this.y;
+			this.last_selected = true;
 
 			return true;
 		}
@@ -196,6 +253,7 @@ export default class Draggable {
 	 */
 	released() {
 		this.dragging = false;
+		this.translateBackAfterDragging();
 
 		if (this.too_close_to_crater) {
 			this.x = this.old_x;

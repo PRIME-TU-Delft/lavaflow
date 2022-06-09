@@ -49,8 +49,8 @@
 			if ($targetLocations?.length) {
 				for (let i = 0; i < $targetLocations.length; i++) {
 					let target = $targetLocations[i];
-					target.update(p5);
-					target.drawCircle(p5, $gltfStore.craters, 75, markerSize, i);
+					target.update(p5, $gltfStore.craters, 75);
+					target.drawCircle(p5, markerSize, i);
 				}
 			}
 
@@ -60,12 +60,19 @@
 		p5.mousePressed = () => {
 			if (!$targetLocations?.length) return;
 
+			let foundFirstMarker = false
+
 			for (let i = 0; i < $targetLocations.length; i++) {
-				const isPressed = $targetLocations[i].pressed(p5);
+				let isPressed = false;
+				$targetLocations[i].deselect();
+
+				if (!foundFirstMarker) {
+					isPressed = $targetLocations[i].pressed(p5);
+					foundFirstMarker = isPressed;
+				}
 
 				if (isPressed) {
 					targetSelected = i;
-					break;
 				}
 			}
 		};
