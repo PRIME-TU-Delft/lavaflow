@@ -52,6 +52,7 @@ impl OpenCVTree {
 pub struct ModelConstructionResult {
 	gltf: String,
 	lava_paths: Vec<Vec<(f32, f32, f32)>>,
+	craters: Vec<(f32, f32)>,
 }
 
 #[wasm_bindgen]
@@ -279,8 +280,15 @@ impl ModelConstructionApi {
 		let min_altitude = level_curve_set.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let computed_lava_paths: Vec<Vec<&Point>> = Vec::new();
-		// crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+		let computed_lava_paths: Vec<Vec<&Point>> =
+			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+
+		// Extract the crater by selecting the first point in the lava-path
+		let mut lava_craters: Vec<(f32, f32)> = Vec::new();
+		if !computed_lava_paths.is_empty() && !computed_lava_paths[0].is_empty() {
+			let c = computed_lava_paths[0][0];
+			lava_craters.push((c.x, c.y));
+		}
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
 		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
@@ -332,6 +340,7 @@ impl ModelConstructionApi {
 		Ok(ModelConstructionResult {
 			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
+			craters: lava_craters,
 		})
 	}
 

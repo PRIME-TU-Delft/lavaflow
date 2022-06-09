@@ -6,6 +6,9 @@ export default class Draggable {
 	dragging: boolean = false;
 	x: number;
 	y: number;
+	old_x: number;
+	old_y: number;
+	too_close_to_crater: boolean;
 	size: number;
 	offsetX: number = 0;
 	offsetY: number = 0;
@@ -24,6 +27,9 @@ export default class Draggable {
 	constructor(x: number, y: number, size: number) {
 		this.x = x;
 		this.y = y;
+		this.old_x = x;
+		this.old_y = y;
+		this.too_close_to_crater = false;
 		this.size = size;
 	}
 
@@ -73,16 +79,42 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
-	drawCircle(p5: p5, markerSize: number, index?: number) {
-		p5.stroke(0);
+	drawCircle(p5: p5, avoid_points: [number, number][], with_distance: number, markerSize: number, index?: number) {
 		p5.fill(255);
-		p5.strokeWeight(STROKE_WIDTH);
 
-		if (index != undefined) {
-			p5.text('#' + index, this.x + this.size / 2, this.y + this.size / 2);
+		this.too_close_to_crater = false;
+
+		for (let i = 0; i < avoid_points.length; i++) {
+			let dx = avoid_points[i][0] - this.x;
+			let dy = avoid_points[i][1] - this.y;
+			let dist = Math.sqrt(dx*dx + dy*dy);
+			if (dist <= with_distance) {
+
+				p5.noStroke();
+				p5.fill(51);
+				p5.rect(this.x - 80, this.y - 35, 160, 20);
+
+				p5.strokeWeight(1);
+				p5.fill(255);
+				p5.textSize(15);
+				p5.textAlign(p5.CENTER);
+				p5.text("Too close to the crater", this.x, this.y - 20);
+
+				p5.fill(255, 0, 0);
+				
+				this.too_close_to_crater = true;
+				break;
+			}
 		}
 
-		p5.circle(this.x + this.size / 2, this.y + this.size / 2, markerSize);
+		p5.stroke(0);
+		p5.strokeWeight(STROKE_WIDTH);
+
+		// if (index != undefined) {
+		// 	p5.text('#' + index, this.x, this.y);
+		// }
+
+		p5.circle(this.x, this.y, markerSize);
 	}
 
 	/**
@@ -142,13 +174,15 @@ export default class Draggable {
 	 */
 	pressed(p5: p5) {
 		// Check if mouse is over this object when global mouse is pressed
-		const xBounded = p5.mouseX > this.x && p5.mouseX < this.x + this.size;
-		const yBounded = p5.mouseY > this.y && p5.mouseY < this.y + this.size;
+		const xBounded = p5.mouseX > this.x - this.size/2 && p5.mouseX < this.x + this.size/2;
+		const yBounded = p5.mouseY > this.y - this.size/2 && p5.mouseY < this.y + this.size/2;
 		if (xBounded && yBounded) {
 			// if so, set this object to be dragged
 			this.dragging = true;
 			this.offsetX = this.x - p5.mouseX;
 			this.offsetY = this.y - p5.mouseY;
+			this.old_x = this.x;
+			this.old_y = this.y;
 
 			return true;
 		}
@@ -162,5 +196,11 @@ export default class Draggable {
 	 */
 	released() {
 		this.dragging = false;
+
+		if (this.too_close_to_crater) {
+			this.x = this.old_x;
+			this.y = this.old_y;
+		}
+
 	}
 }

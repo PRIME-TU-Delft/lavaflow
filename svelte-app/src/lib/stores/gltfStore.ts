@@ -13,7 +13,9 @@ import init, * as wasm from 'wasm';
 
 export interface Model {
 	gltf: string;
-	lavapath: [number, number, number][][];
+	gltf_url: string;
+	lava_paths: [number, number, number][][];
+	craters: [number, number][];
 }
 
 export interface AltitudeGradientPair {
@@ -69,7 +71,7 @@ export function gltfStringToUrl(gltf: string): string {
  * @returns target store with method subscribe, add and remove
  */
 function createGltfStore() {
-	const { subscribe, set } = writable<string>('');
+	const { subscribe, set } = writable<Model>();
 	let api: wasm.ModelConstructionApi;
 	let paperSize: { width: number; height: number };
 
@@ -110,11 +112,11 @@ function createGltfStore() {
 			// Call the wasm api to build the model
 			console.log('before build');
 			model = api.build().to_js() as Model;
-			const gltfUrl = gltfStringToUrl(model.gltf);
+			model.gltf_url = gltfStringToUrl(model.gltf);
 
 			// set the gltf store to the gltf string
-			set(gltfUrl);
-			console.log(gltfUrl);
+			set(model);
+			console.log(model);
 		},
 		getAlitituteAndGradient: (marker: Draggable): AltitudeGradientPair => {
 			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };
