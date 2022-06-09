@@ -8,16 +8,10 @@
 
 	import { onMount } from 'svelte';
 
-	let mounted: boolean;
-	$: ready = window.AFRAME && mounted;
-
-	function loadAframe() {
-		console.warn('aframe loaded for first time');
-	}
+	let i = 10;
+	let j = 10;
 
 	onMount(async () => {
-		console.log(window.AFRAME)
-
 		if (!$gltfStore) {
 			contourLines.set({
 				curves: hc_curves,
@@ -30,55 +24,66 @@
 			console.warn('gltf is loaded from hardcoded data', $gltfStore);
 		}
 
-		mounted = true;
+		let magicAnimation = setInterval(() => {
+			if (i >= 90) {
+				// If i is at the end -> reset to 10 and increase j
+				i = 1;
+				j += 1;
+			} else if (i >= 90 && j >= 90) {
+				// stop interval if i and j are at the end
+				i = 1;
+				j = 1;
+				return;
+			}else {
+				i += 1;
+			}
+		}, 300);
 	});
 </script>
 
 <svelte:head>
-	<!-- {#if mounted && !window.AFRAME}
-		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={loadAframe}></script>
-	{/if} -->
+	<!-- {#if mounted}Add {/if} -->
 </svelte:head>
 
-{#if ready}
-	<a-scene embedded background="color: #ddf">
-		<div class="button backButton">
-			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
-		</div>
+<a-scene embedded background="color: #ddf">
+	<div class="button backButton">
+		<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
+	</div>
 
-		<div class="button placeTargets">
-			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
-		</div>
+	<div class="button placeTargets">
+		<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+	</div>
 
-		<a-entity light="color: #ddf; intensity: 1.5" position="-1 1 0" />
-		<a-entity light="color: #ddf; intensity: 1.5" position="3 1 -4" />
+	<a-entity light="color: #ddf; intensity: 1.5" position="-1 1 0" />
+	<a-entity light="color: #ddf; intensity: 1.5" position="3 1 -4" />
+	<a-entity light="type: ambient; color: #fff" />
 
-		<!-- {#if $gltfStore}
-			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
-				<a-entity gltf-model="url({$gltfStore})" />
-			</a-entity>
-		{:else}
-			<a-entity
-				gltf-model="url(output20.gltf)"
-				scale="0.0001 0.04 0.0001"
-				position="1 1 -3"
-				rotation="0 -90 0"
-			/>
-		{/if} -->
+	{#if $gltfStore}
+		<a-entity position="1 -1 -3" scale="0.05 0.05 0.05" rotation="0 -90 0">
+			<a-entity gltf-model="url({$gltfStore})" />
 
-		<a-entity light="type: ambient; color: #fff"></a-entity>
-
+			{#await gltfStore.getAlitituteAndGradient(i, j) then altAndGrad}
+				<a-entity
+					gltf-model="url(steam_turbine.glb)"
+					scale="0.1 0.1 0.1"
+					position="{i} {gltfStore.altitude_adjusted_to_gradient(altAndGrad)} {j}"
+					rotation="0 0 0"
+					animation-mixer
+				/>
+				<a-box width="2" depth="2" height="{gltfStore.altitude_adjusted_to_gradient(altAndGrad)}" position="{i} {gltfStore.altitude_adjusted_to_gradient(altAndGrad) / 2} {j}" color="gray"/>
+			{/await}
+		</a-entity>
+	{:else}
 		<a-entity
-			gltf-model="url(steam_turbine.glb)"
-			scale="0.5 0.5 0.5"
-			position="1 1 -10"
+			gltf-model="url(output20.gltf)"
+			scale="0.0001 0.04 0.0001"
+			position="1 1 -3"
 			rotation="0 -90 0"
-			animation-mixer
 		/>
+	{/if}
 
-		<a-camera look-controls />
-	</a-scene>
-{/if}
+	<a-camera look-controls />
+</a-scene>
 
 <style>
 	.button {

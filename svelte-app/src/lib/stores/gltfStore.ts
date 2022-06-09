@@ -11,6 +11,10 @@ import type { CurveTree } from '$lib/stores/contourLineStore';
 
 import init, * as wasm from 'wasm';
 
+function radToDeg(radians: number) {
+  var pi = Math.PI;
+  return radians * (180/pi);
+}
 /**
  * Factory for creating a target store
  * @returns target store with method subscribe, add and remove
@@ -81,7 +85,7 @@ function createGltfStore() {
 			api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
 			api.increase_altitude_for_mountain_tops(0.3, false);
 			api.apply_smooth_to_mountain_tops(0.2, 2, 5, false);
-			api.set_catmull_clark_parameters(1);
+			api.set_catmull_clark_parameters(0);
 		},
 		build: () => {
 			// Call the wasm api to build the model
@@ -93,16 +97,27 @@ function createGltfStore() {
 			set(gltfUrl);
 			console.log(gltfUrl);
 		},
-		getAlitituteAndGradient: (x: number, y: number) => {
-			if (!api) return console.warn('no api initialized');
+		getAlitituteAndGradient: (x: number, y: number): AltitudeGradientPair => {
+			if (!api) return {x: 0, y: 0, altitude: 0, gradient: [0, 0, 0]}
 
 			// ask api to get altitude and gradient for a certain point
 			const altitudeGradientPair = api
 				.get_altitude_and_gradient_for_point(x, y)
 				.to_js() as AltitudeGradientPair;
 
+			altitudeGradientPair.gradient[0] = radToDeg(altitudeGradientPair.gradient[0]);
+			altitudeGradientPair.gradient[1] = radToDeg(altitudeGradientPair.gradient[1]);
+			altitudeGradientPair.gradient[2] = radToDeg(altitudeGradientPair.gradient[2]);
+
 			console.log(altitudeGradientPair);
 			return altitudeGradientPair;
+		},
+		altitude_adjusted_to_gradient: (agp: AltitudeGradientPair): number => {
+			return agp.altitude + Math.max(
+				Math.abs(agp.gradient[0]),
+				Math.abs(agp.gradient[1]),
+				Math.abs(agp.gradient[2])
+			)*0.1;
 		}
 	};
 }
