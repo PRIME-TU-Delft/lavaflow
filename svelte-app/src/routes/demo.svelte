@@ -62,7 +62,7 @@
 						{altAndGrad.x} 
 						{altAndGrad.altitude / 2} 
 						{altAndGrad.y}"
-					color="gray"
+					color="#90352C"
 					scale="1 2 1"
 				/>
 			{/each}
