@@ -6,29 +6,10 @@
  */
 
 import { writable } from 'svelte/store';
-import Draggable from '$lib/data/draggable';
 import type { CurveTree } from '$lib/stores/contourLineStore';
+import type Draggable from '$lib/data/draggable';
 
 import init, * as wasm from 'wasm';
-
-function radToDeg(radians: number) {
-	var pi = Math.PI;
-	return radians * (180 / pi);
-}
-/**
- * Factory for creating a target store
- * @returns target store with method subscribe, add and remove
- */
-function createTargetLocations() {
-	const { subscribe, update } = writable<Draggable[]>([new Draggable(500, 500, 0)]);
-
-	return {
-		subscribe,
-		add: (newTarget: Draggable) => update((targets) => [...targets, newTarget]), // append new target to the end of the array
-		remove: (index: number) => update((targets) => targets.filter((_, i) => i !== index)) // remove target at index
-	};
-}
-export const targetLocations = createTargetLocations();
 
 export interface Model {
 	gltf: string;
@@ -40,6 +21,44 @@ export interface AltitudeGradientPair {
 	y: number;
 	altitude: number;
 	gradient: [number, number, number];
+}
+
+/**
+ * Factory for creating a target store
+ * @returns target store with method subscribe, add and remove
+ */
+function createTargetLocations() {
+	const { subscribe, update } = writable<Draggable[]>([]);
+
+	return {
+		subscribe,
+		add: (newTarget: Draggable) => update((targets) => [...targets, newTarget]), // append new target to the end of the array
+		remove: (index: number) => update((targets) => targets.filter((_, i) => i !== index)) // remove target at index
+	};
+}
+export const targetLocations = createTargetLocations();
+
+// GLTF STORE helper functions
+
+/***
+ * Converts a radian to degrees
+ * @param radian - radian in range [-inf, inf]
+ */
+function radToDeg(radians: number) {
+	var pi = Math.PI;
+	return radians * (180 / pi);
+}
+
+function adjustAlititude(altAndgrad: AltitudeGradientPair) {
+	let altitude = altAndgrad.altitude;
+
+	// Take a small modifier that will increase the altitude by a fraction of the largest absolute gradient
+	altitude += 0.02 * altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
+
+	// Increment by 1 to prevent the altitude from being under the model
+	altitude += 1;
+
+	return altitude;
 }
 
 export function gltfStringToUrl(gltf: string): string {
@@ -103,30 +122,24 @@ function createGltfStore() {
 		getAlitituteAndGradient: (marker: Draggable): AltitudeGradientPair => {
 			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };
 
+			//
 			const adjustedX = (marker.x / paperSize.width) * 100;
 			const adjustedY = (marker.y / paperSize.height) * 100;
-
-			console.log({ marker, adjustedX, adjustedY });
 
 			// ask api to get altitude and gradient for a certain point
 			const altitudeGradientPair = api
 				.get_altitude_and_gradient_for_point(adjustedX, adjustedY)
 				.to_js() as AltitudeGradientPair;
 
+			// Get radians from rust however Aframe expects degrees
 			altitudeGradientPair.gradient[0] = radToDeg(altitudeGradientPair.gradient[0]);
 			altitudeGradientPair.gradient[1] = radToDeg(altitudeGradientPair.gradient[1]);
 			altitudeGradientPair.gradient[2] = radToDeg(altitudeGradientPair.gradient[2]);
 
-			console.log(altitudeGradientPair);
+			// Apply modifier to altitude
+			altitudeGradientPair.altitude = adjustAlititude(altitudeGradientPair);
+
 			return altitudeGradientPair;
-		},
-		altitude_adjusted_to_gradient: (agp: AltitudeGradientPair): number => {
-			return (
-				agp.altitude +
-				Math.max(Math.abs(agp.gradient[0]), Math.abs(agp.gradient[1]), Math.abs(agp.gradient[2])) *
-					0.02 +
-				1
-			);
 		}
 	};
 }
