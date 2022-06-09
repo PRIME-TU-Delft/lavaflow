@@ -35,3 +35,12 @@ svelte-build:
     - cd svelte-app
     - yarn
     - yarn build
+
+
+typescript-test:
+  image: node:16
+  before_script:
+    - cd svelte-app
+    - yarn
+  script:
+    - yarn test
