@@ -59,7 +59,10 @@ export function getCurves(img: Mat): ContourTreeObject {
 	hierarchy.delete();
 
 	// return { curves: contours_array, hierarchy: hierarchy_array };  // For debugging purposes, if you want to check the contours without de-duplication
+	
+	// remove the double contours caused by detecting both the inside and the outside of each line
 	[contours_array, hierarchy_array] = removeDoubleContours(contours_array, hierarchy_array);
+	// remove the root, which is a rectangle around the entire image
 	[contours_array, hierarchy_array] = removeRootContour(contours_array, hierarchy_array);
 
 	return {curves: contours_array, hierarchy: hierarchy_array};
@@ -126,7 +129,13 @@ function removeDoubleContours(contours: number[][], hierarchy: number[]): [numbe
 	return [contours_dedup, hierarchy_dedup];
 }
 
-
+/**
+ * Remove the root from the contours tree
+ *
+ * @param contours JavaScript (not OpenCV!) array of contours
+ * @param hierarchy List of parent nodes for every node
+ * @returns The tree without the root
+ */
 function removeRootContour(contours: number[][], hierarchy: number[]): [number[][], number[]] {
 
 	//remove first element from the contours and hierarchy array
