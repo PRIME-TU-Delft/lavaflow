@@ -62,7 +62,7 @@ impl<'a> LavaPathSet<'a> {
 			let mut max = cur;
 			let mut max_g = f32::MIN;
 
-			//keep track of next best for forking
+			//keep track of next best in case of
 			let mut second_best = cur;
 			let mut second_best_g = f32::MIN;
 
@@ -87,6 +87,10 @@ impl<'a> LavaPathSet<'a> {
 			//if diffence is smaller than given value, start another path with half length at second best neighbor
 			if (max_g - second_best_g) < fork_val {
 				self.get_lava_path(second_best.0, length / 2, fork_val, min_altitude, vs, es)?;
+				//add current point to start of new lava path made 
+				//TODO: SET CUR AS START POINT OF NEW LAVA PATH
+				//self.all_paths.last().unwrap().reverse().push(cur.1).reverse();
+				
 			}
 
 			//mark steepest neighbor as next point

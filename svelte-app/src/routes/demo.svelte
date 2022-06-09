@@ -324,8 +324,8 @@
 			console.log($lavapaths)
 
 			const scale_x = 0.05;
-			const scale_y = 0.05;
-			const scale_z = 0.025;
+			const scale_y = 0.025;
+			const scale_z = 0.05;
 
 			if (!$lavapaths?.length) return
 
@@ -347,7 +347,7 @@
 						
 						const p = document.createElement('a-curve-point');
 							//y and z swapped wrt given paths because Aframe uses different axes
-							p.setAttribute('position', { x: scale_x * x , y: (scale_y * z) +1, z: (scale_z * y ) });
+							p.setAttribute('position', { x: (scale_x * x) + 1 , y: (scale_y * z) -1 , z: (scale_z * y ) - 3 });
 							
 							curve.appendChild(p);
 						
@@ -358,9 +358,9 @@
 					
 					//generate cylinders on curve add cylinder along track
 					const track = document.createElement('a-entity');
-					track.setAttribute('clone-along-curve',"curve: #track" + j + "; spacing: 0.04; rotation: 90 0 0;" );
-					track.setAttribute('geometry',"primitive:cylinder; height:0.04; radius:0.02 ;" );
-					track.setAttribute('material', 'color: crimson; transparency: true; opacity: 0.91');
+					track.setAttribute('clone-along-curve',"curve: #track" + j + "; spacing: 0.035; rotation: 90 0 0;" );
+					track.setAttribute('geometry',"primitive:cylinder; height:0.04; radius:0.04 ;" );
+					track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.91');
 					//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
 					//track.setAttribute('animation', "property: material.opacity; to: 1; dur: 10000; loop: false; delay: " + j * 5000 + ";"  ) ;
 
@@ -423,15 +423,15 @@
 		<a-entity light="color: #AFA; intensity: 1.5" position="3 1 -4" />
 
 		{#if $gltfStore}
-			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0" >
+			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 0 0" >
 				<a-entity gltf-model="url({$gltfStore})" />
 			</a-entity>
 		{:else}
 			<a-entity
 				gltf-model="url(output20.gltf)"
-				scale="0.0001 0.04 0.0001"
+				scale="0.05 0.025 0.05"
 				position="1 1 -3"
-				rotation="0 -90 0"
+				rotation="0 0 0"
 			/>
 		{/if}
 
