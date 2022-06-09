@@ -3,7 +3,7 @@
 
 	import { contourLines } from '$lib/stores/contourLineStore';
 
-	import { gltfStore } from '$lib/stores/gltfStore';
+	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 	import { onMount } from 'svelte';
@@ -12,6 +12,8 @@
 	let j = 10;
 
 	onMount(async () => {
+		console.log($targetLocations);
+
 		if (!$gltfStore) {
 			contourLines.set({
 				curves: hc_curves,
@@ -23,21 +25,6 @@
 			gltfStore.build();
 			console.warn('gltf is loaded from hardcoded data', $gltfStore);
 		}
-
-		let magicAnimation = setInterval(() => {
-			if (i >= 90) {
-				// If i is at the end -> reset to 10 and increase j
-				i = 1;
-				j += 10;
-			} else if (i >= 90 && j >= 90) {
-				// stop interval if i and j are at the end
-				i = 1;
-				j = 1;
-				return;
-			}else {
-				i += 3;
-			}
-		}, 500);
 	});
 </script>
 
@@ -59,18 +46,28 @@
 	<a-entity light="type: ambient; color: #fff" />
 
 	{#if $gltfStore}
-		<a-entity position="1 -1 -3" scale="0.05 0.05 0.05" rotation="0 -90 0">
+		<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
 			<a-entity gltf-model="url({$gltfStore})" />
 
-			{#await gltfStore.getAlitituteAndGradient(i, j) then altAndGrad}
+			{#await gltfStore.getAlitituteAndGradient($targetLocations[0]) then altAndGrad}
 				<a-entity
 					gltf-model="url(steam_turbine.glb)"
-					scale="0.1 0.1 0.1"
-					position="{i} {gltfStore.altitude_adjusted_to_gradient(altAndGrad)} {j}"
+					scale="0.1 0.2 0.1"
+					position="{altAndGrad.x} {gltfStore.altitude_adjusted_to_gradient(
+						altAndGrad
+					)} {altAndGrad.y}"
 					rotation="0 0 0"
 					animation-mixer
 				/>
-				<a-box width="2" depth="2" height="{gltfStore.altitude_adjusted_to_gradient(altAndGrad)}" position="{i} {gltfStore.altitude_adjusted_to_gradient(altAndGrad) / 2} {j}" color="gray"/>
+				<a-box
+					width="2"
+					depth="2"
+					height={gltfStore.altitude_adjusted_to_gradient(altAndGrad) / 2}
+					position="{altAndGrad.x} {gltfStore.altitude_adjusted_to_gradient(altAndGrad) /
+						2} {altAndGrad.y}"
+					color="gray"
+					scale="1 2 1"
+				/>
 			{/await}
 		</a-entity>
 	{:else}

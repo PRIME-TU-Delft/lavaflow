@@ -12,8 +12,8 @@ import type { CurveTree } from '$lib/stores/contourLineStore';
 import init, * as wasm from 'wasm';
 
 function radToDeg(radians: number) {
-  var pi = Math.PI;
-  return radians * (180/pi);
+	var pi = Math.PI;
+	return radians * (180 / pi);
 }
 /**
  * Factory for creating a target store
@@ -55,6 +55,8 @@ export function gltfStringToUrl(gltf: string): string {
 function createGltfStore() {
 	const { subscribe, set } = writable<string>('');
 	let api: wasm.ModelConstructionApi;
+	let paperSize: { width: number; height: number };
+
 	let isSetup = false;
 	let model: Model;
 
@@ -67,6 +69,8 @@ function createGltfStore() {
 				await init();
 				isSetup = true;
 			}
+
+			paperSize = curveTree.size;
 
 			// Create a wasm tree out of openCV contour tree
 			const tree = new wasm.OpenCVTree({
@@ -96,12 +100,17 @@ function createGltfStore() {
 			set(gltfUrl);
 			console.log(gltfUrl);
 		},
-		getAlitituteAndGradient: (x: number, y: number): AltitudeGradientPair => {
-			if (!api) return {x: 0, y: 0, altitude: 0, gradient: [0, 0, 0]}
+		getAlitituteAndGradient: (marker: Draggable): AltitudeGradientPair => {
+			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };
+
+			const adjustedX = (marker.x / paperSize.width) * 100;
+			const adjustedY = (marker.y / paperSize.height) * 100;
+
+			console.log({ marker, adjustedX, adjustedY });
 
 			// ask api to get altitude and gradient for a certain point
 			const altitudeGradientPair = api
-				.get_altitude_and_gradient_for_point(x, y)
+				.get_altitude_and_gradient_for_point(adjustedX, adjustedY)
 				.to_js() as AltitudeGradientPair;
 
 			altitudeGradientPair.gradient[0] = radToDeg(altitudeGradientPair.gradient[0]);
@@ -112,11 +121,12 @@ function createGltfStore() {
 			return altitudeGradientPair;
 		},
 		altitude_adjusted_to_gradient: (agp: AltitudeGradientPair): number => {
-			return agp.altitude + Math.max(
-				Math.abs(agp.gradient[0]),
-				Math.abs(agp.gradient[1]),
-				Math.abs(agp.gradient[2])
-			)*0.02 + 1;
+			return (
+				agp.altitude +
+				Math.max(Math.abs(agp.gradient[0]), Math.abs(agp.gradient[1]), Math.abs(agp.gradient[2])) *
+					0.02 +
+				1
+			);
 		}
 	};
 }
