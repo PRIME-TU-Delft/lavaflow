@@ -58,8 +58,8 @@ impl<'a> LavaPathSet<'a> {
 			}
 
 			//per neighbor calculate gradient and find maximum
-				//max = max of nieghbors of cur
-				//max_g = gradient of max 
+			//max = max of nieghbors of cur
+			//max_g = gradient of max
 			let mut max = cur;
 			let mut max_g = f32::MIN;
 
@@ -88,10 +88,9 @@ impl<'a> LavaPathSet<'a> {
 			//if diffence is smaller than given value, start another path with half length at second best neighbor
 			if (max_g - second_best_g) < fork_val {
 				self.get_lava_path(second_best.0, length / 2, fork_val, min_altitude, vs, es)?;
-				//add current point to start of new lava path made 
+				//add current point to start of new lava path made
 				//TODO: SET CUR AS START POINT OF NEW LAVA PATH
 				self.all_paths.last_mut().unwrap().insert(0, cur.1);
-				
 			}
 
 			//mark steepest neighbor as next point
@@ -159,7 +158,6 @@ fn get_start(highest_points: &[usize], vs: &[Point], edges: &[Vec<usize>]) -> Re
 		// if point.z > store.1 {
 		// 	store = (*i, point.z);
 		// }
-		
 	}
 
 	Ok(store.0)

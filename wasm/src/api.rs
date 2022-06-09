@@ -259,27 +259,30 @@ impl ModelConstructionApi {
 		self.computed_model_raster = Some(smoother.raster.clone());
 
 		//apply surface subdivision
-		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, &smoother.raster)?;
-		
+		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, smoother.raster)?;
+
 		log!("surface subdivision complete");
 
 		//for lava path generation : find point index of the highest point in the model
 		let mut top_height = f32::MIN;
-		
+
 		//find max height in normalized model:
-		let normalized_max = Raster::map(Some(max_altitude) , 0.0, max_altitude, 0.0, 100.0).unwrap();
+
+		log!("max altitude: {}", max_altitude);
+
+		let normalized_max = *Raster::map(Some(max_altitude), 0.0, max_altitude, 0.0, 100.0).get_or_insert(max_altitude);
+		log!("normalized max : {}", normalized_max);
 
 		for curve in &level_curve_set.level_curves {
 			//use normalized curve height to determine max
-			let normalized_curve_height = Raster::map(Some(curve.altitude) , 0.0, max_altitude, 0.0, 100.0).unwrap();
+			let normalized_curve_height = *Raster::map(Some(curve.altitude), 0.0, max_altitude, 0.0, 100.0).get_or_insert(curve.altitude);
 			if normalized_curve_height > top_height {
 				top_height = normalized_curve_height;
 			}
 		}
 
-		//TODO: REMOVE ONCE PEAKS ARE CORRECT
-		top_height -= Raster::map(Some(level_curve_set.altitude_step) , 0.0, max_altitude, 0.0, 100.0).unwrap() ;
-		//top_height = 0.0;
+		top_height -= *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(top_height);
+
 
 		//for lava path generation : get list of indexes of points above or on highest level curve
 		let mut highest_points = Vec::new();
@@ -288,18 +291,17 @@ impl ModelConstructionApi {
 				highest_points.push(i);
 			}
 		}
-		//TODO REMOVE
-		// log!("highest point indeces:");
-		// log!("{:?}", highest_points);
 
 		//find lava path from the highest point of the model
 
-			//min alt determines at which alitude a lava path stops 
-		let min_altitude = Raster::map(Some(level_curve_set.altitude_step) , 0.0, max_altitude, 0.0, 100.0).unwrap() / 2.0;
-			//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-			// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let computed_lava_paths: Vec<Vec<&Point>> = crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
-		
+		//min alt determines at which alitude a lava path stops
+		let min_altitude = *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(level_curve_set.altitude_step) / 2.0;
+
+		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
+		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+		let computed_lava_paths: Vec<Vec<&Point>> =
+			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+
 		log!("lava path generation complete");
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
@@ -347,28 +349,6 @@ impl ModelConstructionApi {
 
 			final_points.push(tri10);
 		}
-
-		// //TODO REMOVE
-		if lava_path_triples.len() <= 0 {
-			return Err(JsValue::from("no lava paths?"));
-		}
-		log!("triples:");
-		log!("{:?}", lava_path_triples);
-
-		// for path in &lava_path_triples {
-		// 	for p in path {
-		// 		final_points.push(([p.0, p.2, p.1], [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
-		// 		final_points.push(([p.0 -2.5 , p.2 + 5.0, p.1 -2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
-		// 		final_points.push(([p.0 +2.5 , p.2 + 5.0, p.1 +2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
-
-				
-		// 		final_points.push(([p.0 -2.5 , p.2 + 5.0, p.1 -2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
-		// 		final_points.push(([p.0, p.2, p.1], [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
-		// 		final_points.push(([p.0 +2.5 , p.2 + 5.0, p.1 +2.5],  [255.0 / 255.0, 0.0 / 255.0, 0.0 / 255.0]));
-
-		// 	}
-			
-		// }
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
