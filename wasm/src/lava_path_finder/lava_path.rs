@@ -61,7 +61,7 @@ impl<'a> LavaPathSet<'a> {
 			let mut max = cur;
 			let mut max_g = f32::MIN;
 
-			//keep track of next best in case of
+			//keep track of next best in case of forking
 			let mut second_best = cur;
 			let mut second_best_g = f32::MIN;
 
