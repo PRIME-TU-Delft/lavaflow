@@ -2,17 +2,51 @@
 	import AframeModels from '$lib/components/aframe/AframeModels.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+
+	import { gltfStore } from '$lib/stores/gltfStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
+	import { debugMode } from '$lib/stores/debugStore';
+
 	export let arMode = false;
+
+	onMount(async () => {
+		if ($gltfStore) return; // When gltf store is loaded -> don't (re)load again
+
+		// If debug mode is disabled and there are no contourlines -> goto scanning of paper
+		if (!$debugMode && !$contourLines) {
+			goto('/scan/mapscanning');
+			return;
+		}
+
+		// If debug mode is enabled -> load hardcoded data
+		console.warn('gltf is loaded from hardcoded data');
+
+		if (!$contourLines) {
+			contourLines.set({
+				curves: hc_curves,
+				hierarchy: hc_hierarchy,
+				size: { width: 850, height: 950 }
+			});
+		}
+
+		await gltfStore.setup($contourLines);
+		gltfStore.build();
+	});
 </script>
 
 <a-scene class:arMode renderer="logarithmicDepthBuffer: true;" embedded vr-mode-ui="enabled: false">
-	<div class="button backButton">
-		<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
-	</div>
+	<slot name="overlay">
+		<div class="button backButton">
+			<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
+		</div>
 
-	<div class="button placeTargets">
-		<NavigationButton to="/targetplacement">Place targets</NavigationButton>
-	</div>
+		<div class="button placeTargets">
+			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+		</div>
+	</slot>
 
 	<a-entity light="type: ambient; color: #fff" />
 

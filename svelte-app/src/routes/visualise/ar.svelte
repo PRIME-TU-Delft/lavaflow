@@ -1,41 +1,42 @@
 <script lang="ts">
-	import ArSandBox from '$lib/components/aframe/ArSandBox.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
-	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-
-	import { gltfStore } from '$lib/stores/gltfStore';
-
-	// Todo remove these dependencies
-	import { contourLines } from '$lib/stores/contourLineStore';
-	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
-
-	function loadAr(e: Event) {
-		const target = (e.target as HTMLIFrameElement)?.contentDocument?.body;
-
-		console.log(target);
-		if (!target) return;
-
-		new ArSandBox({ target, props: { gltfStore } });
-	}
-
-	onMount(async () => {
-		// if no gltf is stored goto scanning of paper
-		// if (!$gltfStore) goto('/scan/mapscanning');
-
-		// TODO remove these in production
-		if (!$gltfStore) {
-			contourLines.set({
-				curves: hc_curves,
-				hierarchy: hc_hierarchy,
-				size: { width: 850, height: 950 }
-			});
-
-			await gltfStore.setup($contourLines);
-			gltfStore.build();
-			console.warn('gltf is loaded from hardcoded data', $gltfStore);
-		}
-	});
+	import { mdiChevronLeft } from '@mdi/js';
 </script>
 
-<iframe title="arjs sanbox" on:load={loadAr} />
+<!-- Load scene in arMode -->
+<SceneViewer arMode>
+	<div class="headerButton" slot="overlay">
+		<div class="button backButton">
+			<!-- Custom back button -->
+			<a sveltekit:reload href="/scan/preview">
+				<Button icon={mdiChevronLeft}>Back to preview</Button>
+			</a>
+		</div>
+
+		<div class="button placeTargets">
+			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+		</div>
+	</div>
+</SceneViewer>
+
+<style>
+	.button {
+		position: absolute;
+		width: 15rem;
+		max-width: calc(50vw - 2rem);
+		z-index: 1;
+	}
+
+	.backButton {
+		top: 1rem;
+		left: 1rem;
+	}
+
+	.placeTargets {
+		top: 1rem;
+		right: 1rem;
+	}
+</style>

@@ -13,11 +13,13 @@
 
 	onMount(async () => {
 		if (!$gltfStore) {
-			contourLines.set({
-				curves: hc_curves,
-				hierarchy: hc_hierarchy,
-				size: { width: 850, height: 950 }
-			});
+			if (!$contourLines) {
+				contourLines.set({
+					curves: hc_curves,
+					hierarchy: hc_hierarchy,
+					size: { width: 850, height: 950 }
+				});
+			}
 
 			await gltfStore.setup($contourLines);
 			gltfStore.build();

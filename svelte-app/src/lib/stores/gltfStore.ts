@@ -110,13 +110,11 @@ function createGltfStore() {
 		},
 		build: () => {
 			// Call the wasm api to build the model
-			console.log('before build');
 			model = api.build().to_js() as Model;
 			model.gltf_url = gltfStringToUrl(model.gltf);
 
 			// set the gltf store to the gltf string
 			set(model);
-			console.log(model);
 		},
 		getAlitituteAndGradient: (marker: Draggable): AltitudeGradientPair => {
 			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };

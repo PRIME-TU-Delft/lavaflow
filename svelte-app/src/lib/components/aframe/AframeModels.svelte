@@ -15,7 +15,7 @@
 		<a-entity light="color: #ddf; intensity: 1.5" position="100 100 100" />
 
 		<!-- Mountain -->
-		<a-entity gltf-model="url({$gltfStore})" />
+		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 
 		<!-- Loop over each target location. However, first each Draggable item is converted to an AltitudeAndGradient Object -->
 		{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
