@@ -4,11 +4,9 @@
 	 */
 	import Button from '$lib/components/Button.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
-	import Image from '$lib/components/Image.svelte';
 	import P5TargetPlacement from '$lib/components/p5/P5TargetPlacement.svelte';
 	import Page from '$lib/components/Page.svelte';
 
-	import { perspectiveImage, demoPerspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { targetLocations } from '$lib/stores/gltfStore';
 	import Draggable from '$lib/data/draggable';
@@ -30,18 +28,16 @@
 	}
 
 	onMount(() => {
-		if (!$perspectiveImage) perspectiveImage.set(demoPerspectiveImage);
+		
 	});
 </script>
 
 <Page title="image transformation" let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="demo" back>Back to visualise</NavigationButton>
 
-	<div slot="background">
-		<Image src={$perspectiveImage} alt="background" />
-	</div>
+	<div slot="background" style="background:#aaa;"></div>
 
-	{#if $perspectiveImage}
+	{#if $contourLines}
 		<div class="sketch">
 			<P5TargetPlacement bind:targetSelected {foregroundHeight} {foregroundWidth} curves={$contourLines.curves} />
 		</div>
@@ -50,7 +46,7 @@
 	{/if}
 
 	<div slot="footer">
-		{#if $perspectiveImage}
+		{#if $contourLines}
 			{#if targetSelected != -1}
 				<Button secondary icon={mdiTrashCan} on:click={removeTarget}>
 					Remove target #{targetSelected}
