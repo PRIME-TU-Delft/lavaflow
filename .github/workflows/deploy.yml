@@ -22,6 +22,8 @@ jobs:
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v1
+        with:
+          working-directory: wasm
 
       - name: Install node.js
         uses: actions/setup-node@v3

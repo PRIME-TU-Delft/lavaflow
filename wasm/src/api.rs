@@ -16,6 +16,7 @@ use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
+use crate::surface_subdivision::catmull_clark::catmull_clark_super;
 use crate::utils::log;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
@@ -52,6 +53,7 @@ impl OpenCVTree {
 pub struct ModelConstructionResult {
 	gltf: String,
 	lava_paths: Vec<Vec<(f32, f32, f32)>>,
+	craters: Vec<(f32, f32)>,
 }
 
 #[wasm_bindgen]
@@ -141,6 +143,7 @@ impl ModelConstructionApi {
 	/// If the user of the API wants, the parameters for the algorithm can be changed by calling other methods afterwards.
 	#[wasm_bindgen(constructor)]
 	pub fn new() -> Self {
+		crate::utils::set_panic_hook();
 		// The presented values below are the default values for the different parameters
 		Self {
 			rows: 10,
@@ -301,6 +304,13 @@ impl ModelConstructionApi {
 		let computed_lava_paths: Vec<Vec<&Point>> =
 			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
+		// Extract the crater by selecting the first point in the lava-path
+		let mut lava_craters: Vec<(f32, f32)> = Vec::new();
+		if !computed_lava_paths.is_empty() && !computed_lava_paths[0].is_empty() {
+			let c = computed_lava_paths[0][0];
+			lava_craters.push((c.x, c.y));
+		}
+
 		log!("lava path generation complete");
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
@@ -329,10 +339,10 @@ impl ModelConstructionApi {
 			//rgb green = 0, 153, 51
 			//rgb orange = 255, 153, 51
 
-			let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z));
+			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z));
+			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z));
+			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z));
 
 			// Add the first triangle
 			final_points.push(tri00);
@@ -353,6 +363,7 @@ impl ModelConstructionApi {
 		Ok(ModelConstructionResult {
 			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
+			craters: lava_craters,
 		})
 	}
 
@@ -396,6 +407,9 @@ impl ModelConstructionApi {
 	///
 	///	The normal vector of this plane can now be computed with a cross-product a x b
 	pub fn get_altitude_and_gradient_for_point(&self, x: f32, y: f32) -> Result<AltitudeGradientPair, JsValue> {
+		let dx: isize = 1;
+		let dy: isize = 1;
+
 		// Prebase: convert (x, y) to a Point instance, with z=0
 		let query_point = Point { x, y, z: 0.0 };
 
@@ -405,8 +419,58 @@ impl ModelConstructionApi {
 			.as_ref()
 			.ok_or_else(|| JsValue::from("Cannot compute altitude and gradient before rendering the model"))?;
 
+		// Compute the row/column pair that corresponds to this point
+		let row_col_pair = raster.get_row_col(x, y);
+		let row = row_col_pair.0 as isize;
+		let col = row_col_pair.1 as isize;
+
+		// Collect the altitude/gradient computations for every neighbour
+		let mut neighbour_results: Vec<AltitudeGradientPair> = Vec::new();
+
+		for i in -dx..dx {
+			for j in -dy..dy {
+				neighbour_results.push(self.get_altitude_and_gradient_for_point_helper(col + i, row + j, &query_point)?);
+			}
+		}
+
+		// Compute the average of all attributes
+		let mut altitude: f32 = 0.0;
+		let mut gradient: (f32, f32, f32) = (0.0, 0.0, 0.0);
+
+		for n in &neighbour_results {
+			altitude += n.altitude;
+			gradient.0 += n.gradient.0;
+			gradient.1 += n.gradient.1;
+			gradient.2 += n.gradient.2;
+		}
+
+		altitude /= neighbour_results.len() as f32;
+		gradient.0 /= neighbour_results.len() as f32;
+		gradient.1 /= neighbour_results.len() as f32;
+		gradient.2 /= neighbour_results.len() as f32;
+
+		// Return the obtained result
+		Ok(AltitudeGradientPair { x, y, altitude, gradient })
+	}
+	fn get_altitude_and_gradient_for_point_helper(&self, col: isize, row: isize, query_point: &Point) -> Result<AltitudeGradientPair, JsValue> {
+		// 1. If the model has not yet been computed, return an error
+		let raster = self
+			.computed_model_raster
+			.as_ref()
+			.ok_or_else(|| JsValue::from("Cannot compute altitude and gradient before rendering the model"))?;
+
+		// Check: if x or y fall outside of the raster, return all zeroes
+		if col < 0 || row < 0 || col > (raster.columns as isize) || row > (raster.rows as isize) {
+			return Ok(AltitudeGradientPair {
+				x: 0.0,
+				y: 0.0,
+				altitude: 0.0,
+				gradient: (0.0, 0.0, 0.0),
+			});
+		}
+
 		// 2. Determine in which raster-rectangle this point lies
-		let (a_row, a_col) = raster.get_row_col(x, y);
+		let (a_row, a_col) = (row as usize, col as usize);
 		let (b_row, b_col) = (a_row, a_col + 1);
 		let (c_row, c_col) = (a_row + 1, a_col);
 		let (d_row, d_col) = (a_row + 1, a_col + 1);
@@ -433,7 +497,7 @@ impl ModelConstructionApi {
 		let v2: &Point;
 
 		// Determine which triangle contains the query point and set a and b according to the RustDoc above this function
-		if abc_triangle.contains_point(&query_point) {
+		if abc_triangle.contains_point(query_point) {
 			a_vector = Vector::from_point_to_point(&a_point, &c_point);
 			b_vector = Vector::from_point_to_point(&a_point, &b_point);
 
@@ -471,8 +535,8 @@ impl ModelConstructionApi {
 		let altitude = (v0.z * factor_a + v1.z * factor_b + v2.z * factor_b) / (factor_a + factor_b + factor_c);
 
 		Ok(AltitudeGradientPair {
-			x,
-			y,
+			x: 0.0,
+			y: 0.0,
 			altitude,
 			gradient: (rotation_angle_x, rotation_angle_y, rotation_angle_z),
 		})

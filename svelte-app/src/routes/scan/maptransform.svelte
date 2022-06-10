@@ -35,44 +35,44 @@
 			markerCoords.push(p.x - p.offsetX);
 			markerCoords.push(p.y - p.offsetY);
 		}
-
+		
 		// Apply the perspective transformation using the selected marker coords
 		const result = removePerspective(mat, markerCoords, width, height);
 
-		// Set contour line store to the detected contour lines with hirarchy
-		const { curves, hierarchy } = getCurves(result);
+		try{
+			// Set contour line store to the detected contour lines with hirarchy
+			const { curves, hierarchy } = getCurves(result);
 
-		if (curves.length == 0 || hierarchy.length == 0) {
-			alert('No contours found');
-			return;
+			// Convert the OpenCV Mat to a array of tuples for mountain model construction
+			const contourTuples: [number, number][][] = curves.map((contour) => {
+				let contourTuple: [number, number][] = [];
+
+				for (let i = 0; i < contour.length - 1; i += 2) {
+					contourTuple.push([contour[i], contour[i + 1]]);
+				}
+
+				return contourTuple;
+			});
+
+			contourLines.set({
+				curves: contourTuples,
+				hierarchy: hierarchy,
+				size: { width, height }
+			});
+
+			cv.imshow('canvasOutput', result);
+
+			// set the output image to a store
+			perspectiveImage.set(outputCanvas.toDataURL());
+
+			goto('/scan/preview');
+		}catch(message){
+			alert(message);
 		}
-
-		// Convert the OpenCV Mat to a array of tuples for mountain model construction
-		const contourTuples: [number, number][][] = curves.map((contour) => {
-			let contourTuple: [number, number][] = [];
-
-			for (let i = 0; i < contour.length - 1; i += 2) {
-				contourTuple.push([contour[i], contour[i + 1]]);
-			}
-
-			return contourTuple;
-		});
-
-		contourLines.set({
-			curves: contourTuples,
-			hierarchy: hierarchy,
-			size: { width, height }
-		});
-
-		cv.imshow('canvasOutput', result);
-
-		// set the output image to a store
-		perspectiveImage.set(outputCanvas.toDataURL());
 
 		result.delete();
 		mat.delete();
 
-		goto('/scan/preview');
 	}
 
 	onMount(() => {

@@ -25,10 +25,10 @@
 
 			const size = 100; // size of draggble surface
 
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // []
-			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // ><
-			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.7, size)); // /\
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.7, size)); // ()
+			points.push(new Draggable(foregroundWidth * 0.1, foregroundHeight * 0.1, size)); // []
+			points.push(new Draggable(foregroundWidth * 0.9, foregroundHeight * 0.1, size)); // ><
+			points.push(new Draggable(foregroundWidth * 0.9, foregroundHeight * 0.9, size)); // /\
+			points.push(new Draggable(foregroundWidth * 0.1, foregroundHeight * 0.9, size)); // ()
 		};
 
 		/**
@@ -38,7 +38,7 @@
 		 */
 		function drawLine(p1: Draggable, p2: Draggable) {
 			p5.strokeWeight(10);
-			p5.line(p1.x + p1.size / 2, p1.y + p1.size / 2, p2.x + p2.size / 2, p2.y + p2.size / 2);
+			p5.line(p1.x, p1.y, p2.x, p2.y);
 		}
 
 		p5.draw = () => {

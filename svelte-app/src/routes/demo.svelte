@@ -3,21 +3,13 @@
 
 	import { contourLines } from '$lib/stores/contourLineStore';
 
-	import { gltfStore } from '$lib/stores/gltfStore';
-
+	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
-	import { onMount, onDestroy } from 'svelte';
 	import { lavapaths } from '$lib/stores/gltfStore';
 
+	import Draggable from '$lib/data/draggable';
 
-	let mounted: boolean;
-	let aframeLoaded: boolean;
-	
-	$: ready = (aframeLoaded || window.AFRAME) && mounted;
-
-	function loadAframe() {
-		aframeLoaded = true;
-		console.warn('aframe loaded for first time');
+	import { onMount } from 'svelte';
 
 		
 	const zAxis = new THREE.Vector3(0, 0, 1);
@@ -161,7 +153,6 @@
 	            return this.closestPointInLocalSpace(point, resolution, bTest, currentRes);
 	        }
 	    }
-	});
 
 
 	const tempQuaternion = new THREE.Quaternion();
@@ -172,6 +163,7 @@
 	    lineEnd.applyQuaternion(tempQuaternion);
 	    return lineEnd;
 	}
+	});
 
 	AFRAME.registerShader('line', {
 	    schema: {
@@ -372,7 +364,8 @@
 	}
 
 	onMount(async () => {
-		if (aframeLoaded) console.warn('aframe already loaded');
+		console.log($targetLocations);
+
 		if (!$gltfStore) {
 			contourLines.set({
 				curves: hc_curves,
@@ -405,40 +398,71 @@
 </script>
 
 <svelte:head>
-	{#if mounted && !window.AFRAME}
-		<script src="https://aframe.io/releases/1.3.0/aframe.min.js" on:load={loadAframe}></script>
-	{/if}
+	<!-- {#if mounted}Add {/if} -->
 </svelte:head>
 
-{#if ready}
-	<a-scene lava-path embedded>
-		<div class="button backButton">
-			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
-		</div>
+<a-scene embedded background="color: #ddf">
+	<div class="button backButton">
+		<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
+	</div>
 
-		<div class="button placeTargets">
-			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
-		</div>
+	<div class="button placeTargets">
+		<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+	</div>
 
-		<a-entity light="color: #AFA; intensity: 1.5" position="-1 1 0" />
-		<a-entity light="color: #AFA; intensity: 1.5" position="3 1 -4" />
+	<a-entity light="color: #ddf; intensity: 1.5" position="-1 1 0" />
+	<a-entity light="color: #ddf; intensity: 1.5" position="3 1 -4" />
+	<a-entity light="type: ambient; color: #fff" />
 
-		{#if $gltfStore}
-			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 0 0" >
-				<a-entity gltf-model="url({$gltfStore})" />
-			</a-entity>
-		{:else}
-			<a-entity
-				gltf-model="url(output20.gltf)"
-				scale="0.05 0.025 0.05"
-				position="1 1 -3"
-				rotation="0 0 0"
-			/>
-		{/if}
+	{#if $gltfStore}
+		<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
+			<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 
-		<a-camera look-controls />
-	</a-scene>
-{/if}
+			{#each $gltfStore.craters.map((l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20))) as altAndGrad}
+				<a-cylinder
+					radius="3"
+					height={altAndGrad.altitude / 2}
+					position="
+						{altAndGrad.x} 
+						{altAndGrad.altitude / 2} 
+						{altAndGrad.y}"
+					color="#ff4025"
+					scale="1 2 1"
+				/>
+			{/each}
+
+			{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
+				<a-entity
+					gltf-model="url(steam_turbine.glb)"
+					scale="0.1 0.2 0.1"
+					position="{altAndGrad.x} {altAndGrad.altitude} {altAndGrad.y}"
+					rotation="0 0 0"
+					animation-mixer
+				/>
+				<a-box
+					width="2"
+					depth="2"
+					height={altAndGrad.altitude / 2}
+					position="
+						{altAndGrad.x} 
+						{altAndGrad.altitude / 2} 
+						{altAndGrad.y}"
+					color="#454545"
+					scale="0.8 2 1.3"
+				/>
+			{/each}
+		</a-entity>
+	{:else}
+		<a-entity
+			gltf-model="url(output20.gltf)"
+			scale="0.0001 0.04 0.0001"
+			position="1 1 -3"
+			rotation="0 -90 0"
+		/>
+	{/if}
+
+	<a-camera look-controls />
+</a-scene>
 
 <style>
 	.button {
