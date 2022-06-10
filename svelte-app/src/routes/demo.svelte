@@ -3,7 +3,7 @@
 
 	import { contourLines } from '$lib/stores/contourLineStore';
 
-	import { gltfStore, targetLocations, lavapaths } from '$lib/stores/gltfStore';
+	import { gltfStore, targetLocations, lavapaths} from '$lib/stores/gltfStore';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 	import Draggable from '$lib/data/draggable';
@@ -329,16 +329,16 @@
 	AFRAME.registerComponent('lava-path', {
 		init: function () {
 			console.log('lava path:');
-			console.log($lavapaths);
+			console.log($gltfStore.lava_paths);
 
 			const scale_x = 0.05;
 			const scale_y = 0.025;
 			const scale_z = 0.05;
 
-			if (!$lavapaths?.length) return;
+			if (!$gltfStore.lava_paths?.length) return;
 
-			for (let j = 0; j < $lavapaths.length; j++) {
-				const points = $lavapaths[j];
+			for (let j = 0; j < $gltfStore.lava_paths.length; j++) {
+				const points = $gltfStore.lava_paths[j];
 
 				//create curve element
 				const curve = document.createElement('a-curve');
@@ -374,7 +374,7 @@
 				track.setAttribute('geometry', 'primitive:cylinder; height:0.04; radius:0.5 ;');
 				track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.001');
 				//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
-				const total_time = $lavapaths.length * 2000;
+				const total_time = $gltfStore.lava_paths.length * 2000;
 				track.setAttribute(
 					'animation',
 					'property: material.opacity; to: 1; dur: 2000; loop: false; delay: ' +
@@ -401,11 +401,9 @@
 			gltfStore.build();
 			console.warn('gltf is loaded from hardcoded data', $gltfStore);
 		}
-		console.log('lava path empty :');
-		console.log($lavapaths);
 
-		if (!$lavapaths) {
-			lavapaths.set([
+		if (!$gltfStore.lava_paths) {
+			$gltfStore.lava_paths = [
 				[
 					[4, 4, 7],
 					[1, 1, 3],
@@ -424,7 +422,7 @@
 					[1, 4, -2],
 					[12, 1, -1]
 				]
-			]);
+			];
 		}
 
 		ready = true;
@@ -457,7 +455,6 @@
 		{#if $gltfStore}
 			<a-entity lava-path position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
 				<a-entity gltf-model="url({$gltfStore.gltf_url})" />
-
 				{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20)) ) as altAndGrad}
 					<a-cylinder
 						radius="3"

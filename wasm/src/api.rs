@@ -16,7 +16,6 @@ use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
-use crate::surface_subdivision::catmull_clark::catmull_clark_super;
 use crate::utils::log;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
