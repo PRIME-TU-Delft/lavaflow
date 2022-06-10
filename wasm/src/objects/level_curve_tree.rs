@@ -31,7 +31,7 @@ impl<'a> LevelCurveTree<'a> {
 	// CONSTRUCTORS
 	//
 
-	/// Dynamic constructor: From OpenCV datastructure
+	/// Dynamic constructor: From `OpenCV` datastructure
 	pub fn from_open_cv(pixels_per_curve: &'a Vec<Vec<(u64, u64)>>, parent_relations: &'a Vec<Option<usize>>) -> Self {
 		let mut own_index = 0;
 
@@ -113,11 +113,11 @@ impl<'a> LevelCurveTree<'a> {
 		let mut result: Vec<LevelCurveTree> = Vec::new();
 
 		// Add all trees of whom this instance is the parent
-		for i in 0..self.parent_relations.len() {
-			if self.parent_relations[i] == Some(self.own_index) {
+		for (index, parent) in self.parent_relations.iter().enumerate() {
+			if parent == &Some(self.own_index) {
 				// The node at index i is a child of this instance
 				// Add it to the list
-				result.push(self.from_perspective_index(i));
+				result.push(self.from_perspective_index(index));
 			}
 		}
 
