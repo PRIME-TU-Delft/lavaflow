@@ -113,11 +113,11 @@ impl<'a> LevelCurveTree<'a> {
 		let mut result: Vec<LevelCurveTree> = Vec::new();
 
 		// Add all trees of whom this instance is the parent
-		for i in 0..self.parent_relations.len() {
-			if self.parent_relations[i] == Some(self.own_index) {
+		for (index, parent) in self.parent_relations.iter().enumerate() {
+			if parent == &Some(self.own_index) {
 				// The node at index i is a child of this instance
 				// Add it to the list
-				result.push(self.from_perspective_index(i));
+				result.push(self.from_perspective_index(index));
 			}
 		}
 

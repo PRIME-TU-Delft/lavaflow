@@ -28,21 +28,21 @@ impl LevelCurveSet {
 		let mut closest_two_distances: (f32, f32) = (self.level_curves[0].dist_to_point(p), self.level_curves[1].dist_to_point(p));
 
 		// Go over every level curve in this set
-		for i in 2..self.level_curves.len() {
+		for level_curve in self.level_curves.iter().skip(2) {
 			// Compute the distance from this level curve to this point
-			let current_dist = self.level_curves[i].dist_to_point(p);
+			let current_dist = level_curve.dist_to_point(p);
 
 			// If this distance is smaller than both current level-curves, shift everything over
 			if current_dist < closest_two_distances.0 && current_dist < closest_two_distances.1 {
 				closest_two_levelcurves.1 = closest_two_levelcurves.0;
-				closest_two_levelcurves.0 = &self.level_curves[i];
+				closest_two_levelcurves.0 = level_curve;
 
 				closest_two_distances.1 = closest_two_distances.0;
 				closest_two_distances.0 = current_dist;
 			}
 			// Else, if the distance is greater than the first level curve but smaller than the second, insert the new one
 			else if current_dist >= closest_two_distances.0 && current_dist < closest_two_distances.1 {
-				closest_two_levelcurves.1 = &self.level_curves[i];
+				closest_two_levelcurves.1 = level_curve;
 
 				closest_two_distances.1 = current_dist;
 			}

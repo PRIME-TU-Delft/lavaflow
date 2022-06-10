@@ -36,7 +36,7 @@ impl<'a> Smoother<'a> {
 		let mut altitude_of_layer: Vec<f32> = Vec::new();
 
 		// Initialize the lists, by pushing empty lists for every level curve
-		for _lc in 0..model_constructor.level_curve_map.level_curves.len() + 1 {
+		for _ in 0..model_constructor.level_curve_map.level_curves.len() + 1 {
 			point_indices_per_layer.push(Vec::new());
 			layer_is_top.push(false);
 			altitude_of_layer.push(0.0);

@@ -110,13 +110,13 @@ impl Raster {
 			self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?,
 		);
 
-		for (row, _) in self.altitudes.iter().enumerate() {
-			for (col, _) in self.altitudes[row].iter().enumerate() {
-				if self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))? < min_max.0 {
-					min_max.0 = self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))?;
+		for row in &self.altitudes {
+			for point in row {
+				if point.ok_or_else(|| miette!("Cannot normalise empty raster"))? < min_max.0 {
+					min_max.0 = point.ok_or_else(|| miette!("Cannot normalise empty raster"))?;
 				}
-				if self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))? > min_max.1 {
-					min_max.1 = self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))?;
+				if point.ok_or_else(|| miette!("Cannot normalise empty raster"))? > min_max.1 {
+					min_max.1 = point.ok_or_else(|| miette!("Cannot normalise empty raster"))?;
 				}
 			}
 		}
