@@ -11,7 +11,12 @@
 
 	import { onMount, onDestroy } from 'svelte';
 
+	let ready = false;
 	const zAxis = new THREE.Vector3(0, 0, 1);
+
+	function degToRad(deg: number) {
+		return (deg * Math.PI) / 180;
+	}
 
 	AFRAME.registerComponent('curve-point', {
 		//dependencies: ['position'],
@@ -421,77 +426,84 @@
 				]
 			]);
 		}
+
+		ready = true;
 	});
 
 	onDestroy(() => {
 		delete AFRAME.components['curve-point'];
 		delete AFRAME.components['curve'];
+		delete AFRAME.components['draw-curve'];
 		delete AFRAME.components['lava-path'];
+		delete AFRAME.components['clone-along-curve'];
+		delete AFRAME.shaders['line'];
 	});
 </script>
 
-<a-scene embedded background="color: #ddf">
-	<div class="button backButton">
-		<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
-	</div>
+{#if ready}
+	<a-scene lava-path embedded background="color: #ddf">
+		<div class="button backButton">
+			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
+		</div>
 
-	<div class="button placeTargets">
-		<NavigationButton to="/targetplacement">Place targets</NavigationButton>
-	</div>
+		<div class="button placeTargets">
+			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+		</div>
 
-	<a-entity light="color: #ddf; intensity: 1.5" position="-1 1 0" />
-	<a-entity light="color: #ddf; intensity: 1.5" position="3 1 -4" />
-	<a-entity light="type: ambient; color: #fff" />
+		<a-entity light="color: #ddf; intensity: 1.5" position="-1 1 0" />
+		<a-entity light="color: #ddf; intensity: 1.5" position="3 1 -4" />
+		<a-entity light="type: ambient; color: #fff" />
 
-	{#if $gltfStore}
-		<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
-			<a-entity gltf-model="url({$gltfStore.gltf_url})" />
+		{#if $gltfStore}
+			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
+				<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 
-			{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20)) ) as altAndGrad}
-				<a-cylinder
-					radius="3"
-					height={altAndGrad.altitude / 2}
-					position="
+				{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20)) ) as altAndGrad}
+					<a-cylinder
+						radius="3"
+						height={altAndGrad.altitude / 2}
+						position="
 						{altAndGrad.x} 
 						{altAndGrad.altitude / 2} 
 						{altAndGrad.y}"
-					color="#ff4025"
-					scale="1 2 1"
-				/>
-			{/each}
+						color="#ff4025"
+						scale="1 2 1"
+					/>
+				{/each}
 
-			{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
-				<a-entity
-					gltf-model="url(steam_turbine.glb)"
-					scale="0.1 0.2 0.1"
-					position="{altAndGrad.x} {altAndGrad.altitude} {altAndGrad.y}"
-					rotation="0 0 0"
-					animation-mixer
-				/>
-				<a-box
-					width="2"
-					depth="2"
-					height={altAndGrad.altitude / 2}
-					position="
+				{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
+					<a-entity
+						gltf-model="url(steam_turbine.glb)"
+						scale="0.1 0.2 0.1"
+						position="{altAndGrad.x} {altAndGrad.altitude} {altAndGrad.y}"
+						rotation="0 0 0"
+						animation-mixer
+					/>
+					<a-box
+						width="2"
+						depth="2"
+						height={altAndGrad.altitude / 2}
+						position="
 						{altAndGrad.x} 
 						{altAndGrad.altitude / 2} 
 						{altAndGrad.y}"
-					color="#454545"
-					scale="0.8 2 1.3"
-				/>
-			{/each}
-		</a-entity>
-	{:else}
-		<a-entity
-			gltf-model="url(output20.gltf)"
-			scale="0.0001 0.04 0.0001"
-			position="1 1 -3"
-			rotation="0 -90 0"
-		/>
-	{/if}
+						color="#454545"
+						scale="0.8 2 1.3"
+					/>
+				{/each}
+			</a-entity>
+		{:else}
+			<a-entity
+				gltf-model="url(output20.gltf)"
+				scale="0.0001 0.04 0.0001"
+				position="1 1 -3"
+				rotation="0 -90 0"
+			/>
+		{/if}
 
-	<a-camera look-controls />
-</a-scene>
+		<a-camera look-controls />
+	</a-scene>
+{/if}
 
 <style>
 	.button {
