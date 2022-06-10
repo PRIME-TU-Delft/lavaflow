@@ -283,7 +283,6 @@ impl ModelConstructionApi {
 
 		top_height -= *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(top_height);
 
-
 		//for lava path generation : get list of indexes of points above or on highest level curve
 		let mut highest_points = Vec::new();
 		for (i, v) in vs.iter().enumerate() {

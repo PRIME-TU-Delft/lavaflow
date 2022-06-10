@@ -90,9 +90,11 @@ impl Raster {
 		for row in &self.altitudes {
 			for height in row {
 				match height {
-					Some(x) => if x > max {
-						max = x;
-					},
+					Some(x) => {
+						if x > max {
+							max = x;
+						}
+					}
 					None => (),
 				}
 			}

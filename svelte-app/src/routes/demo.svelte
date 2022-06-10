@@ -20,7 +20,7 @@
 		console.warn('aframe loaded for first time');
 
 		
-		const zAxis = new THREE.Vector3(0, 0, 1);
+	const zAxis = new THREE.Vector3(0, 0, 1);
 	const degToRad = THREE.Math.degToRad;
 
 	AFRAME.registerComponent('curve-point', {

@@ -1,4 +1,4 @@
-use crate::{objects::point::Point, utils::log};
+use crate::objects::point::Point;
 
 /// Finds set of lava paths for a given model, from a specified starting point on the model.
 ///
