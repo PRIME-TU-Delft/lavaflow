@@ -110,13 +110,13 @@ impl Raster {
 			self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?,
 		);
 
-		for (row, _) in self.altitudes.iter().enumerate() {
-			for (col, _) in self.altitudes[row].iter().enumerate() {
-				if self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))? < min_max.0 {
-					min_max.0 = self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))?;
+		for row in &self.altitudes {
+			for point in row {
+				if point.ok_or_else(|| miette!("Cannot normalise empty raster"))? < min_max.0 {
+					min_max.0 = point.ok_or_else(|| miette!("Cannot normalise empty raster"))?;
 				}
-				if self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))? > min_max.1 {
-					min_max.1 = self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))?;
+				if point.ok_or_else(|| miette!("Cannot normalise empty raster"))? > min_max.1 {
+					min_max.1 = point.ok_or_else(|| miette!("Cannot normalise empty raster"))?;
 				}
 			}
 		}
@@ -177,10 +177,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 0
@@ -194,10 +194,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 1 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 10
@@ -211,10 +211,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | 5 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 5 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 50
@@ -228,10 +228,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 11 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 110
@@ -245,10 +245,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | -1 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** -10
@@ -262,10 +262,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | -10 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | -10 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 50
@@ -279,10 +279,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | None |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** None

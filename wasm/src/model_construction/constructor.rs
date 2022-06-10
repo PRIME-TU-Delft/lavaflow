@@ -10,11 +10,6 @@ pub struct ModelConstructor<'a> {
 	pub raster: &'a mut Raster,
 }
 
-// TODO: implement once model is working
-fn local_tin(_p: Vec<f32>) -> f32 {
-	todo!()
-}
-
 impl<'a> ModelConstructor<'a> {
 	pub fn new(raster: &'a mut Raster, contour_margin: f32, level_curve_map: &'a LevelCurveSet) -> ModelConstructor<'a> {
 		let x = raster.columns;
@@ -53,7 +48,17 @@ impl<'a> ModelConstructor<'a> {
 							y: ((row as f32) + 0.5) * self.raster.row_height,
 							z: 0.0,
 						};
-						self.raster.altitudes[row][col] = Some(self.level_curve_map.local_tin_interpolate(&center)?);
+
+						// If an error occurs while interpolating the altitude of a point, set it to an unknown value. It will be determined at a later point.
+						self.raster.altitudes[row][col] = match self.level_curve_map.local_tin_interpolate(&center) {
+							Ok(altitude) => Some(altitude),
+							Err(_) => None,
+						};
+						// If the interpolation causes an error, we also need to make sure the point isn't an SVC.
+						// This might still cause some jank for contour maps that only contain a single point though? If that happens, blame Rens and Pauline :p
+						if self.raster.altitudes[row][col].is_none() {
+							self.is_svc[row][col] = false;
+						}
 					}
 				}
 			}

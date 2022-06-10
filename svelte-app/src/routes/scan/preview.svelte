@@ -4,10 +4,8 @@
 	 */
 	import Button from '$lib/components/Button.svelte';
 	import Page from '$lib/components/Page.svelte';
-	import Image from '$lib/components/Image.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import { perspectiveImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -25,7 +23,7 @@
 	}
 
 	onMount(async () => {
-		if (!$perspectiveImage || !$contourLines.curves || !$contourLines.hierarchy) {
+		if (!$contourLines.curves || !$contourLines.hierarchy) {
 			return goto('/scan/mapscanning');
 		}
 		await gltfStore.setup($contourLines);
@@ -40,11 +38,7 @@
 		Redraw borders
 	</NavigationButton>
 
-	<div slot="background">
-		<Image src={$perspectiveImage} alt="background" />
-	</div>
-
-	<Image src={$perspectiveImage} alt="foreground" />
+	<div slot="background" style="background:#aaa;"></div>
 
 	{#if $contourLines?.curves && $contourLines?.hierarchy}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>

@@ -6,17 +6,19 @@ use miette::{miette, Result};
 // 	level_curves: Vec<LevelCurve>,
 // }
 
-/// Extension of the LevelCurveSet class
+// TODO: I'm not a big fan of the error handing in this function. It's a very long function, with loads of things that can throw an error, with varying consequences. For a future refactor, it would be good to split this into several different functions that each have their own error handling.
+
+/// Extension of the `LevelCurveSet` class
 impl LevelCurveSet {
-	/// Method: local_tin_interpolate
+	/// Method: `local_tin_interpolate`
 	///
 	/// # Arguments
-	/// * 'self': The LevelCurveSet instance to apply this method to
+	/// * 'self': The `LevelCurveSet` instance to apply this method to
 	/// * 'p':    The Point to interpolate
 	pub fn local_tin_interpolate(&self, p: &Point) -> Result<f32> {
 		// If this set contains less than two level-curves, interpolation is not possible. Return 'p.z'
-		if self.level_curves.is_empty() {
-			return Ok(p.z);
+		if self.level_curves.len() < 2 {
+			return Err(miette!("Set contains less than two level curves"));
 		}
 
 		//
@@ -26,21 +28,21 @@ impl LevelCurveSet {
 		let mut closest_two_distances: (f32, f32) = (self.level_curves[0].dist_to_point(p), self.level_curves[1].dist_to_point(p));
 
 		// Go over every level curve in this set
-		for i in 2..self.level_curves.len() {
+		for level_curve in self.level_curves.iter().skip(2) {
 			// Compute the distance from this level curve to this point
-			let current_dist = self.level_curves[i].dist_to_point(p);
+			let current_dist = level_curve.dist_to_point(p);
 
 			// If this distance is smaller than both current level-curves, shift everything over
 			if current_dist < closest_two_distances.0 && current_dist < closest_two_distances.1 {
 				closest_two_levelcurves.1 = closest_two_levelcurves.0;
-				closest_two_levelcurves.0 = &self.level_curves[i];
+				closest_two_levelcurves.0 = level_curve;
 
 				closest_two_distances.1 = closest_two_distances.0;
 				closest_two_distances.0 = current_dist;
 			}
 			// Else, if the distance is greater than the first level curve but smaller than the second, insert the new one
 			else if current_dist >= closest_two_distances.0 && current_dist < closest_two_distances.1 {
-				closest_two_levelcurves.1 = &self.level_curves[i];
+				closest_two_levelcurves.1 = level_curve;
 
 				closest_two_distances.1 = current_dist;
 			}
@@ -57,7 +59,7 @@ impl LevelCurveSet {
 
 		// Additional checking constraint: if one of these level-curves has no points, return 'p.z'
 		if points_closest_0.is_empty() || points_closest_1.is_empty() {
-			return Ok(p.z);
+			return Err(miette!("One of the closest two level curves has no points"));
 		}
 
 		// Create a vector of triangles (which are triples)
@@ -142,7 +144,7 @@ impl LevelCurveSet {
 
 		// Check: If the list of triangles is empty, return 'p.z'
 		if triangles.is_empty() {
-			return Ok(p.z);
+			return Err(miette!("List of interpolation triangles is empty"));
 		}
 
 		let mut triangle_around_p: &Triangle = &triangles[0];
