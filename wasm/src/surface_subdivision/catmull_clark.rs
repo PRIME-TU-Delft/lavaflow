@@ -27,7 +27,7 @@ pub struct Edge {
 	f2: Option<usize>,
 	middle: Point,
 }
-/// Applies the catmull clark surface subdivision algorithm over a given raster. Wrapper to use algoritm on raster, see method catmull_clark() for algorithm over only vetices and faces.
+/// Applies the catmull clark surface subdivision algorithm over a given raster. Wrapper to use algoritm on raster, see method `catmull_clark`() for algorithm over only vetices and faces.
 /// Returns a model in the form of a list of vertices and faces, a face being 4 indexes corresponding to the list of points.
 ///
 /// # Arguments
@@ -187,7 +187,7 @@ fn raster_to_faces(raster: &Raster) -> (Vec<Point>, Vec<Face>) {
 }
 /// Applies the catmull clark surface subdivision algorithm to a a list of vertices and faces, a face being 4 indexes corresponding to the list of pointes.
 /// Implemented using https://rosettacode.org/wiki/Catmull%E2%80%93Clark_subdivision_surface and  https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface as reference.
-/// Points contain a bool feild is_sharp, when this is set to true its z position will be less affected by the algorithm. (To keep height of points on a contour line consistent).
+/// Points contain a bool feild `is_sharp`, when this is set to true its z position will be less affected by the algorithm. (To keep height of points on a contour line consistent).
 ///
 /// ## Arguments
 ///
@@ -431,7 +431,7 @@ fn get_edges_faces(vs: &[Point], fs: &[Face], get_diagonal_edges: bool) -> Resul
 					f2: Some(e2.f1),
 					middle: e1.middle.clone(),
 				});
-				e_index += 2
+				e_index += 2;
 			} else {
 				merged_edges.push(Edge {
 					p1: e1.p1,
@@ -440,7 +440,7 @@ fn get_edges_faces(vs: &[Point], fs: &[Face], get_diagonal_edges: bool) -> Resul
 					f2: None,
 					middle: e1.middle.clone(),
 				});
-				e_index += 1
+				e_index += 1;
 			}
 
 		//if last edge no e2 and no neighboring edge
@@ -452,7 +452,7 @@ fn get_edges_faces(vs: &[Point], fs: &[Face], get_diagonal_edges: bool) -> Resul
 				f2: None,
 				middle: e1.middle.clone(),
 			});
-			e_index += 1
+			e_index += 1;
 		}
 	}
 
@@ -568,7 +568,7 @@ fn get_new_points(vs: &[Point], f_per_v: &[usize], avg_face_points: &[Point], av
 
 		let z = ((v.z * (n - 3.0)) + (2.0 * r.z) + f.z) / n;
 
-		new_vertices.push(Point { x, y, z })
+		new_vertices.push(Point { x, y, z });
 	}
 
 	Ok(new_vertices)

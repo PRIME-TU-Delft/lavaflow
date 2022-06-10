@@ -54,16 +54,14 @@ impl LevelCurve {
 
 		// Loop over every point in the list and find the smallest distance.
 		// You don't have to keep track of which point had this smallest distance.
-		for i in 0..self.points.len() {
-			let p = &self.points[i];
-
+		for (index, point) in self.points.iter().enumerate() {
 			// let current_dist_sqr = Point::dist_sqr(p, a);
-			let current_dist_sqr = Point::xy_dist_sqr(p, a);
+			let current_dist_sqr = Point::xy_dist_sqr(point, a);
 
 			if current_dist_sqr < min_dist_sqr {
 				min_dist_sqr = current_dist_sqr;
-				min_dist_sqr_point = p;
-				min_dist_sqr_index = i;
+				min_dist_sqr_point = point;
+				min_dist_sqr_index = index;
 			}
 		}
 
@@ -96,9 +94,7 @@ impl LevelCurve {
 
 		// Loop over every point in the list and find the smallest distance.
 		// You don't have to keep track of which point had this smallest distance.
-		for i in 0..self.points.len() {
-			let p = &self.points[i];
-
+		for p in &self.points {
 			// let current_dist_sqr = Point::dist_sqr(p, a);
 			let current_dist_sqr = Point::xy_dist_sqr(p, a);
 
@@ -215,6 +211,11 @@ impl LevelCurveSet {
 
 		//calculate area
 		let mut a = 0.0;
+
+		// ! THIS WOULD CAUSE A PANIC
+		// ! In the last iteration, ps[p+1] will always be out of bounds
+		// ! This is why I prefer using Vec::get over slicing :)
+		// ! Pauline wants to keep this function for future reference, but as of now using it would be unsafe
 		for p in 0..ps.len() {
 			a += (ps[p].x * ps[p + 1].y) - (ps[p + 1].x * ps[p].y);
 		}
@@ -222,6 +223,8 @@ impl LevelCurveSet {
 
 		let mut x = 0.0;
 		let mut y = 0.0;
+
+		// ! Same here, index out of bounds
 		for p in 0..ps.len() {
 			let fact = ps[p].x * ps[p + 1].y - ps[p + 1].x * ps[p].y;
 			x += (ps[p].x + ps[p + 1].x) * fact;

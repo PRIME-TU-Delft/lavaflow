@@ -6,7 +6,7 @@ use crate::objects::point::Point;
 ///
 /// * `start_index` - Index of first point in lava path.
 /// * `length` - Desired amount of points in lava path.
-/// * `fork_val` - Value that determines amount of forking. If two potential next points have a smaller difference than fork_val, an additional path will be added to the set.
+/// * `fork_val` - Value that determines amount of forking. If two potential next points have a smaller difference than `fork_val`, an additional path will be added to the set.
 /// * `vs` - List of all points of the model.
 /// * `es` - List of neighbors indexes per point in  the model.
 ///
@@ -31,7 +31,7 @@ impl<'a> LavaPathSet<'a> {
 	///
 	/// * `start` - The index of the first point in the lava path.
 	/// * `length` - Amount of points to be added to the lava path.
-	/// * `fork_val` - Value that determines amount of forking. If two potential next points have a smaller difference than fork_val, an additional path will be added to the set.
+	/// * `fork_val` - Value that determines amount of forking. If two potential next points have a smaller difference than `fork_val`, an additional path will be added to the set.
 	/// * `vs` - List of all points of the model.
 	/// * `es` - List of neighbors indexes per point in  the model.
 	///

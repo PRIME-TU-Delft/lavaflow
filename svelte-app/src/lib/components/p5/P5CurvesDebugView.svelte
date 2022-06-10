@@ -17,18 +17,26 @@
 		p5.setup = () => {
 			p5.createCanvas(foregroundWidth, foregroundHeight);
 
-			p5.fill(p5.color(255, 255, 255));
-			p5.stroke(p5.color(255, 255, 255));
+			p5.background(230);
+
 			curves.forEach((layer, index) => {
 				// Add text to the contour: "index (index of parent)"
+				p5.strokeWeight(1);
+				p5.stroke(30);
+				p5.fill(30);
+				if (debugMode)
+					p5.text(`${index} (${hierarchy[index]})`, layer[0][0] - 10, layer[0][1] - 10);
 
-				if (debugMode) p5.text(`${index} (${hierarchy[index]})`, layer[0][0], layer[0][1]);
-
+				// Display the level-curves to the user
+				p5.strokeWeight(4);
+				p5.noFill();
+				p5.beginShape();
 				for (let curvesPair of layer) {
 					let x = curvesPair[0];
 					let y = curvesPair[1];
-					p5.point(x, y);
+					p5.vertex(x, y);
 				}
+				p5.endShape(p5.CLOSE);
 			});
 		};
 	};
