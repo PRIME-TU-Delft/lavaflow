@@ -16,7 +16,7 @@ use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
-use crate::surface_subdivision::catmull_clark::catmull_clark_super;
+use crate::utils::log;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
 pub trait SmoothingOperation {
@@ -35,7 +35,7 @@ pub struct OpenCVTree {
 #[wasm_bindgen]
 impl OpenCVTree {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<OpenCVTree, JsValue> {
+	pub fn new(val: &JsValue) -> Result<OpenCVTree, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
 	}
 
@@ -58,7 +58,7 @@ pub struct ModelConstructionResult {
 #[wasm_bindgen]
 impl ModelConstructionResult {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<ModelConstructionResult, JsValue> {
+	pub fn new(val: &JsValue) -> Result<ModelConstructionResult, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid ModelConstructionResult"))
 	}
 
@@ -86,7 +86,7 @@ pub struct AltitudeGradientPair {
 #[wasm_bindgen]
 impl AltitudeGradientPair {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<AltitudeGradientPair, JsValue> {
+	pub fn new(val: &JsValue) -> Result<AltitudeGradientPair, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid AltitudeGradientPair"))
 	}
 
@@ -238,6 +238,8 @@ impl ModelConstructionApi {
 		// determine heights
 		model_constructor.construct().map_err(|e| e.to_string())?;
 
+		log!("construction complete");
+
 		// Construct smoother instance
 		let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
@@ -245,6 +247,9 @@ impl ModelConstructionApi {
 		for operation in &self.smoothing_operations_queue {
 			operation.apply(&mut smoother).map_err(|e| e.to_string())?;
 		}
+		log!("smoothing complete");
+		//get max alt before normalization, to be used later
+		let max_altitude = *smoother.raster.get_highest_altitude();
 
 		// Apply raster normalisation, so it will be contained within a 100x100x100 pixel box
 		smoother.raster.normalise().map_err(|e| e.to_string())?;
@@ -256,17 +261,29 @@ impl ModelConstructionApi {
 		self.computed_model_raster = Some(smoother.raster.clone());
 
 		//apply surface subdivision
-		let (vs, fs, edge_map) = catmull_clark_super(self.catmull_clark_iterations, &model_constructor.is_svc, model_constructor.raster, false)?;
+		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, smoother.raster)?;
+
+		log!("surface subdivision complete");
 
 		//for lava path generation : find point index of the highest point in the model
-
 		let mut top_height = f32::MIN;
+
+		//find max height in normalized model:
+
+		log!("max altitude: {}", max_altitude);
+
+		let normalized_max = *Raster::map(Some(max_altitude), 0.0, max_altitude, 0.0, 100.0).get_or_insert(max_altitude);
+		log!("normalized max : {}", normalized_max);
+
 		for curve in &level_curve_set.level_curves {
-			if curve.altitude > top_height {
-				top_height = curve.altitude;
+			//use normalized curve height to determine max
+			let normalized_curve_height = *Raster::map(Some(curve.altitude), 0.0, max_altitude, 0.0, 100.0).get_or_insert(curve.altitude);
+			if normalized_curve_height > top_height {
+				top_height = normalized_curve_height;
 			}
 		}
-		//top_height -= level_curve_map.altitude_step;
+
+		top_height -= *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(top_height);
 
 		//for lava path generation : get list of indexes of points above or on highest level curve
 		let mut highest_points = Vec::new();
@@ -277,8 +294,10 @@ impl ModelConstructionApi {
 		}
 
 		//find lava path from the highest point of the model
+
 		//min alt determines at which alitude a lava path stops
-		let min_altitude = level_curve_set.altitude_step / 2.0;
+		let min_altitude = *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(level_curve_set.altitude_step) / 2.0;
+
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
 		let computed_lava_paths: Vec<Vec<&Point>> =
@@ -290,6 +309,8 @@ impl ModelConstructionApi {
 			let c = computed_lava_paths[0][0];
 			lava_craters.push((c.x, c.y));
 		}
+
+		log!("lava path generation complete");
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
 		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
@@ -339,7 +360,7 @@ impl ModelConstructionApi {
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
-			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
+			gltf: generate_gltf(&final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
 			craters: lava_craters,
 		})
