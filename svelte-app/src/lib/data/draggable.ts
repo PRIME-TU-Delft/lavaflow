@@ -6,11 +6,12 @@ export default class Draggable {
 	dragging: boolean = false;
 	last_selected: boolean = true;
 	drag_translated: boolean = false;
+	too_close_to_crater: boolean = false;
+	too_close_to_other_target: boolean = false;
 	x: number;
 	y: number;
 	old_x: number;
 	old_y: number;
-	too_close_to_crater: boolean = false;
 	size: number;
 	offsetX: number = 0;
 	offsetY: number = 0;
@@ -39,7 +40,7 @@ export default class Draggable {
 	 *
 	 * @param p5 Instance of a p5 sketch
 	 */
-	update(p5: p5, avoid_points?: [number, number][], with_distance?: number) {
+	update(p5: p5, avoid_craters?: [number, number][], crater_distance?: number, avoid_targets?: [number, number][], target_distance?: number, index?: number) {
 		if (!this.dragging) return;
 
 		if (p5.mouseX <= 0 || p5.mouseY <= 0) return;
@@ -51,15 +52,35 @@ export default class Draggable {
 		// Translate above the user's finger
 		this.translateForDragging();
 
-		if (avoid_points != undefined && with_distance != undefined) {
+		if (avoid_craters != undefined && crater_distance != undefined) {
 			this.too_close_to_crater = false;
 
-			for (let i = 0; i < avoid_points.length; i++) {
-				let dx = avoid_points[i][0] - this.x;
-				let dy = avoid_points[i][1] - this.y;
+			for (let i = 0; i < avoid_craters.length; i++) {
+				let dx = avoid_craters[i][0] - this.x;
+				let dy = avoid_craters[i][1] - this.y;
 				let dist = Math.sqrt(dx*dx + dy*dy);
-				if (dist <= with_distance) {
+				if (dist <= crater_distance) {
 					this.too_close_to_crater = true;
+					break;
+				}
+			}
+		}
+
+		if (avoid_targets != undefined && target_distance != undefined) {
+			this.too_close_to_other_target = false;
+
+			for (let i = 0; i < avoid_targets.length; i++) {
+
+				// We cannot be TOO close to ourselves, so skip if i == index
+				if (index != undefined && index == i) {
+					continue;
+				}
+
+				let dx = avoid_targets[i][0] - this.x;
+				let dy = avoid_targets[i][1] - this.y;
+				let dist = Math.sqrt(dx*dx + dy*dy);
+				if (dist <= target_distance) {
+					this.too_close_to_other_target = true;
 					break;
 				}
 			}
@@ -77,6 +98,9 @@ export default class Draggable {
 		this.y = y;
 	}
 
+	/**
+	 * Translate this draggable up, so that the user can see what they are doing.
+	 */
 	translateForDragging() {
 		if (this.dragging && !this.drag_translated) {
 			this.y -= 50;
@@ -84,10 +108,35 @@ export default class Draggable {
 		}
 	}
 
+	/**
+	 * Translate back to the desired position
+	 */
 	translateBackAfterDragging() {
 		if (this.drag_translated) {
 			this.drag_translated = false;
 		}
+	}
+
+	/**
+	 * Display a warning message above this draggable marker
+	 * 
+	 * @param p5 Instance of p5 sketch
+	 * @param msg The warning message to display
+	 */
+	displayWarningMessage(p5: p5, msg: string) {
+		p5.noStroke();
+		p5.fill(51);
+		p5.textSize(15);
+		p5.textAlign(p5.CENTER);
+
+		let text_width = p5.textWidth(msg);
+
+		p5.rect(this.x - text_width/2 - 5, this.y - 35, text_width + 10, 20);
+
+		p5.strokeWeight(1);
+		p5.fill(255);
+
+		p5.text(msg, this.x, this.y - 20);
 	}
 
 	/**
@@ -139,15 +188,10 @@ export default class Draggable {
 
 		// Draw a red color if this point is too close to one of the avoid_points
 		if (this.too_close_to_crater) {
-			p5.noStroke();
-			p5.fill(51);
-			p5.rect(this.x - 80, this.y - 35, 160, 20);
-			p5.strokeWeight(1);
-			p5.fill(255);
-			p5.textSize(15);
-			p5.textAlign(p5.CENTER);
-			p5.text("Too close to the crater", this.x, this.y - 20);
-
+			this.displayWarningMessage(p5, "Too close to the crater");
+			p5.fill(255, 0, 0);
+		} else if (this.too_close_to_other_target) {
+			this.displayWarningMessage(p5, "Too close to another turbine");
 			p5.fill(255, 0, 0);
 		}
 				
@@ -255,9 +299,11 @@ export default class Draggable {
 		this.dragging = false;
 		this.translateBackAfterDragging();
 
-		if (this.too_close_to_crater) {
+		if (this.too_close_to_crater || this.too_close_to_other_target) {
 			this.x = this.old_x;
 			this.y = this.old_y;
+			this.too_close_to_crater = false;
+			this.too_close_to_other_target = false;
 		}
 
 	}
