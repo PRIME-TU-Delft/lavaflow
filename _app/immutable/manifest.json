@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-df7bffca.js",
+    "file": "start-3d3469c7.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -41,7 +41,7 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-c8c63c84.js",
+    "file": "pages/demo.svelte-effa51c2.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -50,7 +50,7 @@
       "_NavigationButton-630e7a6e.js",
       "_contourLineStore-dad742e3.js",
       "_gltfStore-6c41e2c8.js",
-      "_draggable-09cd7880.js",
+      "_draggable-002fe15c.js",
       "_Button-b44a52ed.js",
       "_index-c351e16f.js"
     ],
@@ -73,7 +73,7 @@
     ]
   },
   "src/routes/scan/mapscanning.svelte": {
-    "file": "pages/scan/mapscanning.svelte-c38b9132.js",
+    "file": "pages/scan/mapscanning.svelte-ca63af69.js",
     "src": "src/routes/scan/mapscanning.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -91,7 +91,7 @@
     ]
   },
   "src/routes/scan/maptransform.svelte": {
-    "file": "pages/scan/maptransform.svelte-4d8f5456.js",
+    "file": "pages/scan/maptransform.svelte-c53cb1c1.js",
     "src": "src/routes/scan/maptransform.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -105,7 +105,7 @@
       "_navigation-0e6511d1.js",
       "__commonjsHelpers-ee0fe954.js",
       "_P5-8833a998.js",
-      "_draggable-09cd7880.js",
+      "_draggable-002fe15c.js",
       "_index-c351e16f.js",
       "_singletons-d1fb5791.js",
       "_preload-helper-60cab3ee.js"
@@ -115,7 +115,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-38383d96.js",
+    "file": "pages/scan/preview.svelte-2815d585.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -138,7 +138,7 @@
     ]
   },
   "src/routes/targetplacement.svelte": {
-    "file": "pages/targetplacement.svelte-62e15c5a.js",
+    "file": "pages/targetplacement.svelte-0c7a2b89.js",
     "src": "src/routes/targetplacement.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -150,7 +150,7 @@
       "_gltfStore-6c41e2c8.js",
       "_Page-2c1031a1.js",
       "_contourLineStore-dad742e3.js",
-      "_draggable-09cd7880.js",
+      "_draggable-002fe15c.js",
       "_preload-helper-60cab3ee.js",
       "_index-c351e16f.js"
     ],
@@ -201,8 +201,8 @@
       "_index-c351e16f.js"
     ]
   },
-  "_draggable-09cd7880.js": {
-    "file": "chunks/draggable-09cd7880.js"
+  "_draggable-002fe15c.js": {
+    "file": "chunks/draggable-002fe15c.js"
   },
   "_Button-b44a52ed.js": {
     "file": "chunks/Button-b44a52ed.js",
