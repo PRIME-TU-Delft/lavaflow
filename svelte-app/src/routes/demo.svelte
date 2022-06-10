@@ -80,7 +80,7 @@
 	                    return point;
 	                }
 
-	                return point.object3D.getWorldPosition();
+	                return point.object3D.getWorldPosition(new THREE.Vector3());
 	            });
 
 	            // Update the Curve if either the Curve-Points or other Properties changed
@@ -231,11 +231,11 @@
 	        spacing: {default: 1},
 	        rotation: {
 	            type: 'vec3',
-	            default: '0 0 0'
+	            default: AFRAME.utils.coordinates.parse('0 0 0'),
 	        },
 	        scale: {
 	            type: 'vec3',
-	            default: '1 1 1'
+	            default: AFRAME.utils.coordinates.parse('1 1 1'),
 	        }
 	    },
 
@@ -406,7 +406,7 @@
 
 <svelte:head>
 	{#if mounted && !window.AFRAME}
-		<script src="https://aframe.io/releases/1.0.0/aframe.min.js" on:load={loadAframe}></script>
+		<script src="https://aframe.io/releases/1.3.0/aframe.min.js" on:load={loadAframe}></script>
 	{/if}
 </svelte:head>
 
