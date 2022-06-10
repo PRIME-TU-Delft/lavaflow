@@ -10,11 +10,6 @@ pub struct ModelConstructor<'a> {
 	pub raster: &'a mut Raster,
 }
 
-// TODO: implement once model is working
-fn local_tin(_p: Vec<f32>) -> f32 {
-	todo!()
-}
-
 impl<'a> ModelConstructor<'a> {
 	pub fn new(raster: &'a mut Raster, contour_margin: f32, level_curve_map: &'a LevelCurveSet) -> ModelConstructor<'a> {
 		let x = raster.columns;

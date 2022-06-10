@@ -177,10 +177,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 0
@@ -194,10 +194,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 1 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 10
@@ -211,10 +211,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | 5 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 5 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 50
@@ -228,10 +228,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 11 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 110
@@ -245,10 +245,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | -1 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** -10
@@ -262,10 +262,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | -10 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | -10 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 50
@@ -279,10 +279,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | None |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** None

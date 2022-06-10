@@ -35,7 +35,7 @@ pub struct OpenCVTree {
 #[wasm_bindgen]
 impl OpenCVTree {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<OpenCVTree, JsValue> {
+	pub fn new(val: &JsValue) -> Result<OpenCVTree, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
 	}
 
@@ -58,7 +58,7 @@ pub struct ModelConstructionResult {
 #[wasm_bindgen]
 impl ModelConstructionResult {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<ModelConstructionResult, JsValue> {
+	pub fn new(val: &JsValue) -> Result<ModelConstructionResult, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid ModelConstructionResult"))
 	}
 
@@ -86,7 +86,7 @@ pub struct AltitudeGradientPair {
 #[wasm_bindgen]
 impl AltitudeGradientPair {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<AltitudeGradientPair, JsValue> {
+	pub fn new(val: &JsValue) -> Result<AltitudeGradientPair, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid AltitudeGradientPair"))
 	}
 
@@ -339,7 +339,7 @@ impl ModelConstructionApi {
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
-			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
+			gltf: generate_gltf(&final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
 			craters: lava_craters,
 		})

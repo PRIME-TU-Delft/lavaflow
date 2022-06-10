@@ -8,12 +8,12 @@ use miette::{miette, Result};
 
 // TODO: I'm not a big fan of the error handing in this function. It's a very long function, with loads of things that can throw an error, with varying consequences. For a future refactor, it would be good to split this into several different functions that each have their own error handling.
 
-/// Extension of the LevelCurveSet class
+/// Extension of the `LevelCurveSet` class
 impl LevelCurveSet {
-	/// Method: local_tin_interpolate
+	/// Method: `local_tin_interpolate`
 	///
 	/// # Arguments
-	/// * 'self': The LevelCurveSet instance to apply this method to
+	/// * 'self': The `LevelCurveSet` instance to apply this method to
 	/// * 'p':    The Point to interpolate
 	pub fn local_tin_interpolate(&self, p: &Point) -> Result<f32> {
 		// If this set contains less than two level-curves, interpolation is not possible. Return 'p.z'

@@ -26,7 +26,7 @@ impl<'a> Smoother<'a> {
 	/// After this is completed, create a `Smoother` instance and use it to run specialised smoothing.
 	///
 	/// ### Parameters
-	/// - `model_constructor`: Instance of a ModelConstructor, as a mutable reference with lifetime specifier.
+	/// - `model_constructor`: Instance of a `ModelConstructor`, as a mutable reference with lifetime specifier.
 	pub fn new(model_constructor: &'a mut ModelConstructor) -> Result<Self> {
 		// Construct the list of point-indices per layer.
 		// Construct the list of booleans, specifying whether a layer is a mountain-top.
@@ -36,7 +36,7 @@ impl<'a> Smoother<'a> {
 		let mut altitude_of_layer: Vec<f32> = Vec::new();
 
 		// Initialize the lists, by pushing empty lists for every level curve
-		for _ in 0..model_constructor.level_curve_map.level_curves.len() + 1 {
+		for _ in 0..=model_constructor.level_curve_map.level_curves.len() {
 			point_indices_per_layer.push(Vec::new());
 			layer_is_top.push(false);
 			altitude_of_layer.push(0.0);
@@ -155,7 +155,7 @@ impl<'a> Smoother<'a> {
 		}
 
 		// Initialize the array of altitude-groups, by computing how many layers we will have
-		for _i in 0..((f32::round(max_altitude / model_constructor.level_curve_map.altitude_step) as usize) + 1) {
+		for _i in 0..=(f32::round(max_altitude / model_constructor.level_curve_map.altitude_step) as usize) {
 			altitude_groups.push(Vec::new());
 		}
 

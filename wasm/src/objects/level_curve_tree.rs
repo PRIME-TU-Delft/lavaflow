@@ -31,7 +31,7 @@ impl<'a> LevelCurveTree<'a> {
 	// CONSTRUCTORS
 	//
 
-	/// Dynamic constructor: From OpenCV datastructure
+	/// Dynamic constructor: From `OpenCV` datastructure
 	pub fn from_open_cv(pixels_per_curve: &'a Vec<Vec<(u64, u64)>>, parent_relations: &'a Vec<Option<usize>>) -> Self {
 		let mut own_index = 0;
 
