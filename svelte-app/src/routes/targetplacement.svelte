@@ -18,6 +18,7 @@
 
 	function addTarget(x: number, y: number) {
 		const newTarget = new Draggable(x, y, 20);
+		newTarget.enableSelection();
 		targetLocations.add(newTarget);
 	}
 
@@ -32,7 +33,7 @@
 	});
 </script>
 
-<Page title="image transformation" let:foregroundHeight let:foregroundWidth>
+<Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="demo" back>Back to visualise</NavigationButton>
 
 	<div slot="background" style="background:#aaa;"></div>
@@ -49,11 +50,11 @@
 		{#if $contourLines}
 			{#if targetSelected != -1}
 				<Button secondary icon={mdiTrashCan} on:click={removeTarget}>
-					Remove target #{targetSelected}
+					Remove steam turbine #{targetSelected}
 				</Button>
 			{/if}
 			<Button icon={mdiPin} on:click={() => addTarget(foregroundWidth / 2, foregroundHeight / 2)}>
-				Add target
+				Add steam turbine
 			</Button>
 		{/if}
 	</div>

@@ -21,7 +21,7 @@
 	let cameraOptions: MediaDeviceInfo[] = [];
 	let canvas: HTMLCanvasElement;
 	let loadingNextPage: boolean = false;
-	$: title = instructionVisible ? 'Instructions' : 'Map Scanning';
+	$: title = instructionVisible ? 'Instructions' : 'Capture the image';
 
 	const toggleInstuction = () => (instructionVisible = !instructionVisible);
 

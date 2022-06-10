@@ -33,7 +33,7 @@
 	});
 </script>
 
-<Page title="image transformation">
+<Page title="Result of transformation">
 	<NavigationButton slot="headerButton" to="/scan/maptransform" back>
 		Redraw borders
 	</NavigationButton>
