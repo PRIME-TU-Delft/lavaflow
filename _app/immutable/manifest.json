@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-fe5d6a19.js",
+    "file": "start-f8255ff6.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -41,7 +41,7 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-91580e4c.js",
+    "file": "pages/demo.svelte-7d8cd7f1.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -49,7 +49,7 @@
       "_index-9cd2e54e.js",
       "_NavigationButton-b6d3fe29.js",
       "_contourLineStore-d37fb8d9.js",
-      "_gltfStore-4583681c.js",
+      "_gltfStore-d7ea6e79.js",
       "_draggable-09cd7880.js",
       "_Button-5d6b26fc.js",
       "_index-6c269418.js"
@@ -115,7 +115,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-55cefced.js",
+    "file": "pages/scan/preview.svelte-1b0e4eb9.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -126,7 +126,7 @@
       "_NavigationButton-b6d3fe29.js",
       "_contourLineStore-d37fb8d9.js",
       "_navigation-0e6511d1.js",
-      "_gltfStore-4583681c.js",
+      "_gltfStore-d7ea6e79.js",
       "_debugStore-c65327f7.js",
       "_P5-ccea3d7d.js",
       "_index-6c269418.js",
@@ -138,7 +138,7 @@
     ]
   },
   "src/routes/targetplacement.svelte": {
-    "file": "pages/targetplacement.svelte-4a28267f.js",
+    "file": "pages/targetplacement.svelte-dfe2d2a5.js",
     "src": "src/routes/targetplacement.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -147,7 +147,7 @@
       "_Button-5d6b26fc.js",
       "_NavigationButton-b6d3fe29.js",
       "_P5-ccea3d7d.js",
-      "_gltfStore-4583681c.js",
+      "_gltfStore-d7ea6e79.js",
       "_Page-646f45ef.js",
       "_contourLineStore-d37fb8d9.js",
       "_draggable-09cd7880.js",
@@ -195,8 +195,8 @@
       "_index-6c269418.js"
     ]
   },
-  "_gltfStore-4583681c.js": {
-    "file": "chunks/gltfStore-4583681c.js",
+  "_gltfStore-d7ea6e79.js": {
+    "file": "chunks/gltfStore-d7ea6e79.js",
     "imports": [
       "_index-6c269418.js"
     ]
