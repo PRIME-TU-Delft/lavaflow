@@ -445,7 +445,7 @@
 		</div>
 
 		<div class="button placeTargets">
-			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+			<NavigationButton to="/targetplacement">Place steam turbines</NavigationButton>
 		</div>
 
 		<a-entity light="color: #ddf; intensity: 1.5" position="-1 1 0" />
@@ -458,13 +458,13 @@
 				{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20)) ) as altAndGrad}
 					<a-cylinder
 						radius="3"
-						height={altAndGrad.altitude / 2}
+						height=1
 						position="
 						{altAndGrad.x} 
-						{altAndGrad.altitude / 2} 
+						{altAndGrad.altitude} 
 						{altAndGrad.y}"
 						color="#ff4025"
-						scale="1 2 1"
+						scale="1 1 1"
 					/>
 				{/each}
 

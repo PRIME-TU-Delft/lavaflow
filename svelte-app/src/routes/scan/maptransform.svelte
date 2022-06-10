@@ -77,7 +77,7 @@
 	});
 </script>
 
-<Page title="Image transformation" let:foregroundHeight let:foregroundWidth>
+<Page title="Select the level curves" let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="/scan/mapscanning" back>Rescan image</NavigationButton>
 
 	<div slot="background">
