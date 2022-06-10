@@ -9,6 +9,7 @@
 	import Page from '$lib/components/Page.svelte';
 
 	import { perspectiveImage, demoPerspectiveImage } from '$lib/stores/imageStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import { targetLocations } from '$lib/stores/gltfStore';
 	import Draggable from '$lib/data/draggable';
 
@@ -42,7 +43,7 @@
 
 	{#if $perspectiveImage}
 		<div class="sketch">
-			<P5TargetPlacement bind:targetSelected {foregroundHeight} {foregroundWidth} />
+			<P5TargetPlacement bind:targetSelected {foregroundHeight} {foregroundWidth} curves={$contourLines.curves} />
 		</div>
 	{:else}
 		<NavigationButton to="/scan/mapscanning">No image found. Go to map scanning</NavigationButton>
