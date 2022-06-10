@@ -83,6 +83,25 @@ impl Raster {
 		(f32::floor(y / self.row_height) as usize, f32::floor(x / self.column_width) as usize)
 	}
 
+	///##Instance Method
+	/// Get the highest occurring altitude in a raster
+	pub fn get_highest_altitude(&self) -> &f32 {
+		let mut max = &f32::MIN;
+		for row in &self.altitudes {
+			for height in row {
+				match height {
+					Some(x) => {
+						if x > max {
+							max = x;
+						}
+					}
+					None => (),
+				}
+			}
+		}
+		max
+	}
+
 	/// ## Instance Method
 	/// Normalise the dimensions of this mountain, while maintaining all altitude-information.
 	///
@@ -141,7 +160,7 @@ impl Raster {
 
 	/// ## Private Static Method
 	/// Map an Option<f32> value to a new range, return None if the input is None.
-	fn map(val: Option<f32>, from_min: f32, from_max: f32, to_min: f32, to_max: f32) -> Option<f32> {
+	pub fn map(val: Option<f32>, from_min: f32, from_max: f32, to_min: f32, to_max: f32) -> Option<f32> {
 		// If this value is None, return None
 		if val.is_none() {
 			None

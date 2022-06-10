@@ -25,6 +25,8 @@ export interface AltitudeGradientPair {
 	gradient: [number, number, number];
 }
 
+export const lavapaths = writable<[number, number, number][][]>([])
+
 /**
  * Factory for creating a target store
  * @returns target store with method subscribe, add and remove
@@ -100,6 +102,7 @@ function createGltfStore() {
 			api = new wasm.ModelConstructionApi();
 			api.base(tree, 5);
 			api.set_basic_parameters(50, 50, curveTree.size.width, curveTree.size.height);
+			api.set_lava_path_parameters(20, 0.02);
 			api.set_svc_parameters(50);
 			api.correct_for_altitude_constraints_to_all_layers();
 			api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
@@ -112,6 +115,10 @@ function createGltfStore() {
 			// Call the wasm api to build the model
 			model = api.build().to_js() as Model;
 			model.gltf_url = gltfStringToUrl(model.gltf);
+
+			//set lava path
+			lavapaths.set(model.lava_paths);
+			console.log(model.lava_paths);
 
 			// set the gltf store to the gltf string
 			set(model);

@@ -20,7 +20,7 @@
 	let canvas: HTMLCanvasElement;
 	let loadingNextPage: boolean = false;
 	let deviceId: string;
-	$: title = instructionVisible ? 'Instructions' : 'Map Scanning';
+	$: title = instructionVisible ? 'Instructions' : 'Capture the image';
 
 	const toggleInstuction = () => (instructionVisible = !instructionVisible);
 

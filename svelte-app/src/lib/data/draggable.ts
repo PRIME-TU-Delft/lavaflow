@@ -4,6 +4,7 @@ const STROKE_WIDTH = 4;
 
 export default class Draggable {
 	dragging: boolean = false;
+	enable_selection: boolean = false;
 	last_selected: boolean = true;
 	drag_translated: boolean = false;
 	too_close_to_crater: boolean = false;
@@ -33,6 +34,20 @@ export default class Draggable {
 		this.old_x = x;
 		this.old_y = y;
 		this.size = size;
+	}
+
+	/**
+	 * Set the selection to enabled
+	 */
+	enableSelection() {
+		this.enable_selection = true;
+	}
+
+	/**
+	 * Set the selection to disabled
+	 */
+	disableSelection() {
+		this.enable_selection = false;
 	}
 
 	/**
@@ -182,7 +197,7 @@ export default class Draggable {
 		p5.fill(255);
 
 		// Draw a different color if this is the selected point
-		if (this.last_selected) {
+		if (this.enable_selection && this.last_selected) {
 			p5.fill(0, 140, 220);
 		}
 
@@ -220,11 +235,11 @@ export default class Draggable {
 		// corners in order: bottom left corner, bottom right corner, top corner in the center
 		p5.triangle(
 			this.x - markerSize/2,
-			this.y - markerSize/2,
+			this.y + markerSize/2,
 			this.x + markerSize/2,
-			this.y - markerSize/2,
+			this.y + markerSize/2,
 			this.x,
-			this.y + markerSize/2
+			this.y - markerSize/2
 		);
 
 		this.translateBackAfterDragging();

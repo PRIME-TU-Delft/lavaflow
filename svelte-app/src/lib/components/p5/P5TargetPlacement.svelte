@@ -27,7 +27,7 @@
 
 			curves.forEach((layer, index) => {
 				// Display the level-curves to the user
-				p5.strokeWeight(3);
+				p5.strokeWeight(4);
 				p5.noFill();
 				p5.beginShape();
 				for (let curvesPair of layer) {
