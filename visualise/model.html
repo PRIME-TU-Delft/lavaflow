@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="../favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<style>
+			body {
+				background: #1a1717;
+				color: white;
+				padding: 0;
+				margin: 0 !important;
+				box-sizing: border-box;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
+					Cantarell, 'Helvetica Neue', sans-serif;
+			}
+
+			body > div {
+				height: var(--vh);
+			}
+
+			:root {
+				--primary-color: rgb(225 95 85 / 90%);
+				--secondary-color: rgb(144 53 44 / 90%);
+				--text-color: rgba(94, 14, 14, 100%);
+				--text-color-secondary: rgb(230 223 223);
+			}
+		</style>
+
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+
+		<meta http-equiv="content-security-policy" content="">
+	<link rel="modulepreload" href="/_app/immutable/start-2a851992.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-dda06473.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-f56ba691.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-60cab3ee.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/singletons-d1fb5791.js">
+	</head>
+	<body>
+		<div>
+		<script type="module" data-sveltekit-hydrate="45h">
+		import { start } from "/_app/immutable/start-2a851992.js";
+		start({
+			target: document.querySelector('[data-sveltekit-hydrate="45h"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: true,
+			trailing_slash: "never",
+			hydrate: null
+		});
+	</script></div>
+	</body>
+</html>
