@@ -459,7 +459,7 @@
 					<a-cylinder
 						radius="3"
 						height=1
-						position="\
+						position="
 						{altAndGrad.x} 
 						{altAndGrad.altitude} 
 						{altAndGrad.y}"
