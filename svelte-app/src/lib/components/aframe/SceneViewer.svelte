@@ -5,13 +5,7 @@
 	export let arMode = false;
 </script>
 
-<a-scene
-	class:arMode
-	renderer="logarithmicDepthBuffer: true;"
-	arjs="trackingMethod: best; sourceType: webcam;debugUIEnabled: false;"
-	embedded
-	vr-mode-ui="enabled: false"
->
+<a-scene class:arMode renderer="logarithmicDepthBuffer: true;" embedded vr-mode-ui="enabled: false">
 	<div class="button backButton">
 		<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
 	</div>

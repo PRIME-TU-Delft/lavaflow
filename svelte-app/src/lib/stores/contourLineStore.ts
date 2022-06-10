@@ -20,6 +20,9 @@ function contourLineStore() {
 		subscribe,
 		set: (contours: CurveTree) => {
 			console.log('set contours in store', contours);
+			console.log(new Blob([contours.curves.toString()]).size);
+			// TODO: store this in cache
+
 			set(contours);
 		}
 	};

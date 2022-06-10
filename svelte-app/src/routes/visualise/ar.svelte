@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
+	import ArSandBox from '$lib/components/aframe/ArSandBox.svelte';
 
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -10,10 +10,13 @@
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
-	let ARLoaded = false;
+	function loadAr(e: Event) {
+		const target = (e.target as HTMLIFrameElement)?.contentDocument?.body;
 
-	function loadAr() {
-		ARLoaded = true;
+		console.log(target);
+		if (!target) return;
+
+		new ArSandBox({ target, props: { gltfStore } });
 	}
 
 	onMount(async () => {
@@ -35,14 +38,4 @@
 	});
 </script>
 
-<svelte:head>
-	<script
-		src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"
-		on:load={loadAr}></script>
-</svelte:head>
-
-{#if ARLoaded}
-	<SceneViewer arMode />
-{:else}
-	<h1>Loading</h1>
-{/if}
+<iframe title="arjs sanbox" on:load={loadAr} />
