@@ -1,5 +1,10 @@
 import cv, { type MatVector, type Mat } from 'opencv-ts';
 
+export const UnitTestExport = {
+	getLevels,
+	removeDoubleContours
+};
+
 export type ContourTree = [number[][], number[]];
 export type ContourTreeObject = {
 	curves: number[][];
