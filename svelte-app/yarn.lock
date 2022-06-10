@@ -2,6 +2,23 @@
 # yarn lockfile v1
 
 
+"@ar-js-org/ar.js@^3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@ar-js-org/ar.js/-/ar.js-3.4.0.tgz#43118de417a15a701a58afcbf34af4dddfc691d1"
+  integrity sha512-zAd+cn7oK7YvX9gatX3Kfdmx4AxWXCHl1WOeOnqd4cvzWAg5dLQGnbkNi2Ni27fOC2nfmaHOdYfpDM3Ba3Unfw==
+  dependencies:
+    "@ar-js-org/artoolkit5-js" "^0.1.3"
+    aframe "^1.0.4"
+    three "^0.133.0"
+
+"@ar-js-org/artoolkit5-js@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@ar-js-org/artoolkit5-js/-/artoolkit5-js-0.1.3.tgz#24c2159aef47f183eea004b0f3fe71345ba7f70e"
+  integrity sha512-VMaWxlM5RTftZjXeZ6PRExhec1DFySHy6IprhBeGHPIg8lJO27FwxaHqwWvY050ANjFZEGRhgjvEjaXEmEi76Q==
+  dependencies:
+    "@babel/runtime" "^7.17.2"
+    axios "^0.26.0"
+
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"
@@ -1008,7 +1025,7 @@ aframe-extras@^6.1.1:
   dependencies:
     three-pathfinding "^0.7.0"
 
-aframe@^1.3.0:
+aframe@^1.0.4, aframe@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/aframe/-/aframe-1.3.0.tgz#bafd544d6eca6542a38e56a13ae8b86d325cce8a"
   integrity sha512-f6OQaDf49SzdSxVskJPvPWldOwHpYMsGttmQHhU6FRiASsnyULKG1nqZom9pDuS3fFYEzQVqRMakQ2AhXeLkFg==
@@ -1266,6 +1283,13 @@ babel-preset-jest@^28.1.1:
   dependencies:
     babel-plugin-jest-hoist "^28.1.1"
     babel-preset-current-node-syntax "^1.0.0"
+
+axios@^0.26.0:
+  version "0.26.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.26.1.tgz#1ede41c51fcf51bbbd6fd43669caaa4f0495aaa9"
+  integrity sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==
+  dependencies:
+    follow-redirects "^1.14.8"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -2203,6 +2227,11 @@ flatten-vertex-data@^1.0.0:
   integrity sha512-BvCBFK2NZqerFTdMDgqfHBwxYWnxeCkwONsw6PvBMcUXqo8U/KDWwmXhqx1x2kLIg7DqIsJfOaJFOmlua3Lxuw==
   dependencies:
     dtype "^2.0.0"
+
+follow-redirects@^1.14.8:
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
 forever-agent@~0.6.1:
   version "0.6.1"
@@ -4243,6 +4272,11 @@ redent@^3.0.0:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
 
+regenerator-runtime@^0.13.4:
+  version "0.13.9"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.9.tgz#8925742a98ffd90814988d7566ad30ca3b263b52"
+  integrity sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==
+
 regexparam@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/regexparam/-/regexparam-2.0.0.tgz#059476767d5f5f87f735fc7922d133fd1a118c8c"
@@ -4855,6 +4889,11 @@ throat@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/throat/-/throat-6.0.1.tgz#d514fedad95740c12c2d7fc70ea863eb51ade375"
   integrity sha512-8hmiGIJMDlwjg7dlJ4yKGLK8EsYqKgPWbG3b4wjJddKNwc7N7Dpn08Df4szr/sZdMVeOstrdYSsqzX6BYbcB+w==
+
+three@^0.133.0:
+  version "0.133.1"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.133.1.tgz#5606f4817d67a09d9212d4ccbd6826564774f8f4"
+  integrity sha512-WydohO8ll949B0FTD6MGz59Yv2Lwj8hvObg/0Heh2r42S6+tQC1WByfCNRdmG4D7+odfGod+n8JPV1I2xrboWw==
 
 timed-out@^4.0.1:
   version "4.0.1"

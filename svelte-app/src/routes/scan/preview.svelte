@@ -18,10 +18,6 @@
 
 	let gltfLoaded = false;
 
-	function gotoVisualise() {
-		goto('/demo');
-	}
-
 	onMount(async () => {
 		if (!$contourLines.curves || !$contourLines.hierarchy) {
 			return goto('/scan/mapscanning');
@@ -53,8 +49,12 @@
 	{/if}
 
 	<div slot="footer">
-		<Button loading={!gltfLoaded} on:click={gotoVisualise}>
-			<span>Visualise</span>
+		<!-- TODO: add icons to buttons -->
+		<Button secondary loading={!gltfLoaded} on:click={() => goto('/visualise/model')}>
+			<span>Visualise as model</span>
+		</Button>
+		<Button loading={!gltfLoaded} on:click={() => goto('/visualise/ar')}>
+			<span>Visualise in AR</span>
 		</Button>
 	</div>
 </Page>
