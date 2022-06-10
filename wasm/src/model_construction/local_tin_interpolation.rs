@@ -6,6 +6,8 @@ use miette::{miette, Result};
 // 	level_curves: Vec<LevelCurve>,
 // }
 
+// TODO: I'm not a big fan of the error handing in this function. It's a very long function, with loads of things that can throw an error, with varying consequences. For a future refactor, it would be good to split this into several different functions that each have their own error handling.
+
 /// Extension of the LevelCurveSet class
 impl LevelCurveSet {
 	/// Method: local_tin_interpolate
@@ -15,8 +17,8 @@ impl LevelCurveSet {
 	/// * 'p':    The Point to interpolate
 	pub fn local_tin_interpolate(&self, p: &Point) -> Result<f32> {
 		// If this set contains less than two level-curves, interpolation is not possible. Return 'p.z'
-		if self.level_curves.is_empty() {
-			return Ok(p.z);
+		if self.level_curves.len() < 2 {
+			return Err(miette!("Set contains less than two level curves"));
 		}
 
 		//
@@ -57,7 +59,7 @@ impl LevelCurveSet {
 
 		// Additional checking constraint: if one of these level-curves has no points, return 'p.z'
 		if points_closest_0.is_empty() || points_closest_1.is_empty() {
-			return Ok(p.z);
+			return Err(miette!("One of the closest two level curves has no points"));
 		}
 
 		// Create a vector of triangles (which are triples)
@@ -142,7 +144,7 @@ impl LevelCurveSet {
 
 		// Check: If the list of triangles is empty, return 'p.z'
 		if triangles.is_empty() {
-			return Ok(p.z);
+			return Err(miette!("List of interpolation triangles is empty"));
 		}
 
 		let mut triangle_around_p: &Triangle = &triangles[0];
