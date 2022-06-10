@@ -1,9 +1,11 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
-	import { mdiChevronLeft } from '@mdi/js';
+	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
+
+	import '@ar-js-org/ar.js';
 </script>
 
 <!-- Load scene in arMode -->
@@ -17,7 +19,13 @@
 		</div>
 
 		<div class="button placeTargets">
-			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+			<a sveltekit:reload href="/targetplacement">
+				<Button>
+					<span>Place targets</span>
+
+					<Icon path={mdiChevronRight} />
+				</Button>
+			</a>
 		</div>
 	</div>
 </SceneViewer>
