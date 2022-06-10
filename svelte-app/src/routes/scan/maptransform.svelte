@@ -12,7 +12,7 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
 	import type Draggable from '$lib/data/draggable';
-	import { rawImage, perspectiveImage } from '$lib/stores/imageStore';
+	import { rawImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import removePerspective from '$lib/opencv/removePerspective';
@@ -35,11 +35,11 @@
 			markerCoords.push(p.x - p.offsetX);
 			markerCoords.push(p.y - p.offsetY);
 		}
-		
+
 		// Apply the perspective transformation using the selected marker coords
 		const result = removePerspective(mat, markerCoords, width, height);
 
-		try{
+		try {
 			// Set contour line store to the detected contour lines with hirarchy
 			const { curves, hierarchy } = getCurves(result);
 
@@ -62,17 +62,13 @@
 
 			cv.imshow('canvasOutput', result);
 
-			// set the output image to a store
-			perspectiveImage.set(outputCanvas.toDataURL());
-
 			goto('/scan/preview');
-		}catch(message){
+		} catch (message) {
 			alert(message);
 		}
 
 		result.delete();
 		mat.delete();
-
 	}
 
 	onMount(() => {
