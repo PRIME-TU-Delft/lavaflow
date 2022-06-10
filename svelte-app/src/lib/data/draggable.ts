@@ -40,7 +40,7 @@ export default class Draggable {
 	 *
 	 * @param p5 Instance of a p5 sketch
 	 */
-	update(p5: p5, avoid_craters?: [number, number][], crater_distance?: number, avoid_targets?: [number, number][], target_distance?: number, index?: number) {
+	update(p5: p5, avoid_craters?: [number, number][], crater_distance?: number, avoid_targets?: Draggable[], target_distance?: number, index?: number) {
 		if (!this.dragging) return;
 
 		if (p5.mouseX <= 0 || p5.mouseY <= 0) return;
@@ -76,8 +76,8 @@ export default class Draggable {
 					continue;
 				}
 
-				let dx = avoid_targets[i][0] - this.x;
-				let dy = avoid_targets[i][1] - this.y;
+				let dx = avoid_targets[i].x - this.x;
+				let dy = avoid_targets[i].y - this.y;
 				let dist = Math.sqrt(dx*dx + dy*dy);
 				if (dist <= target_distance) {
 					this.too_close_to_other_target = true;
