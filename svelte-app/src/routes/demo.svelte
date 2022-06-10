@@ -300,7 +300,8 @@
 		}
 	});
 
-	AFRAME.registerPrimitive('a-draw-curve', {
+	if(!AFRAME.primitives.primitives['a-draw-curve']){
+		AFRAME.registerPrimitive('a-draw-curve', {
 		defaultComponents: {
 			'draw-curve': {}
 		},
@@ -308,14 +309,18 @@
 			curveref: 'draw-curve.curve'
 		}
 	});
+  } 
 
+  if(!AFRAME.primitives.primitives['a-curve-point']){
 	AFRAME.registerPrimitive('a-curve-point', {
 		defaultComponents: {
 			'curve-point': {}
 		},
 		mappings: {}
 	});
+}
 
+if(!AFRAME.primitives.primitives['a-curve']){
 	AFRAME.registerPrimitive('a-curve', {
 		defaultComponents: {
 			curve: {}
@@ -325,6 +330,9 @@
 			type: 'curve.type'
 		}
 	});
+}
+
+
 
 	AFRAME.registerComponent('lava-path', {
 		init: function () {
