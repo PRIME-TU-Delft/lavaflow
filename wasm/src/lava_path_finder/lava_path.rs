@@ -40,7 +40,6 @@ impl<'a> LavaPathSet<'a> {
 	///
 	fn get_lava_path(&mut self, start_index: usize, length: usize, fork_val: f32, min_altitude: f32, vs: &'a [Point], es: &'a Vec<Vec<usize>>) -> Result<(), String> {
 		let mut path = Vec::with_capacity(length);
-
 		let start_point = vs.get(start_index).ok_or_else(|| String::from("start point for lava does not exist in point list"))?;
 		path.push(start_point);
 
@@ -57,10 +56,12 @@ impl<'a> LavaPathSet<'a> {
 			}
 
 			//per neighbor calculate gradient and find maximum
+			//max = max of nieghbors of cur
+			//max_g = gradient of max
 			let mut max = cur;
 			let mut max_g = f32::MIN;
 
-			//keep track of next best for forking
+			//keep track of next best in case of forking
 			let mut second_best = cur;
 			let mut second_best_g = f32::MIN;
 
@@ -75,8 +76,8 @@ impl<'a> LavaPathSet<'a> {
 				}
 			}
 
-			//break loop if next point has low altitude (avoid path going to edge of map)
-			if max.1.z <= min_altitude {
+			//break loop if next point has low altitude (avoid path going to edge of map) or is higher than current point
+			if max.1.z <= min_altitude || max.1.z > cur.1.z {
 				break;
 			}
 			//add steepest neighbor to path
@@ -85,6 +86,9 @@ impl<'a> LavaPathSet<'a> {
 			//if diffence is smaller than given value, start another path with half length at second best neighbor
 			if (max_g - second_best_g) < fork_val {
 				self.get_lava_path(second_best.0, length / 2, fork_val, min_altitude, vs, es)?;
+				//add current point to start of new lava path made
+				let mut default: Vec<&Point> = Vec::new();
+				self.all_paths.last_mut().get_or_insert(&mut default).insert(0, cur.1);
 			}
 
 			//mark steepest neighbor as next point
@@ -125,7 +129,7 @@ fn gradient_between_points(from: &Point, to: &Point) -> f32 {
 /// # Return
 /// *  `Result<usize>, String>` - Result of index of start point of lava path.
 ///
-fn get_start(highest_points: &[usize], vs: &[Point], es: &[Vec<usize>]) -> Result<usize, String> {
+fn get_start(highest_points: &[usize], vs: &[Point], edges: &[Vec<usize>]) -> Result<usize, String> {
 	if highest_points.is_empty() {
 		return Err(String::from("lava path: cannot find highest point because no points exist above top contour line."));
 	}
@@ -135,8 +139,7 @@ fn get_start(highest_points: &[usize], vs: &[Point], es: &[Vec<usize>]) -> Resul
 		let mut neighbors: Vec<(usize, &Point)> = Vec::new();
 
 		//per neighbor calculate gradient and find maximum
-
-		for j in &es[*i] {
+		for j in &edges[*i] {
 			neighbors.push((*j, vs.get(*j).ok_or(format!("lava_path: index {i} not found in point list"))?));
 		}
 
@@ -148,6 +151,10 @@ fn get_start(highest_points: &[usize], vs: &[Point], es: &[Vec<usize>]) -> Resul
 				store = (*cur.0, new_g);
 			}
 		}
+		// let point = vs.get(*i).ok_or(format!("lava_path: index {i} not found in point list"))?;
+		// if point.z > store.1 {
+		// 	store = (*i, point.z);
+		// }
 	}
 
 	Ok(store.0)
