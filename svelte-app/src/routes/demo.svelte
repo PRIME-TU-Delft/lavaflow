@@ -354,9 +354,9 @@
 					const p = document.createElement('a-curve-point');
 					//y and z swapped wrt given paths because Aframe uses different axes
 					p.setAttribute('position', {
-						x: scale_x * x + 1,
-						y: scale_y * z - 1,
-						z: scale_z * y - 3
+						x: x,
+						y:  z,
+						z:  y,
 					});
 
 					curve.appendChild(p);
@@ -371,7 +371,7 @@
 					'clone-along-curve',
 					'curve: #track' + j + '; spacing: 0.035; rotation: 90 0 0;'
 				);
-				track.setAttribute('geometry', 'primitive:cylinder; height:0.04; radius:0.04 ;');
+				track.setAttribute('geometry', 'primitive:cylinder; height:0.04; radius:0.5 ;');
 				track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.001');
 				//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
 				const total_time = $lavapaths.length * 2000;
@@ -441,7 +441,7 @@
 </script>
 
 {#if ready}
-	<a-scene lava-path embedded background="color: #ddf">
+	<a-scene  embedded background="color: #ddf">
 		<div class="button backButton">
 			<NavigationButton back to="/scan/mapscanning">Rescan image</NavigationButton>
 		</div>
@@ -455,7 +455,7 @@
 		<a-entity light="type: ambient; color: #fff" />
 
 		{#if $gltfStore}
-			<a-entity position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
+			<a-entity lava-path position="1 -1 -3" scale="0.05 0.025 0.05" rotation="0 -90 0">
 				<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 
 				{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20)) ) as altAndGrad}
