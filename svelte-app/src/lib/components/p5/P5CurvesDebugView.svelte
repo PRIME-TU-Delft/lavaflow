@@ -24,10 +24,11 @@
 				p5.strokeWeight(1);
 				p5.stroke(30);
 				p5.fill(30);
-				if (debugMode) p5.text(`${index} (${hierarchy[index]})`, layer[0][0] - 10, layer[0][1] - 10);
+				if (debugMode)
+					p5.text(`${index} (${hierarchy[index]})`, layer[0][0] - 10, layer[0][1] - 10);
 
 				// Display the level-curves to the user
-				p5.strokeWeight(3);
+				p5.strokeWeight(4);
 				p5.noFill();
 				p5.beginShape();
 				for (let curvesPair of layer) {
