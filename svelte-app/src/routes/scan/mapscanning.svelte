@@ -13,14 +13,13 @@
 	import { mdiCamera, mdiBookOpenVariant } from '@mdi/js';
 	import { goto } from '$app/navigation';
 	import { rawImage } from '$lib/stores/imageStore';
-	import { onMount } from 'svelte';
 
 	let instructionVisible = false;
 	let videoSource: HTMLVideoElement;
 	let cameraSelected: MediaDeviceInfo;
-	let cameraOptions: MediaDeviceInfo[] = [];
 	let canvas: HTMLCanvasElement;
 	let loadingNextPage: boolean = false;
+	let deviceId: string;
 	$: title = instructionVisible ? 'Instructions' : 'Map Scanning';
 
 	const toggleInstuction = () => (instructionVisible = !instructionVisible);
@@ -46,38 +45,12 @@
 		goto('/scan/maptransform');
 	}
 
-	export async function getStream() {
-		const deviceId = cameraSelected
-			? { deviceId: cameraSelected.deviceId }
-			: { facingMode: 'environment' };
-
-		const constraints = {
-			video: deviceId
-		};
-
-		console.log(JSON.stringify(constraints));
-
-		try {
-			const stream = await navigator.mediaDevices.getUserMedia(constraints);
-			videoSource.srcObject = stream;
-			videoSource.play();
-		} catch (error) {
-			console.error('Error:', error);
-		}
+	function updateCamera() {
+		deviceId = cameraSelected.deviceId;
 	}
-
-	onMount(async () => {
-		await getStream();
-		const devices = await navigator.mediaDevices.enumerateDevices();
-		cameraOptions = devices.filter((device) => device.kind == 'videoinput');
-
-		if (cameraOptions?.length) {
-			cameraSelected = cameraOptions[0];
-		}
-	});
 </script>
 
-<VideoStream let:loading let:stream let:error>
+<VideoStream {deviceId} let:loading let:stream let:error let:cameraOptions>
 	<Page fullscreen={!loading} {title} closeButton={instructionVisible} on:close={toggleInstuction}>
 		<div slot="background">
 			<Video {loading} {stream} />
@@ -85,7 +58,13 @@
 
 		<div slot="options">
 			{#if !instructionVisible && cameraOptions?.length > 1}
-				<Dropdown value={cameraSelected} options={cameraOptions} let:option let:index>
+				<Dropdown
+					bind:value={cameraSelected}
+					options={cameraOptions}
+					let:option
+					let:index
+					on:change={updateCamera}
+				>
 					{option.label || 'Camera ' + (index + 1)}
 				</Dropdown>
 			{/if}
