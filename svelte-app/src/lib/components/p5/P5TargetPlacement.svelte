@@ -49,7 +49,7 @@
 			if ($targetLocations?.length) {
 				for (let i = 0; i < $targetLocations.length; i++) {
 					let target = $targetLocations[i];
-					target.update(p5, $gltfStore.craters, 75);
+					target.update(p5, $gltfStore.craters, 75, $targetLocations, 50, i);
 					target.drawCircle(p5, markerSize, i);
 				}
 			}
