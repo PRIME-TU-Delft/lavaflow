@@ -28,19 +28,21 @@
 		targetSelected = -1;
 	}
 
-	onMount(() => {
-		
-	});
+	onMount(() => {});
 </script>
 
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
-	<NavigationButton slot="headerButton" to="demo" back>Back to visualise</NavigationButton>
 
-	<div slot="background" style="background:#aaa;"></div>
+	<div slot="background" style="background:#aaa;" />
 
 	{#if $contourLines}
 		<div class="sketch">
-			<P5TargetPlacement bind:targetSelected {foregroundHeight} {foregroundWidth} curves={$contourLines.curves} />
+			<P5TargetPlacement
+				bind:targetSelected
+				{foregroundHeight}
+				{foregroundWidth}
+				curves={$contourLines.curves}
+			/>
 		</div>
 	{:else}
 		<NavigationButton to="/scan/mapscanning">No image found. Go to map scanning</NavigationButton>

@@ -2,25 +2,24 @@
 	/**
 	 * This is where the user inspects the level curves that are drawn, to check if the user wants to rescan the image or not
 	 */
+	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import Page from '$lib/components/Page.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
-	import { contourLines } from '$lib/stores/contourLineStore';
+	import { mdiChevronRight } from '@mdi/js';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+
+	import { contourLines } from '$lib/stores/contourLineStore';
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { debugMode } from '$lib/stores/debugStore';
-	import P5CurvesDebugView from '$lib/components/p5/P5CurvesDebugView.svelte';
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
 
 	let gltfLoaded = false;
-
-	function gotoVisualise() {
-		goto('/demo');
-	}
 
 	onMount(async () => {
 		if (!$contourLines.curves || !$contourLines.hierarchy) {
@@ -38,7 +37,7 @@
 		Redraw borders
 	</NavigationButton>
 
-	<div slot="background" style="background:#aaa;"></div>
+	<div slot="background" style="background:#aaa;" />
 
 	{#if $contourLines?.curves && $contourLines?.hierarchy}
 		<div class="sketch" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
@@ -53,8 +52,13 @@
 	{/if}
 
 	<div slot="footer">
-		<Button loading={!gltfLoaded} on:click={gotoVisualise}>
-			<span>Visualise</span>
+		<Button secondary loading={!gltfLoaded} on:click={() => goto('/visualise/model')}>
+			<span>Visualise as model</span>
+			<Icon path={mdiChevronRight} />
+		</Button>
+		<Button loading={!gltfLoaded} on:click={() => goto('/visualise/ar')}>
+			<span>Visualise in AR</span>
+			<Icon path={mdiChevronRight} />
 		</Button>
 	</div>
 </Page>

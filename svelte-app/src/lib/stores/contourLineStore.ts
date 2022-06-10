@@ -15,12 +15,23 @@ export type CurveTree = {
 
 function contourLineStore() {
 	const { subscribe, set } = writable<CurveTree>();
+	let setup = false;
+
+	if (!setup && typeof window !== 'undefined') {
+		const localContourLines = localStorage?.getItem('contourlines');
+		if (localContourLines) {
+			set(JSON.parse(localContourLines) as CurveTree);
+			setup = true;
+		}
+	}
 
 	return {
 		subscribe,
-		set: (contours: CurveTree) => {
-			console.log('set contours in store', contours);
-			set(contours);
+		set: (curveTree: CurveTree) => {
+			localStorage.setItem('contourlines', JSON.stringify(curveTree));
+
+			set(curveTree);
+			setup = true;
 		}
 	};
 }
