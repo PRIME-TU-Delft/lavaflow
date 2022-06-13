@@ -113,10 +113,10 @@ impl Raster {
 	/// After having performed all these operations, the volcano will fit exactly in a cube of 100.0 x 100.0 x 100.0.
 	///
 	/// This method changes the state of the raster and returns void.
-	pub fn normalise(&mut self) -> Result<()> {
+	pub fn normalise(&mut self, x: f32, y: f32, z: f32) -> Result<()> {
 		// Set the width and height to 100.0 by 100.0
-		self.row_height = 100.0 / (self.rows as f32);
-		self.column_width = 100.0 / (self.columns as f32);
+		self.row_height = y / (self.rows as f32);
+		self.column_width = x / (self.columns as f32);
 
 		// If this raster does not contain any information (aka self.altitudes is empty or not defined), throw an error
 		if self.altitudes.is_empty() || self.altitudes[0].is_empty() {
@@ -148,7 +148,7 @@ impl Raster {
 			updated_altitudes.push(Vec::new());
 			for (col, _) in self.altitudes[row].iter().enumerate() {
 				updated_altitudes[row].push(None);
-				updated_altitudes[row][col] = Raster::map(self.altitudes[row][col], min_max.0, min_max.1, 0.0, 100.0);
+				updated_altitudes[row][col] = Raster::map(self.altitudes[row][col], min_max.0, min_max.1, 0.0, z);
 			}
 		}
 
