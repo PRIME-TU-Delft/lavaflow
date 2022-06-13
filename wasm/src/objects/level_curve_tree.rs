@@ -196,6 +196,11 @@ impl<'a> LevelCurveTree<'a> {
 			}
 		}
 
+		// If self doesn't have any children, current_level_curve must be a mountain-top. Update the administration
+		if self.get_children().is_empty() {
+			current_level_curve.is_mountain_top = true;
+		}
+
 		result.add_level_curve(current_level_curve);
 
 		// if there are no children to traverse return current set

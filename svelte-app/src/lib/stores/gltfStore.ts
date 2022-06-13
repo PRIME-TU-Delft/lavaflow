@@ -101,14 +101,18 @@ function createGltfStore() {
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
 			api.base(tree, 5);
-			api.set_basic_parameters(50, 50, curveTree.size.width, curveTree.size.height);
+			api.set_basic_parameters(45, 45, curveTree.size.width, curveTree.size.height);
 			api.set_lava_path_parameters(20, 0.02);
 			api.set_svc_parameters(50);
-			api.correct_for_altitude_constraints_to_all_layers();
-			api.apply_smooth_to_layer(0, 0.7, 4, 10, false);
-			api.apply_smooth_to_middle_layers(0.7, 4, 10, false);
-			api.increase_altitude_for_mountain_tops(1, false);
-			api.apply_smooth_to_mountain_tops(0.3, 5, 10, false);
+
+			// Increase the altitude of the mountain tops and smooth them
+			api.increase_altitude_for_mountain_tops(2, false);
+			api.apply_smooth_to_mountain_tops(1, 5, 3, false);
+
+			// Smooth the middle layers
+			api.apply_smooth_to_middle_layers(0.7, 3, 5, false);
+
+			// Apply Catmull Clark
 			api.set_catmull_clark_parameters(1);
 		},
 		build: () => {
