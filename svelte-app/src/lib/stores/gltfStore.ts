@@ -100,7 +100,7 @@ function createGltfStore() {
 
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
-			api.base(tree, 0);
+			api.base(tree, 5);
 			api.set_basic_parameters(45, 45, curveTree.size.width, curveTree.size.height);
 			api.set_lava_path_parameters(20, 0.02);
 			api.set_svc_parameters(50);
