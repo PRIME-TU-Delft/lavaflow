@@ -1,0 +1,1 @@
+import{w as s}from"./index-082afcc0.js";function r(){const{subscribe:n,set:e}=s();let o=!1;if(!o&&typeof window!="undefined"){const t=localStorage==null?void 0:localStorage.getItem("contourlines");t&&(e(JSON.parse(t)),o=!0)}return{subscribe:n,set:t=>{localStorage.setItem("contourlines",JSON.stringify(t)),e(t),o=!0}}}const c=r();export{c};
