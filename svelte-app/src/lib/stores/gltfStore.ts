@@ -7,40 +7,88 @@
 
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
-import type Draggable from '$lib/data/draggable';
+import Draggable from '$lib/data/draggable';
 
 import init, * as wasm from 'wasm';
 
+type Vec2 = [number, number];
+type Vec3 = [number, number, number];
 export interface Model {
 	gltf: string;
 	gltf_url: string;
-	lava_paths: [number, number, number][][];
-	craters: [number, number][];
+	lava_paths: Vec3[][];
+	craters: Vec2[];
 }
 
 export interface AltitudeGradientPair {
 	x: number;
 	y: number;
 	altitude: number;
-	gradient: [number, number, number];
+	gradient: Vec3;
 }
 
-export const lavapaths = writable<[number, number, number][][]>([])
-
 /**
- * Factory for creating a target store
- * @returns target store with method subscribe, add and remove
+ * Factory for creating a target of crater location store
+ * @returns location store with method subscribe, add and remove
  */
-function createTargetLocations() {
-	const { subscribe, update } = writable<Draggable[]>([]);
+// Get cache from local storage
+function convertToTargets(cachedTargets: Draggable[]): Draggable[] {
+	return cachedTargets.map((target) => new Draggable(target.x, target.y, target.size));
+}
+
+function createLocationStore<T>(storageIndex: string, convertToLocation: (locations: T[]) => T[]) {
+	function getCache() {
+		// Get initial locations from the local storage
+		if (typeof window !== 'undefined') {
+			const cachedLocations = localStorage?.getItem(storageIndex);
+
+			try {
+				if (cachedLocations) {
+					const parsedLocations = JSON.parse(cachedLocations);
+					return convertToLocation(parsedLocations);
+				}
+			} catch (_) {
+				return [];
+			}
+		}
+		return [];
+	}
+
+	// Set cache to local storage
+	function setCache(locations: T[]) {
+		if (typeof window !== 'undefined') {
+			localStorage.setItem(storageIndex, JSON.stringify(locations));
+		}
+	}
+
+	const { subscribe, update, set } = writable<T[]>(getCache());
 
 	return {
 		subscribe,
-		add: (newTarget: Draggable) => update((targets) => [...targets, newTarget]), // append new target to the end of the array
-		remove: (index: number) => update((targets) => targets.filter((_, i) => i !== index)) // remove target at index
+		clear: () => set([]),
+		set: (locations: T[]) => {
+			set(locations);
+			setCache(locations);
+		},
+		add: (location: T) =>
+			update((oldLocations) => {
+				// append new location to the end of the array
+				const newLocations = [...oldLocations, location];
+				setCache(newLocations);
+				return newLocations;
+			}),
+		remove: (index: number) =>
+			update((oldLocations) => {
+				// remove location at index
+				const newLocations = oldLocations.filter((_, i) => i !== index);
+				setCache(newLocations);
+				return newLocations;
+			})
 	};
 }
-export const targetLocations = createTargetLocations();
+
+export const targetLocations = createLocationStore<Draggable>('targets', convertToTargets);
+export const craterLocations = createLocationStore<Vec2>('craters', (ls) => ls);
 
 // GLTF STORE helper functions
 
@@ -116,9 +164,9 @@ function createGltfStore() {
 			model = api.build().to_js() as Model;
 			model.gltf_url = gltfStringToUrl(model.gltf);
 
-			//set lava path
-			lavapaths.set(model.lava_paths);
-			console.log(model.lava_paths);
+			// (re-)set the target and crater location
+			targetLocations.clear();
+			craterLocations.set(model.craters);
 
 			// set the gltf store to the gltf string
 			set(model);
@@ -126,7 +174,7 @@ function createGltfStore() {
 		getAlitituteAndGradient: (marker: Draggable): AltitudeGradientPair => {
 			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };
 
-			//
+			// Rust creates a 100*100 grid, so we need to convert the marker coordinates to this grid
 			const adjustedX = (marker.x / paperSize.width) * 100;
 			const adjustedY = (marker.y / paperSize.height) * 100;
 
@@ -136,9 +184,7 @@ function createGltfStore() {
 				.to_js() as AltitudeGradientPair;
 
 			// Get radians from rust however Aframe expects degrees
-			altitudeGradientPair.gradient[0] = radToDeg(altitudeGradientPair.gradient[0]);
-			altitudeGradientPair.gradient[1] = radToDeg(altitudeGradientPair.gradient[1]);
-			altitudeGradientPair.gradient[2] = radToDeg(altitudeGradientPair.gradient[2]);
+			altitudeGradientPair.gradient.map((rad) => radToDeg(rad));
 
 			// Apply modifier to altitude
 			altitudeGradientPair.altitude = adjustAlititude(altitudeGradientPair);
