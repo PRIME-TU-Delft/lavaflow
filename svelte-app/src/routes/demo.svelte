@@ -9,7 +9,9 @@
 	import { gltfStore } from '$lib/stores/gltfStore';
 
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+
+	import { THREE } from 'aframe';
 
 	let ready = false;
 	const zAxis = new THREE.Vector3(0, 0, 1);
@@ -300,32 +302,6 @@
 		}
 	});
 
-	AFRAME.registerPrimitive('a-draw-curve', {
-		defaultComponents: {
-			'draw-curve': {}
-		},
-		mappings: {
-			curveref: 'draw-curve.curve'
-		}
-	});
-
-	AFRAME.registerPrimitive('a-curve-point', {
-		defaultComponents: {
-			'curve-point': {}
-		},
-		mappings: {}
-	});
-
-	AFRAME.registerPrimitive('a-curve', {
-		defaultComponents: {
-			curve: {}
-		},
-
-		mappings: {
-			type: 'curve.type'
-		}
-	});
-
 	AFRAME.registerComponent('lava-path', {
 		init: function () {
 			console.log('lava path:');
@@ -341,7 +317,8 @@
 				const points = $gltfStore.lava_paths[j];
 
 				//create curve element
-				const curve = document.createElement('a-curve');
+				const curve = document.createElement('a-entity');
+				curve.setAttribute('a-curve', '');
 				curve.setAttribute('id', 'track' + j);
 
 				//add points per curve
@@ -351,12 +328,13 @@
 					const y = v[1];
 					const z = v[2];
 
-					const p = document.createElement('a-curve-point');
+					const p = document.createElement('a-entity');
+					p.setAttribute('a-curve-point', '');
 					//y and z swapped wrt given paths because Aframe uses different axes
 					p.setAttribute('position', {
 						x: x,
-						y:  z,
-						z:  y,
+						y: z,
+						z: y
 					});
 
 					curve.appendChild(p);

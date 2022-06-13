@@ -20,7 +20,7 @@
 		<!-- Loop over each target location. However, first each Draggable item is converted to an AltitudeAndGradient Object -->
 		{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
 			<a-entity
-				gltf-model="url(steam_turbine.glb)"
+				gltf-model="url(/steam_turbine.glb)"
 				scale="0.1 0.2 0.1"
 				position="{altAndGrad.x} {altAndGrad.altitude} {altAndGrad.y}"
 				rotation="0 0 0"
