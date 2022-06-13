@@ -113,6 +113,9 @@ pub fn generate_gltf(triangle_vertices: &[([f32; 3], [f32; 3])]) -> Result<Strin
 		sparse: None,
 	};
 
+	let mut material = json::Material::default();
+	material.pbr_metallic_roughness.metallic_factor.0 = 0.3;
+
 	let primitive = json::mesh::Primitive {
 		attributes: {
 			let mut map = std::collections::HashMap::new();
@@ -123,7 +126,7 @@ pub fn generate_gltf(triangle_vertices: &[([f32; 3], [f32; 3])]) -> Result<Strin
 		extensions: Default::default(),
 		extras: Default::default(),
 		indices: None,
-		material: None,
+		material: Some(json::Index::new(0)),
 		mode: Valid(json::mesh::Mode::Triangles),
 		targets: None,
 	};
@@ -163,6 +166,7 @@ pub fn generate_gltf(triangle_vertices: &[([f32; 3], [f32; 3])]) -> Result<Strin
 			name: None,
 			nodes: vec![json::Index::new(0)],
 		}],
+		materials: vec![material],
 		..Default::default()
 	};
 

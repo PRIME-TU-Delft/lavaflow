@@ -9,10 +9,10 @@
 {#if $gltfStore}
 	<a-entity position="1 -1 -3" scale={scaleString} rotation="0 -90 0">
 		<!-- Place "soccer" spotlights on each corner of the model -->
-		<a-entity light="color: #ddf; intensity: 1.5" position="-100 100 -100" />
-		<a-entity light="color: #ddf; intensity: 1.5" position="100 100 -100" />
-		<a-entity light="color: #ddf; intensity: 1.5" position="-100 100 100" />
-		<a-entity light="color: #ddf; intensity: 1.5" position="100 100 100" />
+		<a-entity light="color: #ddf; intensity: 1" position="-100 100 -100" />
+		<a-entity light="color: #ddf; intensity: 1" position="100 100 -100" />
+		<a-entity light="color: #ddf; intensity: 1" position="-100 100 100" />
+		<a-entity light="color: #ddf; intensity: 1" position="100 100 100" />
 
 		<!-- Mountain -->
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
