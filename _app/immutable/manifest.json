@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-589cd975.js",
+    "file": "start-f22deeee.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -43,13 +43,13 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-d26e31bf.js",
+    "file": "pages/demo.svelte-d38d6c28.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-b2cf3344.js",
-      "_aframe-master-11ea78ab.js",
+      "_aframe-master-39951690.js",
       "_contourLineStore-0bb23d49.js",
       "_gltfStore-f44234c6.js",
       "_NavigationButton-f564c9bc.js",
@@ -162,14 +162,14 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-bfb47a1f.js",
+    "file": "pages/visualise/ar.svelte-9663589f.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-b2cf3344.js",
       "_Button-2751e271.js",
-      "_aframe-master-11ea78ab.js",
+      "_aframe-master-39951690.js",
       "__commonjsHelpers-56d41998.js",
       "_gltfStore-f44234c6.js",
       "_index-082afcc0.js",
@@ -184,13 +184,13 @@
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-79d748af.js",
+    "file": "pages/visualise/model.svelte-c15eb0bd.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-b2cf3344.js",
-      "_aframe-master-11ea78ab.js",
+      "_aframe-master-39951690.js",
       "_gltfStore-f44234c6.js",
       "_index-082afcc0.js",
       "_NavigationButton-f564c9bc.js",
@@ -223,8 +223,8 @@
       "_index-082afcc0.js"
     ]
   },
-  "_aframe-master-11ea78ab.js": {
-    "file": "chunks/aframe-master-11ea78ab.js",
+  "_aframe-master-39951690.js": {
+    "file": "chunks/aframe-master-39951690.js",
     "imports": [
       "_index-b2cf3344.js",
       "_gltfStore-f44234c6.js",
