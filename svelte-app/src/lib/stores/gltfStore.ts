@@ -7,7 +7,7 @@
 
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
-import type Draggable from '$lib/data/draggable';
+import Draggable from '$lib/data/draggable';
 import ApiSettings from '$lib/data/apiSettings';
 
 import init, * as wasm from 'wasm';
