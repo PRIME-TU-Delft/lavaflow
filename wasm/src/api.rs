@@ -149,7 +149,7 @@ impl ModelConstructionApi {
 			columns: 10,
 			width: 100.0,
 			height: 100.0,
-			altitude_step: 10.0,
+			altitude_step: 25.0,
 			curve_point_separation: 10.0,
 			svc_distance: 10.0,
 			catmull_clark_iterations: 0,
@@ -252,7 +252,9 @@ impl ModelConstructionApi {
 		let max_altitude = *smoother.raster.get_highest_altitude();
 
 		// Apply raster normalisation, so it will be contained within a 100x100x100 pixel box
-		smoother.raster.normalise().map_err(|e| e.to_string())?;
+		let num_layers = level_curve_set.get_level_curves().len() as f32;
+		let max_height_after_normalisation = f32::min(self.altitude_step * num_layers, 100.0);
+		smoother.raster.normalise(100.0, 100.0, max_height_after_normalisation).map_err(|e| e.to_string())?;
 
 		//
 		// All smoothing operations have been applied, thereofore the final raster has been computed.

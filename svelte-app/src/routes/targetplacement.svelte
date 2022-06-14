@@ -32,7 +32,6 @@
 </script>
 
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
-
 	<div slot="background" style="background:#aaa;" />
 
 	{#if $contourLines}
@@ -44,8 +43,6 @@
 				curves={$contourLines.curves}
 			/>
 		</div>
-	{:else}
-		<NavigationButton to="/scan/mapscanning">No image found. Go to map scanning</NavigationButton>
 	{/if}
 
 	<div slot="footer">
@@ -58,6 +55,10 @@
 			<Button icon={mdiPin} on:click={() => addTarget(foregroundWidth / 2, foregroundHeight / 2)}>
 				Add steam turbine
 			</Button>
+		{:else}
+			<NavigationButton back to="/scan/mapscanning">
+				No image found. Go to map scanning
+			</NavigationButton>
 		{/if}
 	</div>
 </Page>
