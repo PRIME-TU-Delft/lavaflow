@@ -2,6 +2,7 @@
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
 	import 'aframe';
+	import 'aframe-extras';
 </script>
 
 <SceneViewer />

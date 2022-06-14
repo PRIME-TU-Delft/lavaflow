@@ -566,7 +566,8 @@ impl Default for ModelConstructionApi {
 
 use smoothing_operation_derive::SmoothingOperation;
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToLayer {
 	pub layer: usize,
 	pub strength: f32,
@@ -575,14 +576,16 @@ pub struct SmoothingOperationApplySmoothToLayer {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationSetAltitudeForLayer {
 	pub layer: usize,
 	pub altitude: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToAltitudeGroup {
 	pub altitude_group: usize,
 	pub strength: f32,
@@ -591,14 +594,16 @@ pub struct SmoothingOperationApplySmoothToAltitudeGroup {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationIncreaseAltitudeForAltitudeGroup {
 	pub altitude_group: usize,
 	pub percentage_of_altitude_step: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToMiddleLayers {
 	pub strength: f32,
 	pub coverage: usize,
@@ -606,7 +611,8 @@ pub struct SmoothingOperationApplySmoothToMiddleLayers {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToMountainTops {
 	pub strength: f32,
 	pub coverage: usize,
@@ -614,13 +620,15 @@ pub struct SmoothingOperationApplySmoothToMountainTops {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationIncreaseAltitudeForMountainTops {
 	pub percentage_of_altitude_step: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToAll {
 	pub strength: f32,
 	pub coverage: usize,
@@ -628,5 +636,6 @@ pub struct SmoothingOperationApplySmoothToAll {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationCorrectForAltitudeConstraintsToAllLayers {}

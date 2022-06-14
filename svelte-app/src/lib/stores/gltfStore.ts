@@ -7,7 +7,8 @@
 
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
-import Draggable from '$lib/data/draggable';
+import type Draggable from '$lib/data/draggable';
+import ApiSettings from '$lib/data/apiSettings';
 
 import init, * as wasm from 'wasm';
 
@@ -155,20 +156,29 @@ function createGltfStore() {
 
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
-			api.base(tree, 5);
-			api.set_basic_parameters(45, 45, curveTree.size.width, curveTree.size.height);
-			api.set_lava_path_parameters(20, 0.02);
-			api.set_svc_parameters(50);
 
-			// Increase the altitude of the mountain tops and smooth them
-			api.increase_altitude_for_mountain_tops(2, false);
-			api.apply_smooth_to_mountain_tops(1, 5, 3, false);
+			let api_settings = new ApiSettings(
+/*				 OpenCV tree */ tree,
+/*						Rows */ 45,
+/*					 Columns */ 45,
+/*					   Width */ curveTree.size.width,
+/*					  Height */ curveTree.size.height,
+/*	  Curve Point Separation */ 5,
+/*		  		SVC Distance */ 50,
+/*	Catmull Clark Iterations */ 1,
+/*			Lava Path Length */ 20,
+/*		   Lava Path Forking */ 0.2,
+/*		Smoothing Operations */ [
+					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.9, 5, 1, false),
+					new wasm.SmoothingOperationApplySmoothToMiddleLayers(0.7, 3, 5, false),
+					new wasm.SmoothingOperationIncreaseAltitudeForMountainTops(2, false),
+					new wasm.SmoothingOperationApplySmoothToMountainTops(1, 8, 1, false)
+				]
+			);
 
-			// Smooth the middle layers
-			api.apply_smooth_to_middle_layers(0.7, 3, 5, false);
+			api_settings.apply_to_api(api);
 
-			// Apply Catmull Clark
-			api.set_catmull_clark_parameters(1);
+			
 		},
 		build: () => {
 			// Call the wasm api to build the model
