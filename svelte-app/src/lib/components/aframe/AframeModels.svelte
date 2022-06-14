@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
+	import Draggable from '$lib/data/draggable';
 
 	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
 
@@ -16,6 +17,21 @@
 
 		<!-- Mountain -->
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
+
+		<!-- Craters -->
+		{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20)) ) as altAndGrad}
+			<a-cylinder
+				radius="3"
+				height={altAndGrad.altitude / 2}
+				position="
+				{altAndGrad.x} 
+				{altAndGrad.altitude / 2} 
+				{altAndGrad.y}"
+				color="#ff4025"
+				scale="1 2 1"
+			/>
+		{/each}
+
 
 		<!-- Loop over each target location. However, first each Draggable item is converted to an AltitudeAndGradient Object -->
 		{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
