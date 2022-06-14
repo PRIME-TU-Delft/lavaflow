@@ -377,7 +377,7 @@
 
 			await gltfStore.setup($contourLines);
 			gltfStore.build();
-			console.warn('gltf is loaded from hardcoded data', $gltfStore);
+			console.warn('gltf is loaded from hardcoded data');
 		}
 
 		if (!$gltfStore.lava_paths) {

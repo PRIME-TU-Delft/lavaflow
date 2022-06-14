@@ -6,6 +6,7 @@
  */
 
 import { writable } from 'svelte/store';
+import { targetLocations } from '$lib/stores/gltfStore';
 
 export type CurveTree = {
 	curves: [number, number][][];
@@ -31,6 +32,7 @@ function contourLineStore() {
 			localStorage.setItem('contourlines', JSON.stringify(curveTree));
 
 			set(curveTree);
+			targetLocations.clear();
 			setup = true;
 		}
 	};
