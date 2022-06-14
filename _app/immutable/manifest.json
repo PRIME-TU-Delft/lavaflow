@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-1be2dbb1.js",
+    "file": "start-f3609b75.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -43,14 +43,14 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-8580a7c7.js",
+    "file": "pages/demo.svelte-e4923fd1.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-b2cf3344.js",
-      "_aframe-master-5c1cd875.js",
-      "_contourLineStore-92c658a7.js",
+      "_aframe-master-a7eaaf7b.js",
+      "_contourLineStore-66468231.js",
       "_NavigationButton-f564c9bc.js",
       "_Button-2751e271.js",
       "_navigation-0e6511d1.js",
@@ -93,7 +93,7 @@
     ]
   },
   "src/routes/scan/maptransform.svelte": {
-    "file": "pages/scan/maptransform.svelte-97691f92.js",
+    "file": "pages/scan/maptransform.svelte-799aef10.js",
     "src": "src/routes/scan/maptransform.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -103,10 +103,11 @@
       "_Page-bed51374.js",
       "_NavigationButton-f564c9bc.js",
       "_imageStore-3f8ad5ab.js",
-      "_contourLineStore-92c658a7.js",
+      "_contourLineStore-66468231.js",
       "_navigation-0e6511d1.js",
       "__commonjsHelpers-56d41998.js",
       "_P5-ab5ed039.js",
+      "_draggable-4f1d7329.js",
       "_index-082afcc0.js",
       "_singletons-d1fb5791.js",
       "_preload-helper-60cab3ee.js"
@@ -116,7 +117,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-2842814a.js",
+    "file": "pages/scan/preview.svelte-b99cd8d7.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -127,7 +128,7 @@
       "_Page-bed51374.js",
       "_NavigationButton-f564c9bc.js",
       "_navigation-0e6511d1.js",
-      "_contourLineStore-92c658a7.js",
+      "_contourLineStore-66468231.js",
       "_debugStore-aae9bc5b.js",
       "_preload-helper-60cab3ee.js",
       "_singletons-d1fb5791.js",
@@ -138,7 +139,7 @@
     ]
   },
   "src/routes/targetplacement.svelte": {
-    "file": "pages/targetplacement.svelte-ae436684.js",
+    "file": "pages/targetplacement.svelte-97b0932c.js",
     "src": "src/routes/targetplacement.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -147,8 +148,9 @@
       "_Button-2751e271.js",
       "_NavigationButton-f564c9bc.js",
       "_P5-ab5ed039.js",
-      "_contourLineStore-92c658a7.js",
+      "_contourLineStore-66468231.js",
       "_Page-bed51374.js",
+      "_draggable-4f1d7329.js",
       "_preload-helper-60cab3ee.js",
       "_index-082afcc0.js"
     ],
@@ -157,16 +159,16 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-0b166cfd.js",
+    "file": "pages/visualise/ar.svelte-c8ed714e.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-b2cf3344.js",
       "_Button-2751e271.js",
-      "_aframe-master-5c1cd875.js",
+      "_aframe-master-a7eaaf7b.js",
       "__commonjsHelpers-56d41998.js",
-      "_contourLineStore-92c658a7.js",
+      "_contourLineStore-66468231.js",
       "_index-082afcc0.js",
       "_NavigationButton-f564c9bc.js",
       "_navigation-0e6511d1.js",
@@ -178,21 +180,21 @@
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-30ef2f9b.js",
+    "file": "pages/visualise/model.svelte-b68b5f96.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-b2cf3344.js",
-      "_aframe-master-5c1cd875.js",
-      "_contourLineStore-92c658a7.js",
+      "_aframe-master-a7eaaf7b.js",
+      "__commonjsHelpers-56d41998.js",
+      "_contourLineStore-66468231.js",
       "_index-082afcc0.js",
       "_NavigationButton-f564c9bc.js",
       "_Button-2751e271.js",
       "_navigation-0e6511d1.js",
       "_singletons-d1fb5791.js",
-      "_debugStore-aae9bc5b.js",
-      "__commonjsHelpers-56d41998.js"
+      "_debugStore-aae9bc5b.js"
     ]
   },
   "_index-b2cf3344.js": {
@@ -216,11 +218,11 @@
       "_index-082afcc0.js"
     ]
   },
-  "_aframe-master-5c1cd875.js": {
-    "file": "chunks/aframe-master-5c1cd875.js",
+  "_aframe-master-a7eaaf7b.js": {
+    "file": "chunks/aframe-master-a7eaaf7b.js",
     "imports": [
       "_index-b2cf3344.js",
-      "_contourLineStore-92c658a7.js",
+      "_contourLineStore-66468231.js",
       "_NavigationButton-f564c9bc.js",
       "_navigation-0e6511d1.js",
       "_debugStore-aae9bc5b.js",
@@ -230,8 +232,8 @@
       "assets/aframe-master-ca0a78ac.css"
     ]
   },
-  "_contourLineStore-92c658a7.js": {
-    "file": "chunks/contourLineStore-92c658a7.js",
+  "_contourLineStore-66468231.js": {
+    "file": "chunks/contourLineStore-66468231.js",
     "imports": [
       "_index-082afcc0.js"
     ]
@@ -289,6 +291,9 @@
     "dynamicImports": [
       "_p5.min-0883924f.js"
     ]
+  },
+  "_draggable-4f1d7329.js": {
+    "file": "chunks/draggable-4f1d7329.js"
   },
   "_p5.min-0883924f.js": {
     "file": "chunks/p5.min-0883924f.js",
