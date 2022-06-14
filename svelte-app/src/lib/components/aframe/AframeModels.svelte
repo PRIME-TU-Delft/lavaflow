@@ -27,11 +27,11 @@
 				animation-mixer
 			/>
 			<a-box
-				width="2"
-				depth="2"
+				width="1.4"
+				depth="2.5"
 				height={altAndGrad.altitude / 2}
-				position="{altAndGrad.x} {altAndGrad.altitude / 2} {altAndGrad.y}"
-				color="#90352C"
+				position="{altAndGrad.x} {altAndGrad.altitude / 2} {altAndGrad.y + 0.15}"
+				color="#444"
 				scale="1 2 1"
 			/>
 		{/each}

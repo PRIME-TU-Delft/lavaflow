@@ -79,14 +79,15 @@ fn impl_smoothing_operation(ast: &syn::DeriveInput) -> TokenStream {
 	let impl_constructor = quote! {
 		#[wasm_bindgen]
 		impl #name {
+			#[wasm_bindgen(constructor)]
 			pub fn new(#(#found_field_names:#found_field_types),*) -> Self {
 				Self {
 					#(#found_field_names),*
 				}
 			}
 
-			pub fn from(val: &JsValue) -> Result<#name, JsValue> {
-				val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid for SmoothingOperation"))
+			pub fn apply_to_api(&self, api: &mut ModelConstructionApi) {
+				api.#function_name_ident(#(self.#found_field_names),*);
 			}
 		}
 	};
