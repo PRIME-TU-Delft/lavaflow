@@ -52,6 +52,7 @@
 		margin-block: 0.5rem;
 		border-radius: 0.3rem;
 		cursor: pointer;
+		user-select:none;
 	}
 
 	button.noMargin {

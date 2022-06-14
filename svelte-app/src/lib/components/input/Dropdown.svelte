@@ -6,9 +6,10 @@
 	 */
 	export let value: T;
 	export let options: T[];
+	export let secondary = false;
 </script>
 
-<select bind:value on:change>
+<select class:secondary bind:value on:change>
 	{#each options as option, index}
 		<option value={option}>
 			<slot {option} {index}>{option}</slot>
@@ -29,5 +30,10 @@
 		margin-block: 0.5rem;
 		border-radius: 0.3rem;
 		cursor: pointer;
+	}
+
+	.secondary {
+		background: var(--secondary-color);
+		color: var(--text-color-secondary);
 	}
 </style>

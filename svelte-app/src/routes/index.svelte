@@ -3,7 +3,22 @@
 </script>
 
 <script>
+	import { onMount } from 'svelte';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
+
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import Dropdown from '$lib/components/input/Dropdown.svelte';
+
+	onMount(async () => {
+		if ($difficultyStore) return; // When gltf store is loaded -> don't (re)load again
+
+		await difficultyStore.setup();
+		difficultyStore.build();
+	});
+
+	function updateDifficulty() {
+		difficultyStore.set_difficulty_to($difficultyStore.name);
+	}
 </script>
 
 <div class="tudelftLogo" />
@@ -26,7 +41,12 @@
 		predict the lava will reach.
 	</div>
 
-	<NavigationButton large to="scan/mapscanning">Start flowing</NavigationButton>
+	{#if $difficultyStore}
+		<Dropdown secondary bind:value={$difficultyStore.name} options={$difficultyStore.options} let:option on:change={updateDifficulty}>
+			Difficulty: {option}
+		</Dropdown>
+		<NavigationButton large to="scan/mapscanning">Start flowing</NavigationButton>
+	{/if}
 	<!-- <NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton> -->
 </main>
 

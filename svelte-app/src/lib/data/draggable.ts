@@ -154,6 +154,7 @@ export default class Draggable {
 
 		let text_width = p5.textWidth(msg);
 
+		p5.rectMode(p5.CORNER);
 		p5.rect(this.x - text_width / 2 - 5, this.y - 35, text_width + 10, 20);
 
 		p5.strokeWeight(1);
@@ -191,6 +192,7 @@ export default class Draggable {
 			p5.strokeWeight(0.5);
 			p5.stroke(0);
 			p5.fill(200);
+			p5.rectMode(p5.CORNER);
 			p5.rect(this.x, this.y - markerSize / 2, 50, markerSize);
 
 			p5.fill(0);

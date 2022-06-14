@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AframeModels from '$lib/components/aframe/AframeModels.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import Button from '../Button.svelte';
 
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -43,6 +44,10 @@
 			<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
 		</div>
 
+		<div class="button pointsButton">
+			<Button secondary>Points: 10000</Button>
+		</div>
+
 		<div class="button placeTargets">
 			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 		</div>
@@ -79,6 +84,11 @@
 	.backButton {
 		top: 1rem;
 		left: 1rem;
+	}
+
+	.pointsButton {
+		top: 5rem;
+		right: 1rem;
 	}
 
 	.placeTargets {
