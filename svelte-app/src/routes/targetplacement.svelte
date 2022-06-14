@@ -6,16 +6,21 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import P5TargetPlacement from '$lib/components/p5/P5TargetPlacement.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Instructions from '$lib/components/InstructionsTargets.svelte';
 
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { targetLocations } from '$lib/stores/gltfStore';
 	import Draggable from '$lib/data/draggable';
 
 	import { onMount } from 'svelte';
-	import { mdiPin, mdiTrashCan } from '@mdi/js';
+	import { mdiPin, mdiTrashCan, mdiBookOpenVariant } from '@mdi/js';
+import { instructions } from '$lib/data/instructions';
 
 	let targetSelected = -1;
+	let instructionVisible = false;
 
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
+	
 	function addTarget(x: number, y: number) {
 		const newTarget = new Draggable(x, y, 20);
 		newTarget.enableSelection();
@@ -34,18 +39,29 @@
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
 	<div slot="background" style="background:#aaa;" />
 
-	{#if $contourLines}
-		<div class="sketch">
-			<P5TargetPlacement
-				bind:targetSelected
-				{foregroundHeight}
-				{foregroundWidth}
-				curves={$contourLines.curves}
-			/>
-		</div>
+	{#if instructionVisible}
+		<Instructions />
+	{:else}
+		{#if $contourLines}
+			<div class="sketch">
+				<P5TargetPlacement
+					bind:targetSelected
+					{foregroundHeight}
+					{foregroundWidth}
+					curves={$contourLines.curves}
+				/>
+			</div>
+		{/if}
 	{/if}
 
 	<div slot="footer">
+		<Button icon={mdiBookOpenVariant} on:click={() => toggleInstruction()}>
+			{#if instructionVisible}
+				Close instructions
+			{:else}
+				Read instructions
+			{/if}
+		</Button>
 		{#if $contourLines}
 			{#if targetSelected != -1}
 				<Button secondary icon={mdiTrashCan} on:click={removeTarget}>

@@ -22,7 +22,7 @@
 	let deviceId: string;
 	$: title = instructionVisible ? 'Instructions' : 'Capture the image';
 
-	const toggleInstuction = () => (instructionVisible = !instructionVisible);
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	/**
 	 * Goto scan/maptransform
@@ -51,7 +51,7 @@
 </script>
 
 <VideoStream {deviceId} let:loading let:stream let:error let:cameraOptions>
-	<Page fullscreen={!loading} {title} closeButton={instructionVisible} on:close={toggleInstuction}>
+	<Page fullscreen={!loading} {title} closeButton={instructionVisible} on:close={toggleInstruction}>
 		<div slot="background">
 			<Video {loading} {stream} />
 		</div>
@@ -78,7 +78,7 @@
 
 		<div slot="footer">
 			{#if !instructionVisible}
-				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstuction}>
+				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstruction}>
 					Read scan instructions
 				</Button>
 				<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>

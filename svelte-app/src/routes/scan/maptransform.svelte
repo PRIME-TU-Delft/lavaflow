@@ -10,6 +10,8 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import Page from '$lib/components/Page.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import Instructions from '$lib/components/InstructionsTransformation.svelte';
+
 
 	import type Draggable from '$lib/data/draggable';
 	import { rawImage } from '$lib/stores/imageStore';
@@ -25,6 +27,9 @@
 
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
+	let instructionVisible = false;
+
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	function gotoPreview(width: number, height: number) {
 		const mat = cv.imread('foregroundImage');
@@ -40,7 +45,7 @@
 		const result = removePerspective(mat, markerCoords, width, height);
 
 		try {
-			// Set contour line store to the detected contour lines with hirarchy
+			// Set contour line store to the detected contour lines with hierarchy
 			const { curves, hierarchy } = getCurves(result);
 
 			// Convert the OpenCV Mat to a array of tuples for mountain model construction
@@ -83,24 +88,29 @@
 	<div slot="background">
 		<img id="backgroundImage" src={$rawImage} alt="background" />
 	</div>
+	
 
-	<div class="sketch">
-		<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
-	</div>
-
-	<img
-		style="display:none"
-		height={foregroundHeight}
-		width={foregroundWidth}
-		id="foregroundImage"
-		src={$rawImage}
-		alt="background"
-	/>
+	{#if instructionVisible}
+			<Instructions />
+		{:else}
+			<div class="sketch">
+				<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
+			</div>
+		
+			<img
+				style="display:none"
+				height={foregroundHeight}
+				width={foregroundWidth}
+				id="foregroundImage"
+				src={$rawImage}
+				alt="background"
+			/>
+	{/if}
 
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
 	<div slot="footer">
-		<Button secondary icon={mdiInformation}>
+		<Button secondary icon={mdiInformation} on:click={toggleInstruction}>
 			Drag each marker to the correct corner on the map
 		</Button>
 
