@@ -33,7 +33,14 @@ export interface AltitudeGradientPair {
  */
 // Get cache from local storage
 function convertToTargets(cachedTargets: Draggable[]): Draggable[] {
-	return cachedTargets.map((target) => new Draggable(target.x, target.y, target.size));
+	return cachedTargets.map((target) => {
+		const dragItem = new Draggable(target.x, target.y, target.size, target.offsetX, target.offsetY);
+
+		dragItem.enableSelection();
+		dragItem.deselect();
+
+		return dragItem;
+	});
 }
 
 function createLocationStore<T>(storageIndex: string, convertToLocation: (locations: T[]) => T[]) {
@@ -164,8 +171,7 @@ function createGltfStore() {
 			model = api.build().to_js() as Model;
 			model.gltf_url = gltfStringToUrl(model.gltf);
 
-			// (re-)set the target and crater location
-			targetLocations.clear();
+			// (re-)set the crater locations
 			craterLocations.set(model.craters);
 
 			// set the gltf store to the gltf string

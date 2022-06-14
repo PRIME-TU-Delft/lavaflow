@@ -14,8 +14,8 @@ export default class Draggable {
 	old_x: number;
 	old_y: number;
 	size: number;
-	offsetX: number = 0;
-	offsetY: number = 0;
+	offsetX: number;
+	offsetY: number;
 
 	/**
 	 * Initialize a draggable marker at a given position
@@ -28,12 +28,14 @@ export default class Draggable {
 	 * @param {number} y initial y coordinate of the marker
 	 * @param {number} size height/width of the draggable surface in pixels
 	 */
-	constructor(x: number, y: number, size: number) {
+	constructor(x: number, y: number, size: number, offsetX: number = 0, offsetY: number = 0) {
 		this.x = x;
 		this.y = y;
 		this.old_x = x;
 		this.old_y = y;
 		this.size = size;
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
 	}
 
 	/**

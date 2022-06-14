@@ -83,6 +83,9 @@
 			if (!$targetLocations?.length) return;
 
 			for (let target of $targetLocations) target.released();
+
+			// When mouse is released -> reset the cache
+			targetLocations.set($targetLocations);
 		};
 	}
 </script>
