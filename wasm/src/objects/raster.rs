@@ -324,7 +324,7 @@ mod tests {
 		raster.set(1, 1, 0.0);
 
 		// Perform normalisation
-		assert!(raster.normalise().is_ok());
+		assert!(raster.normalise(100., 100., 100.).is_ok());
 
 		// Assertions
 		assert_float_eq(Some(raster.row_height), Some(50.0));
