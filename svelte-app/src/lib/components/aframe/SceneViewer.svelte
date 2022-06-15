@@ -11,6 +11,7 @@
 	import { debugMode } from '$lib/stores/debugStore';
 
 	export let arMode = false;
+	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
 
 	onMount(async () => {
 		if ($gltfStore) return; // When gltf store is loaded -> don't (re)load again
@@ -37,7 +38,7 @@
 	});
 </script>
 
-<a-scene class:arMode renderer="logarithmicDepthBuffer: true;" embedded vr-mode-ui="enabled: false">
+<a-scene class:arMode embedded vr-mode-ui="enabled: false">
 	<slot name="overlay">
 		<div class="button backButton">
 			<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
@@ -55,10 +56,10 @@
 		<a-marker preset="hiro">
 			<a-box position="0 0 -1" rotation="0 0 0" color="red" />
 
-			<AframeModels />
+			<AframeModels {scale} />
 		</a-marker>
 	{:else}
-		<AframeModels />
+		<AframeModels {scale} />
 	{/if}
 
 	<a-camera />

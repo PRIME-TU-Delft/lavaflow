@@ -2,15 +2,19 @@
 	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
 	import Draggable from '$lib/data/draggable';
 
-	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
+	export let scale: [number, number, number];
 
 	$: scaleString = scale.join(' ');
 </script>
 
 {#if $gltfStore}
-	<a-entity lava-path position="1 -1 -3" scale={scaleString} rotation="0 -90 0">
+	<!----------------------------------------------------------------
+	--        				SUPER ENTITY							--
+	------------------------------------------------------------------>
+	<a-entity lava-path scale={scaleString} >
+
 		<!----------------------------------------------------------------
-		--  Place "soccer" spotlights on each corner of the model				--
+		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>
 		<a-entity light="color: #ddf; intensity: 0.75" position="-100 150 -100" />
 		<a-entity light="color: #ddf; intensity: 0.75" position="100 150 -100" />
@@ -18,12 +22,12 @@
 		<a-entity light="color: #ddf; intensity: 0.75" position="100 150 100" />
 
 		<!----------------------------------------------------------------
-		--                    MOUNTAIN																	--
+		--                    MOUNTAIN									--
 		------------------------------------------------------------------>
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 
 		<!----------------------------------------------------------------
-		--                    CRATERS																	  --
+		--                    CRATERS								  --
 		------------------------------------------------------------------>
 		{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20), true) ) as altAndGrad}
 			{console.log(altAndGrad)}
