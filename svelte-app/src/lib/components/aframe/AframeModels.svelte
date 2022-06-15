@@ -9,17 +9,24 @@
 
 {#if $gltfStore}
 	<a-entity position="1 -1 -3" scale={scaleString} rotation="0 -90 0">
-		<!-- Place "soccer" spotlights on each corner of the model -->
+		<!----------------------------------------------------------------
+		--  Place "soccer" spotlights on each corner of the model				--
+		------------------------------------------------------------------>
 		<a-entity light="color: #ddf; intensity: 0.75" position="-100 150 -100" />
 		<a-entity light="color: #ddf; intensity: 0.75" position="100 150 -100" />
 		<a-entity light="color: #ddf; intensity: 0.75" position="-100 150 100" />
 		<a-entity light="color: #ddf; intensity: 0.75" position="100 150 100" />
 
-		<!-- Mountain -->
+		<!----------------------------------------------------------------
+		--                    MOUNTAIN																	--
+		------------------------------------------------------------------>
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 
-		<!-- Craters -->
-		{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20)) ) as altAndGrad}
+		<!----------------------------------------------------------------
+		--                    CRATERS																	  --
+		------------------------------------------------------------------>
+		{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20), true) ) as altAndGrad}
+			{console.log(altAndGrad)}
 			<a-cylinder
 				radius="3"
 				height={altAndGrad.altitude / 2}
@@ -32,8 +39,12 @@
 			/>
 		{/each}
 
-
-		<!-- Loop over each target location. However, first each Draggable item is converted to an AltitudeAndGradient Object -->
+		<!----------------------------------------------------------------
+		--       		        	TARGETS				                					  --
+		--                                                              --
+		-- Loop over each target location, However, first each          --
+		-- Draggable item is converted to an AltitudeAndGradient Object --
+		------------------------------------------------------------------>
 		{#each $targetLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
 			<a-entity
 				gltf-model="url(/steam_turbine.glb)"

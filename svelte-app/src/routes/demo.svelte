@@ -365,47 +365,6 @@
 		}
 	});
 
-	onMount(async () => {
-		if (!$gltfStore) {
-			if (!$contourLines) {
-				contourLines.set({
-					curves: hc_curves,
-					hierarchy: hc_hierarchy,
-					size: { width: 850, height: 950 }
-				});
-			}
-
-			await gltfStore.setup($contourLines);
-			gltfStore.build();
-			console.warn('gltf is loaded from hardcoded data');
-		}
-
-		if (!$gltfStore.lava_paths) {
-			$gltfStore.lava_paths = [
-				[
-					[4, 4, 7],
-					[1, 1, 3],
-					[4, 2, 2],
-					[3, 3, -1]
-				],
-				[
-					[1, 1, 3],
-					[0, -2, -4],
-					[1, 1, -2],
-					[1, 2, -1],
-					[2, 2, 0]
-				],
-				[
-					[1, 1, -2],
-					[1, 4, -2],
-					[12, 1, -1]
-				]
-			];
-		}
-
-		ready = true;
-	});
-
 	onDestroy(() => {
 		delete AFRAME.components['curve-point'];
 		delete AFRAME.components['curve'];

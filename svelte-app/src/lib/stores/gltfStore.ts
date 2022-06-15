@@ -157,18 +157,19 @@ function createGltfStore() {
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
 
-			let api_settings = new ApiSettings(
-/*				 OpenCV tree */ tree,
-/*						Rows */ 45,
-/*					 Columns */ 45,
-/*					   Width */ curveTree.size.width,
-/*					  Height */ curveTree.size.height,
-/*	  Curve Point Separation */ 5,
-/*		  		SVC Distance */ 50,
-/*	Catmull Clark Iterations */ 1,
-/*			Lava Path Length */ 20,
-/*		   Lava Path Forking */ 0.2,
-/*		Smoothing Operations */ [
+			const api_settings = new ApiSettings(
+				tree /* OpenCV tree */,
+				45 /* Rows */,
+				45 /* Columns */,
+				curveTree.size.width /* Width */,
+				curveTree.size.height /* Height */,
+				5 /*	Curve Point Separation */,
+				50 /* SVC Distance */,
+				1 /*	Catmull Clark Iterations */,
+				20 /*	Lava Path Length */,
+				0.2 /* Lava Path Forking */,
+				[
+					/* Smoothing Operations */
 					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.9, 5, 1, false),
 					new wasm.SmoothingOperationApplySmoothToMiddleLayers(0.7, 3, 5, false),
 					new wasm.SmoothingOperationIncreaseAltitudeForMountainTops(2, false),
@@ -177,8 +178,6 @@ function createGltfStore() {
 			);
 
 			api_settings.apply_to_api(api);
-
-			
 		},
 		build: () => {
 			// Call the wasm api to build the model
@@ -191,12 +190,16 @@ function createGltfStore() {
 			// set the gltf store to the gltf string
 			set(model);
 		},
-		getAlitituteAndGradient: (marker: Draggable): AltitudeGradientPair => {
+		getAlitituteAndGradient: (marker: Draggable, noAdjustAxis = false): AltitudeGradientPair => {
 			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };
 
-			// Rust creates a 100*100 grid, so we need to convert the marker coordinates to this grid
-			const adjustedX = (marker.x / paperSize.width) * 100;
-			const adjustedY = (marker.y / paperSize.height) * 100;
+			let [adjustedX, adjustedY] = [marker.x, marker.y];
+
+			if (!noAdjustAxis) {
+				// Rust creates a 100*100 grid, so we need to convert the marker coordinates to this grid
+				adjustedX = (marker.x / paperSize.width) * 100;
+				adjustedY = (marker.y / paperSize.height) * 100;
+			}
 
 			// ask api to get altitude and gradient for a certain point
 			const altitudeGradientPair = api

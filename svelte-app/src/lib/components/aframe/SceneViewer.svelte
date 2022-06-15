@@ -22,13 +22,13 @@
 		}
 
 		// If debug mode is enabled -> load hardcoded data
-		console.warn('gltf is loaded from hardcoded data');
+		console.warn('SCENE VIEWER: gltf is loaded from hardcoded data');
 
 		if (!$contourLines) {
 			contourLines.set({
 				curves: hc_curves,
 				hierarchy: hc_hierarchy,
-				size: { width: 850, height: 950 }
+				size: { width: 800, height: 960 }
 			});
 		}
 
