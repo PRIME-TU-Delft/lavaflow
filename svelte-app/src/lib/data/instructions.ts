@@ -25,19 +25,15 @@ export const instructions: Instruction[] = [
 	{
 		title: 'Drawing with dark pen',
 		description:
-			'To recognise your level curves, we prefer a dark and thic pen. Using a lighter pen will result in inaccurate results'
+			'To recognise your level curves, we prefer a dark and thick marker. Using a lighter pen will result in inaccurate results'
 	},
 	{
-		title: 'Propper lighting',
+		title: 'Proper lighting',
 		description:
 			'Level curves are hard to distinguish from background in a low light setting. Try to use natual daylight or a propper ceiling light for best results.'
 	},
 	{
 		title: 'Close your curves',
-		description: 'To avoid false readings, close your curves as much as possible'
+		description: 'To avoid false readings, close your curves, don\'t leave any open-ended lines'
 	},
-	{
-		title: 'Only one paper should be visible',
-		description: 'To avoid false readings, only one paper should be visible at a time'
-	}
 ];

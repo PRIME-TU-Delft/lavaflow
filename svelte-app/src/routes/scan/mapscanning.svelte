@@ -7,6 +7,7 @@
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
 	import Instructions from '$lib/components/Instructions.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import VideoStream from '$lib/components/VideoStream.svelte';
 	import Video from '$lib/components/Video.svelte';
 
@@ -14,15 +15,14 @@
 	import { goto } from '$app/navigation';
 	import { rawImage } from '$lib/stores/imageStore';
 
-	let instructionVisible = false;
+	let instructionVisible: boolean;
 	let videoSource: HTMLVideoElement;
 	let cameraSelected: MediaDeviceInfo;
 	let canvas: HTMLCanvasElement;
 	let loadingNextPage: boolean = false;
 	let deviceId: string;
-	$: title = instructionVisible ? 'Instructions' : 'Capture the image';
 
-	const toggleInstuction = () => (instructionVisible = !instructionVisible);
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	/**
 	 * Goto scan/maptransform
@@ -50,8 +50,12 @@
 	}
 </script>
 
+<Modal title="scan instructions" bind:visible={instructionVisible}>
+	<Instructions />
+</Modal>
+
 <VideoStream {deviceId} let:loading let:stream let:error let:cameraOptions>
-	<Page fullscreen={!loading} {title} closeButton={instructionVisible} on:close={toggleInstuction}>
+	<Page fullscreen={!loading} title={'Capture the image'}>
 		<div slot="background">
 			<Video {loading} {stream} />
 		</div>
@@ -70,21 +74,17 @@
 			{/if}
 		</div>
 
-		{#if instructionVisible}
-			<Instructions />
-		{:else}
-			<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream} />
-		{/if}
+		<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream} />
 
 		<div slot="footer">
 			{#if !instructionVisible}
-				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstuction}>
+				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstruction}>
 					Read scan instructions
 				</Button>
-				<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>
-					Capture photo of map
-				</Button>
 			{/if}
+			<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>
+				Capture photo of map
+			</Button>
 		</div>
 	</Page>
 </VideoStream>
