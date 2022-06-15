@@ -302,6 +302,38 @@
 		}
 	});
 
+	if(!AFRAME.primitives.primitives['a-draw-curve']){
+		AFRAME.registerPrimitive('a-draw-curve', {
+		defaultComponents: {
+			'draw-curve': {}
+		},
+		mappings: {
+			curveref: 'draw-curve.curve'
+		}
+	});
+  } 
+
+  if(!AFRAME.primitives.primitives['a-curve-point']){
+	AFRAME.registerPrimitive('a-curve-point', {
+		defaultComponents: {
+			'curve-point': {}
+		},
+		mappings: {}
+	});
+}
+
+if(!AFRAME.primitives.primitives['a-curve']){
+	AFRAME.registerPrimitive('a-curve', {
+		defaultComponents: {
+			curve: {}
+		},
+
+		mappings: {
+			type: 'curve.type'
+		}
+	});
+}
+
 	AFRAME.registerComponent('lava-path', {
 		init: function () {
 			console.log('lava path:');
@@ -317,24 +349,22 @@
 				const points = $gltfStore.lava_paths[j];
 
 				//create curve element
-				const curve = document.createElement('a-entity');
-				curve.setAttribute('a-curve', '');
+				const curve = document.createElement('a-curve');
 				curve.setAttribute('id', 'track' + j);
 
 				//add points per curve
 				for (let i = 0; i < points.length; i++) {
+					//y and z swapped wrt given paths because Aframe uses different axes
 					const v = points[i];
 					const x = v[0];
-					const y = v[1];
-					const z = v[2];
+					const y = v[2];
+					const z = v[1];
 
-					const p = document.createElement('a-entity');
-					p.setAttribute('a-curve-point', '');
-					//y and z swapped wrt given paths because Aframe uses different axes
+					const p = document.createElement('a-curve-point');
 					p.setAttribute('position', {
 						x: x,
-						y: z,
-						z: y
+						y: y,
+						z: z,
 					});
 
 					curve.appendChild(p);
