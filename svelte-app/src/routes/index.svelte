@@ -41,7 +41,9 @@
 		class="landing_page_container"
 		style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);"
 	>
-		<div class="introduction" />
+		<div class="introduction">
+			The climate crisis is upon us! Lava tends to very precisely follow the steepest downwards direction, when it flows down the hills of a volcano. Its intense heat makes for a great opportunity to generate electricity for nearby cities. Your job is to predict where the lava will flow and place steam turbines on its paths. The steam turbines generate higher amounts of electricity as the lava reaches closer. Save the world by using this amazing sustainable energy-soruce!
+		</div>
 
 		<div class="get_started_button">
 			<Button large on:click={get_started}>Get started</Button>
