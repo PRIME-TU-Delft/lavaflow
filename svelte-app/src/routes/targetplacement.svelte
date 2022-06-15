@@ -15,6 +15,7 @@
 
 	import { onMount } from 'svelte';
 	import { mdiPin, mdiTrashCan, mdiBookOpenVariant } from '@mdi/js';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
 
 	let targetSelected = -1;
 	let instructionVisible = false;
@@ -43,6 +44,7 @@
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
 	<div slot="background" style="background:#aaa;" />
 
+	{#if $contourLines?.curves && $difficultyStore}
 	<div class="sketch">
 		<P5TargetPlacement
 			bind:targetSelected
@@ -51,6 +53,7 @@
 			curves={$contourLines.curves}
 		/>
 	</div>
+	{/if}
 		
 
 	<div slot="footer">

@@ -40,8 +40,7 @@
 				p5.strokeWeight(1);
 				p5.stroke('#f2682c');
 
-				const posX = (crater[0] * foregroundWidth) / 100;
-				const posY = (crater[1] * foregroundHeight) / 100;
+				const [posX, posY] = crater;
 
 				// Inner ring
 				p5.fill('#f2682c');

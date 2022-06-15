@@ -11,7 +11,7 @@
 	<!----------------------------------------------------------------
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
-	<a-entity lava-path scale={scaleString} >
+	<a-entity scale={scaleString} >
 
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--

@@ -26,7 +26,7 @@
 			return goto('/scan/mapscanning');
 		}
 		await gltfStore.setup($contourLines);
-		gltfStore.build();
+		gltfStore.build($contourLines);
 
 		gltfLoaded = true;
 	});

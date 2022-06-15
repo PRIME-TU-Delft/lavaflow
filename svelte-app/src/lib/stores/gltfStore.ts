@@ -178,13 +178,16 @@ function createGltfStore() {
 
 			api_settings.apply_to_api(api);
 		},
-		build: () => {
+		build: (curveTree: CurveTree) => {
 			// Call the wasm api to build the model
 			model = api.build().to_js() as Model;
 			model.gltf_url = gltfStringToUrl(model.gltf);
 
 			// (re-)set the crater locations
-			craterLocations.set(model.craters);
+			craterLocations.set(model.craters.map(c => [
+				(c[0] * curveTree.size.width) / 100,
+				(c[1] * curveTree.size.width) / 100
+			]));
 
 			// set the gltf store to the gltf string
 			set(model);

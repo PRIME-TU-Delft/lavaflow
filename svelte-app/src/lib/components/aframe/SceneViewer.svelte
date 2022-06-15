@@ -35,7 +35,7 @@
 		}
 
 		await gltfStore.setup($contourLines);
-		gltfStore.build();
+		gltfStore.build($contourLines);
 	});
 </script>
 
