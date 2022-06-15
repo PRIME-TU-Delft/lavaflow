@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
+	import { gltfStore } from '$lib/stores/gltfStore';
+	import { targetLocations } from '$lib/stores/locationStore';
 	import Draggable from '$lib/data/draggable';
 
 	export let scale: [number, number, number];
@@ -11,8 +12,7 @@
 	<!----------------------------------------------------------------
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
-	<a-entity scale={scaleString} >
-
+	<a-entity scale={scaleString}>
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>

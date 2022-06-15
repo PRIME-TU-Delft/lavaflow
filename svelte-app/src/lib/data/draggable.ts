@@ -1,4 +1,4 @@
-import p5 from 'p5';
+import type p5 from 'p5';
 
 const STROKE_WIDTH = 4;
 
@@ -16,7 +16,7 @@ export default class Draggable {
 	size: number;
 	offsetX: number;
 	offsetY: number;
-	instruction: string = "";
+	instruction: string = '';
 	instruction_width: number = -1;
 	instruction_height: number = -1;
 
