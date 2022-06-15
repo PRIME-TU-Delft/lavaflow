@@ -69,10 +69,13 @@
 
 			// The user will have to insert at least a certain amount of steam-turbines
 			// this amount is defined in the difficultyStore
-			let msg = '';
-			if ($targetLocations.length < $difficultyStore.min_steam_turbines) {
+			let msg = "";
+			if ($targetLocations.length != $difficultyStore.min_steam_turbines && $difficultyStore.min_steam_turbines == $difficultyStore.max_steam_turbines) {
 				// The player hasn't yet placed enough turbines
-				msg = 'You must place at least ' + $difficultyStore.min_steam_turbines + ' steam turbines';
+				msg = "You must place exactly " + $difficultyStore.min_steam_turbines + " steam turbines";
+			} else if ($targetLocations.length < $difficultyStore.min_steam_turbines) {
+				// The player hasn't yet placed enough turbines
+				msg = "You must place at least " + $difficultyStore.min_steam_turbines + " steam turbines";
 			} else if ($targetLocations.length > $difficultyStore.max_steam_turbines) {
 				// The player placed too many turbines
 				msg = 'You may maximally place ' + $difficultyStore.max_steam_turbines + ' steam turbines';
