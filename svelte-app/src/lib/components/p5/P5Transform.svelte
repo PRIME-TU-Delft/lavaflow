@@ -36,7 +36,7 @@
 			points[0].setInstruction("Drag me to the rectangle\non the paper.", 190, 40);
 			points[1].setInstruction("Drag me to the cross\non the paper.", 190, 40);
 			points[2].setInstruction("Drag me to the triangle\non the paper.", 190, 40);
-			points[3].setInstruction("Drag me to the circle\non the paper.", 190, 40);
+			points[3].setInstruction("Drag me to the circle\non the paper.", 190, 40, true);
 		};
 
 		/**

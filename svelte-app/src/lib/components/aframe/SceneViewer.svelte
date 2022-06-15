@@ -8,6 +8,7 @@
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 	import { debugMode } from '$lib/stores/debugStore';
 
@@ -34,7 +35,7 @@
 			});
 		}
 
-		await gltfStore.setup($contourLines);
+		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
 		gltfStore.build($contourLines);
 	});
 </script>

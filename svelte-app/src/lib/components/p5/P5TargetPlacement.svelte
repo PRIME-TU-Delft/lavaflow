@@ -49,7 +49,7 @@
 
 				// Outer ring - for showing users the minumum distance from the crater
 				p5.strokeWeight(0.5);
-				p5.ellipse(posX, posY, 150, 150);
+				p5.ellipse(posX, posY, $difficultyStore.min_crater_distance*2, $difficultyStore.min_crater_distance*2);
 			}
 
 			// Draw the turbine-markers
@@ -60,12 +60,12 @@
 				target.update(
 					p5,
 					craters,
-					75,
+					$difficultyStore.min_crater_distance,
 					$targetLocations,
 					$difficultyStore.min_steam_turbine_separation,
 					i
 				);
-				target.drawCircle(p5, markerSize, i);
+				target.drawCircle(p5, markerSize, i+1);
 			}
 
 			// The user will have to insert at least a certain amount of steam-turbines
@@ -80,14 +80,14 @@
 			} else if ($targetLocations.length < $difficultyStore.min_steam_turbines) {
 				// The player hasn't yet placed enough turbines
 				msg = 'You must place at least ' + $difficultyStore.min_steam_turbines + ' steam turbines';
-			} else if ($targetLocations.length > $difficultyStore.max_steam_turbines) {
+			} else if ($targetLocations.length == $difficultyStore.max_steam_turbines) {
 				// The player placed too many turbines
-				msg = 'You may maximally place ' + $difficultyStore.max_steam_turbines + ' steam turbines';
+				msg = 'You have reached the maximal amount of ' + $difficultyStore.max_steam_turbines + ' steam turbines';
 			}
 
 			if (
 				$targetLocations.length < $difficultyStore.min_steam_turbines ||
-				$targetLocations.length > $difficultyStore.max_steam_turbines
+				$targetLocations.length >= $difficultyStore.max_steam_turbines
 			) {
 				p5.noStroke();
 				p5.fill(51);
@@ -97,7 +97,7 @@
 				let text_width = p5.textWidth(msg);
 
 				p5.rectMode(p5.CENTER);
-				p5.rect(p5.width / 2, 60, 300, 30);
+				p5.rect(p5.width / 2, 60, text_width + 10, 30);
 
 				p5.strokeWeight(1);
 				p5.fill(255);
