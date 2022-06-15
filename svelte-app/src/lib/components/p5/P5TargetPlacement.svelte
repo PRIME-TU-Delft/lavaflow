@@ -38,14 +38,17 @@
 				p5.strokeWeight(1);
 				p5.stroke('#f2682c');
 
+				const posX = (crater[0] * foregroundWidth) / 100;
+				const posY = (crater[1] * foregroundHeight) / 100;
+
 				// Inner ring
 				p5.fill('#f2682c');
-				p5.ellipse(crater[0], crater[1], 50, 50);
+				p5.ellipse(posX, posY, 50, 50);
 				p5.noFill();
 
 				// Outer ring - for showing users the minumum distance from the crater
 				p5.strokeWeight(0.5);
-				p5.ellipse(crater[0], crater[1], 150, 150);
+				p5.ellipse(posX, posY, 150, 150);
 			}
 
 			// Draw the turbine-markers
