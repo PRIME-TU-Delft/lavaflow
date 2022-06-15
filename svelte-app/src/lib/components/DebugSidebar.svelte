@@ -120,6 +120,7 @@
 	/**
 	 * Set a certain value of a smooth parameter
 	 */
+	// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 	function setParameter(key: string, value: any) {
 		smoothParametersOpen.setValue(key, value);
 	}
