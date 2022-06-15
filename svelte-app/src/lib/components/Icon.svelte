@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let path: string;
 	export let size = 1;
-	export let color: string = '';
+	export let color = '';
 	export let flip: 'h' | 'v' | '' = '';
 	export let rotate = 0;
 	export let spin = 0;
@@ -11,7 +11,7 @@
 	$: inverse = typeof spin !== 'boolean' && spin < 0 ? true : false;
 	$: spinfunc = inverse ? 'spin-inverse' : 'spin';
 
-	const getStyles = (size: number, color: string, flip: string, rotate: number, spin: number) => {
+	const getStyles = (size: number, color: string, flip: string, rotate: number) => {
 		const transform = [];
 		const styles = [];
 		if (size !== null) {
@@ -32,7 +32,7 @@
 			return `${cur} ${item[0]}:${item[1]};`;
 		}, '');
 	};
-	$: style = getStyles(size, color, flip, rotate, spin);
+	$: style = getStyles(size, color, flip, rotate);
 </script>
 
 <svg viewBox="0 0 24 24" {style}>

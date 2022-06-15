@@ -12,6 +12,7 @@
 	import { debugMode } from '$lib/stores/debugStore';
 
 	export let arMode = false;
+	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
 
 	onMount(async () => {
 		if ($gltfStore) return; // When gltf store is loaded -> don't (re)load again
@@ -23,13 +24,13 @@
 		}
 
 		// If debug mode is enabled -> load hardcoded data
-		console.warn('gltf is loaded from hardcoded data');
+		console.warn('SCENE VIEWER: gltf is loaded from hardcoded data');
 
 		if (!$contourLines) {
 			contourLines.set({
 				curves: hc_curves,
 				hierarchy: hc_hierarchy,
-				size: { width: 850, height: 950 }
+				size: { width: 800, height: 960 }
 			});
 		}
 
@@ -38,7 +39,7 @@
 	});
 </script>
 
-<a-scene class:arMode renderer="logarithmicDepthBuffer: true;" embedded vr-mode-ui="enabled: false">
+<a-scene class:arMode embedded vr-mode-ui="enabled: false">
 	<slot name="overlay">
 		<div class="button backButton">
 			<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
@@ -60,13 +61,13 @@
 		<a-marker preset="hiro">
 			<a-box position="0 0 -1" rotation="0 0 0" color="red" />
 
-			<AframeModels />
+			<AframeModels {scale} />
 		</a-marker>
 	{:else}
-		<AframeModels />
+		<AframeModels {scale} />
 	{/if}
 
-	<a-camera />
+	<a-camera position="4 2 7"/>
 </a-scene>
 
 <style>

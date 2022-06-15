@@ -3,12 +3,12 @@ import type p5 from 'p5';
 const STROKE_WIDTH = 4;
 
 export default class Draggable {
-	dragging: boolean = false;
-	enable_selection: boolean = false;
-	last_selected: boolean = true;
-	drag_translated: boolean = false;
-	too_close_to_crater: boolean = false;
-	too_close_to_other_target: boolean = false;
+	dragging = false;
+	enable_selection = false;
+	last_selected = true;
+	drag_translated = false;
+	too_close_to_crater = false;
+	too_close_to_other_target = false;
 	x: number;
 	y: number;
 	old_x: number;
@@ -28,7 +28,7 @@ export default class Draggable {
 	 * @param {number} y initial y coordinate of the marker
 	 * @param {number} size height/width of the draggable surface in pixels
 	 */
-	constructor(x: number, y: number, size: number, offsetX: number = 0, offsetY: number = 0) {
+	constructor(x: number, y: number, size: number, offsetX = 0, offsetY = 0) {
 		this.x = x;
 		this.y = y;
 		this.old_x = x;
@@ -80,9 +80,9 @@ export default class Draggable {
 			this.too_close_to_crater = false;
 
 			for (let i = 0; i < avoid_craters.length; i++) {
-				let dx = avoid_craters[i][0] - this.x;
-				let dy = avoid_craters[i][1] - this.y;
-				let dist = Math.sqrt(dx * dx + dy * dy);
+				const dx = avoid_craters[i][0] - this.x;
+				const dy = avoid_craters[i][1] - this.y;
+				const dist = Math.sqrt(dx * dx + dy * dy);
 				if (dist <= crater_distance) {
 					this.too_close_to_crater = true;
 					break;
@@ -99,9 +99,9 @@ export default class Draggable {
 					continue;
 				}
 
-				let dx = avoid_targets[i].x - this.x;
-				let dy = avoid_targets[i].y - this.y;
-				let dist = Math.sqrt(dx * dx + dy * dy);
+				const dx = avoid_targets[i].x - this.x;
+				const dy = avoid_targets[i].y - this.y;
+				const dist = Math.sqrt(dx * dx + dy * dy);
 				if (dist <= target_distance) {
 					this.too_close_to_other_target = true;
 					break;
@@ -152,7 +152,7 @@ export default class Draggable {
 		p5.textSize(15);
 		p5.textAlign(p5.CENTER);
 
-		let text_width = p5.textWidth(msg);
+		const text_width = p5.textWidth(msg);
 
 		p5.rectMode(p5.CORNER);
 		p5.rect(this.x - text_width / 2 - 5, this.y - 35, text_width + 10, 20);

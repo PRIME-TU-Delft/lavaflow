@@ -157,7 +157,7 @@ function createGltfStore() {
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
 
-			let api_settings = new ApiSettings(
+			const api_settings = new ApiSettings(
 /*				 OpenCV tree */ tree,
 /*						Rows */ 45,
 /*					 Columns */ 45,
@@ -177,8 +177,6 @@ function createGltfStore() {
 			);
 
 			api_settings.apply_to_api(api);
-
-			
 		},
 		build: () => {
 			// Call the wasm api to build the model
@@ -191,12 +189,16 @@ function createGltfStore() {
 			// set the gltf store to the gltf string
 			set(model);
 		},
-		getAlitituteAndGradient: (marker: Draggable): AltitudeGradientPair => {
+		getAlitituteAndGradient: (marker: Draggable, noAdjustAxis = false): AltitudeGradientPair => {
 			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };
 
-			// Rust creates a 100*100 grid, so we need to convert the marker coordinates to this grid
-			const adjustedX = (marker.x / paperSize.width) * 100;
-			const adjustedY = (marker.y / paperSize.height) * 100;
+			let [adjustedX, adjustedY] = [marker.x, marker.y];
+
+			if (!noAdjustAxis) {
+				// Rust creates a 100*100 grid, so we need to convert the marker coordinates to this grid
+				adjustedX = (marker.x / paperSize.width) * 100;
+				adjustedY = (marker.y / paperSize.height) * 100;
+			}
 
 			// ask api to get altitude and gradient for a certain point
 			const altitudeGradientPair = api

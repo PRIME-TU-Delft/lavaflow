@@ -5,15 +5,14 @@
 
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
-	import { contourLines } from '$lib/stores/contourLineStore';
 	import { gltfStore } from '$lib/stores/gltfStore';
 
-	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 	import { onMount, onDestroy } from 'svelte';
 
 	import { THREE } from 'aframe';
 
 	let ready = false;
+	let scale: [number, number, number] = [0.05, 0.025, 0.05];
 	const zAxis = new THREE.Vector3(0, 0, 1);
 
 	function degToRad(deg: number) {
@@ -302,14 +301,42 @@
 		}
 	});
 
+	if(!AFRAME.primitives.primitives['a-draw-curve']){
+		AFRAME.registerPrimitive('a-draw-curve', {
+		defaultComponents: {
+			'draw-curve': {}
+		},
+		mappings: {
+			curveref: 'draw-curve.curve'
+		}
+	});
+  } 
+
+  if(!AFRAME.primitives.primitives['a-curve-point']){
+	AFRAME.registerPrimitive('a-curve-point', {
+		defaultComponents: {
+			'curve-point': {}
+		},
+		mappings: {}
+	});
+}
+
+if(!AFRAME.primitives.primitives['a-curve']){
+	AFRAME.registerPrimitive('a-curve', {
+		defaultComponents: {
+			curve: {}
+		},
+
+		mappings: {
+			type: 'curve.type'
+		}
+	});
+}
+
 	AFRAME.registerComponent('lava-path', {
 		init: function () {
 			console.log('lava path:');
 			console.log($gltfStore.lava_paths);
-
-			const scale_x = 0.05;
-			const scale_y = 0.025;
-			const scale_z = 0.05;
 
 			if (!$gltfStore.lava_paths?.length) return;
 
@@ -317,24 +344,22 @@
 				const points = $gltfStore.lava_paths[j];
 
 				//create curve element
-				const curve = document.createElement('a-entity');
-				curve.setAttribute('a-curve', '');
+				const curve = document.createElement('a-curve');
 				curve.setAttribute('id', 'track' + j);
 
 				//add points per curve
 				for (let i = 0; i < points.length; i++) {
-					const v = points[i];
-					const x = v[0];
-					const y = v[1];
-					const z = v[2];
-
-					const p = document.createElement('a-entity');
-					p.setAttribute('a-curve-point', '');
 					//y and z swapped wrt given paths because Aframe uses different axes
+					const v = points[i];
+					const x = v[0] ;
+					const y = v[2] ;
+					const z = v[1] ;
+
+					const p = document.createElement('a-curve-point');
 					p.setAttribute('position', {
-						x: x,
-						y: z,
-						z: y
+						 x: (x/scale[0])   ,
+						 y: (y/scale[1]) ,
+						 z: (z/scale[2]) ,
 					});
 
 					curve.appendChild(p);
@@ -349,7 +374,7 @@
 					'clone-along-curve',
 					'curve: #track' + j + '; spacing: 0.035; rotation: 90 0 0;'
 				);
-				track.setAttribute('geometry', 'primitive:cylinder; height:0.04; radius:0.5 ;');
+				track.setAttribute('geometry', 'primitive:cylinder; height:0.04; radius:0.4 ;');
 				track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.001');
 				//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
 				const total_time = $gltfStore.lava_paths.length * 2000;
@@ -365,47 +390,6 @@
 		}
 	});
 
-	onMount(async () => {
-		if (!$gltfStore) {
-			if (!$contourLines) {
-				contourLines.set({
-					curves: hc_curves,
-					hierarchy: hc_hierarchy,
-					size: { width: 850, height: 950 }
-				});
-			}
-
-			await gltfStore.setup($contourLines);
-			gltfStore.build();
-			console.warn('gltf is loaded from hardcoded data');
-		}
-
-		if (!$gltfStore.lava_paths) {
-			$gltfStore.lava_paths = [
-				[
-					[4, 4, 7],
-					[1, 1, 3],
-					[4, 2, 2],
-					[3, 3, -1]
-				],
-				[
-					[1, 1, 3],
-					[0, -2, -4],
-					[1, 1, -2],
-					[1, 2, -1],
-					[2, 2, 0]
-				],
-				[
-					[1, 1, -2],
-					[1, 4, -2],
-					[12, 1, -1]
-				]
-			];
-		}
-
-		ready = true;
-	});
-
 	onDestroy(() => {
 		delete AFRAME.components['curve-point'];
 		delete AFRAME.components['curve'];
@@ -416,4 +400,4 @@
 	});
 </script>
 
-<SceneViewer />
+<SceneViewer {scale} />
