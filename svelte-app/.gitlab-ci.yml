@@ -41,6 +41,13 @@ typescript-test:
   image: node:16
   before_script:
     - cd svelte-app
-    - yarn
+    - yarn --dev
   script:
-    - yarn test
+    - yarn test --ci --reporters=default --reporters=jest-junit --coverage
+  artifacts:
+    reports:
+      junit:
+        - svelte-app/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: svelte-app/coverage/clover.xml
