@@ -158,18 +158,17 @@ function createGltfStore() {
 			api = new wasm.ModelConstructionApi();
 
 			const api_settings = new ApiSettings(
-				tree /* OpenCV tree */,
-				45 /* Rows */,
-				45 /* Columns */,
-				curveTree.size.width /* Width */,
-				curveTree.size.height /* Height */,
-				5 /*	Curve Point Separation */,
-				50 /* SVC Distance */,
-				1 /*	Catmull Clark Iterations */,
-				20 /*	Lava Path Length */,
-				0.02 /* Lava Path Forking */,
-				[
-					/* Smoothing Operations */
+/*				 OpenCV tree */ tree,
+/*						Rows */ 45,
+/*					 Columns */ 45,
+/*					   Width */ curveTree.size.width,
+/*					  Height */ curveTree.size.height,
+/*	  Curve Point Separation */ 5,
+/*		  		SVC Distance */ 50,
+/*	Catmull Clark Iterations */ 1,
+/*			Lava Path Length */ 20,
+/*		   Lava Path Forking */ 0.2,
+/*		Smoothing Operations */ [
 					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.9, 5, 1, false),
 					new wasm.SmoothingOperationApplySmoothToMiddleLayers(0.7, 3, 5, false),
 					new wasm.SmoothingOperationIncreaseAltitudeForMountainTops(2, false),
