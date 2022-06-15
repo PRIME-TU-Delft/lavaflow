@@ -43,11 +43,8 @@ typescript-test:
     - cd svelte-app
     - yarn --dev
   script:
-    - yarn test --ci --reporters=default --reporters=jest-junit --coverage
+    - yarn test --ci --reporters=default --reporters=jest-junit
   artifacts:
     reports:
       junit:
         - svelte-app/junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: svelte-app/coverage/clover.xml

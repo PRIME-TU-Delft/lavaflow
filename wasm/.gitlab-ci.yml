@@ -54,11 +54,8 @@ wasm-test:
   script:
     - cd wasm
     - cargo nextest run
-    - cargo tarpaulin --skip-clean -o xml
+    - cargo tarpaulin --skip-clean
   artifacts:
     reports:
       junit:
         - wasm/target/nextest/default/junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: wasm/cobertura.xml
