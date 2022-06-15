@@ -25,7 +25,7 @@
 
 			const size = 100; // size of draggble surface'
 
-			points = [];
+			points = []; // make sure the array is empty to make sure it does not add more than 4 points
 
 			points.push(new Draggable(foregroundWidth * 0.1, foregroundHeight * 0.1, size)); // []
 			points.push(new Draggable(foregroundWidth * 0.9, foregroundHeight * 0.1, size)); // ><

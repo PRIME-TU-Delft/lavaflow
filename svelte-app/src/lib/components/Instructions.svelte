@@ -16,7 +16,7 @@
 		<div class="title">Drawing with dark pen</div>
 		<div class="description">
 			To recognise your level curves, we prefer a dark and thick marker. Using a lighter pen will
-			result in inaccurate results
+			likely not work
 		</div>
 	</div>
 	<div class="instruction">
