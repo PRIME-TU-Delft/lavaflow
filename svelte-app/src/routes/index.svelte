@@ -10,19 +10,17 @@
 	import Button from '$lib/components/Button.svelte';
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
 
-	onMount(async () => {
-		if ($difficultyStore) return; // When gltf store is loaded -> don't (re)load again
+	import { difficulty_modes } from '$lib/data/difficultyModes';
 
-		await difficultyStore.setup();
-		difficultyStore.build();
+	onMount(() => {
+		// When difficultyStore is loaded -> don't (re)load again
+		if ($difficultyStore) return;
+
+		difficultyStore.setup();
 	});
 
-	function updateDifficulty() {
-		difficultyStore.set_difficulty_to($difficultyStore.name);
-	}
-
 	let header_height = 20;
-	let page_shift_top = 0;
+	let page_shift_top = -1;
 	// let header_height = 10;
 	// let page_shift_top = -1;
 
@@ -49,16 +47,20 @@
 </header>
 
 <main>
-	<div class="landing_page_container" style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);">
-		<div class="introduction">
-			
-		</div>
+	<div
+		class="landing_page_container"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);"
+	>
+		<div class="introduction" />
 
 		<div class="get_started_button">
 			<Button large on:click={get_started}>Get started</Button>
 		</div>
 	</div>
-	<div class="get_started_container" style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);">
+	<div
+		class="get_started_container"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);"
+	>
 		<Button secondary small on:click={go_back_up}>Back to starting page</Button>
 
 		<div class="difficulty_container">
@@ -69,15 +71,25 @@
 				{#if $difficultyStore}
 					<div class="difficulty_description_container">
 						<h4>{$difficultyStore.name}</h4>
-						<p class="min_turbines">You must place at least <span class="min_turbines_bold">{$difficultyStore.min_steam_turbines}</span> steam turbines.</p>
+						<p class="min_turbines">
+							You must place at least <span class="min_turbines_bold"
+								>{$difficultyStore.min_steam_turbines}</span
+							> steam turbines.
+						</p>
 						<p>{$difficultyStore.description}</p>
 					</div>
 				{/if}
 			</div>
 
 			{#if $difficultyStore}
-				<Dropdown secondary large bind:value={$difficultyStore.name} options={difficultyStore.get_options()} let:option on:change={updateDifficulty}>
-					Difficulty: {option}
+				<Dropdown
+					secondary={true}
+					large={true}
+					bind:value={$difficultyStore}
+					options={difficulty_modes}
+					let:option
+				>
+					Difficulty: {option.name}
 				</Dropdown>
 			{/if}
 		</div>
@@ -175,7 +187,7 @@
 			font-size: 1.5em;
 		}
 	}
-	
+
 	.landing_page_container {
 		position: relative;
 
@@ -225,7 +237,7 @@
 			}
 
 			p.min_turbines {
-				font-family: "Roboto Slab";
+				font-family: 'Roboto Slab';
 				font-weight: 200;
 
 				margin-top: 10px;
@@ -248,6 +260,5 @@
 		.start_flowing_button {
 			position: relative;
 		}
-
 	}
 </style>
