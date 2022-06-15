@@ -3,6 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="../favicon.png" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<style>
@@ -12,7 +15,7 @@
 				padding: 0;
 				margin: 0 !important;
 				box-sizing: border-box;
-				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
+				font-family: "Arial", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
 					Cantarell, 'Helvetica Neue', sans-serif;
 			}
 
@@ -20,10 +23,46 @@
 				height: var(--vh);
 			}
 
+			h1, h2, h3, h4, h5, h6 {
+				font-family: "Roboto Slab";
+			}
+
+			h1 {
+				font-weight: 900;
+				font-size: 3em;
+			}
+
+			h2 {
+				font-weight: 700;
+				font-size: 2em;
+			}
+
+			h3 {
+				font-weight: 600;
+				font-size: 1.6em;
+			}
+
+			h4 {
+				font-weight: 600;
+				font-size: 1.1em;
+			}
+
+			h5 {
+				font-weight: 400;
+				font-size: 1em;
+			}
+
+			h6 {
+				font-weight: 400;
+				font-size: 1em;
+			}
+
+
 			:root {
 				--primary-color: rgb(225 95 85 / 90%);
 				--secondary-color: rgb(144 53 44 / 90%);
-				--text-color: rgba(94, 14, 14, 100%);
+				/* --text-color: rgba(94, 14, 14, 100%); */
+				--text-color: rgb(255, 255, 255);
 				--text-color-secondary: rgb(230 223 223);
 			}
 		</style>
@@ -39,29 +78,31 @@
 		</script>
 
 		<meta http-equiv="content-security-policy" content="">
-	<link rel="stylesheet" href="/_app/immutable/assets/pages/scan/mapscanning.svelte-0de776e0.css">
-	<link rel="stylesheet" href="/_app/immutable/assets/Button-0909b9de.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/pages/scan/mapscanning.svelte-ab799fc3.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/Button-8a3752fc.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/Dropdown-a1b629cf.css">
 	<link rel="stylesheet" href="/_app/immutable/assets/Page-56f87161.css">
 	<link rel="stylesheet" href="/_app/immutable/assets/Modal-7bba798f.css">
-	<link rel="modulepreload" href="/_app/immutable/start-05bf29d4.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-b38653d6.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-f8726bb3.js">
+	<link rel="modulepreload" href="/_app/immutable/start-62e4a657.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-12998d59.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-d282005e.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-60cab3ee.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/singletons-d1fb5791.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-ed3ae1a1.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/debugStore-e83bc269.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/scan/mapscanning.svelte-d7516e5f.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/Button-b2e517d1.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/Page-63cca219.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/Modal-578a1abe.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-1999bbec.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/debugStore-08e1510f.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/scan/mapscanning.svelte-8afff61c.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Button-1b490879.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Dropdown-ea44566a.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Page-503a883b.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Modal-ac7c73c5.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/navigation-0e6511d1.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/imageStore-aa14458a.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/imageStore-f0761c82.js">
 	</head>
 	<body>
 		<div>
 
 
-<div class="background svelte-1b8j2rq"><div class="modal svelte-1b8j2rq"><button  class="svelte-1eyq29y"><div class="title svelte-1eyq29y">
+<div class="background svelte-1b8j2rq"><div class="modal svelte-1b8j2rq"><button  class="svelte-1n8dks1"><div class="title svelte-1n8dks1">
 			Close scan instructions</div>
 
 		
@@ -101,7 +142,7 @@
 		</div></div>
 </div>
 
-			<button  class="svelte-1eyq29y"><div class="title svelte-1eyq29y">
+			<button  class="svelte-1n8dks1"><div class="title svelte-1n8dks1">
 			Close scan instructions</div>
 
 		
@@ -115,7 +156,7 @@
 		<div class="backdrop svelte-kogjrd"></div></div>
 
 	<div class="foreground svelte-kogjrd"><header class="svelte-kogjrd">
-				<button  class="svelte-1eyq29y  noMargin"><div class="title svelte-1eyq29y">
+				<button  class="svelte-1n8dks1  noMargin"><div class="title svelte-1n8dks1">
 			<svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:var(--text-color);" class="svelte-z4mprv"><path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"></path></svg>
 					Back
 				</div>
@@ -134,7 +175,7 @@
 	</div></main>
 
 		<footer class="svelte-kogjrd"><div slot="footer">
-			<button  class="svelte-1eyq29y"><div class="title svelte-1eyq29y"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"></path></svg>
+			<button  class="svelte-1n8dks1"><div class="title svelte-1n8dks1"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"></path></svg>
 			Capture photo of map
 			</div>
 
@@ -145,10 +186,10 @@
 <canvas id="captureCanvas" style="display: none; position: absolute"></canvas>
 
 
-		<script type="module" data-sveltekit-hydrate="uxabq6">
-		import { start } from "/_app/immutable/start-05bf29d4.js";
+		<script type="module" data-sveltekit-hydrate="1431i72">
+		import { start } from "/_app/immutable/start-62e4a657.js";
 		start({
-			target: document.querySelector('[data-sveltekit-hydrate="uxabq6"]').parentNode,
+			target: document.querySelector('[data-sveltekit-hydrate="1431i72"]').parentNode,
 			paths: {"base":"","assets":""},
 			session: {},
 			route: true,

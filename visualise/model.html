@@ -3,6 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="../favicon.png" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<style>
@@ -12,7 +15,7 @@
 				padding: 0;
 				margin: 0 !important;
 				box-sizing: border-box;
-				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
+				font-family: "Arial", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
 					Cantarell, 'Helvetica Neue', sans-serif;
 			}
 
@@ -20,10 +23,46 @@
 				height: var(--vh);
 			}
 
+			h1, h2, h3, h4, h5, h6 {
+				font-family: "Roboto Slab";
+			}
+
+			h1 {
+				font-weight: 900;
+				font-size: 3em;
+			}
+
+			h2 {
+				font-weight: 700;
+				font-size: 2em;
+			}
+
+			h3 {
+				font-weight: 600;
+				font-size: 1.6em;
+			}
+
+			h4 {
+				font-weight: 600;
+				font-size: 1.1em;
+			}
+
+			h5 {
+				font-weight: 400;
+				font-size: 1em;
+			}
+
+			h6 {
+				font-weight: 400;
+				font-size: 1em;
+			}
+
+
 			:root {
 				--primary-color: rgb(225 95 85 / 90%);
 				--secondary-color: rgb(144 53 44 / 90%);
-				--text-color: rgba(94, 14, 14, 100%);
+				/* --text-color: rgba(94, 14, 14, 100%); */
+				--text-color: rgb(255, 255, 255);
 				--text-color-secondary: rgb(230 223 223);
 			}
 		</style>
@@ -39,16 +78,16 @@
 		</script>
 
 		<meta http-equiv="content-security-policy" content="">
-	<link rel="modulepreload" href="/_app/immutable/start-05bf29d4.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-b38653d6.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-f8726bb3.js">
+	<link rel="modulepreload" href="/_app/immutable/start-62e4a657.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-12998d59.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-d282005e.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-60cab3ee.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/singletons-d1fb5791.js">
 	</head>
 	<body>
 		<div>
 		<script type="module" data-sveltekit-hydrate="45h">
-		import { start } from "/_app/immutable/start-05bf29d4.js";
+		import { start } from "/_app/immutable/start-62e4a657.js";
 		start({
 			target: document.querySelector('[data-sveltekit-hydrate="45h"]').parentNode,
 			paths: {"base":"","assets":""},
