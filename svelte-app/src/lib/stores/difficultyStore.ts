@@ -38,5 +38,7 @@ function createDifficultyStore() {
 }
 export const difficultyStore = createDifficultyStore();
 export function cacheDifficultyStore(level: DifficultyLevel) {
-	localStorage.setItem('level', JSON.stringify(level));
+	if (typeof window !== 'undefined') {
+		localStorage.setItem('level', JSON.stringify(level));
+	}
 }

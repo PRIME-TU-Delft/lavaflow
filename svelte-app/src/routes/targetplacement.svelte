@@ -57,6 +57,9 @@
 		
 
 	<div slot="footer">
+		<Button icon={mdiBookOpenVariant} on:click={() => toggleInstruction()}>
+			Read instructions
+		</Button>
 		{#if $contourLines}
 			{#if targetSelected != -1}
 				<Button secondary icon={mdiTrashCan} on:click={removeTarget}>
