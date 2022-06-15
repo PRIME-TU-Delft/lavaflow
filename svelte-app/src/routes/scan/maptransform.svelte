@@ -9,6 +9,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import Instructions from '$lib/components/InstructionsTransformation.svelte';
 
@@ -82,30 +83,30 @@
 	});
 </script>
 
+<Modal title="transformation instructions" closeButtons = "top" bind:visible={instructionVisible}>
+	<Instructions />
+</Modal>
+
 <Page title="Select the level curves" let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="/scan/mapscanning" back>Rescan image</NavigationButton>
 
 	<div slot="background">
 		<img id="backgroundImage" src={$rawImage} alt="background" />
 	</div>
-	
 
-	{#if instructionVisible}
-			<Instructions />
-		{:else}
-			<div class="sketch">
-				<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
-			</div>
-		
-			<img
-				style="display:none"
-				height={foregroundHeight}
-				width={foregroundWidth}
-				id="foregroundImage"
-				src={$rawImage}
-				alt="background"
-			/>
-	{/if}
+	<div class="sketch">
+		<P5Transform bind:points {foregroundHeight} {foregroundWidth} />
+	</div>
+
+	<img
+		style="display:none"
+		height={foregroundHeight}
+		width={foregroundWidth}
+		id="foregroundImage"
+		src={$rawImage}
+		alt="background"
+	/>
+
 
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 

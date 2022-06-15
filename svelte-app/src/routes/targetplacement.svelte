@@ -6,6 +6,7 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import P5TargetPlacement from '$lib/components/p5/P5TargetPlacement.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import Instructions from '$lib/components/InstructionsTargets.svelte';
 
 	import { contourLines } from '$lib/stores/contourLineStore';
@@ -14,7 +15,6 @@
 
 	import { onMount } from 'svelte';
 	import { mdiPin, mdiTrashCan, mdiBookOpenVariant } from '@mdi/js';
-import { instructions } from '$lib/data/instructions';
 
 	let targetSelected = -1;
 	let instructionVisible = false;
@@ -36,31 +36,26 @@ import { instructions } from '$lib/data/instructions';
 	onMount(() => {});
 </script>
 
+<Modal title="transformation instructions" closeButtons = "top" bind:visible={instructionVisible}>
+	<Instructions />
+</Modal>
+
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
 	<div slot="background" style="background:#aaa;" />
 
-	{#if instructionVisible}
-		<Instructions />
-	{:else}
-		{#if $contourLines}
-			<div class="sketch">
-				<P5TargetPlacement
-					bind:targetSelected
-					{foregroundHeight}
-					{foregroundWidth}
-					curves={$contourLines.curves}
-				/>
-			</div>
-		{/if}
-	{/if}
+	<div class="sketch">
+		<P5TargetPlacement
+			bind:targetSelected
+			{foregroundHeight}
+			{foregroundWidth}
+			curves={$contourLines.curves}
+		/>
+	</div>
+		
 
 	<div slot="footer">
 		<Button icon={mdiBookOpenVariant} on:click={() => toggleInstruction()}>
-			{#if instructionVisible}
-				Close instructions
-			{:else}
-				Read instructions
-			{/if}
+			Read instructions
 		</Button>
 		{#if $contourLines}
 			{#if targetSelected != -1}
