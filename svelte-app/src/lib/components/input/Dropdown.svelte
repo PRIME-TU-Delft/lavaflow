@@ -1,6 +1,5 @@
 <script lang="ts">
 import { mdiChevronDown } from "@mdi/js";
-import Icon from "../Icon.svelte";
 
 	type T = $$Generic;
 
