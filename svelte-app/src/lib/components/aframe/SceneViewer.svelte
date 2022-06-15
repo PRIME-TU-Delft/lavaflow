@@ -62,7 +62,7 @@
 		<AframeModels {scale} />
 	{/if}
 
-	<a-camera />
+	<a-camera position="4 2 7"/>
 </a-scene>
 
 <style>
