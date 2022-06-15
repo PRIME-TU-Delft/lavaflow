@@ -357,13 +357,6 @@ if(!AFRAME.primitives.primitives['a-curve']){
 
 					const p = document.createElement('a-curve-point');
 					p.setAttribute('position', {
-							// x: x ,
-							// y: y ,
-							// z: z ,
-
-						//  x: (x*0.05) -4  ,
-						//  y: (y*0.025)  -1 ,
-						//  z: (z*0.05) - 3,
 						 x: (x/scale[0])   ,
 						 y: (y/scale[1]) ,
 						 z: (z/scale[2]) ,

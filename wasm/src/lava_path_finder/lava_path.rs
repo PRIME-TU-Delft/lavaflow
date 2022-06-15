@@ -11,17 +11,19 @@ use crate::objects::point::Point;
 /// * `es` - List of neighbors indexes per point in  the model.
 ///
 /// # Return
-/// *  `Result<Vec<Vec< &'a Point>>, String>` - Result of list of lava paths. A lava path is a list of
+/// *  `Result<(Vec<Vec<&'a Point>>, Point), String>` - Result of list of lava paths and the start point. A lava path is a list of points.
 ///
-pub fn get_lava_paths_super<'a>(highest_points: &[usize], length: usize, fork_val: f32, min_altitude: f32, vs: &'a [Point], es: &'a Vec<Vec<usize>>) -> Result<Vec<Vec<&'a Point>>, String> {
-	let mut paths = LavaPathSet { all_paths: Vec::new() };
+pub fn get_lava_paths_super<'a>(highest_points: &[usize], length: usize, fork_val: f32, min_altitude: f32, vs: &'a [Point], es: &'a Vec<Vec<usize>>) -> Result<(Vec<Vec<&'a Point>>, Vec<&'a Point>), String> {
+	let mut paths = LavaPathSet { all_paths: Vec::new(), lava_start_points: Vec::new() };
 	let start_point = get_start(highest_points, vs, es)?;
+	paths.lava_start_points.push(&vs[start_point]);
 	paths.get_lava_path(start_point, length, fork_val, min_altitude, vs, es)?;
-	Ok(paths.all_paths)
+	Ok((paths.all_paths,paths.lava_start_points))
 }
 
 struct LavaPathSet<'a> {
 	all_paths: Vec<Vec<&'a Point>>,
+	lava_start_points: Vec<&'a Point>
 }
 
 impl<'a> LavaPathSet<'a> {

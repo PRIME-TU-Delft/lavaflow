@@ -271,11 +271,7 @@ impl ModelConstructionApi {
 		let mut top_height = f32::MIN;
 
 		//find max height in normalized model:
-
-		log!("max altitude: {}", max_altitude);
-
 		let normalized_max = *Raster::map(Some(max_altitude), 0.0, max_altitude, 0.0, 100.0).get_or_insert(max_altitude);
-		log!("normalized max : {}", normalized_max);
 
 		for curve in &level_curve_set.level_curves {
 			//use normalized curve height to determine max
@@ -301,18 +297,15 @@ impl ModelConstructionApi {
 		let min_altitude = *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(level_curve_set.altitude_step) / 2.0;
 
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let computed_lava_paths: Vec<Vec<&Point>> =
+		//0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+		let (computed_lava_paths, lava_start_points): (Vec<Vec<&Point>>, Vec<&Point>) =
 			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
-		// Extract the crater by selecting the first point in the lava-path
+		// Extract the crater by selecting the start points in the lava-paths
 		let mut lava_craters: Vec<(f32, f32)> = Vec::new();
-		if !computed_lava_paths.is_empty() && !computed_lava_paths[0].is_empty() {
-			let c = computed_lava_paths[0][0];
-			lava_craters.push((c.x, c.y));
+		for p in &lava_start_points {
+			lava_craters.push((p.x, p.y));
 		}
-
-		log!("lava path generation complete");
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
 		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();

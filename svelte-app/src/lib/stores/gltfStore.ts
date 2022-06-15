@@ -167,7 +167,7 @@ function createGltfStore() {
 				50 /* SVC Distance */,
 				1 /*	Catmull Clark Iterations */,
 				20 /*	Lava Path Length */,
-				0.2 /* Lava Path Forking */,
+				0.02 /* Lava Path Forking */,
 				[
 					/* Smoothing Operations */
 					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.9, 5, 1, false),
