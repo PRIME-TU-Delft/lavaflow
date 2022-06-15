@@ -5,6 +5,7 @@
 	export let loading = false;
 	export let disabled = false;
 	export let large = false;
+	export let small = false;
 	export let secondary = false;
 	export let icon: string = '';
 	export let noMargin = false;
@@ -15,6 +16,7 @@
 	class:disabled={disabled || loading}
 	class:noMargin
 	class:large
+	class:small
 	class:secondary
 	on:click
 >
@@ -46,6 +48,8 @@
 		width: 100%;
 		padding: 0.75rem 1.1rem;
 
+		font-family: "Roboto Slab";
+		font-weight: 700;
 		font-size: 1rem;
 		text-align: left;
 		border: none;
@@ -77,6 +81,10 @@
 
 	.large {
 		padding: 1rem 1.5rem;
+	}
+
+	.small {
+		padding: 0.5rem 1.5rem;
 	}
 
 	.secondary {
