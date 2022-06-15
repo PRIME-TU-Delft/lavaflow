@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AframeModels from '$lib/components/aframe/AframeModels.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
-	import Button from '../Button.svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
