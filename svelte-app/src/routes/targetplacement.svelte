@@ -10,17 +10,17 @@
 	import Instructions from '$lib/components/InstructionsTargets.svelte';
 
 	import { contourLines } from '$lib/stores/contourLineStore';
-	import { targetLocations } from '$lib/stores/gltfStore';
+	import { targetLocations } from '$lib/stores/locationStore';
 	import Draggable from '$lib/data/draggable';
 
-	import { onMount } from 'svelte';
 	import { mdiPin, mdiTrashCan, mdiBookOpenVariant } from '@mdi/js';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
 
 	let targetSelected = -1;
 	let instructionVisible = false;
 
 	const toggleInstruction = () => (instructionVisible = !instructionVisible);
-	
+
 	function addTarget(x: number, y: number) {
 		const newTarget = new Draggable(x, y, 20);
 		newTarget.enableSelection();
@@ -32,26 +32,25 @@
 		targetLocations.remove(targetSelected);
 		targetSelected = -1;
 	}
-
-	onMount(() => {});
 </script>
 
-<Modal title="transformation instructions" closeButtons = "top" bind:visible={instructionVisible}>
+<Modal title="transformation instructions" closeButtons="top" bind:visible={instructionVisible}>
 	<Instructions />
 </Modal>
 
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
 	<div slot="background" style="background:#aaa;" />
 
-	<div class="sketch">
-		<P5TargetPlacement
-			bind:targetSelected
-			{foregroundHeight}
-			{foregroundWidth}
-			curves={$contourLines.curves}
-		/>
-	</div>
-		
+	{#if $contourLines?.curves && $difficultyStore}
+		<div class="sketch">
+			<P5TargetPlacement
+				bind:targetSelected
+				{foregroundHeight}
+				{foregroundWidth}
+				curves={$contourLines.curves}
+			/>
+		</div>
+	{/if}
 
 	<div slot="footer">
 		<Button icon={mdiBookOpenVariant} on:click={() => toggleInstruction()}>

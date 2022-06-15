@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
+	import { gltfStore } from '$lib/stores/gltfStore';
+	import { targetLocations } from '$lib/stores/locationStore';
 	import Draggable from '$lib/data/draggable';
 
 	export let scale: [number, number, number];
@@ -11,8 +12,7 @@
 	<!----------------------------------------------------------------
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
-	<a-entity lava-path scale={scaleString} >
-
+	<a-entity scale={scaleString}>
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>
@@ -62,7 +62,7 @@
 				depth="2.5"
 				height={altAndGrad.altitude / 2}
 				position="{altAndGrad.x} {altAndGrad.altitude / 2} {altAndGrad.y + 0.15}"
-				color="#ff4025"
+				color="#444"
 				scale="1 2 1"
 			/>
 		{/each}
