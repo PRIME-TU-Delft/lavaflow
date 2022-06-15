@@ -20,9 +20,7 @@
 	});
 
 	let header_height = 20;
-	let page_shift_top = -1;
-	// let header_height = 10;
-	// let page_shift_top = -1;
+	let page_shift_top = 0;
 
 	function get_started() {
 		header_height = 10;
