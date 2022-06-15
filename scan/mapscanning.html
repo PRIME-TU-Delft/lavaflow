@@ -39,25 +39,73 @@
 		</script>
 
 		<meta http-equiv="content-security-policy" content="">
-	<link rel="stylesheet" href="/_app/immutable/assets/pages/scan/mapscanning.svelte-ae14864a.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/pages/scan/mapscanning.svelte-0de776e0.css">
 	<link rel="stylesheet" href="/_app/immutable/assets/Button-0909b9de.css">
 	<link rel="stylesheet" href="/_app/immutable/assets/Page-56f87161.css">
-	<link rel="modulepreload" href="/_app/immutable/start-ff112ccf.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-b2cf3344.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-082afcc0.js">
+	<link rel="stylesheet" href="/_app/immutable/assets/Modal-7bba798f.css">
+	<link rel="modulepreload" href="/_app/immutable/start-05bf29d4.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-b38653d6.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-f8726bb3.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-60cab3ee.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/singletons-d1fb5791.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-8133c060.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/debugStore-aae9bc5b.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/scan/mapscanning.svelte-347c98b9.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/Button-2751e271.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/Page-bed51374.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-ed3ae1a1.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/debugStore-e83bc269.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/scan/mapscanning.svelte-d7516e5f.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Button-b2e517d1.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Page-63cca219.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Modal-578a1abe.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/navigation-0e6511d1.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/imageStore-3f8ad5ab.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/imageStore-aa14458a.js">
 	</head>
 	<body>
 		<div>
 
+
+<div class="background svelte-1b8j2rq"><div class="modal svelte-1b8j2rq"><button  class="svelte-1eyq29y"><div class="title svelte-1eyq29y">
+			Close scan instructions</div>
+
+		
+</button>
+
+			<div class="instructions svelte-nxz67r"><h2>Good example of contour map</h2>
+	<div class="example svelte-nxz67r"></div>
+
+	<h2>Instructions</h2>
+
+	<div class="section svelte-nxz67r">Drawing</div>
+	<div class="instruction svelte-nxz67r"><div class="title svelte-nxz67r">Curves should have sufficient margin</div>
+		<div class="description">The curves should have sufficient margin between them, overlapping or close lines are hard to
+			interpret
+		</div></div>
+	<div class="instruction svelte-nxz67r"><div class="title svelte-nxz67r">Drawing with dark pen</div>
+		<div class="description">To recognise your level curves, we prefer a dark and thick marker. Using a lighter pen will
+			likely not work
+		</div></div>
+	<div class="instruction svelte-nxz67r"><div class="title svelte-nxz67r">Close your curves</div>
+		<div class="description">To avoid false readings, close your curves, dont leave any open-ended lines
+		</div></div>
+
+	<div class="section svelte-nxz67r">Scanning</div>
+	<div class="instruction svelte-nxz67r"><div class="title svelte-nxz67r">Four corners visible</div>
+		<div class="description">To scan the level curves, we need to have the four corners visible
+		</div></div>
+	<div class="instruction svelte-nxz67r"><div class="title svelte-nxz67r">Drawing should not be too far</div>
+		<div class="description">Scanning works best from a distance of 0.5 meters from the piece of paper. For best the best
+			result try to scan the paper as close to parallel as possible. This is easiest if you put your
+			drawing on a table instead of hnewing it.
+		</div></div>
+	<div class="instruction svelte-nxz67r"><div class="title svelte-nxz67r">Proper lighting</div>
+		<div class="description">Level curves are hard to distinguish from background in a low light setting. Try to use natual
+			daylight or a propper ceiling light for best results. Be careful of sharp or dark shadows on
+			the drawing, as they might get interpreted as part of your drawing.
+		</div></div>
+</div>
+
+			<button  class="svelte-1eyq29y"><div class="title svelte-1eyq29y">
+			Close scan instructions</div>
+
+		
+</button></div></div>
 
 <div class="page svelte-kogjrd"><div class="background svelte-kogjrd"><div slot="background"><div class="loadingVideo svelte-wvnab8"><div class="svelte-wvnab8"><h1 class="svelte-wvnab8">Loading video...</h1>
 
@@ -69,8 +117,8 @@
 	<div class="foreground svelte-kogjrd"><header class="svelte-kogjrd">
 				<button  class="svelte-1eyq29y  noMargin"><div class="title svelte-1eyq29y">
 			<svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:var(--text-color);" class="svelte-z4mprv"><path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"></path></svg>
-						Back
-					</div>
+					Back
+				</div>
 
 		
 </button>
@@ -85,15 +133,10 @@
 
 	</div></main>
 
-		<footer class="svelte-kogjrd"><div slot="footer"><button  class="svelte-1eyq29y    secondary"><div class="title svelte-1eyq29y"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><path d="M17.5 14.33C18.29 14.33 19.13 14.41 20 14.57V16.07C19.38 15.91 18.54 15.83 17.5 15.83C15.6 15.83 14.11 16.16 13 16.82V15.13C14.17 14.6 15.67 14.33 17.5 14.33M13 12.46C14.29 11.93 15.79 11.67 17.5 11.67C18.29 11.67 19.13 11.74 20 11.9V13.4C19.38 13.24 18.54 13.16 17.5 13.16C15.6 13.16 14.11 13.5 13 14.15M17.5 10.5C15.6 10.5 14.11 10.82 13 11.5V9.84C14.23 9.28 15.73 9 17.5 9C18.29 9 19.13 9.08 20 9.23V10.78C19.26 10.59 18.41 10.5 17.5 10.5M21 18.5V7C19.96 6.67 18.79 6.5 17.5 6.5C15.45 6.5 13.62 7 12 8V19.5C13.62 18.5 15.45 18 17.5 18C18.69 18 19.86 18.16 21 18.5M17.5 4.5C19.85 4.5 21.69 5 23 6V20.56C23 20.68 22.95 20.8 22.84 20.91C22.73 21 22.61 21.08 22.5 21.08C22.39 21.08 22.31 21.06 22.25 21.03C20.97 20.34 19.38 20 17.5 20C15.45 20 13.62 20.5 12 21.5C10.66 20.5 8.83 20 6.5 20C4.84 20 3.25 20.36 1.75 21.07C1.72 21.08 1.68 21.08 1.63 21.1C1.59 21.11 1.55 21.12 1.5 21.12C1.39 21.12 1.27 21.08 1.16 21C1.05 20.89 1 20.78 1 20.65V6C2.34 5 4.18 4.5 6.5 4.5C8.83 4.5 10.66 5 12 6C13.34 5 15.17 4.5 17.5 4.5Z"></path></svg>
-			Read scan instructions
-				</div>
-
-		
-</button>
-				<button  class="svelte-1eyq29y"><div class="title svelte-1eyq29y"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"></path></svg>
+		<footer class="svelte-kogjrd"><div slot="footer">
+			<button  class="svelte-1eyq29y"><div class="title svelte-1eyq29y"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"></path></svg>
 			Capture photo of map
-				</div>
+			</div>
 
 		
 </button></div></footer></div>
@@ -102,10 +145,10 @@
 <canvas id="captureCanvas" style="display: none; position: absolute"></canvas>
 
 
-		<script type="module" data-sveltekit-hydrate="u4l0vt">
-		import { start } from "/_app/immutable/start-ff112ccf.js";
+		<script type="module" data-sveltekit-hydrate="uxabq6">
+		import { start } from "/_app/immutable/start-05bf29d4.js";
 		start({
-			target: document.querySelector('[data-sveltekit-hydrate="u4l0vt"]').parentNode,
+			target: document.querySelector('[data-sveltekit-hydrate="uxabq6"]').parentNode,
 			paths: {"base":"","assets":""},
 			session: {},
 			route: true,
