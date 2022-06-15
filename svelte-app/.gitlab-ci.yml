@@ -1,10 +1,9 @@
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/wasm/.cargo
 
-
 .wasm_cache:
   cache:
-    key: "rust-wasm-build"
+    key: 'rust-wasm-build'
     paths:
       - wasm/target/
       - wasm/pkg/
@@ -13,7 +12,6 @@ variables:
   before_script:
     # Show cache size, but if dirs not found just show the error without crashing the CI job
     - du -sh wasm/target wasm/pkg $CARGO_HOME || true
-
 
 # Build job also installs linting/testing tools used by other jobs
 svelte-wasmbuild:
@@ -26,7 +24,6 @@ svelte-wasmbuild:
   cache:
     policy: pull-push
 
-
 svelte-build:
   extends: .wasm_cache
   needs: [svelte-wasmbuild]
@@ -35,7 +32,6 @@ svelte-build:
     - cd svelte-app
     - yarn
     - yarn build
-
 
 typescript-test:
   image: node:16

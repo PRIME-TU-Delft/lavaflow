@@ -64,7 +64,7 @@ export function getCurves(img: Mat): ContourTreeObject {
 	hierarchy.delete();
 
 	// return { curves: contours_array, hierarchy: hierarchy_array };  // For debugging purposes, if you want to check the contours without de-duplication
-	
+
 	// remove the double contours caused by detecting both the inside and the outside of each line
 	[contours_array, hierarchy_array] = removeDoubleContours(contours_array, hierarchy_array);
 	// remove the root, which is a rectangle around the entire image
@@ -72,8 +72,7 @@ export function getCurves(img: Mat): ContourTreeObject {
 
 	validateContours(contours_array, hierarchy_array); //throw exceptions if something is wrong with the scan
 
-	return {curves: contours_array, hierarchy: hierarchy_array};
-	
+	return { curves: contours_array, hierarchy: hierarchy_array };
 }
 
 /**
@@ -83,8 +82,8 @@ export function getCurves(img: Mat): ContourTreeObject {
  * @returns array of depth levels of every node
  */
 function getLevels(hierarchy_array: number[]): number[] {
-	let levels: number[] = [];
-	for (let parent of hierarchy_array) {
+	const levels: number[] = [];
+	for (const parent of hierarchy_array) {
 		if (parent == -1) {
 			levels.push(0);
 		} else {
@@ -93,7 +92,6 @@ function getLevels(hierarchy_array: number[]): number[] {
 	}
 	return levels;
 }
-
 
 /**
  * Remove every odd-leveled node from the contours tree
@@ -105,11 +103,9 @@ function getLevels(hierarchy_array: number[]): number[] {
 function removeDoubleContours(contours: number[][], hierarchy: number[]): [number[][], number[]] {
 	const levels = getLevels(hierarchy);
 
-	let contours_dedup: number[][] = []; 
-	let hierarchy_dedup: number[] = [];
-	let new_indices: number[] = []; // this array will hold the indices of the contours in the deduplicated array
-
-	
+	const contours_dedup: number[][] = [];
+	const hierarchy_dedup: number[] = [];
+	const new_indices: number[] = []; // this array will hold the indices of the contours in the deduplicated array
 
 	// For every even-leveled node, add its contour and parent index to the deduplicated arrays
 	// Also add the index where it is added to the new_indices array
@@ -126,12 +122,12 @@ function removeDoubleContours(contours: number[][], hierarchy: number[]): [numbe
 
 	// update the hierarchy to correspond to the deduplicated array
 	hierarchy_dedup.forEach((parent, i) => {
-		if(hierarchy_dedup[i] == -1) {
+		if (hierarchy_dedup[i] == -1) {
 			hierarchy_dedup[i] = -1; // root node has index -1
 		} else {
 			hierarchy_dedup[i] = new_indices[hierarchy_dedup[i]];
 		}
-	})
+	});
 
 	return [contours_dedup, hierarchy_dedup];
 }
@@ -144,7 +140,6 @@ function removeDoubleContours(contours: number[][], hierarchy: number[]): [numbe
  * @returns The tree without the root
  */
 function removeRootContour(contours: number[][], hierarchy: number[]): [number[][], number[]] {
-
 	//remove first element from the contours and hierarchy array
 	contours.shift();
 	hierarchy.shift();
@@ -152,8 +147,7 @@ function removeRootContour(contours: number[][], hierarchy: number[]): [number[]
 	//subtract 1 from all hierarchy references, this also changes all references of 0 to -1
 	hierarchy.forEach((parent, i) => {
 		hierarchy[i] = hierarchy[i] - 1;
-	})
-
+	});
 
 	return [contours, hierarchy];
 }
@@ -164,19 +158,20 @@ function removeRootContour(contours: number[][], hierarchy: number[]): [number[]
  * @param contours JavaScript array of contours
  * @param hierarchy List of parent nodes for every node
  */
- function validateContours(contours: number[][], hierarchy: number[]): void {
+function validateContours(contours: number[][], hierarchy: number[]): void {
 	if (contours.length == 0 || hierarchy.length == 0) {
-		throw('No contours found');	
+		throw 'No contours found';
 	}
 
 	contours.forEach((contour, i) => {
-		if(contour.length <= 3) {
-			throw("A detected contour was too small, please try again");
+		if (contour.length <= 3) {
+			throw 'A detected contour was too small, please try again';
 		}
 
-		if(hierarchy[i] < -1) { // original scan had more than one root
-			console.log(contours, hierarchy)
-			throw("Something went wrong while scanning. Try to not include things other than the level curves in your scan, or take a new picture");
+		if (hierarchy[i] < -1) {
+			// original scan had more than one root
+			console.log(contours, hierarchy);
+			throw 'Something went wrong while scanning. Try to not include things other than the level curves in your scan, or take a new picture';
 		}
-	})
+	});
 }
