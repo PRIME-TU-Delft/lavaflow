@@ -3,21 +3,13 @@
 </script>
 
 <script>
-	import { onMount } from 'svelte';
-	import { difficultyStore } from '$lib/stores/difficultyStore';
+	import { difficultyStore, cacheDifficultyStore } from '$lib/stores/difficultyStore';
 
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
 
 	import { difficulty_modes } from '$lib/data/difficultyModes';
-
-	onMount(() => {
-		// When difficultyStore is loaded -> don't (re)load again
-		if ($difficultyStore) return;
-
-		difficultyStore.setup();
-	});
 
 	let header_height = 20;
 	let page_shift_top = 0;
@@ -70,9 +62,9 @@
 					<div class="difficulty_description_container">
 						<h4>{$difficultyStore.name}</h4>
 						<p class="min_turbines">
-							You must place at least <span class="min_turbines_bold"
-								>{$difficultyStore.min_steam_turbines}</span
-							> steam turbines.
+							You must place at least
+							<span class="min_turbines_bold">{$difficultyStore.min_steam_turbines}</span>
+							steam turbines.
 						</p>
 						<p>{$difficultyStore.description}</p>
 					</div>
@@ -86,6 +78,7 @@
 					bind:value={$difficultyStore}
 					options={difficulty_modes}
 					let:option
+					on:change={() => cacheDifficultyStore($difficultyStore)}
 				>
 					Difficulty: {option.name}
 				</Dropdown>
