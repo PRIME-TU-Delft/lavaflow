@@ -166,9 +166,7 @@ export default class Draggable {
 	 * @param markerSize the size of this marker
 	 */
 	drawInstruction(p5: p5, markerSize: number) {
-		if (!this.dragging) return;
-
-		if (this.instruction.length > 0) {
+		if (this.instruction.length > 0 && this.dragging) {
 			let box_width = p5.textWidth(this.instruction) + 20;
 			let box_height = markerSize;
 

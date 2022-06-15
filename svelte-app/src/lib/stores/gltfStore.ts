@@ -184,7 +184,7 @@ function createGltfStore() {
 			model.gltf_url = gltfStringToUrl(model.gltf);
 
 			// (re-)set the crater locations
-			craterLocations.set(model.craters.map(c => [
+			craterLocations.set(model.craters.map((c) => [
 				(c[0] * curveTree.size.width) / 100,
 				(c[1] * curveTree.size.width) / 100
 			]));
