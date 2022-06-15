@@ -6,8 +6,10 @@
 
 	import Input from '$lib/components/input/Input.svelte';
 
+	type T = $$Generic;
+
 	export let label: string;
-	export let value: any;
+	export let value: T;
 
 	const dispatch = createEventDispatcher();
 
