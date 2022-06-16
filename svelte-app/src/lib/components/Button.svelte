@@ -50,7 +50,7 @@
 		width: 100%;
 		padding: 0.75rem 1.1rem;
 
-		font-family: "Roboto Slab";
+		font-family: 'Roboto Slab';
 		font-weight: 700;
 		font-size: 1rem;
 		text-align: left;
@@ -58,7 +58,7 @@
 		margin-block: 0.5rem;
 		border-radius: 0.3rem;
 		cursor: pointer;
-		user-select:none;
+		user-select: none;
 	}
 
 	button.noMargin {
@@ -95,7 +95,7 @@
 	}
 
 	.green {
-		background: #047836;
+		background: #308167;
 		color: #fff;
 	}
 
