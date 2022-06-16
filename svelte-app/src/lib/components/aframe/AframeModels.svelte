@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { targetLocations } from '$lib/stores/locationStore';
-	import Draggable from '$lib/data/draggable';
 
 	export let scale: [number, number, number];
-	export let lava_revealed: boolean = false;
+	export const lava_revealed: boolean = false;
 
 	$: scaleString = scale.join(' ');
 </script>
@@ -28,7 +27,7 @@
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 
 		<!----------------------------------------------------------------
-		--                    CRATERS								  --
+		--    CRATERS removed because now loaded with gltf              --
 		------------------------------------------------------------------>
 		<!-- {#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20), true) ) as altAndGrad}
 			<a-cylinder

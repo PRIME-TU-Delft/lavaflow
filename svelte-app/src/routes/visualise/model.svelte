@@ -1,21 +1,19 @@
 <script lang="ts">
-
 	import 'aframe';
 	import 'aframe-extras';
 
 	/**
 	 * This view is created to test and show the client the progess of the mountain construction
 	 */
-	
+
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 
 	import { THREE } from 'aframe';
 
-	let ready = false;
 	let scale: [number, number, number] = [0.05, 0.025, 0.05];
 	const zAxis = new THREE.Vector3(0, 0, 1);
 
@@ -305,37 +303,37 @@
 		}
 	});
 
-	if(!AFRAME.primitives.primitives['a-draw-curve']){
+	if (!AFRAME.primitives.primitives['a-draw-curve']) {
 		AFRAME.registerPrimitive('a-draw-curve', {
-		defaultComponents: {
-			'draw-curve': {}
-		},
-		mappings: {
-			curveref: 'draw-curve.curve'
-		}
-	});
-  } 
+			defaultComponents: {
+				'draw-curve': {}
+			},
+			mappings: {
+				curveref: 'draw-curve.curve'
+			}
+		});
+	}
 
-  if(!AFRAME.primitives.primitives['a-curve-point']){
-	AFRAME.registerPrimitive('a-curve-point', {
-		defaultComponents: {
-			'curve-point': {}
-		},
-		mappings: {}
-	});
-}
+	if (!AFRAME.primitives.primitives['a-curve-point']) {
+		AFRAME.registerPrimitive('a-curve-point', {
+			defaultComponents: {
+				'curve-point': {}
+			},
+			mappings: {}
+		});
+	}
 
-if(!AFRAME.primitives.primitives['a-curve']){
-	AFRAME.registerPrimitive('a-curve', {
-		defaultComponents: {
-			curve: {}
-		},
+	if (!AFRAME.primitives.primitives['a-curve']) {
+		AFRAME.registerPrimitive('a-curve', {
+			defaultComponents: {
+				curve: {}
+			},
 
-		mappings: {
-			type: 'curve.type'
-		}
-	});
-}
+			mappings: {
+				type: 'curve.type'
+			}
+		});
+	}
 
 	AFRAME.registerComponent('lava-path', {
 		init: function () {
@@ -355,15 +353,15 @@ if(!AFRAME.primitives.primitives['a-curve']){
 				for (let i = 0; i < points.length; i++) {
 					//y and z swapped wrt given paths because Aframe uses different axes
 					const v = points[i];
-					const x = v[0] ;
-					const y = v[2] ;
-					const z = v[1] ;
+					const x = v[0];
+					const y = v[2];
+					const z = v[1];
 
 					const p = document.createElement('a-curve-point');
 					p.setAttribute('position', {
-						 x: (x/scale[0])   ,
-						 y: (y/scale[1]) ,
-						 z: (z/scale[2]) ,
+						x: x / scale[0],
+						y: y / scale[1],
+						z: z / scale[2]
 					});
 
 					curve.appendChild(p);
@@ -403,6 +401,5 @@ if(!AFRAME.primitives.primitives['a-curve']){
 		delete AFRAME.shaders['line'];
 	});
 </script>
-
 
 <SceneViewer />

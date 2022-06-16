@@ -17,19 +17,17 @@
 	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
 
 	let lava_revealed = false;
-	let lava_button_content = ["Reveal lava", "Hide lava"];
+	let lava_button_content = ['Reveal lava', 'Hide lava'];
 	let show_points = false;
 	let points = 0;
 
 	function computePoints() {
-
 		let lava_paths = $gltfStore.lava_paths;
 		let turbines = $targetLocations;
 
 		points = 10;
 		lava_revealed = !lava_revealed;
 		show_points = !show_points;
-
 	}
 
 	onMount(async () => {
@@ -57,44 +55,60 @@
 	});
 </script>
 
-<a-scene class:arMode embedded vr-mode-ui="enabled: false">
+<a-scene
+	class:arMode
+	embedded
+	vr-mode-ui="enabled: false"
+	arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+>
 	<slot name="overlay">
 		<div class="button backButton">
-			<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
+			<slot name="backButton">
+				<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
+			</slot>
 		</div>
 
-		
-			<div class="button pointsButton">
-				{#if $targetLocations.length > 0}
-					<Button secondary on:click={computePoints}>{lava_revealed ? lava_button_content[1] : lava_button_content[0]}</Button>
-					{#if show_points}
-						<Button green>Points: {points}</Button>
-					{/if}
-				{:else}
-					<Button disabled secondary>Place targets to begin</Button>
+		<div class="button rightButton">
+			<slot name="targetButton">
+				<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+			</slot>
+
+			{#if $targetLocations.length > 0}
+				<Button secondary on:click={computePoints}>
+					{lava_revealed ? lava_button_content[1] : lava_button_content[0]}
+				</Button>
+				{#if show_points}
+					<Button green>Points: {points}</Button>
 				{/if}
-			</div>
-		
-
-		<div class="button placeTargets">
-			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+			{:else}
+				<Button disabled secondary>Place targets to begin</Button>
+			{/if}
 		</div>
+
+		<!-- <div class="button placeTargets">
+			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+		</div> -->
 	</slot>
 
 	<a-entity light="type: ambient; color: #fff" />
 
 	<!-- If AR is enabled -> wrap model in  -->
 	{#if arMode}
-		<a-marker preset="hiro">
-			<a-box position="0 0 -1" rotation="0 0 0" color="red" />
+		<a-marker id="marker0" type="barcode" value="0">
+			{#if $debugMode}
+				<!-- When debugging -> display blue cube on top of marker -->
+				<a-box position="0 0 0" material="color: blue; opacity: 0.5;" />
+			{/if}
 
 			<AframeModels {scale} />
 		</a-marker>
+
+		<a-entity camera />
 	{:else}
 		<AframeModels {scale} />
-	{/if}
 
-	<a-camera position="4 2 7"/>
+		<a-camera position="4 2 7" />
+	{/if}
 </a-scene>
 
 <style>
@@ -114,12 +128,7 @@
 		left: 1rem;
 	}
 
-	.pointsButton {
-		top: 5rem;
-		right: 1rem;
-	}
-
-	.placeTargets {
+	.rightButton {
 		top: 1rem;
 		right: 1rem;
 	}

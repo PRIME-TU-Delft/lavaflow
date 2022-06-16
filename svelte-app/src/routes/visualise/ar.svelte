@@ -10,41 +10,17 @@
 
 <!-- Load scene in arMode -->
 <SceneViewer arMode>
-	<div class="headerButton" slot="overlay">
-		<div class="button backButton">
-			<!-- Custom back button -->
-			<a sveltekit:reload href="/scan/preview">
-				<Button icon={mdiChevronLeft}>Back to preview</Button>
-			</a>
-		</div>
+	<!-- Custom back button that will reload the page-->
+	<a slot="backButton" sveltekit:reload href="/scan/preview">
+		<Button icon={mdiChevronLeft}>Back to preview</Button>
+	</a>
 
-		<div class="button placeTargets">
-			<a sveltekit:reload href="/targetplacement">
-				<Button>
-					<span>Place targets</span>
+	<!-- Custom target button -->
+	<a slot="targetButton" sveltekit:reload href="/targetplacement">
+		<Button>
+			<span>Place targets</span>
 
-					<Icon path={mdiChevronRight} />
-				</Button>
-			</a>
-		</div>
-	</div>
+			<Icon path={mdiChevronRight} />
+		</Button>
+	</a>
 </SceneViewer>
-
-<style>
-	.button {
-		position: absolute;
-		width: 15rem;
-		max-width: calc(50vw - 2rem);
-		z-index: 1;
-	}
-
-	.backButton {
-		top: 1rem;
-		left: 1rem;
-	}
-
-	.placeTargets {
-		top: 1rem;
-		right: 1rem;
-	}
-</style>
