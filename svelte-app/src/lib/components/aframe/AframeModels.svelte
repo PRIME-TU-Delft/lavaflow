@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { gltfStore, targetLocations } from '$lib/stores/gltfStore';
+	import { gltfStore } from '$lib/stores/gltfStore';
+	import { targetLocations } from '$lib/stores/locationStore';
 	import Draggable from '$lib/data/draggable';
 
 	export let scale: [number, number, number];
+	export let lava_revealed: boolean = false;
 
 	$: scaleString = scale.join(' ');
 </script>
@@ -11,8 +13,7 @@
 	<!----------------------------------------------------------------
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
-	<a-entity lava-path scale={scaleString} >
-
+	<a-entity scale={scaleString}>
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>
@@ -29,7 +30,7 @@
 		<!----------------------------------------------------------------
 		--                    CRATERS								  --
 		------------------------------------------------------------------>
-		{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20), true) ) as altAndGrad}
+		<!-- {#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20), true) ) as altAndGrad}
 			<a-cylinder
 				radius="2"
 				height={altAndGrad.altitude / 2}
@@ -41,7 +42,7 @@
 				color="#ff4025"
 				scale="1 2 1"
 			/>
-		{/each}
+		{/each} -->
 
 		<!----------------------------------------------------------------
 		--       		        	TARGETS				                					  --
@@ -62,7 +63,7 @@
 				depth="2.5"
 				height={altAndGrad.altitude / 2}
 				position="{altAndGrad.x} {altAndGrad.altitude / 2} {altAndGrad.y + 0.15}"
-				color="#ff4025"
+				color="#444"
 				scale="1 2 1"
 			/>
 		{/each}

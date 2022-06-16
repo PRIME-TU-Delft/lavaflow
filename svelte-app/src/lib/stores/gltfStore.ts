@@ -7,8 +7,10 @@
 
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
-import Draggable from '$lib/data/draggable';
+import { craterLocations } from '$lib/stores/locationStore';
+
 import ApiSettings from '$lib/data/apiSettings';
+import type Draggable from '$lib/data/draggable';
 
 import init, * as wasm from 'wasm';
 
@@ -28,76 +30,6 @@ export interface AltitudeGradientPair {
 	gradient: Vec3;
 }
 
-/**
- * Factory for creating a target of crater location store
- * @returns location store with method subscribe, add and remove
- */
-// Get cache from local storage
-function convertToTargets(cachedTargets: Draggable[]): Draggable[] {
-	return cachedTargets.map((target) => {
-		const dragItem = new Draggable(target.x, target.y, target.size, target.offsetX, target.offsetY);
-
-		dragItem.enableSelection();
-		dragItem.deselect();
-
-		return dragItem;
-	});
-}
-
-function createLocationStore<T>(storageIndex: string, convertToLocation: (locations: T[]) => T[]) {
-	function getCache() {
-		// Get initial locations from the local storage
-		if (typeof window !== 'undefined') {
-			const cachedLocations = localStorage?.getItem(storageIndex);
-
-			try {
-				if (cachedLocations) {
-					const parsedLocations = JSON.parse(cachedLocations);
-					return convertToLocation(parsedLocations);
-				}
-			} catch (_) {
-				return [];
-			}
-		}
-		return [];
-	}
-
-	// Set cache to local storage
-	function setCache(locations: T[]) {
-		if (typeof window !== 'undefined') {
-			localStorage.setItem(storageIndex, JSON.stringify(locations));
-		}
-	}
-
-	const { subscribe, update, set } = writable<T[]>(getCache());
-
-	return {
-		subscribe,
-		clear: () => set([]),
-		set: (locations: T[]) => {
-			set(locations);
-			setCache(locations);
-		},
-		add: (location: T) =>
-			update((oldLocations) => {
-				// append new location to the end of the array
-				const newLocations = [...oldLocations, location];
-				setCache(newLocations);
-				return newLocations;
-			}),
-		remove: (index: number) =>
-			update((oldLocations) => {
-				// remove location at index
-				const newLocations = oldLocations.filter((_, i) => i !== index);
-				setCache(newLocations);
-				return newLocations;
-			})
-	};
-}
-
-export const targetLocations = createLocationStore<Draggable>('targets', convertToTargets);
-export const craterLocations = createLocationStore<Vec2>('craters', (ls) => ls);
-
 // GLTF STORE helper functions
 
 /***
@@ -112,10 +44,10 @@ function adjustAlititude(altAndgrad: AltitudeGradientPair) {
 	let altitude = altAndgrad.altitude;
 
 	// Take a small modifier that will increase the altitude by a fraction of the largest absolute gradient
-	altitude += 0.02 * altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
+	altitude += 1 * altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
 
 	// Increment by 1 to prevent the altitude from being under the model
-	return altitude + 1;
+	return altitude * 1.07;
 }
 
 export function gltfStringToUrl(gltf: string): string {
@@ -139,7 +71,7 @@ function createGltfStore() {
 	return {
 		subscribe,
 		set,
-		setup: async (curveTree: CurveTree) => {
+		setup: async (curveTree: CurveTree, lava_path_forking: number) => {
 			// if wasm is not yet setup, do so
 			if (!isSetup) {
 				await init();
@@ -158,17 +90,17 @@ function createGltfStore() {
 			api = new wasm.ModelConstructionApi();
 
 			const api_settings = new ApiSettings(
-/*				 OpenCV tree */ tree,
-/*						Rows */ 45,
-/*					 Columns */ 45,
-/*					   Width */ curveTree.size.width,
-/*					  Height */ curveTree.size.height,
-/*	  Curve Point Separation */ 5,
-/*		  		SVC Distance */ 50,
-/*	Catmull Clark Iterations */ 1,
-/*			Lava Path Length */ 20,
-/*		   Lava Path Forking */ 0.2,
-/*		Smoothing Operations */ [
+				/*				 OpenCV tree */ tree,
+				/*						Rows */ 45,
+				/*					 Columns */ 45,
+				/*					   Width */ curveTree.size.width,
+				/*					  Height */ curveTree.size.height,
+				/*	  Curve Point Separation */ 5,
+				/*		  		SVC Distance */ 50,
+				/*	Catmull Clark Iterations */ 1,
+				/*			Lava Path Length */ 20,
+				/*		   Lava Path Forking */ lava_path_forking,
+				/*		Smoothing Operations */ [
 					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.9, 5, 1, false),
 					new wasm.SmoothingOperationApplySmoothToMiddleLayers(0.7, 3, 5, false),
 					new wasm.SmoothingOperationIncreaseAltitudeForMountainTops(2, false),
@@ -178,10 +110,15 @@ function createGltfStore() {
 
 			api_settings.apply_to_api(api);
 		},
-		build: () => {
+		build: (curveTree: CurveTree) => {
 			// Call the wasm api to build the model
 			model = api.build().to_js() as Model;
 			model.gltf_url = gltfStringToUrl(model.gltf);
+
+			model.craters = model.craters.map((c) => [
+				(c[0] * curveTree.size.width) / 100,
+				(c[1] * curveTree.size.width) / 100
+			]);
 
 			// (re-)set the crater locations
 			craterLocations.set(model.craters);

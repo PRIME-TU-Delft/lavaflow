@@ -3,21 +3,15 @@
 </script>
 
 <script>
-	import { onMount } from 'svelte';
-	import { difficultyStore } from '$lib/stores/difficultyStore';
+	import { difficultyStore, cacheDifficultyStore } from '$lib/stores/difficultyStore';
 
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
 
 	import { difficulty_modes } from '$lib/data/difficultyModes';
-
-	onMount(() => {
-		// When difficultyStore is loaded -> don't (re)load again
-		if ($difficultyStore) return;
-
-		difficultyStore.setup();
-	});
+	import { onMount } from 'svelte';
+	import { dev } from '$app/env';
 
 	let header_height = 20;
 	let page_shift_top = 0;
@@ -31,6 +25,13 @@
 		header_height = 20;
 		page_shift_top = 0;
 	}
+
+	onMount(() => {
+		difficultyStore.clear();
+
+		if (dev) return;
+		// TODO clear all other stores
+	});
 </script>
 
 <div class="tudelftLogo" />
@@ -49,7 +50,14 @@
 		class="landing_page_container"
 		style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);"
 	>
-		<div class="introduction" />
+		<div class="introduction">
+			The climate crisis is upon us! Lava tends to very precisely follow the steepest downwards
+			direction, when it flows down the hills of a volcano. Its intense heat makes for a great
+			opportunity to generate electricity for nearby cities. Your job is to predict where the lava
+			will flow and place steam turbines on its paths. The steam turbines generate higher amounts of
+			electricity as the lava reaches closer. Save the world by using this amazing sustainable
+			energy-soruce!
+		</div>
 
 		<div class="get_started_button">
 			<Button large on:click={get_started}>Get started</Button>
@@ -70,9 +78,9 @@
 					<div class="difficulty_description_container">
 						<h4>{$difficultyStore.name}</h4>
 						<p class="min_turbines">
-							You must place at least <span class="min_turbines_bold"
-								>{$difficultyStore.min_steam_turbines}</span
-							> steam turbines.
+							You must place at least
+							<span class="min_turbines_bold">{$difficultyStore.min_steam_turbines}</span>
+							steam turbines.
 						</p>
 						<p>{$difficultyStore.description}</p>
 					</div>
@@ -86,6 +94,7 @@
 					bind:value={$difficultyStore}
 					options={difficulty_modes}
 					let:option
+					on:change={() => cacheDifficultyStore($difficultyStore)}
 				>
 					Difficulty: {option.name}
 				</Dropdown>
@@ -96,7 +105,6 @@
 			<NavigationButton large to="scan/mapscanning">Start flowing</NavigationButton>
 		</div>
 	</div>
-	<!-- <NavigationButton large to="/" secondary={true}>Teacher corner</NavigationButton> -->
 </main>
 
 <style lang="scss">

@@ -14,6 +14,7 @@
 
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { gltfStore } from '$lib/stores/gltfStore';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { debugMode } from '$lib/stores/debugStore';
 
 	let foregroundWidth: number;
@@ -25,8 +26,8 @@
 		if (!$contourLines.curves || !$contourLines.hierarchy) {
 			return goto('/scan/mapscanning');
 		}
-		await gltfStore.setup($contourLines);
-		gltfStore.build();
+		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
+		gltfStore.build($contourLines);
 
 		gltfLoaded = true;
 	});

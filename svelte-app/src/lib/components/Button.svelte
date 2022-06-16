@@ -7,6 +7,7 @@
 	export let large = false;
 	export let small = false;
 	export let secondary = false;
+	export let green = false;
 	export let icon: string = '';
 	export let noMargin = false;
 </script>
@@ -18,6 +19,7 @@
 	class:large
 	class:small
 	class:secondary
+	class:green
 	on:click
 >
 	{#if loading}
@@ -48,7 +50,7 @@
 		width: 100%;
 		padding: 0.75rem 1.1rem;
 
-		font-family: "Roboto Slab";
+		font-family: 'Roboto Slab';
 		font-weight: 700;
 		font-size: 1rem;
 		text-align: left;
@@ -56,7 +58,7 @@
 		margin-block: 0.5rem;
 		border-radius: 0.3rem;
 		cursor: pointer;
-		user-select:none;
+		user-select: none;
 	}
 
 	button.noMargin {
@@ -90,6 +92,11 @@
 	.secondary {
 		background: var(--secondary-color);
 		color: var(--text-color-secondary);
+	}
+
+	.green {
+		background: #308167;
+		color: #fff;
 	}
 
 	:global(button > .title > span) {

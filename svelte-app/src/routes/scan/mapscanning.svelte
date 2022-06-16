@@ -4,6 +4,7 @@
 
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
+	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
 	import Instructions from '$lib/components/Instructions.svelte';
 	import Page from '$lib/components/Page.svelte';
@@ -56,6 +57,8 @@
 
 <VideoStream {deviceId} let:loading let:stream let:error let:cameraOptions>
 	<Page fullscreen={!loading} title={'Capture the image'}>
+		<NavigationButton slot="headerButton" back to="/">Back home</NavigationButton>
+
 		<div slot="background">
 			<Video {loading} {stream} />
 		</div>

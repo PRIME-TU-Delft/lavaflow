@@ -16,6 +16,10 @@ export default class Draggable {
 	size: number;
 	offsetX: number;
 	offsetY: number;
+	instruction: string = '';
+	instruction_width: number = -1;
+	instruction_height: number = -1;
+	instruction_show_initially: boolean = false;
 
 	/**
 	 * Initialize a draggable marker at a given position
@@ -39,6 +43,23 @@ export default class Draggable {
 	}
 
 	/**
+	 * Set the instruction-value of this draggable
+	 * @param instruction The instruction to display
+	 */
+	setInstruction(instruction: string, instruction_w?: number, instruction_h?: number, initial?: boolean) {
+		this.instruction = instruction;
+		if (instruction_w != undefined) {
+			this.instruction_width = instruction_w;
+		}
+		if (instruction_h != undefined) {
+			this.instruction_height = instruction_h;
+		}
+		if (initial != undefined) {
+			this.instruction_show_initially = initial;
+		}
+	}
+
+	/**
 	 * Set the selection to enabled
 	 */
 	enableSelection() {
@@ -50,6 +71,19 @@ export default class Draggable {
 	 */
 	disableSelection() {
 		this.enable_selection = false;
+	}
+
+	/**
+	 * Check if this draggable is too close to another
+	 * @param other the other draggable
+	 * @param max_dist the max distance it may be away
+	 * @returns 
+	 */
+	isTooCloseTo(x: number, y: number, max_dist: number) {
+		const dx = x - this.x;
+		const dy = y - this.y;
+		const dist = Math.sqrt(dx * dx + dy * dy);
+		return dist <= max_dist;
 	}
 
 	/**
@@ -74,7 +108,7 @@ export default class Draggable {
 		this.y = p5.mouseY + this.offsetY;
 
 		// Translate above the user's finger
-		this.translateForDragging();
+		this.translateForDragging(p5);
 
 		if (avoid_craters != undefined && crater_distance != undefined) {
 			this.too_close_to_crater = false;
@@ -124,7 +158,10 @@ export default class Draggable {
 	/**
 	 * Translate this draggable up, so that the user can see what they are doing.
 	 */
-	translateForDragging() {
+	translateForDragging(p5: p5) {
+		if (p5.mouseX <= 0 || p5.mouseY <= 0) return;
+		if (p5.mouseX >= p5.width || p5.mouseY >= p5.height) return;
+
 		if (this.dragging && !this.drag_translated) {
 			this.y -= 50;
 			this.drag_translated = true;
@@ -137,6 +174,42 @@ export default class Draggable {
 	translateBackAfterDragging() {
 		if (this.drag_translated) {
 			this.drag_translated = false;
+		}
+	}
+
+	/**
+	 * Display the instruction to the user, if this draggable has one.
+	 * @param p5 p5
+	 * @param markerSize the size of this marker
+	 */
+	drawInstruction(p5: p5, markerSize: number) {
+		if (this.instruction.length > 0 && (this.dragging || this.instruction_show_initially)) {
+
+			// After the user has started to drag the markers around, stop showing the markers 'initially'
+			if (this.dragging) {
+				this.instruction_show_initially = false;
+			}
+
+			let box_width = p5.textWidth(this.instruction) + 20;
+			let box_height = markerSize;
+
+			if (this.instruction_width >= 0) {
+				box_width = this.instruction_width;
+			}
+			if (this.instruction_height >= 0) {
+				box_height = this.instruction_height;
+			}
+
+			p5.strokeWeight(0.5);
+			p5.stroke(0);
+			p5.fill(200);
+			p5.rectMode(p5.CENTER);
+			p5.rect(this.x, this.y - markerSize / 2 - 25, box_width, box_height);
+
+			p5.fill(0);
+			p5.textAlign(p5.CENTER);
+			p5.textSize(15);
+			p5.text(this.instruction, this.x, this.y - 40);
 		}
 	}
 
@@ -169,11 +242,14 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 */
 	drawRect(p5: p5, markerSize: number) {
-		this.translateForDragging();
+		this.translateForDragging(p5);
+
+		this.drawInstruction(p5, markerSize);
 
 		p5.stroke(0);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
+		p5.rectMode(p5.CORNER);
 		p5.rect(this.x - markerSize / 2, this.y - markerSize / 2, markerSize, markerSize);
 
 		this.translateBackAfterDragging();
@@ -186,7 +262,9 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawCircle(p5: p5, markerSize: number, index?: number) {
-		this.translateForDragging();
+		this.translateForDragging(p5);
+
+		this.drawInstruction(p5, markerSize);
 
 		if (index != undefined) {
 			p5.strokeWeight(0.5);
@@ -198,7 +276,7 @@ export default class Draggable {
 			p5.fill(0);
 			p5.textAlign(p5.CENTER);
 			p5.textSize(15);
-			p5.text('#' + index, this.x + 30, this.y + 5);
+			p5.text(index, this.x + 30, this.y + 5);
 		}
 
 		// Set a white background
@@ -233,7 +311,9 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawTriangle(p5: p5, markerSize: number) {
-		this.translateForDragging();
+		this.translateForDragging(p5);
+
+		this.drawInstruction(p5, markerSize);
 
 		p5.stroke(0);
 		p5.fill(255);
@@ -259,7 +339,9 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawCross(p5: p5, markerSize: number) {
-		this.translateForDragging();
+		this.translateForDragging(p5);
+
+		this.drawInstruction(p5, markerSize);
 
 		p5.stroke(0);
 		p5.strokeWeight(STROKE_WIDTH * 2);

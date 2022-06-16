@@ -24,7 +24,7 @@
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/p5/P5Transform.svelte';
-	import { mdiInformation, mdiChevronRight } from '@mdi/js';
+	import { mdiInformation, mdiChevronRight, mdiBookOpenVariant } from '@mdi/js';
 
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
@@ -111,8 +111,8 @@
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
 	<div slot="footer">
-		<Button secondary icon={mdiInformation} on:click={toggleInstruction}>
-			Drag each marker to the correct corner on the map
+		<Button secondary small icon={mdiBookOpenVariant} on:click={toggleInstruction}>
+			Read instructions
 		</Button>
 
 		<Button on:click={() => gotoPreview(foregroundWidth, foregroundHeight)}>

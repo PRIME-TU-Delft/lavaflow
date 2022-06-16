@@ -16,6 +16,7 @@ export class DifficultyLevel {
 	min_steam_turbines: number;
 	max_steam_turbines: number = 10;
 	min_steam_turbine_separation: number;
+	min_crater_distance: number;
 
 	constructor(
 		name: string,
@@ -23,7 +24,8 @@ export class DifficultyLevel {
 		max_lava_distance: number,
 		lava_forking: number,
 		min_steam_turbines: number,
-		min_steam_turbine_separation: number
+		min_steam_turbine_separation: number,
+		min_crater_distance: number
 	) {
 		this.name = name;
 		this.description = description;
@@ -31,6 +33,7 @@ export class DifficultyLevel {
 		this.lava_forking = lava_forking;
 		this.min_steam_turbines = min_steam_turbines;
 		this.min_steam_turbine_separation = min_steam_turbine_separation;
+		this.min_crater_distance = min_crater_distance;
 	}
 
 	computePointsForLavaDistance(dist: number): number {
@@ -43,27 +46,30 @@ export const difficulty_modes = [
 		'Tutorial',
 		'This is the easiest level of difficulty, which is meant to get you familiarised with the game.',
 		200,
-		0.8,
+		0.2,
 		2,
-		50
+		50,
+		75
 	),
-	new DifficultyLevel('Easy', 'Take it easy.', 200, 0.8, 3, 50),
+	new DifficultyLevel('Easy', 'Take it easy.', 200, 0.2, 3, 50, 75),
 	new DifficultyLevel(
 		'Medium',
 		'There is less lava and it must reach closer to the steam turbines. Steam turbines should be placed further apart from each other.',
 		150,
-		0.6,
+		0.1,
 		5,
-		100
+		100,
+		75
 	),
 	new DifficultyLevel(
 		'Hard',
 		"The lava must reach even closer to the steam turbines and you'll have to place them even further apart.",
 		100,
-		0.6,
+		0.1,
 		5,
-		150
+		150,
+		75
 	),
-	new DifficultyLevel('Impossible', 'Only Dennis can solve this level.', 50, 0.4, 10, 200)
+	new DifficultyLevel('Impossible', 'Only Dennis can solve this level.', 50, 0.1, 10, 200, 200)
 	// Custom difficulty: Add your own difficulty levels here, they'll automatically be imcorporated throughout the app.
 ];

@@ -8,11 +8,29 @@
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 	import { debugMode } from '$lib/stores/debugStore';
+	import { targetLocations } from '$lib/stores/locationStore';
 
 	export let arMode = false;
 	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
+
+	let lava_revealed = false;
+	let lava_button_content = ["Reveal lava", "Hide lava"];
+	let show_points = false;
+	let points = 0;
+
+	function computePoints() {
+
+		let lava_paths = $gltfStore.lava_paths;
+		let turbines = $targetLocations;
+
+		points = 10;
+		lava_revealed = !lava_revealed;
+		show_points = !show_points;
+
+	}
 
 	onMount(async () => {
 		if ($gltfStore) return; // When gltf store is loaded -> don't (re)load again
@@ -34,8 +52,8 @@
 			});
 		}
 
-		await gltfStore.setup($contourLines);
-		gltfStore.build();
+		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
+		gltfStore.build($contourLines);
 	});
 </script>
 
@@ -45,9 +63,18 @@
 			<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
 		</div>
 
-		<div class="button pointsButton">
-			<Button secondary>Points: 10000</Button>
-		</div>
+		
+			<div class="button pointsButton">
+				{#if $targetLocations.length > 0}
+					<Button secondary on:click={computePoints}>{lava_revealed ? lava_button_content[1] : lava_button_content[0]}</Button>
+					{#if show_points}
+						<Button green>Points: {points}</Button>
+					{/if}
+				{:else}
+					<Button disabled secondary>Place targets to begin</Button>
+				{/if}
+			</div>
+		
 
 		<div class="button placeTargets">
 			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
