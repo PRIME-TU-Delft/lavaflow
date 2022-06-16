@@ -1,4 +1,3 @@
-use crate::utils::log;
 use crate::{api::ModelConstructionApi, objects::point::Point};
 
 impl ModelConstructionApi {
@@ -89,7 +88,6 @@ impl ModelConstructionApi {
 		// Compute distance to closest lava-path segment
 		let mut lava_distance = (f32::MAX, f32::MAX);
 		for lava_path in lava_path_triples {
-
 			let mut current_lava_distance = f32::MAX;
 
 			for (lpx, lpy, lpz) in lava_path {
@@ -121,6 +119,5 @@ impl ModelConstructionApi {
 		} else {
 			0
 		}
-
 	}
 }

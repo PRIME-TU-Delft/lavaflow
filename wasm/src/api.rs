@@ -16,7 +16,6 @@ use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
-use crate::utils::log;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
 pub trait SmoothingOperation {
@@ -255,7 +254,7 @@ impl ModelConstructionApi {
 		// determine heights
 		model_constructor.construct().map_err(|e| e.to_string())?;
 
-		log!("construction complete");
+		//log!("construction complete");
 
 		// Construct smoother instance
 		let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
@@ -264,7 +263,7 @@ impl ModelConstructionApi {
 		for operation in &self.smoothing_operations_queue {
 			operation.apply(&mut smoother).map_err(|e| e.to_string())?;
 		}
-		log!("smoothing complete");
+		//log!("smoothing complete");
 		//get max alt before normalization, to be used later
 		let max_altitude = *smoother.raster.get_highest_altitude();
 
@@ -282,7 +281,7 @@ impl ModelConstructionApi {
 		//apply surface subdivision
 		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, smoother.raster)?;
 
-		log!("surface subdivision complete");
+		//log!("surface subdivision complete");
 
 		//for lava path generation : find point index of the highest point in the model
 		let mut top_height = f32::MIN;
@@ -557,7 +556,6 @@ impl ModelConstructionApi {
 	///
 	///
 	pub fn compute_player_points(&self, input: LavaPathTurbineInput) -> usize {
-		
 		let max_points_per_turbine: usize = input.max_points_total / input.turbines.len();
 		let mut result: usize = 1;
 
