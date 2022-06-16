@@ -71,7 +71,9 @@ impl ModelConstructionApi {
 		// }
 
 		// If this distance is smaller than the threshold, make this color be a lava-crater
-		let result: (f32, f32, f32) = if closest_dist_sqr <= 2.5/* || closest_dist_sqr_lava_path <= 0.3 */ {
+		let result: (f32, f32, f32) = if closest_dist_sqr <= 2.5
+		/* || closest_dist_sqr_lava_path <= 0.3 */
+		{
 			color_lava_crater
 		} else {
 			// 1. Map the altitude so it becomes a value between [0, 1]
