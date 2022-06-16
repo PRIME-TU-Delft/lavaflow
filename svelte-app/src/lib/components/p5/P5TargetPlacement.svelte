@@ -35,8 +35,9 @@
 
 			// Draw the craters | if the craters are stored in the gltf store -> pick those craters
 			//                  | else -> pick the (cached) craters from the localstorage
-			const craters = $gltfStore?.craters ?? $craterLocations ?? [];
-			for (let crater of craters) {
+			const craters = $craterLocations ?? [];
+			// console.log({ gltf: $gltfStore?.craters, $craterLocations });
+			for (let crater of $craterLocations) {
 				p5.strokeWeight(1);
 				p5.stroke('#f2682c');
 
@@ -49,7 +50,12 @@
 
 				// Outer ring - for showing users the minumum distance from the crater
 				p5.strokeWeight(0.5);
-				p5.ellipse(posX, posY, $difficultyStore.min_crater_distance*2, $difficultyStore.min_crater_distance*2);
+				p5.ellipse(
+					posX,
+					posY,
+					$difficultyStore.min_crater_distance * 2,
+					$difficultyStore.min_crater_distance * 2
+				);
 			}
 
 			// Draw the turbine-markers
@@ -65,7 +71,7 @@
 					$difficultyStore.min_steam_turbine_separation,
 					i
 				);
-				target.drawCircle(p5, markerSize, i+1);
+				target.drawCircle(p5, markerSize, i + 1);
 			}
 
 			// The user will have to insert at least a certain amount of steam-turbines
@@ -82,7 +88,10 @@
 				msg = 'You must place at least ' + $difficultyStore.min_steam_turbines + ' steam turbines';
 			} else if ($targetLocations.length == $difficultyStore.max_steam_turbines) {
 				// The player placed too many turbines
-				msg = 'You have reached the maximal amount of ' + $difficultyStore.max_steam_turbines + ' steam turbines';
+				msg =
+					'You have reached the maximal amount of ' +
+					$difficultyStore.max_steam_turbines +
+					' steam turbines';
 			}
 
 			if (

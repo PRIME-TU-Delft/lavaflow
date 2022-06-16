@@ -376,9 +376,9 @@ if(!AFRAME.primitives.primitives['a-curve']){
 				const track = document.createElement('a-entity');
 				track.setAttribute(
 					'clone-along-curve',
-					'curve: #track' + j + '; spacing: 0.035; rotation: 90 0 0;'
+					'curve: #track' + j + '; spacing: 0.55; rotation: 90 0 0;'
 				);
-				track.setAttribute('geometry', 'primitive:cylinder; height:0.04; radius:0.4 ;');
+				track.setAttribute('geometry', 'primitive:cylinder; height:0.6; radius:0.4 ;');
 				track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.001');
 				//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
 				const total_time = $gltfStore.lava_paths.length * 2000;
