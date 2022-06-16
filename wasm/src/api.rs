@@ -333,10 +333,10 @@ impl ModelConstructionApi {
 			//rgb green = 0, 153, 51
 			//rgb orange = 255, 153, 51
 
-			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z, p0.x, p0.y, &lava_craters, &lava_path_triples));
-			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z, p3.x, p3.y, &lava_craters, &lava_path_triples));
-			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z, p1.x, p1.y, &lava_craters, &lava_path_triples));
-			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z, p2.x, p2.y, &lava_craters, &lava_path_triples));
+			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z, p0, &lava_craters, &lava_path_triples));
+			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z, p3, &lava_craters, &lava_path_triples));
+			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z, p1, &lava_craters, &lava_path_triples));
+			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z, p2, &lava_craters, &lava_path_triples));
 
 			// Add the first triangle
 			final_points.push(tri00);
