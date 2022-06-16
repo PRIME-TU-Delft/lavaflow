@@ -19,6 +19,7 @@ export default class Draggable {
 	instruction: string = '';
 	instruction_width: number = -1;
 	instruction_height: number = -1;
+	instruction_show_initially: boolean = false;
 
 	/**
 	 * Initialize a draggable marker at a given position
@@ -45,13 +46,16 @@ export default class Draggable {
 	 * Set the instruction-value of this draggable
 	 * @param instruction The instruction to display
 	 */
-	setInstruction(instruction: string, instruction_w?: number, instruction_h?: number) {
+	setInstruction(instruction: string, instruction_w?: number, instruction_h?: number, initial?: boolean) {
 		this.instruction = instruction;
 		if (instruction_w != undefined) {
 			this.instruction_width = instruction_w;
 		}
 		if (instruction_h != undefined) {
 			this.instruction_height = instruction_h;
+		}
+		if (initial != undefined) {
+			this.instruction_show_initially = initial;
 		}
 	}
 
@@ -67,6 +71,19 @@ export default class Draggable {
 	 */
 	disableSelection() {
 		this.enable_selection = false;
+	}
+
+	/**
+	 * Check if this draggable is too close to another
+	 * @param other the other draggable
+	 * @param max_dist the max distance it may be away
+	 * @returns 
+	 */
+	isTooCloseTo(x: number, y: number, max_dist: number) {
+		const dx = x - this.x;
+		const dy = y - this.y;
+		const dist = Math.sqrt(dx * dx + dy * dy);
+		return dist <= max_dist;
 	}
 
 	/**
@@ -166,7 +183,13 @@ export default class Draggable {
 	 * @param markerSize the size of this marker
 	 */
 	drawInstruction(p5: p5, markerSize: number) {
-		if (this.instruction.length > 0 && this.dragging) {
+		if (this.instruction.length > 0 && (this.dragging || this.instruction_show_initially)) {
+
+			// After the user has started to drag the markers around, stop showing the markers 'initially'
+			if (this.dragging) {
+				this.instruction_show_initially = false;
+			}
+
 			let box_width = p5.textWidth(this.instruction) + 20;
 			let box_height = markerSize;
 
@@ -253,7 +276,7 @@ export default class Draggable {
 			p5.fill(0);
 			p5.textAlign(p5.CENTER);
 			p5.textSize(15);
-			p5.text('#' + index, this.x + 30, this.y + 5);
+			p5.text(index, this.x + 30, this.y + 5);
 		}
 
 		// Set a white background

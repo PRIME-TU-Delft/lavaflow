@@ -71,7 +71,7 @@ function createGltfStore() {
 	return {
 		subscribe,
 		set,
-		setup: async (curveTree: CurveTree) => {
+		setup: async (curveTree: CurveTree, lava_path_forking: number) => {
 			// if wasm is not yet setup, do so
 			if (!isSetup) {
 				await init();
@@ -91,15 +91,15 @@ function createGltfStore() {
 
 			const api_settings = new ApiSettings(
 				/*				 OpenCV tree */ tree,
-				/*						Rows */ 45,
-				/*					 Columns */ 45,
+				/*						Rows */ 35,
+				/*					 Columns */ 35,
 				/*					   Width */ curveTree.size.width,
 				/*					  Height */ curveTree.size.height,
 				/*	  Curve Point Separation */ 5,
 				/*		  		SVC Distance */ 50,
 				/*	Catmull Clark Iterations */ 1,
 				/*			Lava Path Length */ 20,
-				/*		   Lava Path Forking */ 0.2,
+				/*		   Lava Path Forking */ lava_path_forking,
 				/*		Smoothing Operations */ [
 					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.9, 5, 1, false),
 					new wasm.SmoothingOperationApplySmoothToMiddleLayers(0.7, 3, 5, false),
