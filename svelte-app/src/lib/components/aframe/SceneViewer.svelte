@@ -59,6 +59,7 @@
 	class:arMode
 	embedded
 	vr-mode-ui="enabled: false"
+	gesture-detector
 	arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
 >
 	<slot name="overlay">
@@ -94,13 +95,22 @@
 
 	<!-- If AR is enabled -> wrap model in  -->
 	{#if arMode}
-		<a-marker id="marker0" type="barcode" value="0">
+		<a-marker
+			id="marker0"
+			type="barcode"
+			value="0"
+			raycaster="objects: .clickable"
+			emitevents="true"
+			cursor="fuse: false; rayOrigin: mouse;"
+		>
 			{#if $debugMode}
 				<!-- When debugging -> display blue cube on top of marker -->
 				<a-box position="0 0 0" material="color: blue; opacity: 0.5;" />
 			{/if}
 
-			<AframeModels {scale} />
+			<a-entity class="clickable" gesture-handler>
+				<AframeModels {scale} />
+			</a-entity>
 		</a-marker>
 
 		<a-entity camera />
