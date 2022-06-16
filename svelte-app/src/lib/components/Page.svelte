@@ -49,6 +49,7 @@
 		display: grid;
 		align-items: center;
 		justify-items: center;
+		touch-action: none;
 	}
 
 	.background,
