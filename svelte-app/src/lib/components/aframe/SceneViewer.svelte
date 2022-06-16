@@ -58,14 +58,26 @@
 	});
 </script>
 
-<a-scene class:arMode embedded vr-mode-ui="enabled: false">
+<a-scene
+	class:arMode
+	embedded
+	vr-mode-ui="enabled: false"
+	gesture-detector
+	arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+>
 	<slot name="overlay">
 		<div class="button backButton">
-			<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
+			<slot name="backButton">
+				<NavigationButton back to="/scan/preview">Back to preview</NavigationButton>
+			</slot>
 		</div>
 
+
+		<div class="button rightButton">
+			<slot name="targetButton">
+				<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+			</slot>
 		
-		<div class="button pointsButton">
 			{#if $targetLocations.length > 0}
 				{#if lava_revealed}
 					<Button secondary on:click={hideLava}>Hide lava</Button>
@@ -77,27 +89,40 @@
 				<Button disabled secondary>Place targets to begin</Button>
 			{/if}
 		</div>
-		
 
-		<div class="button placeTargets">
+		<!-- <div class="button placeTargets">
 			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
-		</div>
+		</div> -->
 	</slot>
 
 	<a-entity light="type: ambient; color: #fff" />
 
 	<!-- If AR is enabled -> wrap model in  -->
 	{#if arMode}
-		<a-marker preset="hiro">
-			<a-box position="0 0 -1" rotation="0 0 0" color="red" />
+		<a-marker
+			id="marker0"
+			type="barcode"
+			value="0"
+			raycaster="objects: .clickable"
+			emitevents="true"
+			cursor="fuse: false; rayOrigin: mouse;"
+		>
+			{#if $debugMode}
+				<!-- When debugging -> display blue cube on top of marker -->
+				<a-box position="0 0 0" material="color: blue; opacity: 0.5;" />
+			{/if}
 
-			<AframeModels {scale} />
+			<a-entity class="clickable" gesture-handler>
+				<AframeModels {scale} />
+			</a-entity>
 		</a-marker>
+
+		<a-entity camera />
 	{:else}
 		<AframeModels {scale} />
-	{/if}
 
-	<a-camera position="4 2 7"/>
+		<a-camera position="4 2 7" />
+	{/if}
 </a-scene>
 
 <style>
@@ -117,12 +142,7 @@
 		left: 1rem;
 	}
 
-	.pointsButton {
-		top: 5rem;
-		right: 1rem;
-	}
-
-	.placeTargets {
+	.rightButton {
 		top: 1rem;
 		right: 1rem;
 	}

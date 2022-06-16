@@ -20,7 +20,7 @@
 {#if loading}
 	<div class="loadingVideo">
 		<div>
-			<h1>Loading video...</h1>
+			<h2>Loading video...</h2>
 
 			{#if error && error.includes('Permission denied')}
 				The browser is unable to access the camera, try re-enabling the camera and reload
