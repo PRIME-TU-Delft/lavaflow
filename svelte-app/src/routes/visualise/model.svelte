@@ -1,12 +1,15 @@
 <script lang="ts">
+
+	import 'aframe';
+	import 'aframe-extras';
+
 	/**
 	 * This view is created to test and show the client the progess of the mountain construction
 	 */
-
+	
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
-	import { gltfStore, targetLocations} from '$lib/stores/gltfStore';
-	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
+	import { gltfStore } from '$lib/stores/gltfStore';
 
 	import { onMount, onDestroy } from 'svelte';
 
@@ -18,39 +21,6 @@
 
 	function degToRad(deg: number) {
 		return (deg * Math.PI) / 180;
-	}
-
-
-	function calculateScore(paths : [number, number, number][][] , targetLocations : Draggable[] ) {
-
-		if (targetLocations.length > 0 && paths.length > 0 ) {
-			let sum_of_min_dists = 0.0;
-			for (const target of targetLocations) {
-				const altGrad = gltfStore.getAlitituteAndGradient(target);
-				const target_point :  [number, number, number] = [altGrad.x , altGrad.altitude, altGrad.y];
-				let min_dist = 0.0;
-
-				//iterate over all lava points and find closest lava point
-				for (const path of paths ){
-					for (const path_point of path){
-						if(dist(target_point, path_point) < min_dist){
-							min_dist = dist(target_point, path_point);
-						}
-					}
-				}
-				sum_of_min_dists =+ min_dist;
-
-			}
-
-			return sum_of_min_dists/targetLocations.length;
-
-		} else {
-			console.warn("No targets have been placed")
-			return 0.0;
-		}
-	}
-	function dist(a : [number, number, number] , b : [number, number, number]) {
-		return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b [2], 2));
 	}
 
 	AFRAME.registerComponent('curve-point', {
@@ -367,8 +337,6 @@ if(!AFRAME.primitives.primitives['a-curve']){
 	});
 }
 
-
-
 	AFRAME.registerComponent('lava-path', {
 		init: function () {
 			console.log('lava path:');
@@ -408,9 +376,9 @@ if(!AFRAME.primitives.primitives['a-curve']){
 				const track = document.createElement('a-entity');
 				track.setAttribute(
 					'clone-along-curve',
-					'curve: #track' + j + '; spacing: 1; rotation: 90 0 0;'
+					'curve: #track' + j + '; spacing: 0.55; rotation: 90 0 0;'
 				);
-				track.setAttribute('geometry', 'primitive:cylinder; height:1; radius:0.4 ;');
+				track.setAttribute('geometry', 'primitive:cylinder; height:0.6; radius:0.4 ;');
 				track.setAttribute('material', 'color: orangered; transparency: true; opacity: 0.001');
 				//track.setAttribute('animation',"property: rotation; to: 0 360 0; loop: true; dur: 10000");
 				const total_time = $gltfStore.lava_paths.length * 2000;
@@ -436,4 +404,5 @@ if(!AFRAME.primitives.primitives['a-curve']){
 	});
 </script>
 
-<SceneViewer {scale} />
+
+<SceneViewer />

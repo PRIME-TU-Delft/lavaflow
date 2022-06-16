@@ -4,6 +4,8 @@ use super::constructor::ModelConstructor;
 
 use miette::{miette, Result};
 
+use crate::utils::log;
+
 /// # Struct: Smoother
 /// The Smoother is a struct that allows for applying mountain-smoothing in a much more controlled manner.
 /// For example, it enables smoothing per altitude-group of level-curves. Developers can detach specific parts of
@@ -646,8 +648,10 @@ impl<'a> Smoother<'a> {
 	/// ### Returns
 	/// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
 	pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32, allow_svc_change: bool) -> Result<()> {
+		log!("Increase altitude for mountain tops was called");
 		for i in 0..self.layer_is_top.len() {
 			if self.layer_is_top[i] {
+				log!("Increasing altitude of layer {}", i);
 				self.set_altitude_for_layer(i, self.altitude_of_layer[i] + self.altitude_step * percentage_of_altitude_step, allow_svc_change)?;
 			}
 		}

@@ -149,7 +149,7 @@ impl ModelConstructionApi {
 			columns: 10,
 			width: 100.0,
 			height: 100.0,
-			altitude_step: 10.0,
+			altitude_step: 25.0,
 			curve_point_separation: 10.0,
 			svc_distance: 10.0,
 			catmull_clark_iterations: 0,
@@ -252,7 +252,9 @@ impl ModelConstructionApi {
 		let max_altitude = *smoother.raster.get_highest_altitude();
 
 		// Apply raster normalisation, so it will be contained within a 100x100x100 pixel box
-		smoother.raster.normalise().map_err(|e| e.to_string())?;
+		let num_layers = level_curve_set.get_level_curves().len() as f32;
+		let max_height_after_normalisation = f32::min(self.altitude_step * num_layers, 100.0);
+		smoother.raster.normalise(100.0, 100.0, max_height_after_normalisation).map_err(|e| e.to_string())?;
 
 		//
 		// All smoothing operations have been applied, thereofore the final raster has been computed.
@@ -269,11 +271,7 @@ impl ModelConstructionApi {
 		let mut top_height = f32::MIN;
 
 		//find max height in normalized model:
-
-		log!("max altitude: {}", max_altitude);
-
 		let normalized_max = *Raster::map(Some(max_altitude), 0.0, max_altitude, 0.0, 100.0).get_or_insert(max_altitude);
-		log!("normalized max : {}", normalized_max);
 
 		for curve in &level_curve_set.level_curves {
 			//use normalized curve height to determine max
@@ -299,18 +297,15 @@ impl ModelConstructionApi {
 		let min_altitude = *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(level_curve_set.altitude_step) / 2.0;
 
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let computed_lava_paths: Vec<Vec<&Point>> =
+		//0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+		let (computed_lava_paths, lava_start_points): (Vec<Vec<&Point>>, Vec<&Point>) =
 			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
-		// Extract the crater by selecting the first point in the lava-path
+		// Extract the crater by selecting the start points in the lava-paths
 		let mut lava_craters: Vec<(f32, f32)> = Vec::new();
-		if !computed_lava_paths.is_empty() && !computed_lava_paths[0].is_empty() {
-			let c = computed_lava_paths[0][0];
-			lava_craters.push((c.x, c.y));
+		for p in &lava_start_points {
+			lava_craters.push((p.x, p.y));
 		}
-
-		log!("lava path generation complete");
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
 		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
@@ -338,10 +333,10 @@ impl ModelConstructionApi {
 			//rgb green = 0, 153, 51
 			//rgb orange = 255, 153, 51
 
-			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z));
-			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z));
-			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z));
-			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z));
+			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z, p0, &lava_craters, &lava_path_triples));
+			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z, p3, &lava_craters, &lava_path_triples));
+			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z, p1, &lava_craters, &lava_path_triples));
+			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z, p2, &lava_craters, &lava_path_triples));
 
 			// Add the first triangle
 			final_points.push(tri00);
@@ -564,7 +559,8 @@ impl Default for ModelConstructionApi {
 
 use smoothing_operation_derive::SmoothingOperation;
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToLayer {
 	pub layer: usize,
 	pub strength: f32,
@@ -573,14 +569,16 @@ pub struct SmoothingOperationApplySmoothToLayer {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationSetAltitudeForLayer {
 	pub layer: usize,
 	pub altitude: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToAltitudeGroup {
 	pub altitude_group: usize,
 	pub strength: f32,
@@ -589,14 +587,16 @@ pub struct SmoothingOperationApplySmoothToAltitudeGroup {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationIncreaseAltitudeForAltitudeGroup {
 	pub altitude_group: usize,
 	pub percentage_of_altitude_step: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToMiddleLayers {
 	pub strength: f32,
 	pub coverage: usize,
@@ -604,7 +604,8 @@ pub struct SmoothingOperationApplySmoothToMiddleLayers {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToMountainTops {
 	pub strength: f32,
 	pub coverage: usize,
@@ -612,13 +613,15 @@ pub struct SmoothingOperationApplySmoothToMountainTops {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationIncreaseAltitudeForMountainTops {
 	pub percentage_of_altitude_step: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToAll {
 	pub strength: f32,
 	pub coverage: usize,
@@ -626,5 +629,6 @@ pub struct SmoothingOperationApplySmoothToAll {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationCorrectForAltitudeConstraintsToAllLayers {}

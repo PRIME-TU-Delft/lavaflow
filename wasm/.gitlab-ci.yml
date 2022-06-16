@@ -55,3 +55,7 @@ wasm-test:
     - cd wasm
     - cargo nextest run
     - cargo tarpaulin --skip-clean
+  artifacts:
+    reports:
+      junit:
+        - wasm/target/nextest/default/junit.xml

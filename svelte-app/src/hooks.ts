@@ -9,12 +9,12 @@ interface HandleType {
 }
 
 // paths to not apply ssr
-const noSSR = ['/demo', '/scan/maptransform', '/debug'];
+const noSSR = ['/demo', '/scan/maptransform', '/debug', '/visualise'];
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }: HandleType) {
 	const response = await resolve(event, {
-		ssr:!noSSR.some((path) => event.url.pathname.startsWith(path)), // Check if the current route is not in the noSSR array
+		ssr: !noSSR.some((path) => event.url.pathname.startsWith(path)), // Check if the current route is not in the noSSR array
 		transformPage: ({ html }) => html.replace('old', 'new')
 	});
 

@@ -77,11 +77,17 @@ fn impl_smoothing_operation(ast: &syn::DeriveInput) -> TokenStream {
 
 	// Quote the implementation of the constructor
 	let impl_constructor = quote! {
+		#[wasm_bindgen]
 		impl #name {
+			#[wasm_bindgen(constructor)]
 			pub fn new(#(#found_field_names:#found_field_types),*) -> Self {
 				Self {
 					#(#found_field_names),*
 				}
+			}
+
+			pub fn apply_to_api(&self, api: &mut ModelConstructionApi) {
+				api.#function_name_ident(#(self.#found_field_names),*);
 			}
 		}
 	};

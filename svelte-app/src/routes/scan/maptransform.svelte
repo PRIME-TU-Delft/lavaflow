@@ -9,7 +9,10 @@
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import Instructions from '$lib/components/InstructionsTransformation.svelte';
+
 
 	import type Draggable from '$lib/data/draggable';
 	import { rawImage } from '$lib/stores/imageStore';
@@ -21,10 +24,13 @@
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/p5/P5Transform.svelte';
-	import { mdiInformation, mdiChevronRight } from '@mdi/js';
+	import { mdiInformation, mdiChevronRight, mdiBookOpenVariant } from '@mdi/js';
 
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
+	let instructionVisible = false;
+
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	function gotoPreview(width: number, height: number) {
 		const mat = cv.imread('foregroundImage');
@@ -40,7 +46,7 @@
 		const result = removePerspective(mat, markerCoords, width, height);
 
 		try {
-			// Set contour line store to the detected contour lines with hirarchy
+			// Set contour line store to the detected contour lines with hierarchy
 			const { curves, hierarchy } = getCurves(result);
 
 			// Convert the OpenCV Mat to a array of tuples for mountain model construction
@@ -77,7 +83,11 @@
 	});
 </script>
 
-<Page title="Image transformation" let:foregroundHeight let:foregroundWidth>
+<Modal title="transformation instructions" closeButtons = "top" bind:visible={instructionVisible}>
+	<Instructions />
+</Modal>
+
+<Page title="Select the level curves" let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="/scan/mapscanning" back>Rescan image</NavigationButton>
 
 	<div slot="background">
@@ -97,11 +107,12 @@
 		alt="background"
 	/>
 
+
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
 	<div slot="footer">
-		<Button secondary icon={mdiInformation}>
-			Drag each marker to the correct corner on the map
+		<Button secondary small icon={mdiBookOpenVariant} on:click={toggleInstruction}>
+			Read instructions
 		</Button>
 
 		<Button on:click={() => gotoPreview(foregroundWidth, foregroundHeight)}>

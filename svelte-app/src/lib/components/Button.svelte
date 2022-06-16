@@ -5,7 +5,9 @@
 	export let loading = false;
 	export let disabled = false;
 	export let large = false;
+	export let small = false;
 	export let secondary = false;
+	export let green = false;
 	export let icon: string = '';
 	export let noMargin = false;
 </script>
@@ -15,7 +17,9 @@
 	class:disabled={disabled || loading}
 	class:noMargin
 	class:large
+	class:small
 	class:secondary
+	class:green
 	on:click
 >
 	{#if loading}
@@ -46,12 +50,15 @@
 		width: 100%;
 		padding: 0.75rem 1.1rem;
 
+		font-family: 'Roboto Slab';
+		font-weight: 700;
 		font-size: 1rem;
 		text-align: left;
 		border: none;
 		margin-block: 0.5rem;
 		border-radius: 0.3rem;
 		cursor: pointer;
+		user-select: none;
 	}
 
 	button.noMargin {
@@ -78,9 +85,18 @@
 		padding: 1rem 1.5rem;
 	}
 
+	.small {
+		padding: 0.5rem 1.5rem;
+	}
+
 	.secondary {
 		background: var(--secondary-color);
 		color: var(--text-color-secondary);
+	}
+
+	.green {
+		background: #308167;
+		color: #fff;
 	}
 
 	:global(button > .title > span) {

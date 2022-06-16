@@ -6,18 +6,90 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import P5TargetPlacement from '$lib/components/p5/P5TargetPlacement.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+	import Instructions from '$lib/components/InstructionsTargets.svelte';
 
 	import { contourLines } from '$lib/stores/contourLineStore';
-	import { targetLocations } from '$lib/stores/gltfStore';
+	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
 	import Draggable from '$lib/data/draggable';
 
-	import { onMount } from 'svelte';
-	import { mdiPin, mdiTrashCan } from '@mdi/js';
+	import { mdiPin, mdiTrashCan, mdiBookOpenVariant } from '@mdi/js';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
 
 	let targetSelected = -1;
+	let instructionVisible = false;
 
-	function addTarget(x: number, y: number) {
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
+
+	function addTarget(x: number, y: number, viewportwidth: number, viewportheight: number) {
+		// If the maximum amount of steam turbines has been reached, don't add more
+		if ($targetLocations.length >= $difficultyStore.max_steam_turbines) return;
+
 		const newTarget = new Draggable(x, y, 20);
+		newTarget.enableSelection();
+
+		for (let t of $targetLocations) {
+			while (newTarget.isTooCloseTo(t.x, t.y, $difficultyStore.min_steam_turbine_separation)) {
+				// This target is too close to another
+				let x_dir = newTarget.x - t.x;
+				let y_dir = newTarget.y - t.y;
+
+				if (x_dir == 0) x_dir = 0.001;
+				if (y_dir == 0) y_dir = 0.001;
+
+				newTarget.x += x_dir;
+				newTarget.y += y_dir;
+			}
+		}
+
+		let is_too_close = false;
+		let too_close_relative: Draggable = newTarget;
+
+		let count = 0;
+
+		while (true) {
+			is_too_close = false;
+
+			if (
+				newTarget.x <= 0 ||
+				newTarget.x >= viewportwidth ||
+				newTarget.y <= 0 ||
+				newTarget.y >= viewportheight
+			) {
+				newTarget.x = 20 + Math.random() * (viewportwidth - 40);
+				newTarget.y = 20 + Math.random() * (viewportheight - 40);
+			}
+
+			for (let t of $targetLocations) {
+				if (newTarget.isTooCloseTo(t.x, t.y, $difficultyStore.min_steam_turbine_separation)) {
+					// This target is too close to another
+					is_too_close = true;
+					too_close_relative = t;
+				}
+			}
+
+			for (let c of $craterLocations) {
+				if (newTarget.isTooCloseTo(c[0], c[1], $difficultyStore.min_crater_distance)) {
+					// This target is too close to a crater
+					if (is_too_close == false) {
+						too_close_relative = new Draggable(c[0], c[1], 20);
+					}
+					is_too_close = true;
+				}
+			}
+
+			if (!is_too_close) break;
+
+			let x_dir = newTarget.x - too_close_relative.x;
+			let y_dir = newTarget.y - too_close_relative.y;
+
+			if (x_dir == 0) x_dir = 0.001;
+			if (y_dir == 0) y_dir = 0.001;
+
+			newTarget.x += x_dir;
+			newTarget.y += y_dir;
+		}
+
 		targetLocations.add(newTarget);
 	}
 
@@ -27,34 +99,76 @@
 		targetSelected = -1;
 	}
 
-	onMount(() => {
-		
-	});
+	function clearTargets() {
+		for (let i = $targetLocations.length - 1; i >= 0; i--) {
+			targetSelected = i;
+			removeTarget();
+		}
+	}
+
+	function addMinimalAmountOfTurbines(foregroundWidth: number, foregroundHeight: number) {
+		let added_turbines = false;
+
+		// We'll add as many steam-turbines as necessary to reach the minimal amount
+		while ($targetLocations.length < $difficultyStore.min_steam_turbines) {
+			addTarget(foregroundWidth / 8, foregroundHeight / 8, foregroundWidth, foregroundHeight);
+			added_turbines = true;
+		}
+
+		return added_turbines;
+	}
 </script>
 
-<Page title="image transformation" let:foregroundHeight let:foregroundWidth>
-	<NavigationButton slot="headerButton" to="demo" back>Back to visualise</NavigationButton>
+<Modal title="transformation instructions" closeButtons="top" bind:visible={instructionVisible}>
+	<Instructions />
+</Modal>
 
-	<div slot="background" style="background:#aaa;"></div>
+<Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
+	<div slot="background" style="background:#aaa;" />
 
-	{#if $contourLines}
+	{#if $contourLines?.curves && $difficultyStore && $targetLocations}
 		<div class="sketch">
-			<P5TargetPlacement bind:targetSelected {foregroundHeight} {foregroundWidth} curves={$contourLines.curves} />
+			<P5TargetPlacement
+				bind:targetSelected
+				{foregroundHeight}
+				{foregroundWidth}
+				curves={$contourLines.curves}
+			/>
 		</div>
-	{:else}
-		<NavigationButton to="/scan/mapscanning">No image found. Go to map scanning</NavigationButton>
 	{/if}
 
 	<div slot="footer">
+		<!-- <Button icon={mdiBookOpenVariant} on:click={() => toggleInstruction()}>
+			Read instructions
+		</Button> -->
 		{#if $contourLines}
-			{#if targetSelected != -1}
+			{#if targetSelected != -1 && $targetLocations.length > $difficultyStore.min_steam_turbines}
 				<Button secondary icon={mdiTrashCan} on:click={removeTarget}>
-					Remove target #{targetSelected}
+					Remove steam turbine {targetSelected + 1}
+				</Button>
+			{:else if $targetLocations.length > 0}
+				<Button secondary icon={mdiTrashCan} on:click={clearTargets}>
+					Clear all steam turbines
 				</Button>
 			{/if}
-			<Button icon={mdiPin} on:click={() => addTarget(foregroundWidth / 2, foregroundHeight / 2)}>
-				Add target
+			<Button
+				icon={mdiPin}
+				on:click={() => {
+					if (!addMinimalAmountOfTurbines(foregroundWidth, foregroundHeight - 100))
+						addTarget(
+							foregroundWidth / 8,
+							foregroundHeight / 8,
+							foregroundWidth,
+							foregroundHeight - 100
+						);
+				}}
+			>
+				Add steam turbine
 			</Button>
+		{:else}
+			<NavigationButton back to="/scan/mapscanning">
+				No image found. Go to map scanning
+			</NavigationButton>
 		{/if}
 	</div>
 </Page>

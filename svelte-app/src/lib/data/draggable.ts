@@ -3,18 +3,23 @@ import type p5 from 'p5';
 const STROKE_WIDTH = 4;
 
 export default class Draggable {
-	dragging: boolean = false;
-	last_selected: boolean = true;
-	drag_translated: boolean = false;
-	too_close_to_crater: boolean = false;
-	too_close_to_other_target: boolean = false;
+	dragging = false;
+	enable_selection = false;
+	last_selected = true;
+	drag_translated = false;
+	too_close_to_crater = false;
+	too_close_to_other_target = false;
 	x: number;
 	y: number;
 	old_x: number;
 	old_y: number;
 	size: number;
-	offsetX: number = 0;
-	offsetY: number = 0;
+	offsetX: number;
+	offsetY: number;
+	instruction: string = '';
+	instruction_width: number = -1;
+	instruction_height: number = -1;
+	instruction_show_initially: boolean = false;
 
 	/**
 	 * Initialize a draggable marker at a given position
@@ -27,12 +32,58 @@ export default class Draggable {
 	 * @param {number} y initial y coordinate of the marker
 	 * @param {number} size height/width of the draggable surface in pixels
 	 */
-	constructor(x: number, y: number, size: number) {
+	constructor(x: number, y: number, size: number, offsetX = 0, offsetY = 0) {
 		this.x = x;
 		this.y = y;
 		this.old_x = x;
 		this.old_y = y;
 		this.size = size;
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+	}
+
+	/**
+	 * Set the instruction-value of this draggable
+	 * @param instruction The instruction to display
+	 */
+	setInstruction(instruction: string, instruction_w?: number, instruction_h?: number, initial?: boolean) {
+		this.instruction = instruction;
+		if (instruction_w != undefined) {
+			this.instruction_width = instruction_w;
+		}
+		if (instruction_h != undefined) {
+			this.instruction_height = instruction_h;
+		}
+		if (initial != undefined) {
+			this.instruction_show_initially = initial;
+		}
+	}
+
+	/**
+	 * Set the selection to enabled
+	 */
+	enableSelection() {
+		this.enable_selection = true;
+	}
+
+	/**
+	 * Set the selection to disabled
+	 */
+	disableSelection() {
+		this.enable_selection = false;
+	}
+
+	/**
+	 * Check if this draggable is too close to another
+	 * @param other the other draggable
+	 * @param max_dist the max distance it may be away
+	 * @returns 
+	 */
+	isTooCloseTo(x: number, y: number, max_dist: number) {
+		const dx = x - this.x;
+		const dy = y - this.y;
+		const dist = Math.sqrt(dx * dx + dy * dy);
+		return dist <= max_dist;
 	}
 
 	/**
@@ -40,7 +91,14 @@ export default class Draggable {
 	 *
 	 * @param p5 Instance of a p5 sketch
 	 */
-	update(p5: p5, avoid_craters?: [number, number][], crater_distance?: number, avoid_targets?: Draggable[], target_distance?: number, index?: number) {
+	update(
+		p5: p5,
+		avoid_craters?: [number, number][],
+		crater_distance?: number,
+		avoid_targets?: Draggable[],
+		target_distance?: number,
+		index?: number
+	) {
 		if (!this.dragging) return;
 
 		if (p5.mouseX <= 0 || p5.mouseY <= 0) return;
@@ -50,15 +108,15 @@ export default class Draggable {
 		this.y = p5.mouseY + this.offsetY;
 
 		// Translate above the user's finger
-		this.translateForDragging();
+		this.translateForDragging(p5);
 
 		if (avoid_craters != undefined && crater_distance != undefined) {
 			this.too_close_to_crater = false;
 
 			for (let i = 0; i < avoid_craters.length; i++) {
-				let dx = avoid_craters[i][0] - this.x;
-				let dy = avoid_craters[i][1] - this.y;
-				let dist = Math.sqrt(dx*dx + dy*dy);
+				const dx = avoid_craters[i][0] - this.x;
+				const dy = avoid_craters[i][1] - this.y;
+				const dist = Math.sqrt(dx * dx + dy * dy);
 				if (dist <= crater_distance) {
 					this.too_close_to_crater = true;
 					break;
@@ -70,15 +128,14 @@ export default class Draggable {
 			this.too_close_to_other_target = false;
 
 			for (let i = 0; i < avoid_targets.length; i++) {
-
 				// We cannot be TOO close to ourselves, so skip if i == index
 				if (index != undefined && index == i) {
 					continue;
 				}
 
-				let dx = avoid_targets[i].x - this.x;
-				let dy = avoid_targets[i].y - this.y;
-				let dist = Math.sqrt(dx*dx + dy*dy);
+				const dx = avoid_targets[i].x - this.x;
+				const dy = avoid_targets[i].y - this.y;
+				const dist = Math.sqrt(dx * dx + dy * dy);
 				if (dist <= target_distance) {
 					this.too_close_to_other_target = true;
 					break;
@@ -101,7 +158,10 @@ export default class Draggable {
 	/**
 	 * Translate this draggable up, so that the user can see what they are doing.
 	 */
-	translateForDragging() {
+	translateForDragging(p5: p5) {
+		if (p5.mouseX <= 0 || p5.mouseY <= 0) return;
+		if (p5.mouseX >= p5.width || p5.mouseY >= p5.height) return;
+
 		if (this.dragging && !this.drag_translated) {
 			this.y -= 50;
 			this.drag_translated = true;
@@ -118,8 +178,44 @@ export default class Draggable {
 	}
 
 	/**
+	 * Display the instruction to the user, if this draggable has one.
+	 * @param p5 p5
+	 * @param markerSize the size of this marker
+	 */
+	drawInstruction(p5: p5, markerSize: number) {
+		if (this.instruction.length > 0 && (this.dragging || this.instruction_show_initially)) {
+
+			// After the user has started to drag the markers around, stop showing the markers 'initially'
+			if (this.dragging) {
+				this.instruction_show_initially = false;
+			}
+
+			let box_width = p5.textWidth(this.instruction) + 20;
+			let box_height = markerSize;
+
+			if (this.instruction_width >= 0) {
+				box_width = this.instruction_width;
+			}
+			if (this.instruction_height >= 0) {
+				box_height = this.instruction_height;
+			}
+
+			p5.strokeWeight(0.5);
+			p5.stroke(0);
+			p5.fill(200);
+			p5.rectMode(p5.CENTER);
+			p5.rect(this.x, this.y - markerSize / 2 - 25, box_width, box_height);
+
+			p5.fill(0);
+			p5.textAlign(p5.CENTER);
+			p5.textSize(15);
+			p5.text(this.instruction, this.x, this.y - 40);
+		}
+	}
+
+	/**
 	 * Display a warning message above this draggable marker
-	 * 
+	 *
 	 * @param p5 Instance of p5 sketch
 	 * @param msg The warning message to display
 	 */
@@ -129,9 +225,10 @@ export default class Draggable {
 		p5.textSize(15);
 		p5.textAlign(p5.CENTER);
 
-		let text_width = p5.textWidth(msg);
+		const text_width = p5.textWidth(msg);
 
-		p5.rect(this.x - text_width/2 - 5, this.y - 35, text_width + 10, 20);
+		p5.rectMode(p5.CORNER);
+		p5.rect(this.x - text_width / 2 - 5, this.y - 35, text_width + 10, 20);
 
 		p5.strokeWeight(1);
 		p5.fill(255);
@@ -145,13 +242,15 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 */
 	drawRect(p5: p5, markerSize: number) {
+		this.translateForDragging(p5);
 
-		this.translateForDragging();
+		this.drawInstruction(p5, markerSize);
 
 		p5.stroke(0);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
-		p5.rect(this.x - markerSize/2, this.y - markerSize/2, markerSize, markerSize);
+		p5.rectMode(p5.CORNER);
+		p5.rect(this.x - markerSize / 2, this.y - markerSize / 2, markerSize, markerSize);
 
 		this.translateBackAfterDragging();
 	}
@@ -163,38 +262,40 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawCircle(p5: p5, markerSize: number, index?: number) {
+		this.translateForDragging(p5);
 
-		this.translateForDragging();
+		this.drawInstruction(p5, markerSize);
 
 		if (index != undefined) {
 			p5.strokeWeight(0.5);
 			p5.stroke(0);
 			p5.fill(200);
-			p5.rect(this.x, this.y - markerSize/2, 50, markerSize);
+			p5.rectMode(p5.CORNER);
+			p5.rect(this.x, this.y - markerSize / 2, 50, markerSize);
 
 			p5.fill(0);
 			p5.textAlign(p5.CENTER);
 			p5.textSize(15);
-			p5.text("#" + index, this.x + 30, this.y + 5);
+			p5.text(index, this.x + 30, this.y + 5);
 		}
 
 		// Set a white background
 		p5.fill(255);
 
 		// Draw a different color if this is the selected point
-		if (this.last_selected) {
+		if (this.enable_selection && this.last_selected) {
 			p5.fill(0, 140, 220);
 		}
 
 		// Draw a red color if this point is too close to one of the avoid_points
 		if (this.too_close_to_crater) {
-			this.displayWarningMessage(p5, "Too close to the crater");
+			this.displayWarningMessage(p5, 'Too close to the crater');
 			p5.fill(255, 0, 0);
 		} else if (this.too_close_to_other_target) {
-			this.displayWarningMessage(p5, "Too close to another turbine");
+			this.displayWarningMessage(p5, 'Too close to another turbine');
 			p5.fill(255, 0, 0);
 		}
-				
+
 		p5.stroke(0);
 		p5.strokeWeight(STROKE_WIDTH);
 
@@ -210,8 +311,9 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawTriangle(p5: p5, markerSize: number) {
+		this.translateForDragging(p5);
 
-		this.translateForDragging();
+		this.drawInstruction(p5, markerSize);
 
 		p5.stroke(0);
 		p5.fill(255);
@@ -219,12 +321,12 @@ export default class Draggable {
 
 		// corners in order: bottom left corner, bottom right corner, top corner in the center
 		p5.triangle(
-			this.x - markerSize/2,
-			this.y - markerSize/2,
-			this.x + markerSize/2,
-			this.y - markerSize/2,
+			this.x - markerSize / 2,
+			this.y + markerSize / 2,
+			this.x + markerSize / 2,
+			this.y + markerSize / 2,
 			this.x,
-			this.y + markerSize/2
+			this.y - markerSize / 2
 		);
 
 		this.translateBackAfterDragging();
@@ -237,8 +339,9 @@ export default class Draggable {
 	 * @param markerSize The size in pixels of the marker to be drawn
 	 */
 	drawCross(p5: p5, markerSize: number) {
+		this.translateForDragging(p5);
 
-		this.translateForDragging();
+		this.drawInstruction(p5, markerSize);
 
 		p5.stroke(0);
 		p5.strokeWeight(STROKE_WIDTH * 2);
@@ -246,18 +349,18 @@ export default class Draggable {
 
 		// draw line from top left to bottom right
 		p5.line(
-			this.x - markerSize/2,
-			this.y - markerSize/2,
-			this.x + markerSize/2,
-			this.y + markerSize/2
+			this.x - markerSize / 2,
+			this.y - markerSize / 2,
+			this.x + markerSize / 2,
+			this.y + markerSize / 2
 		);
 
 		// draw line from top right to bottom left
 		p5.line(
-			this.x + markerSize/2,
-			this.y - markerSize/2,
-			this.x - markerSize/2,
-			this.y + markerSize/2
+			this.x + markerSize / 2,
+			this.y - markerSize / 2,
+			this.x - markerSize / 2,
+			this.y + markerSize / 2
 		);
 
 		this.translateBackAfterDragging();
@@ -274,8 +377,8 @@ export default class Draggable {
 	 */
 	pressed(p5: p5) {
 		// Check if mouse is over this object when global mouse is pressed
-		const xBounded = p5.mouseX > this.x - this.size/2 && p5.mouseX < this.x + this.size/2;
-		const yBounded = p5.mouseY > this.y - this.size/2 && p5.mouseY < this.y + this.size/2;
+		const xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < this.x + this.size / 2;
+		const yBounded = p5.mouseY > this.y - this.size / 2 && p5.mouseY < this.y + this.size / 2;
 		if (xBounded && yBounded) {
 			// if so, set this object to be dragged
 			this.dragging = true;
@@ -305,6 +408,5 @@ export default class Draggable {
 			this.too_close_to_crater = false;
 			this.too_close_to_other_target = false;
 		}
-
 	}
 }

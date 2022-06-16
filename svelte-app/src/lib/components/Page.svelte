@@ -1,18 +1,14 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { mdiChevronLeft, mdiClose } from '@mdi/js';
+	import { mdiChevronLeft } from '@mdi/js';
 
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
 	export let title = '';
-	export let closeButton = false;
 	export let fullscreen = false;
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
-
-	const dispatch = createEventDispatcher();
 </script>
 
 <div class="page">
@@ -24,17 +20,10 @@
 	<div class="foreground" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 		<header>
 			<slot name="headerButton">
-				{#if closeButton}
-					<Button noMargin on:click={() => dispatch('close')}>
-						<Icon path={mdiClose} color="var(--text-color)" />
-						Close
-					</Button>
-				{:else}
-					<Button noMargin on:click={() => history.back()}>
-						<Icon path={mdiChevronLeft} color="var(--text-color)" />
-						Back
-					</Button>
-				{/if}
+				<Button noMargin on:click={() => history.back()}>
+					<Icon path={mdiChevronLeft} color="var(--text-color)" />
+					Back
+				</Button>
 			</slot>
 			<div class="title">
 				{title}
@@ -123,6 +112,7 @@
 		margin: 0 0 0 auto;
 		border-radius: 0.3rem;
 		cursor: pointer;
+		user-select: none;
 	}
 
 	main {
