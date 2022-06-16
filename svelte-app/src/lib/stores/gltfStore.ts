@@ -44,10 +44,10 @@ function adjustAlititude(altAndgrad: AltitudeGradientPair) {
 	let altitude = altAndgrad.altitude;
 
 	// Take a small modifier that will increase the altitude by a fraction of the largest absolute gradient
-	altitude += 0.02 * altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
+	altitude += 1 * altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
 
 	// Increment by 1 to prevent the altitude from being under the model
-	return altitude + 1;
+	return altitude * 1.07;
 }
 
 export function gltfStringToUrl(gltf: string): string {
@@ -91,8 +91,8 @@ function createGltfStore() {
 
 			const api_settings = new ApiSettings(
 				/*				 OpenCV tree */ tree,
-				/*						Rows */ 35,
-				/*					 Columns */ 35,
+				/*						Rows */ 45,
+				/*					 Columns */ 45,
 				/*					   Width */ curveTree.size.width,
 				/*					  Height */ curveTree.size.height,
 				/*	  Curve Point Separation */ 5,

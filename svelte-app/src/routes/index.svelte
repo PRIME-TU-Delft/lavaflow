@@ -10,6 +10,7 @@
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
 
 	import { difficulty_modes } from '$lib/data/difficultyModes';
+	import { onMount } from 'svelte';
 
 	let header_height = 20;
 	let page_shift_top = 0;
@@ -23,6 +24,11 @@
 		header_height = 20;
 		page_shift_top = 0;
 	}
+
+	onMount(() => {
+		// Clear all cached data from previous sessions.
+		localStorage.clear();
+	})
 </script>
 
 <div class="tudelftLogo" />

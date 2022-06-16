@@ -7,6 +7,7 @@
 	export let large = false;
 	export let small = false;
 	export let secondary = false;
+	export let green = false;
 	export let icon: string = '';
 	export let noMargin = false;
 </script>
@@ -18,6 +19,7 @@
 	class:large
 	class:small
 	class:secondary
+	class:green
 	on:click
 >
 	{#if loading}
@@ -90,6 +92,11 @@
 	.secondary {
 		background: var(--secondary-color);
 		color: var(--text-color-secondary);
+	}
+
+	.green {
+		background: #047836;
+		color: #fff;
 	}
 
 	:global(button > .title > span) {
