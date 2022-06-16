@@ -16,7 +16,6 @@ use crate::objects::level_curve_tree::LevelCurveTree;
 use crate::objects::point::{Point, Vector};
 use crate::objects::raster::Raster;
 use crate::objects::triangle::Triangle;
-use crate::utils::log;
 
 // Create a trait that will be used for the procedural macro 'SmoothingOperation'
 pub trait SmoothingOperation {
@@ -96,6 +95,23 @@ impl AltitudeGradientPair {
 
 	pub fn to_js(&self) -> Result<JsValue, JsValue> {
 		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize AltitudeGradientPair"))
+	}
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LavaPathTurbineInput {
+	lava_paths: Vec<Vec<(f32, f32, f32)>>,
+	turbines: Vec<(f32, f32)>,
+	max_lava_distance: f32,
+	max_points_total: usize,
+}
+
+#[wasm_bindgen]
+impl LavaPathTurbineInput {
+	#[wasm_bindgen(constructor)]
+	pub fn new(val: &JsValue) -> Result<LavaPathTurbineInput, JsValue> {
+		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid LavaPathTurbineInput"))
 	}
 }
 
@@ -238,7 +254,7 @@ impl ModelConstructionApi {
 		// determine heights
 		model_constructor.construct().map_err(|e| e.to_string())?;
 
-		log!("construction complete");
+		//log!("construction complete");
 
 		// Construct smoother instance
 		let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
@@ -247,7 +263,7 @@ impl ModelConstructionApi {
 		for operation in &self.smoothing_operations_queue {
 			operation.apply(&mut smoother).map_err(|e| e.to_string())?;
 		}
-		log!("smoothing complete");
+		//log!("smoothing complete");
 		//get max alt before normalization, to be used later
 		let max_altitude = *smoother.raster.get_highest_altitude();
 
@@ -265,7 +281,7 @@ impl ModelConstructionApi {
 		//apply surface subdivision
 		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, smoother.raster)?;
 
-		log!("surface subdivision complete");
+		//log!("surface subdivision complete");
 
 		//for lava path generation : find point index of the highest point in the model
 		let mut top_height = f32::MIN;
@@ -534,6 +550,22 @@ impl ModelConstructionApi {
 			altitude,
 			gradient: (rotation_angle_x, rotation_angle_y, rotation_angle_z),
 		})
+	}
+
+	/// Compute the points that the player obtained
+	///
+	///
+	pub fn compute_player_points(&self, input: LavaPathTurbineInput) -> usize {
+		let max_points_per_turbine: usize = input.max_points_total / input.turbines.len();
+		let mut result: usize = 1;
+
+		// 1. Loop over all the steam-turbines and determine the number of points per steam-turbine
+		for turbine in input.turbines {
+			// 2. Determine the number of points for this specific turbine and sum the points
+			result += ModelConstructionApi::points_for_turbine(turbine, &input.lava_paths, input.max_lava_distance, max_points_per_turbine);
+		}
+
+		result
 	}
 
 	//

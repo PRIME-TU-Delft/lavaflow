@@ -5,7 +5,8 @@
 
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
-	import { gltfStore } from '$lib/stores/gltfStore';
+	import { gltfStore, targetLocations} from '$lib/stores/gltfStore';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 
 	import { onMount, onDestroy } from 'svelte';
 
@@ -17,6 +18,39 @@
 
 	function degToRad(deg: number) {
 		return (deg * Math.PI) / 180;
+	}
+
+
+	function calculateScore(paths : [number, number, number][][] , targetLocations : Draggable[] ) {
+
+		if (targetLocations.length > 0 && paths.length > 0 ) {
+			let sum_of_min_dists = 0.0;
+			for (const target of targetLocations) {
+				const altGrad = gltfStore.getAlitituteAndGradient(target);
+				const target_point :  [number, number, number] = [altGrad.x , altGrad.altitude, altGrad.y];
+				let min_dist = 0.0;
+
+				//iterate over all lava points and find closest lava point
+				for (const path of paths ){
+					for (const path_point of path){
+						if(dist(target_point, path_point) < min_dist){
+							min_dist = dist(target_point, path_point);
+						}
+					}
+				}
+				sum_of_min_dists =+ min_dist;
+
+			}
+
+			return sum_of_min_dists/targetLocations.length;
+
+		} else {
+			console.warn("No targets have been placed")
+			return 0.0;
+		}
+	}
+	function dist(a : [number, number, number] , b : [number, number, number]) {
+		return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b [2], 2));
 	}
 
 	AFRAME.registerComponent('curve-point', {
@@ -332,6 +366,8 @@ if(!AFRAME.primitives.primitives['a-curve']){
 		}
 	});
 }
+
+
 
 	AFRAME.registerComponent('lava-path', {
 		init: function () {

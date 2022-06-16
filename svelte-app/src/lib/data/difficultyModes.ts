@@ -45,31 +45,47 @@ export const difficulty_modes = [
 	new DifficultyLevel(
 		'Tutorial',
 		'This is the easiest level of difficulty, which is meant to get you familiarised with the game.',
-		200,
-		0.2,
+		10,
+		0.6,
 		2,
-		50,
-		75
+		25,
+		30
 	),
-	new DifficultyLevel('Easy', 'Take it easy.', 200, 0.2, 3, 50, 75),
+	new DifficultyLevel(
+		'Easy',
+		'Take it easy.',
+		10,
+		0.4,
+		3,
+		40,
+		30
+	),
 	new DifficultyLevel(
 		'Medium',
 		'There is less lava and it must reach closer to the steam turbines. Steam turbines should be placed further apart from each other.',
-		150,
-		0.1,
-		5,
-		100,
-		75
+		8,
+		0.4,
+		4,
+		50,
+		30
 	),
 	new DifficultyLevel(
 		'Hard',
 		"The lava must reach even closer to the steam turbines and you'll have to place them even further apart.",
-		100,
-		0.1,
 		5,
-		150,
-		75
+		0.3,
+		7,
+		65,
+		50
 	),
-	new DifficultyLevel('Impossible', 'Only Dennis can solve this level.', 50, 0.1, 10, 200, 200)
+	new DifficultyLevel(
+		'Impossible',
+		'Only Dennis can solve this level.',
+		3,
+		0.2, 
+		10,
+		75,
+		100
+	)
 	// Custom difficulty: Add your own difficulty levels here, they'll automatically be imcorporated throughout the app.
 ];

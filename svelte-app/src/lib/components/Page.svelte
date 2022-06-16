@@ -54,6 +54,7 @@
         -khtml-user-select: none;
         -webkit-user-select: none;
         -o-user-select: none;
+		touch-action: none;
 	}
 
 	.background,
