@@ -30,7 +30,7 @@
 		<!----------------------------------------------------------------
 		--                    CRATERS								  --
 		------------------------------------------------------------------>
-		{#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20), true) ) as altAndGrad}
+		<!-- {#each $gltfStore.craters.map( (l) => gltfStore.getAlitituteAndGradient(new Draggable(l[0], l[1], 20), true) ) as altAndGrad}
 			<a-cylinder
 				radius="2"
 				height={altAndGrad.altitude / 2}
@@ -42,7 +42,7 @@
 				color="#ff4025"
 				scale="1 2 1"
 			/>
-		{/each}
+		{/each} -->
 
 		<!----------------------------------------------------------------
 		--       		        	TARGETS				                					  --
