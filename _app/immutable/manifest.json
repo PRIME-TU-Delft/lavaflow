@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-549f667c.js",
+    "file": "start-6cb0d324.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -43,13 +43,13 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-b32a58c1.js",
+    "file": "pages/demo.svelte-115e9f2c.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-ca5d62ed.js",
-      "_aframe-master-321013f2.js",
+      "_aframe-master-52339316.js",
       "_gltfStore-4d0c5d70.js",
       "_contourLineStore-080ee4cb.js",
       "_index-bcf3c295.js",
@@ -63,7 +63,7 @@
     ]
   },
   "src/routes/index.svelte": {
-    "file": "pages/index.svelte-8f72e71d.js",
+    "file": "pages/index.svelte-59a2833f.js",
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -71,7 +71,7 @@
       "_index-ca5d62ed.js",
       "_difficultyStore-d15690e4.js",
       "_NavigationButton-4b0ccaf5.js",
-      "_Dropdown-e5e62b45.js",
+      "_Dropdown-8e372fbe.js",
       "_index-bcf3c295.js"
     ],
     "css": [
@@ -79,14 +79,14 @@
     ]
   },
   "src/routes/scan/mapscanning.svelte": {
-    "file": "pages/scan/mapscanning.svelte-2075d94e.js",
+    "file": "pages/scan/mapscanning.svelte-5376b514.js",
     "src": "src/routes/scan/mapscanning.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-ca5d62ed.js",
       "_NavigationButton-4b0ccaf5.js",
-      "_Dropdown-e5e62b45.js",
+      "_Dropdown-8e372fbe.js",
       "_Page-ada7c1be.js",
       "_Modal-1308c881.js",
       "_navigation-0e6511d1.js",
@@ -95,7 +95,7 @@
       "_index-bcf3c295.js"
     ],
     "css": [
-      "assets/pages/scan/mapscanning.svelte-ab799fc3.css"
+      "assets/pages/scan/mapscanning.svelte-1bff02b5.css"
     ]
   },
   "src/routes/scan/maptransform.svelte": {
@@ -167,14 +167,14 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-15262ae1.js",
+    "file": "pages/visualise/ar.svelte-f333b0e2.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-ca5d62ed.js",
       "_NavigationButton-4b0ccaf5.js",
-      "_aframe-master-321013f2.js",
+      "_aframe-master-52339316.js",
       "__commonjsHelpers-56d41998.js",
       "_gltfStore-4d0c5d70.js",
       "_index-bcf3c295.js",
@@ -184,19 +184,16 @@
       "_navigation-0e6511d1.js",
       "_singletons-d1fb5791.js",
       "_debugStore-218dd941.js"
-    ],
-    "css": [
-      "assets/pages/visualise/ar.svelte-9181ae5f.css"
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-23dc9497.js",
+    "file": "pages/visualise/model.svelte-f0a59658.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-ca5d62ed.js",
-      "_aframe-master-321013f2.js",
+      "_aframe-master-52339316.js",
       "__commonjsHelpers-56d41998.js",
       "_gltfStore-4d0c5d70.js",
       "_contourLineStore-080ee4cb.js",
@@ -230,8 +227,8 @@
       "_index-bcf3c295.js"
     ]
   },
-  "_aframe-master-321013f2.js": {
-    "file": "chunks/aframe-master-321013f2.js",
+  "_aframe-master-52339316.js": {
+    "file": "chunks/aframe-master-52339316.js",
     "imports": [
       "_index-ca5d62ed.js",
       "_gltfStore-4d0c5d70.js",
@@ -243,7 +240,7 @@
       "__commonjsHelpers-56d41998.js"
     ],
     "css": [
-      "assets/aframe-master-b6c32b3d.css"
+      "assets/aframe-master-3126ea4d.css"
     ]
   },
   "_gltfStore-4d0c5d70.js": {
@@ -289,13 +286,13 @@
   "__commonjsHelpers-56d41998.js": {
     "file": "chunks/_commonjsHelpers-56d41998.js"
   },
-  "_Dropdown-e5e62b45.js": {
-    "file": "chunks/Dropdown-e5e62b45.js",
+  "_Dropdown-8e372fbe.js": {
+    "file": "chunks/Dropdown-8e372fbe.js",
     "imports": [
       "_index-ca5d62ed.js"
     ],
     "css": [
-      "assets/Dropdown-a1b629cf.css"
+      "assets/Dropdown-c4b628b5.css"
     ]
   },
   "_Page-ada7c1be.js": {
