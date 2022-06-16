@@ -7,8 +7,20 @@
 
 	import '@ar-js-org/ar.js';
 	import { onDestroy } from 'svelte';
+	import type { Component, Entity, ObjectMap, System } from 'aframe';
+	import type { Vector3 } from 'three';
 
-	AFRAME.registerComponent('gesture-handler', {
+	interface GestureHandlerType extends Component<any, System<any>> {
+		isVisible: boolean;
+		initialScale: Vector3;
+		scaleFactor: number;
+		el: Entity<ObjectMap<Component<any, System<any>>>> & {
+			sceneEl: any;
+		};
+		handleRotation: (event: CustomEvent<{ positionChange: { x: number; y: number } }>) => any;
+	}
+
+	AFRAME.registerComponent<GestureHandlerType>('gesture-handler', {
 		schema: {
 			enabled: { default: true },
 			rotationFactor: { default: 5 },
@@ -24,11 +36,11 @@
 			this.initialScale = this.el.object3D.scale.clone();
 			this.scaleFactor = 1;
 
-			this.el.sceneEl.addEventListener('markerFound', (e) => {
+			this.el.sceneEl.addEventListener('markerFound', () => {
 				this.isVisible = true;
 			});
 
-			this.el.sceneEl.addEventListener('markerLost', (e) => {
+			this.el.sceneEl.addEventListener('markerLost', () => {
 				this.isVisible = false;
 			});
 		},
@@ -73,7 +85,17 @@
 
 	// Component that detects and emits events for touch gestures
 
-	AFRAME.registerComponent('gesture-detector', {
+	interface GestureDetectorType {
+		targetElement: Entity<ObjectMap<Component<any, System<any>>>>;
+		internalState: {
+			previousState?: { position: { x: number; y: number; z: number }; spread: number };
+		};
+		emitGestureEvent: {
+			bind: (t: GestureDetectorType & Component<any, System<any>>) => () => any;
+		};
+	}
+
+	AFRAME.registerComponent<GestureDetectorType>('gesture-detector', {
 		schema: {
 			element: { default: '' }
 		},
@@ -86,7 +108,7 @@
 			}
 
 			this.internalState = {
-				previousState: null
+				previousState: undefined
 			};
 
 			this.emitGestureEvent = this.emitGestureEvent.bind(this);
@@ -106,7 +128,7 @@
 			this.targetElement.removeEventListener('touchmove', this.emitGestureEvent);
 		},
 
-		emitGestureEvent(event) {
+		emitGestureEvent(event: Event) {
 			const currentState = this.getTouchState(event);
 
 			const previousState = this.internalState.previousState;
@@ -123,7 +145,7 @@
 
 				this.el.emit(eventName, previousState);
 
-				this.internalState.previousState = null;
+				this.internalState.previousState = undefined;
 			}
 
 			if (gestureStarted) {
@@ -141,7 +163,10 @@
 			}
 
 			if (gestureContinues) {
-				const eventDetail = {
+				const eventDetail: Partial<{
+					positionChange: { x: number; y: number };
+					spreadChange: number;
+				}> = {
 					positionChange: {
 						x: currentState.position.x - previousState.position.x,
 
@@ -223,7 +248,7 @@
 			return touchState;
 		},
 
-		getEventPrefix(touchCount) {
+		getEventPrefix(touchCount: number) {
 			const numberNames = ['one', 'two', 'three', 'many'];
 
 			return numberNames[Math.min(touchCount, 4) - 1];
