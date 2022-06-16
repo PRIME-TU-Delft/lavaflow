@@ -4,7 +4,7 @@
 
 	export let rotation = 0;
 	export let scale: [number, number, number];
-	//export let lava_revealed: boolean = false;
+	export let lava_revealed: boolean = false;
 
 	$: scaleString = scale.join(' ');
 </script>
@@ -16,6 +16,10 @@
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
 	<a-entity scale={scaleString} rotation="0 {rotation} 0">
+		{#if lava_revealed}
+		<a-entity lava-path />
+		{/if}
+
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>

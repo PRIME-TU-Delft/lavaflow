@@ -57,21 +57,23 @@ impl ModelConstructionApi {
 		}
 
 		// Compute the closest distance to a lava path
-		let mut closest_dist_sqr_lava_path = f32::MAX;
-		for lava_path in lava_path_triples.iter() {
-			for (lpx, lpy, lpz) in lava_path.iter() {
-				let dx = p.x - lpx;
-				let dy = p.y - lpy;
-				let dz = alt - lpz;
-				let dist_sqr = dx * dx + dy * dy + dz * dz;
-				if dist_sqr < closest_dist_sqr_lava_path {
-					closest_dist_sqr_lava_path = dist_sqr;
-				}
-			}
-		}
+		//let mut closest_dist_sqr_lava_path = f32::MAX;
+		// for lava_path in lava_path_triples.iter() {
+		// 	for (lpx, lpy, lpz) in lava_path.iter() {
+		// 		let dx = p.x - lpx;
+		// 		let dy = p.y - lpy;
+		// 		let dz = alt - lpz;
+		// 		let dist_sqr = dx * dx + dy * dy + dz * dz;
+		// 		if dist_sqr < closest_dist_sqr_lava_path {
+		// 			closest_dist_sqr_lava_path = dist_sqr;
+		// 		}
+		// 	}
+		// }
 
 		// If this distance is smaller than the threshold, make this color be a lava-crater
-		let result: (f32, f32, f32) = if closest_dist_sqr <= 2.5 || closest_dist_sqr_lava_path <= 0.3 {
+		let result: (f32, f32, f32) = if closest_dist_sqr <= 2.5
+		/* || closest_dist_sqr_lava_path <= 0.3 */
+		{
 			color_lava_crater
 		} else {
 			// 1. Map the altitude so it becomes a value between [0, 1]
