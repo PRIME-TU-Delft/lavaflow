@@ -137,15 +137,6 @@
 		}
 	});
 
-	const tempQuaternion = new THREE.Quaternion();
-
-	function normalFromTangent(tangent: THREE.Vector3) {
-		let lineEnd = new THREE.Vector3(0, 1, 0);
-		tempQuaternion.setFromUnitVectors(zAxis, tangent);
-		lineEnd.applyQuaternion(tempQuaternion);
-		return lineEnd;
-	}
-
 	AFRAME.registerShader('line', {
 		schema: {
 			color: { default: '#ff0000' }
