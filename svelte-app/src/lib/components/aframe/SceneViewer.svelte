@@ -43,17 +43,17 @@
 			return;
 		}
 
-		// If debug mode is enabled -> load hardcoded data
-		console.warn('SCENE VIEWER: gltf is loaded from hardcoded data');
-
 		if (!$contourLines) {
-			contourLines.set({
+			// If debug mode is enabled -> load hardcoded data
+			console.warn('SCENE VIEWER: gltf is loaded from hardcoded data');
+			contourLines.setup({
 				curves: hc_curves,
 				hierarchy: hc_hierarchy,
 				size: { width: 800, height: 960 }
 			});
 		}
 
+		// TODO: Optimisation this should only be needed when the user is in debug mode
 		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
 		gltfStore.build($contourLines);
 	});

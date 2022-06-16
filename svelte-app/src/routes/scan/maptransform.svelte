@@ -13,7 +13,6 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import Instructions from '$lib/components/InstructionsTransformation.svelte';
 
-
 	import type Draggable from '$lib/data/draggable';
 	import { rawImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
@@ -60,7 +59,7 @@
 				return contourTuple;
 			});
 
-			contourLines.set({
+			contourLines.setup({
 				curves: contourTuples,
 				hierarchy: hierarchy,
 				size: { width, height }
@@ -83,7 +82,7 @@
 	});
 </script>
 
-<Modal title="transformation instructions" closeButtons = "top" bind:visible={instructionVisible}>
+<Modal title="transformation instructions" closeButtons="top" bind:visible={instructionVisible}>
 	<Instructions />
 </Modal>
 
@@ -107,7 +106,6 @@
 		alt="background"
 	/>
 
-
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
 	<div slot="footer">
@@ -127,10 +125,10 @@
 		height: 100%;
 		touch-action: none;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 
 	#backgroundImage {
@@ -139,9 +137,9 @@
 		object-fit: cover;
 		touch-action: none;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 </style>
