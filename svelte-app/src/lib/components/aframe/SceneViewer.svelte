@@ -113,13 +113,13 @@
 			{/if}
 
 			<a-entity class="clickable" gesture-handler>
-				<AframeModels {scale} />
+				<AframeModels {scale} {lava_revealed} />
 			</a-entity>
 		</a-marker>
 
 		<a-entity camera />
 	{:else}
-		<AframeModels {scale} />
+		<AframeModels {scale} {lava_revealed} />
 
 		<a-camera position="4 2 7" />
 	{/if}
