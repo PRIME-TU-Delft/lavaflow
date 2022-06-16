@@ -3,7 +3,7 @@
 	import { targetLocations } from '$lib/stores/locationStore';
 
 	export let scale: [number, number, number];
-	export const lava_revealed: boolean = false;
+	//export let lava_revealed: boolean = false;
 
 	$: scaleString = scale.join(' ');
 </script>

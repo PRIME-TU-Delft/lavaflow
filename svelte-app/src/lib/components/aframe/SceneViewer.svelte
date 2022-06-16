@@ -17,17 +17,20 @@
 	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
 
 	let lava_revealed = false;
-	let lava_button_content = ['Reveal lava', 'Hide lava'];
-	let show_points = false;
-	let points = 0;
+	let obtained_points = 0;
+	let max_points = 1000;
 
-	function computePoints() {
-		let lava_paths = $gltfStore.lava_paths;
-		let turbines = $targetLocations;
+	function revealLava() {
+		// Compute the amount of points the user obtained
+		// The rust api exports a function that can be used to efficiently compute the player's points.
+		// Use this api-call to compute the points
+		obtained_points = gltfStore.computePlayerPoints(max_points);
 
-		points = 10;
-		lava_revealed = !lava_revealed;
-		show_points = !show_points;
+		lava_revealed = true;
+	}
+
+	function hideLava() {
+		lava_revealed = false;
 	}
 
 	onMount(async () => {
@@ -69,17 +72,18 @@
 			</slot>
 		</div>
 
+
 		<div class="button rightButton">
 			<slot name="targetButton">
 				<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 			</slot>
-
+		
 			{#if $targetLocations.length > 0}
-				<Button secondary on:click={computePoints}>
-					{lava_revealed ? lava_button_content[1] : lava_button_content[0]}
-				</Button>
-				{#if show_points}
-					<Button green>Points: {points}</Button>
+				{#if lava_revealed}
+					<Button secondary on:click={hideLava}>Hide lava</Button>
+					<Button green>Points: {obtained_points} / {max_points}</Button>
+				{:else}
+					<Button on:click={revealLava}>Reveal lava</Button>
 				{/if}
 			{:else}
 				<Button disabled secondary>Place targets to begin</Button>

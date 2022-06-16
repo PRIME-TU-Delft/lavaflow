@@ -8,6 +8,9 @@
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
 import { craterLocations } from '$lib/stores/locationStore';
+import { difficultyStore } from '$lib/stores/difficultyStore';
+import { targetLocations } from '$lib/stores/locationStore';
+import { get } from 'svelte/store';
 
 import ApiSettings from '$lib/data/apiSettings';
 import type Draggable from '$lib/data/draggable';
@@ -80,6 +83,8 @@ function createGltfStore() {
 
 			paperSize = curveTree.size;
 
+			// TODO: add paperSize cache just in case
+
 			// Create a wasm tree out of openCV contour tree
 			const tree = new wasm.OpenCVTree({
 				pixels_per_curve: curveTree.curves,
@@ -117,7 +122,7 @@ function createGltfStore() {
 
 			model.craters = model.craters.map((c) => [
 				(c[0] * curveTree.size.width) / 100,
-				(c[1] * curveTree.size.width) / 100
+				(c[1] * curveTree.size.height) / 100
 			]);
 
 			// (re-)set the crater locations
@@ -149,6 +154,19 @@ function createGltfStore() {
 			altitudeGradientPair.altitude = adjustAlititude(altitudeGradientPair);
 
 			return altitudeGradientPair;
+		},
+		computePlayerPoints: (max_points_total: number) => {
+			if (!api) return 0;
+
+			// TODO: add cache
+			const {width, height} = paperSize;
+
+			return api.compute_player_points(new wasm.LavaPathTurbineInput({
+				lava_paths: model.lava_paths,
+				turbines: get(targetLocations).map(l => [l.x/width*100, l.y/height*100]),
+				max_lava_distance: get(difficultyStore).max_lava_distance,
+				max_points_total: max_points_total
+			}));
 		}
 	};
 }
