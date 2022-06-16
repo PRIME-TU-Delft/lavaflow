@@ -1,5 +1,5 @@
 <script lang="ts">
-import { mdiChevronDown } from "@mdi/js";
+	import { mdiChevronDown } from '@mdi/js';
 
 	type T = $$Generic;
 
@@ -27,15 +27,15 @@ import { mdiChevronDown } from "@mdi/js";
 		width: 100%;
 		padding: 0.75rem 1.1rem;
 
-		font-family: "Roboto Slab";
-		font-weight: 500;
+		font-family: 'Roboto Slab';
+		font-weight: 600;
 		font-size: 1rem;
 		text-align: left;
 		border: none;
 		margin-block: 0.5rem;
 		border-radius: 0.3rem;
 		cursor: pointer;
-		position:relative;
+		position: relative;
 
 		-webkit-appearance: none;
 	}
