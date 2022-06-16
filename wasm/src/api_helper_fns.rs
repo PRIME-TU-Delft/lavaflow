@@ -13,7 +13,7 @@ impl ModelConstructionApi {
 		)
 	}
 
-	pub fn color_for_altitude(&self, min_alt: f32, max_alt: f32, alt: f32, px: f32, py: f32, lava_craters: &Vec<(f32, f32)>) -> [f32; 3] {
+	pub fn color_for_altitude(&self, min_alt: f32, max_alt: f32, alt: f32, px: f32, py: f32, lava_craters: &Vec<(f32, f32)>, lava_path_triples: &Vec<Vec<(f32, f32, f32)>>) -> [f32; 3] {
 		// Initialisation: tuples for every color that we'd like to use
 		let color_rock_dark = (
 			ModelConstructionApi::map(30.0, 0.0, 255.0, 0.0, 1.0),
@@ -58,8 +58,22 @@ impl ModelConstructionApi {
 			}
 		}
 
+		// Compute the closest distance to a lava path
+		let mut closest_dist_sqr_lava_path = f32::MAX;
+		for lava_path in lava_path_triples.iter() {
+			for (lpx, lpy, lpz) in lava_path.iter() {
+				let dx = px - lpx;
+				let dy = py - lpy;
+				let dz = alt - lpz;
+				let dist_sqr = dx*dx + dy*dy;
+				if dist_sqr < closest_dist_sqr_lava_path {
+					closest_dist_sqr_lava_path = dist_sqr;
+				}
+			}
+		}
+
 		// If this distance is smaller than the threshold, make this color be a lava-crater
-		if closest_dist_sqr <= 5.0 {
+		if closest_dist_sqr <= 2.5 || closest_dist_sqr_lava_path <= 1.0 {
 			result = color_lava_crater;
 		} else {
 			// 1. Map the altitude so it becomes a value between [0, 1]
