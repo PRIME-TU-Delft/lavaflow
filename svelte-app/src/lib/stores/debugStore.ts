@@ -6,5 +6,6 @@
  */
 
 import { writable } from 'svelte/store';
+import { dev } from '$app/env';
 
-export const debugMode = writable<boolean>(true);
+export const debugMode = writable<boolean>(dev);
