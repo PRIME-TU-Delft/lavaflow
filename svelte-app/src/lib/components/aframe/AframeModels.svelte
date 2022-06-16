@@ -4,6 +4,7 @@
 	import Draggable from '$lib/data/draggable';
 
 	export let scale: [number, number, number];
+	export let lava_revealed: boolean = false;
 
 	$: scaleString = scale.join(' ');
 </script>
@@ -12,7 +13,7 @@
 	<!----------------------------------------------------------------
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
-	<a-entity lava-path scale={scaleString}>
+	<a-entity scale={scaleString}>
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>
