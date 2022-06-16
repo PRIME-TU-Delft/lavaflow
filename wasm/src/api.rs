@@ -99,6 +99,23 @@ impl AltitudeGradientPair {
 	}
 }
 
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LavaPathTurbineInput {
+	lava_paths: Vec<Vec<(f32, f32, f32)>>,
+	turbines: Vec<(f32, f32)>,
+	max_lava_distance: f32,
+	max_points_total: usize,
+}
+
+#[wasm_bindgen]
+impl LavaPathTurbineInput {
+	#[wasm_bindgen(constructor)]
+	pub fn new(val: &JsValue) -> Result<LavaPathTurbineInput, JsValue> {
+		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid LavaPathTurbineInput"))
+	}
+}
+
 /// Main API
 ///
 /// This struct represents the main API towards WASM and can be used for all communication with the library.
@@ -534,6 +551,23 @@ impl ModelConstructionApi {
 			altitude,
 			gradient: (rotation_angle_x, rotation_angle_y, rotation_angle_z),
 		})
+	}
+
+	/// Compute the points that the player obtained
+	///
+	///
+	pub fn compute_player_points(&self, input: LavaPathTurbineInput) -> usize {
+		
+		let max_points_per_turbine: usize = input.max_points_total / input.turbines.len();
+		let mut result: usize = 1;
+
+		// 1. Loop over all the steam-turbines and determine the number of points per steam-turbine
+		for turbine in input.turbines {
+			// 2. Determine the number of points for this specific turbine and sum the points
+			result += ModelConstructionApi::points_for_turbine(turbine, &input.lava_paths, input.max_lava_distance, max_points_per_turbine);
+		}
+
+		result
 	}
 
 	//

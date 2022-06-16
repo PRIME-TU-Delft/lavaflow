@@ -1,3 +1,4 @@
+use crate::utils::log;
 use crate::{api::ModelConstructionApi, objects::point::Point};
 
 impl ModelConstructionApi {
@@ -82,5 +83,44 @@ impl ModelConstructionApi {
 		};
 
 		[result.0, result.1, result.2]
+	}
+
+	pub fn points_for_turbine(turbine: (f32, f32), lava_path_triples: &[Vec<(f32, f32, f32)>], max_lava_distance: f32, max_points_per_turbine: usize) -> usize {
+		// Compute distance to closest lava-path segment
+		let mut lava_distance = (f32::MAX, f32::MAX);
+		for lava_path in lava_path_triples {
+
+			let mut current_lava_distance = f32::MAX;
+
+			for (lpx, lpy, lpz) in lava_path {
+				let dx = turbine.0 - lpx;
+				let dy = turbine.1 - lpy;
+				let dist = f32::sqrt(dx * dx + dy * dy);
+				if dist < current_lava_distance {
+					current_lava_distance = dist;
+				}
+			}
+
+			if current_lava_distance < lava_distance.0 {
+				// Shift both over, remove the second one
+				lava_distance.1 = lava_distance.0;
+				lava_distance.0 = current_lava_distance;
+			} else if current_lava_distance < lava_distance.1 {
+				// Replace the second one
+				lava_distance.1 = current_lava_distance;
+			}
+		}
+
+		if lava_distance.0 <= max_lava_distance && lava_distance.1 <= max_lava_distance {
+			let aggregate_distance = (lava_distance.0 + lava_distance.1) / 4.0;
+			ModelConstructionApi::map(aggregate_distance, 0.0, max_lava_distance, max_points_per_turbine as f32, 0.0) as usize
+		} else if lava_distance.0 <= max_lava_distance {
+			ModelConstructionApi::map(lava_distance.0, 0.0, max_lava_distance, max_points_per_turbine as f32, 0.0) as usize
+		} else if lava_distance.1 <= max_lava_distance {
+			ModelConstructionApi::map(lava_distance.1, 0.0, max_lava_distance, max_points_per_turbine as f32, 0.0) as usize
+		} else {
+			0
+		}
+
 	}
 }
