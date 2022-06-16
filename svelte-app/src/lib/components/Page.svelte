@@ -49,6 +49,11 @@
 		display: grid;
 		align-items: center;
 		justify-items: center;
+		user-select: none;
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -o-user-select: none;
 		touch-action: none;
 	}
 
@@ -114,6 +119,10 @@
 		border-radius: 0.3rem;
 		cursor: pointer;
 		user-select: none;
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -o-user-select: none;
 	}
 
 	main {
@@ -127,6 +136,11 @@
 
 	.fullscreen {
 		display: block;
+		user-select: none;
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -o-user-select: none;
 	}
 
 	footer {
