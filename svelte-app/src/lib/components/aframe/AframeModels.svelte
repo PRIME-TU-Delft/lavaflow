@@ -2,17 +2,20 @@
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { targetLocations } from '$lib/stores/locationStore';
 
+	export let rotation = 0;
 	export let scale: [number, number, number];
 	//export let lava_revealed: boolean = false;
 
 	$: scaleString = scale.join(' ');
 </script>
 
+{rotation}
+
 {#if $gltfStore}
 	<!----------------------------------------------------------------
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
-	<a-entity scale={scaleString}>
+	<a-entity scale={scaleString} rotation="0 {rotation} 0">
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>

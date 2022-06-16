@@ -15,6 +15,7 @@
 
 	export let arMode = false;
 	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
+	export let rotation: number = 0;
 
 	let lava_revealed = false;
 	let obtained_points = 0;
@@ -72,12 +73,11 @@
 			</slot>
 		</div>
 
-
 		<div class="button rightButton">
 			<slot name="targetButton">
 				<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 			</slot>
-		
+
 			{#if $targetLocations.length > 0}
 				{#if lava_revealed}
 					<Button secondary on:click={hideLava}>Hide lava</Button>
@@ -119,7 +119,7 @@
 
 		<a-entity camera />
 	{:else}
-		<AframeModels {scale} />
+		<AframeModels {scale} {rotation} />
 
 		<a-camera position="4 2 7" />
 	{/if}
