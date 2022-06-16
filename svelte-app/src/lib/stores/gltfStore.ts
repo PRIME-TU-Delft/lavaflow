@@ -117,7 +117,7 @@ function createGltfStore() {
 
 			model.craters = model.craters.map((c) => [
 				(c[0] * curveTree.size.width) / 100,
-				(c[1] * curveTree.size.width) / 100
+				(c[1] * curveTree.size.height) / 100
 			]);
 
 			// (re-)set the crater locations
