@@ -33,7 +33,13 @@ function createDifficultyStore() {
 
 	return {
 		subscribe,
-		set
+		set: (level: DifficultyLevel) => {
+			cacheDifficultyStore(level);
+			set(level);
+		},
+		clear: () => {
+			set(difficulty_modes[0]);
+		}
 	};
 }
 export const difficultyStore = createDifficultyStore();
