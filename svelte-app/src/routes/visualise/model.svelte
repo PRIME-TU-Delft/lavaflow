@@ -21,7 +21,7 @@
 		return (deg * Math.PI) / 180;
 	}
 
-	AFRAME.registerComponent('curve-point', {
+	AFRAME.registerComponent<any>('curve-point', {
 		//dependencies: ['position'],
 
 		schema: {},
@@ -31,14 +31,14 @@
 			this.el.emit('curve-point-change');
 		},
 
-		changeHandler: function (event: Event) {
+		changeHandler: function (event: CustomEvent) {
 			if (event.detail.name == 'position') {
 				this.el.emit('curve-point-change');
 			}
 		}
 	});
 
-	AFRAME.registerComponent('curve', {
+	AFRAME.registerComponent<any>('curve', {
 		schema: {
 			type: {
 				type: 'string',
@@ -58,7 +58,7 @@
 			this.el.addEventListener('curve-point-change', this.update.bind(this));
 		},
 
-		update: function (oldData) {
+		update: function (oldData: CustomEvent | string) {
 			this.points = Array.from(this.el.querySelectorAll('a-curve-point, [curve-point]'));
 
 			if (this.points.length <= 1) {
@@ -66,7 +66,7 @@
 				this.curve = null;
 			} else {
 				// Get Array of Positions from Curve-Points
-				let pointsArray = this.points.map(function (point) {
+				let pointsArray = this.points.map(function (point: any) {
 					if (point.x !== undefined && point.y !== undefined && point.z !== undefined) {
 						return point;
 					}
@@ -119,9 +119,6 @@
 						case 'CatmullRom':
 							this.curve = new THREE.CatmullRomCurve3(this.pathPoints);
 							break;
-						case 'Spline':
-							this.curve = new THREE.SplineCurve3(this.pathPoints);
-							break;
 						default:
 							throw new Error(
 								'No Three constructor of type (case sensitive): ' + this.data.type + 'Curve3'
@@ -137,37 +134,6 @@
 
 		remove: function () {
 			this.el.removeEventListener('curve-point-change', this.update.bind(this));
-		},
-
-		closestPointInLocalSpace: function closestPoint(point, resolution, testPoint, currentRes) {
-			if (!this.curve) throw Error('Curve not instantiated yet.');
-			resolution = resolution || 0.1 / this.curve.getLength();
-			currentRes = currentRes || 0.5;
-			testPoint = testPoint || 0.5;
-			currentRes /= 2;
-			let aTest = testPoint + currentRes;
-			let bTest = testPoint - currentRes;
-			let a = this.curve.getPointAt(aTest);
-			let b = this.curve.getPointAt(bTest);
-			let aDistance = a.distanceTo(point);
-			let bDistance = b.distanceTo(point);
-			let aSmaller = aDistance < bDistance;
-			if (currentRes < resolution) {
-				let tangent = this.curve.getTangentAt(aSmaller ? aTest : bTest);
-				if (currentRes < resolution)
-					return {
-						result: aSmaller ? aTest : bTest,
-						location: aSmaller ? a : b,
-						distance: aSmaller ? aDistance : bDistance,
-						normal: normalFromTangent(tangent),
-						tangent: tangent
-					};
-			}
-			if (aDistance < bDistance) {
-				return this.closestPointInLocalSpace(point, resolution, aTest, currentRes);
-			} else {
-				return this.closestPointInLocalSpace(point, resolution, bTest, currentRes);
-			}
 		}
 	});
 
@@ -194,7 +160,7 @@
 		}
 	});
 
-	AFRAME.registerComponent('draw-curve', {
+	AFRAME.registerComponent<any>('draw-curve', {
 		//dependencies: ['curve', 'material'],
 
 		schema: {
@@ -215,7 +181,7 @@
 					this.curve.curve.getPoints(this.curve.curve.getPoints().length * 10)
 				);
 				let mesh = this.el.getOrCreateObject3D('mesh', THREE.Line);
-				lineMaterial = mesh.material
+				const lineMaterial = mesh.material
 					? mesh.material
 					: new THREE.LineBasicMaterial({
 							color: '#ff0000'
@@ -227,11 +193,11 @@
 
 		remove: function () {
 			this.data.curve.removeEventListener('curve-updated', this.update.bind(this));
-			this.el.getObject3D('mesh').geometry = new THREE.Geometry();
+			this.el.getObject3D('mesh').geometry = new THREE.BufferGeometry();
 		}
 	});
 
-	AFRAME.registerComponent('clone-along-curve', {
+	AFRAME.registerComponent<any>('clone-along-curve', {
 		//dependencies: ['curve'],
 
 		schema: {

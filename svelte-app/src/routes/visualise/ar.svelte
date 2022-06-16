@@ -7,20 +7,9 @@
 
 	import '@ar-js-org/ar.js';
 	import { onDestroy } from 'svelte';
-	import type { Component, Entity, ObjectMap, System } from 'aframe';
-	import type { Vector3 } from 'three';
 
-	interface GestureHandlerType extends Component<any, System<any>> {
-		isVisible: boolean;
-		initialScale: Vector3;
-		scaleFactor: number;
-		el: Entity<ObjectMap<Component<any, System<any>>>> & {
-			sceneEl: any;
-		};
-		handleRotation: (event: CustomEvent<{ positionChange: { x: number; y: number } }>) => any;
-	}
-
-	AFRAME.registerComponent<GestureHandlerType>('gesture-handler', {
+	// TODO: make type more specific
+	AFRAME.registerComponent<any>('gesture-handler', {
 		schema: {
 			enabled: { default: true },
 			rotationFactor: { default: 5 },
@@ -30,7 +19,6 @@
 
 		init: function () {
 			this.handleScale = this.handleScale.bind(this);
-			this.handleRotation = this.handleRotation.bind(this);
 
 			this.isVisible = false;
 			this.initialScale = this.el.object3D.scale.clone();
@@ -47,27 +35,17 @@
 
 		update: function () {
 			if (this.data.enabled) {
-				this.el.sceneEl.addEventListener('onefingermove', this.handleRotation);
 				this.el.sceneEl.addEventListener('twofingermove', this.handleScale);
 			} else {
-				this.el.sceneEl.removeEventListener('onefingermove', this.handleRotation);
 				this.el.sceneEl.removeEventListener('twofingermove', this.handleScale);
 			}
 		},
 
 		remove: function () {
-			this.el.sceneEl.removeEventListener('onefingermove', this.handleRotation);
 			this.el.sceneEl.removeEventListener('twofingermove', this.handleScale);
 		},
 
-		handleRotation: function (event) {
-			if (this.isVisible) {
-				this.el.object3D.rotation.y += event.detail.positionChange.x * this.data.rotationFactor;
-				this.el.object3D.rotation.x += event.detail.positionChange.y * this.data.rotationFactor;
-			}
-		},
-
-		handleScale: function (event) {
+		handleScale: function (event: CustomEvent) {
 			if (this.isVisible) {
 				this.scaleFactor *= 1 + event.detail.spreadChange / event.detail.startSpread;
 
@@ -84,18 +62,8 @@
 	});
 
 	// Component that detects and emits events for touch gestures
-
-	interface GestureDetectorType {
-		targetElement: Entity<ObjectMap<Component<any, System<any>>>>;
-		internalState: {
-			previousState?: { position: { x: number; y: number; z: number }; spread: number };
-		};
-		emitGestureEvent: {
-			bind: (t: GestureDetectorType & Component<any, System<any>>) => () => any;
-		};
-	}
-
-	AFRAME.registerComponent<GestureDetectorType>('gesture-detector', {
+	// TODO: make type more specific
+	AFRAME.registerComponent<any>('gesture-detector', {
 		schema: {
 			element: { default: '' }
 		},
@@ -128,7 +96,7 @@
 			this.targetElement.removeEventListener('touchmove', this.emitGestureEvent);
 		},
 
-		emitGestureEvent(event: Event) {
+		emitGestureEvent(event: CustomEvent) {
 			const currentState = this.getTouchState(event);
 
 			const previousState = this.internalState.previousState;
@@ -192,7 +160,7 @@
 			}
 		},
 
-		getTouchState: function (event) {
+		getTouchState: function (event: any) {
 			if (event.touches.length === 0) {
 				return null;
 			}
@@ -205,7 +173,12 @@
 				touchList.push(event.touches[i]);
 			}
 
-			const touchState = {
+			const touchState: Partial<{
+				touchCount: number;
+				positionRaw: { x: number; y: number };
+				position: { x: number; y: number };
+				spread: number;
+			}> = {
 				touchCount: touchList.length
 			};
 
