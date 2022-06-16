@@ -112,6 +112,7 @@
 		margin: 0 0 0 auto;
 		border-radius: 0.3rem;
 		cursor: pointer;
+		user-select: none;
 	}
 
 	main {

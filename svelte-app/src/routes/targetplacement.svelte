@@ -22,7 +22,6 @@
 	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	function addTarget(x: number, y: number, viewportwidth: number, viewportheight: number) {
-
 		// If the maximum amount of steam turbines has been reached, don't add more
 		if ($targetLocations.length >= $difficultyStore.max_steam_turbines) return;
 
@@ -47,12 +46,16 @@
 		let too_close_relative: Draggable = newTarget;
 
 		let count = 0;
-		
-		while (true) {
 
+		while (true) {
 			is_too_close = false;
 
-			if (newTarget.x <= 0 || newTarget.x >= viewportwidth || newTarget.y <= 0 || newTarget.y >= viewportheight) {
+			if (
+				newTarget.x <= 0 ||
+				newTarget.x >= viewportwidth ||
+				newTarget.y <= 0 ||
+				newTarget.y >= viewportheight
+			) {
 				newTarget.x = 20 + Math.random() * (viewportwidth - 40);
 				newTarget.y = 20 + Math.random() * (viewportheight - 40);
 			}
@@ -85,7 +88,6 @@
 
 			newTarget.x += x_dir;
 			newTarget.y += y_dir;
-
 		}
 
 		targetLocations.add(newTarget);
@@ -107,8 +109,6 @@
 	function addMinimalAmountOfTurbines(foregroundWidth: number, foregroundHeight: number) {
 		let added_turbines = false;
 
-		
-
 		// We'll add as many steam-turbines as necessary to reach the minimal amount
 		while ($targetLocations.length < $difficultyStore.min_steam_turbines) {
 			addTarget(foregroundWidth / 8, foregroundHeight / 8, foregroundWidth, foregroundHeight);
@@ -124,7 +124,6 @@
 </Modal>
 
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
-
 	<div slot="background" style="background:#aaa;" />
 
 	{#if $contourLines?.curves && $difficultyStore && $targetLocations}
@@ -152,9 +151,18 @@
 					Clear all steam turbines
 				</Button>
 			{/if}
-			<Button icon={mdiPin} on:click={() => {
-				if (!addMinimalAmountOfTurbines(foregroundWidth, foregroundHeight - 100)) addTarget(foregroundWidth / 8, foregroundHeight / 8, foregroundWidth, foregroundHeight - 100);
-				}}>
+			<Button
+				icon={mdiPin}
+				on:click={() => {
+					if (!addMinimalAmountOfTurbines(foregroundWidth, foregroundHeight - 100))
+						addTarget(
+							foregroundWidth / 8,
+							foregroundHeight / 8,
+							foregroundWidth,
+							foregroundHeight - 100
+						);
+				}}
+			>
 				Add steam turbine
 			</Button>
 		{:else}
