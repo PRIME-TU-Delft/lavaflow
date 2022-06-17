@@ -94,7 +94,7 @@ function createGltfStore() {
 
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
-
+			// svc distance = (the largest image dimension/ number of rows or columns) / 1.5
 			const api_settings = new ApiSettings(
 				/*				 OpenCV tree */ tree,
 				/*						Rows */ 45,
@@ -102,14 +102,14 @@ function createGltfStore() {
 				/*					   Width */ curveTree.size.width,
 				/*					  Height */ curveTree.size.height,
 				/*	  Curve Point Separation */ 5,
-				/*		  		SVC Distance */ 50,
+				/*		  		SVC Distance */ Math.max(curveTree.size.width , curveTree.size.height) / (45 *1.5),
 				/*	Catmull Clark Iterations */ 1,
 				/*			Lava Path Length */ 20,
 				/*		   Lava Path Forking */ lava_path_forking,
 				/*		Smoothing Operations */ [
-					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.9, 5, 1, false),
+					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.3, 5, 1, false),
 					new wasm.SmoothingOperationApplySmoothToMiddleLayers(0.7, 3, 5, false),
-					new wasm.SmoothingOperationIncreaseAltitudeForMountainTops(2, false),
+					new wasm.SmoothingOperationIncreaseAltitudeForMountainTops(0.25, true),
 					new wasm.SmoothingOperationApplySmoothToMountainTops(1, 8, 1, false)
 				]
 			);

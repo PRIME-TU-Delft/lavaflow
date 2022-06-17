@@ -283,38 +283,15 @@ impl ModelConstructionApi {
 		//apply surface subdivision
 		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, smoother.raster)?;
 
-		//log!("surface subdivision complete");
+		//STEP: find lava path from the highest point of the model
 
-		//for lava path generation : find point index of the highest point in the model
-		let mut top_height = f32::MIN;
-
-		for curve in &level_curve_set.level_curves {
-			//use normalized curve height to determine max
-			let normalized_curve_height = *Raster::map(Some(curve.altitude), 0.0, max_altitude, 0.0, 100.0).get_or_insert(curve.altitude);
-			if normalized_curve_height > top_height {
-				top_height = normalized_curve_height;
-			}
-		}
-
-		top_height -= *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(top_height);
-
-		//for lava path generation : get list of indexes of points above or on highest level curve
-		let mut highest_points = Vec::new();
-		for (i, v) in vs.iter().enumerate() {
-			if v.z >= top_height {
-				highest_points.push(i);
-			}
-		}
-
-		//find lava path from the highest point of the model
-
-		//min alt determines at which alitude a lava path stops
-		let min_altitude = *Raster::map(Some(level_curve_set.altitude_step), 0.0, max_altitude, 0.0, 100.0).get_or_insert(level_curve_set.altitude_step) / 2.0;
+		//min alt determines at which alitude a lava path stops : currently halfway between surface and 1st curve
+		let min_altitude = map(level_curve_set.altitude_step, 0.0, max_altitude, 0.0, 100.0) / 2.0;
 
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
 		//0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
 		let (computed_lava_paths, lava_start_points): (Vec<Vec<&Point>>, Vec<&Point>) =
-			crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+			crate::lava_path_finder::lava_path::get_lava_paths_super(self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
 
 		// Extract the crater by selecting the start points in the lava-paths
 		let mut lava_craters: Vec<(f32, f32)> = Vec::new();
@@ -357,8 +334,8 @@ impl ModelConstructionApi {
 			vs_lava_distance.push(vertex_dist);
 		}
 
-		// Lava color
-		let color_lava_flow = (map(255.0, 0.0, 255.0, 0.0, 1.0), map(32.0, 0.0, 255.0, 0.0, 1.0), map(21.0, 0.0, 255.0, 0.0, 1.0));
+		// Lava color : rgb(227, 59, 53)
+		let color_lava_flow = (map(227.0, 0.0, 255.0, 0.0, 1.0), map(59.0, 0.0, 255.0, 0.0, 1.0), map(53.0, 0.0, 255.0, 0.0, 1.0));
 		let color_crater_center = (map(242.0, 0.0, 255.0, 0.0, 1.0), map(231.0, 0.0, 255.0, 0.0, 1.0), map(73.0, 0.0, 255.0, 0.0, 1.0));
 
 		//Turn faces of model into triangles
