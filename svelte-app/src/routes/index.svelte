@@ -8,6 +8,7 @@
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
+	import MeetTheDevelopers from '$lib/components/MeetTheDevelopers.svelte';
 
 	import { difficulty_modes } from '$lib/data/difficultyModes';
 	import { onMount } from 'svelte';
@@ -21,18 +22,25 @@
 	let main_width = 0;
 	let landing_page_container_height = 0;
 	let get_started_container_height = 0;
+	let meet_developers_container_height = 0;
 	let page_shift_top = 0;
 
-	function get_started() {
-		header_height = 10;
-		page_shift_top = -1;
-		main_height = get_started_container_height;
-	}
-
-	function go_back_up() {
+	function goto_landing_page() {
 		header_height = 20;
 		page_shift_top = 0;
-		main_height = landing_page_container_height;
+		main_height = landing_page_container_height + 22; // 22px is the height of the copyright bar
+	}
+
+	function goto_get_started_page() {
+		header_height = 10;
+		page_shift_top = -1;
+		main_height = get_started_container_height + 22; // 22px is the height of the copyright bar
+	}
+
+	function goto_meet_developers_page() {
+		header_height = 10;
+		page_shift_top = -2;
+		main_height = meet_developers_container_height + 22; // 22px is the height of the copyright bar
 	}
 
 	onMount(() => {
@@ -47,7 +55,7 @@
 	});
 
 	// Listen for the initialisation of the clientHeight of the landing page (first page) and then update accordingly.
-	$: landing_page_container_height, go_back_up();
+	$: landing_page_container_height, goto_landing_page();
 </script>
 
 <header style="height:{header_height}rem;">
@@ -76,15 +84,18 @@
 		</div>
 
 		<div class="get_started_button">
-			<Button large on:click={get_started}>Get started</Button>
+			<Button large on:click={goto_get_started_page}>Get started</Button>
 		</div>
 	</div>
+
+
+
 	<div
 		class="get_started_container"
 		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top+1} * {header_height}rem);"
 		bind:clientHeight={get_started_container_height}
 	>
-		<Button secondary small on:click={go_back_up}>Back to starting page</Button>
+		<Button secondary small on:click={goto_landing_page}>Back to starting page</Button>
 
 		<div class="difficulty_container">
 			<div class="difficulty_title">
@@ -121,8 +132,28 @@
 		<div class="start_flowing_button">
 			<NavigationButton large to="scan/mapscanning">Start flowing</NavigationButton>
 		</div>
+
+		<div class="meet_the_developers">
+			<p on:click={goto_meet_developers_page}>Meet the developers</p>
+		</div>
+	</div>
+
+
+
+	<div
+		class="meet_developers_container"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top+1} * ({landing_page_container_height + get_started_container_height}px + 2*{header_height}rem)); "
+		bind:clientHeight={meet_developers_container_height}
+	>
+		<Button secondary small on:click={goto_get_started_page}>Back to the game</Button>
+
+		<MeetTheDevelopers />
 	</div>
 </main>
+
+<div class="copyright">
+	<p>Copyright &copy; 2022 PRIME, TU Delft. All rights reserved.</p>
+</div>
 
 <style lang="scss">
 	main {
@@ -283,6 +314,66 @@
 
 		.start_flowing_button {
 			position: relative;
+		}
+	}
+
+	.meet_the_developers {
+		margin-top: 20px;
+
+		p {
+			color: #eee;
+			text-decoration: underline;
+			text-align: center;
+		}
+
+		p:hover {
+			cursor: pointer;
+		}
+
+	}
+
+	.meet_developers_container {
+		position: relative;
+		height: auto;
+
+		transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
+		-webkit-transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
+
+		.introduction {
+			margin: 1rem 0;
+			font-size: 1.1rem;
+			line-height: 1.5rem;
+
+			position: relative;
+		}
+
+		.get_started_button {
+			position: relative;
+		}
+	}
+
+	.copyright {
+		position: fixed;
+		width: 100vw;
+		height: 22px;
+
+		background: #1a1717;
+
+		left: 0;
+		bottom: 0;
+
+		p {
+			margin: 0;
+			padding: 0;
+
+			font-family: "Roboto Slab";
+			font-weight: 200;
+			font-size: 10pt;
+			color: #999;
+
+			width: 100vw;
+
+			text-align: center;
 		}
 	}
 </style>
