@@ -9,7 +9,7 @@ use miette::Result;
 use serde::{Deserialize, Serialize};
 
 // Internal imports
-use crate::api_helper_fns::{map, cap};
+use crate::api_helper_fns::{cap, map};
 use crate::gltf_conversion::generate_gltf;
 use crate::model_construction::constructor::ModelConstructor;
 use crate::model_construction::smoother::Smoother;
@@ -364,7 +364,6 @@ impl ModelConstructionApi {
 		let color_lava_flow = (map(255.0, 0.0, 255.0, 0.0, 1.0), map(32.0, 0.0, 255.0, 0.0, 1.0), map(21.0, 0.0, 255.0, 0.0, 1.0));
 		let color_crater_center = (map(242.0, 0.0, 255.0, 0.0, 1.0), map(231.0, 0.0, 255.0, 0.0, 1.0), map(73.0, 0.0, 255.0, 0.0, 1.0));
 
-
 		//Turn faces of model into triangles
 		let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 		let mut lava_path_final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
@@ -385,10 +384,10 @@ impl ModelConstructionApi {
 			// Add these points to the final_points gltf, together creating the gltf for the mountain itself
 			//
 
-			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z, p0, &lava_craters, color_crater_center, color_lava_flow));
-			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z, p3, &lava_craters, color_crater_center, color_lava_flow));
-			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z, p1, &lava_craters, color_crater_center, color_lava_flow));
-			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z, p2, &lava_craters, color_crater_center, color_lava_flow));
+			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude((0.0, 100.0), p0.z, p0, &lava_craters, color_crater_center, color_lava_flow));
+			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude((0.0, 100.0), p3.z, p3, &lava_craters, color_crater_center, color_lava_flow));
+			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude((0.0, 100.0), p1.z, p1, &lava_craters, color_crater_center, color_lava_flow));
+			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude((0.0, 100.0), p2.z, p2, &lava_craters, color_crater_center, color_lava_flow));
 
 			// Add the first triangle
 			final_points.push(tri00);

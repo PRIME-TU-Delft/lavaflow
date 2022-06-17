@@ -23,7 +23,9 @@ pub fn map_color(val: f32, min: f32, max: f32, color_1: (f32, f32, f32), color_2
 }
 
 impl ModelConstructionApi {
-	pub fn color_for_altitude(&self, min_alt: f32, max_alt: f32, alt: f32, p: &Point, lava_craters: &[(f32, f32)], color_crater_center: (f32, f32, f32), color_crater_outside: (f32, f32, f32)) -> [f32; 3] {
+	pub fn color_for_altitude(&self, alt_range: (f32, f32), alt: f32, p: &Point, lava_craters: &[(f32, f32)], color_crater_center: (f32, f32, f32), color_crater_outside: (f32, f32, f32)) -> [f32; 3] {
+		let (min_alt, max_alt) = alt_range;
+
 		// Initialisation: tuples for every color that we'd like to use
 		let color_rock_dark = (map(30.0, 0.0, 255.0, 0.0, 1.0), map(15.0, 0.0, 255.0, 0.0, 1.0), map(25.0, 0.0, 255.0, 0.0, 1.0));
 
