@@ -251,3 +251,11 @@
 		</Button>
 	</a>
 </SceneViewer>
+
+<style>
+	:global(.a-canvas) {
+		width: auto;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+</style>
