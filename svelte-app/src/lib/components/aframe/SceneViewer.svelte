@@ -65,6 +65,7 @@
 	vr-mode-ui="enabled: false"
 	gesture-detector
 	arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+	stats={$debugMode}
 >
 	<slot name="overlay">
 		<div class="button backButton">
@@ -141,5 +142,9 @@
 	.rightButton {
 		top: 1rem;
 		right: 1rem;
+	}
+
+	:global(.rs-base) {
+		top: 50vh;
 	}
 </style>
