@@ -310,7 +310,7 @@
 			}
 
 			.difficulty_description_container {
-				height: auto;
+				height: 6rem;
 			}
 		}
 
