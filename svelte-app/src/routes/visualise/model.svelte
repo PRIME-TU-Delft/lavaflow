@@ -3,6 +3,9 @@
 	import 'aframe-extras';
 
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
+	import FancySlider from '$lib/components/input/FancySlider.svelte';
+
+	let rotation = 0;
 </script>
 
 <SceneViewer {rotation} />
