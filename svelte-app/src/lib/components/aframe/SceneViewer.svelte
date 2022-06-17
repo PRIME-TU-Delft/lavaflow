@@ -4,7 +4,7 @@
 	import Button from '$lib/components/Button.svelte';
 
 	import { goto } from '$app/navigation';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
@@ -56,10 +56,6 @@
 		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
 		gltfStore.build($contourLines);
 	});
-
-	onDestroy(() => {
-
-	})
 </script>
 
 <a-scene
