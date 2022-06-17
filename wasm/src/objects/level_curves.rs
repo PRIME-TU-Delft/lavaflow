@@ -190,59 +190,6 @@ impl LevelCurveSet {
 		&self.level_curves
 	}
 
-	// Adds new level curve of a single point that represents a peak.
-	//	TODO: how to determine multiple peaks?? -> use parentage tree thing
-	// Location of peak is determined using centroid formula for polygons from wikipedia
-	// Height of peak = 1/2 alitude_step above top level curve.
-	pub fn add_peak(&mut self) {
-		//	let old_curve = self.level_curves.last().ok_or("level_curves.add_peak() : Original set has no curves to add to")?;
-
-		//find top level curve
-		let mut max_curve_height = 0.0;
-		let mut top_curve: &LevelCurve = &LevelCurve::new(0.0);
-		for curve in &self.level_curves {
-			if curve.altitude > max_curve_height {
-				max_curve_height = curve.altitude;
-				top_curve = curve;
-			}
-		}
-
-		let ps = &top_curve.points;
-
-		//calculate area
-		let mut a = 0.0;
-
-		// ! THIS WOULD CAUSE A PANIC
-		// ! In the last iteration, ps[p+1] will always be out of bounds
-		// ! This is why I prefer using Vec::get over slicing :)
-		// ! Pauline wants to keep this function for future reference, but as of now using it would be unsafe
-		for p in 0..ps.len() {
-			a += (ps[p].x * ps[p + 1].y) - (ps[p + 1].x * ps[p].y);
-		}
-		a /= 2.0;
-
-		let mut x = 0.0;
-		let mut y = 0.0;
-
-		// ! Same here, index out of bounds
-		for p in 0..ps.len() {
-			let fact = ps[p].x * ps[p + 1].y - ps[p + 1].x * ps[p].y;
-			x += (ps[p].x + ps[p + 1].x) * fact;
-			y += (ps[p].y + ps[p + 1].y) * fact;
-		}
-
-		y /= 6.0 * a;
-		x /= 6.0 * a;
-
-		let peak_height = top_curve.altitude + 0.5 * self.altitude_step;
-
-		self.add_level_curve(LevelCurve {
-			altitude: peak_height,
-			points: vec![Point { x, y, z: peak_height }],
-			is_mountain_top: true,
-		});
-	}
-
 	// Find points (minimum_x_cooridinate, minimum_y_coordinate) , (maximum_x_cooridinate, maximum_y_coordinate) of coordinates in levelcurveset ,
 	// for the puropose of genererating a raster to cover whole area of levelcurves
 	pub fn get_bounding_points(&self) -> (Point, Point) {
