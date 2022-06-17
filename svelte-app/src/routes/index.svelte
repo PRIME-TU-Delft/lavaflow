@@ -24,11 +24,13 @@
 	let get_started_container_height = 0;
 	let meet_developers_container_height = 0;
 	let page_shift_top = 0;
+	let copyright_height = 35;
 
 	let scrolling_animation_initialized = false;
 	function initialize_scrolling_animation() {
 		if (!scrolling_animation_initialized) {
 			goto_landing_page();
+
 			scrolling_animation_initialized = true;
 		}
 	}
@@ -36,19 +38,19 @@
 	function goto_landing_page() {
 		header_height = 20;
 		page_shift_top = 0;
-		main_height = landing_page_container_height + 22; // 22px is the height of the copyright bar
+		main_height = landing_page_container_height + copyright_height;
 	}
 
 	function goto_get_started_page() {
 		header_height = 10;
 		page_shift_top = -1;
-		main_height = get_started_container_height + 22; // 22px is the height of the copyright bar
+		main_height = get_started_container_height + copyright_height;
 	}
 
 	function goto_meet_developers_page() {
 		header_height = 10;
 		page_shift_top = -2;
-		main_height = meet_developers_container_height + 22; // 22px is the height of the copyright bar
+		main_height = meet_developers_container_height + copyright_height;
 	}
 
 	onMount(() => {
@@ -100,7 +102,7 @@
 
 	<div
 		class="get_started_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top+1} * {header_height}rem);"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top+1} * 2 * {header_height}rem);"
 		bind:clientHeight={get_started_container_height}
 	>
 		<Button secondary small on:click={goto_landing_page}>Back to starting page</Button>
@@ -159,7 +161,7 @@
 	</div>
 </main>
 
-<div class="copyright">
+<div class="copyright" style="height:{copyright_height}px">
 	<p>Copyright &copy; 2022 PRIME, TU Delft. All rights reserved.</p>
 </div>
 
@@ -363,7 +365,6 @@
 	.copyright {
 		position: fixed;
 		width: 100vw;
-		height: 22px;
 
 		background: #1a1717;
 
