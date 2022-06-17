@@ -126,7 +126,7 @@
 				$targetLocations[i].deselect();
 
 				if (!foundFirstMarker) {
-					isPressed = $targetLocations[i].pressed(p5);
+					isPressed = $targetLocations[i].pressed(p5, true);
 					foundFirstMarker = isPressed;
 				}
 
