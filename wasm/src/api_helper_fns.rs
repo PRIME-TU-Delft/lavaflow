@@ -4,16 +4,6 @@ pub fn map(val: f32, from_min: f32, from_max: f32, to_min: f32, to_max: f32) -> 
 	to_min + ((val - from_min) / (from_max - from_min) * (to_max - to_min))
 }
 
-pub fn cap(val: f32, from: f32, to: f32) -> f32 {
-	if val < from {
-		from
-	} else if val > to {
-		to
-	} else {
-		val
-	}
-}
-
 pub fn map_color(val: f32, min: f32, max: f32, color_1: (f32, f32, f32), color_2: (f32, f32, f32)) -> (f32, f32, f32) {
 	(
 		map(val, min, max, color_1.0, color_2.0),
