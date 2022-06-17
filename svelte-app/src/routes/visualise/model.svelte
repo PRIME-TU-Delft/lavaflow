@@ -6,13 +6,12 @@
 	 * This view is created to test and show the client the progess of the mountain construction
 	 */
 
-	import Range from '$lib/components/input/Range.svelte';
+	import FancySlider from '$lib/components/input/FancySlider.svelte';
 	import SceneViewer from '$lib/components/aframe/SceneViewer.svelte';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 
 	import { onDestroy } from 'svelte';
-
 	import { THREE } from 'aframe';
 
 	let scale: [number, number, number] = [0.05, 0.025, 0.05];
@@ -363,4 +362,16 @@
 
 <SceneViewer {rotation} />
 
-<Range from={0} to={360} label="rotation" bind:value={rotation} step={10} />
+<div class="rotationSlider">
+	<FancySlider from={-200} to={200} step={10} bind:value={rotation} />
+</div>
+
+<style>
+	.rotationSlider {
+		position: absolute;
+		bottom: 1rem;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 100;
+	}
+</style>
