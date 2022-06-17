@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-6cb0d324.js",
+    "file": "start-e1605b86.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -43,14 +43,14 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-115e9f2c.js",
+    "file": "pages/demo.svelte-c791159c.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-ca5d62ed.js",
-      "_aframe-master-52339316.js",
-      "_gltfStore-4d0c5d70.js",
+      "_aframe-master-11ae188d.js",
+      "_gltfStore-b1ad03a1.js",
       "_contourLineStore-080ee4cb.js",
       "_index-bcf3c295.js",
       "_NavigationButton-4b0ccaf5.js",
@@ -79,7 +79,7 @@
     ]
   },
   "src/routes/scan/mapscanning.svelte": {
-    "file": "pages/scan/mapscanning.svelte-5376b514.js",
+    "file": "pages/scan/mapscanning.svelte-6e42365d.js",
     "src": "src/routes/scan/mapscanning.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -95,7 +95,7 @@
       "_index-bcf3c295.js"
     ],
     "css": [
-      "assets/pages/scan/mapscanning.svelte-1bff02b5.css"
+      "assets/pages/scan/mapscanning.svelte-e9026b7c.css"
     ]
   },
   "src/routes/scan/maptransform.svelte": {
@@ -122,7 +122,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-3455a887.js",
+    "file": "pages/scan/preview.svelte-0c63eee2.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -133,7 +133,7 @@
       "_Page-ada7c1be.js",
       "_navigation-0e6511d1.js",
       "_contourLineStore-080ee4cb.js",
-      "_gltfStore-4d0c5d70.js",
+      "_gltfStore-b1ad03a1.js",
       "_difficultyStore-d15690e4.js",
       "_debugStore-218dd941.js",
       "_preload-helper-60cab3ee.js",
@@ -167,16 +167,16 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-f333b0e2.js",
+    "file": "pages/visualise/ar.svelte-5c26ec75.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-ca5d62ed.js",
       "_NavigationButton-4b0ccaf5.js",
-      "_aframe-master-52339316.js",
+      "_aframe-master-11ae188d.js",
       "__commonjsHelpers-56d41998.js",
-      "_gltfStore-4d0c5d70.js",
+      "_gltfStore-b1ad03a1.js",
       "_index-bcf3c295.js",
       "_contourLineStore-080ee4cb.js",
       "_difficultyStore-d15690e4.js",
@@ -187,23 +187,23 @@
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-f0a59658.js",
+    "file": "pages/visualise/model.svelte-b2fc9044.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-ca5d62ed.js",
-      "_aframe-master-52339316.js",
+      "_aframe-master-11ae188d.js",
       "__commonjsHelpers-56d41998.js",
-      "_gltfStore-4d0c5d70.js",
-      "_contourLineStore-080ee4cb.js",
+      "_gltfStore-b1ad03a1.js",
       "_index-bcf3c295.js",
+      "_contourLineStore-080ee4cb.js",
+      "_difficultyStore-d15690e4.js",
+      "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
       "_NavigationButton-4b0ccaf5.js",
       "_navigation-0e6511d1.js",
       "_singletons-d1fb5791.js",
-      "_difficultyStore-d15690e4.js",
-      "_debugStore-218dd941.js",
-      "_@vite-plugin-wasm-pack@wasm-9c455baf.js"
+      "_debugStore-218dd941.js"
     ]
   },
   "_index-ca5d62ed.js": {
@@ -227,11 +227,11 @@
       "_index-bcf3c295.js"
     ]
   },
-  "_aframe-master-52339316.js": {
-    "file": "chunks/aframe-master-52339316.js",
+  "_aframe-master-11ae188d.js": {
+    "file": "chunks/aframe-master-11ae188d.js",
     "imports": [
       "_index-ca5d62ed.js",
-      "_gltfStore-4d0c5d70.js",
+      "_gltfStore-b1ad03a1.js",
       "_contourLineStore-080ee4cb.js",
       "_NavigationButton-4b0ccaf5.js",
       "_navigation-0e6511d1.js",
@@ -243,8 +243,8 @@
       "assets/aframe-master-3126ea4d.css"
     ]
   },
-  "_gltfStore-4d0c5d70.js": {
-    "file": "chunks/gltfStore-4d0c5d70.js",
+  "_gltfStore-b1ad03a1.js": {
+    "file": "chunks/gltfStore-b1ad03a1.js",
     "imports": [
       "_index-bcf3c295.js",
       "_contourLineStore-080ee4cb.js",
