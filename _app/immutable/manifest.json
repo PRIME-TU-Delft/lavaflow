@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-40bb2cbd.js",
+    "file": "start-ec553f31.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -43,14 +43,14 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-467a727f.js",
+    "file": "pages/demo.svelte-41e5618d.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-78deb6b4.js",
-      "_aframe-master-96a99a91.js",
-      "_gltfStore-f17ea5d9.js",
+      "_aframe-master-7f8db9be.js",
+      "_gltfStore-6a0dfa4c.js",
       "_contourLineStore-22a814b1.js",
       "_index-b55d7b60.js",
       "_NavigationButton-041fec4a.js",
@@ -123,7 +123,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-ca89659c.js",
+    "file": "pages/scan/preview.svelte-effff50f.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -134,7 +134,7 @@
       "_Page-bc8c4f5a.js",
       "_navigation-0e6511d1.js",
       "_contourLineStore-22a814b1.js",
-      "_gltfStore-f17ea5d9.js",
+      "_gltfStore-6a0dfa4c.js",
       "_difficultyStore-686b8d7b.js",
       "_debugStore-9d35858d.js",
       "_preload-helper-60cab3ee.js",
@@ -168,43 +168,43 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-baa1e91a.js",
+    "file": "pages/visualise/ar.svelte-5f542979.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-78deb6b4.js",
       "_NavigationButton-041fec4a.js",
-      "_aframe-master-96a99a91.js",
+      "_aframe-master-7f8db9be.js",
       "__commonjsHelpers-56d41998.js",
-      "_gltfStore-f17ea5d9.js",
+      "_gltfStore-6a0dfa4c.js",
       "_index-b55d7b60.js",
       "_contourLineStore-22a814b1.js",
       "_difficultyStore-686b8d7b.js",
+      "_debugStore-9d35858d.js",
       "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
       "_navigation-0e6511d1.js",
-      "_singletons-d1fb5791.js",
-      "_debugStore-9d35858d.js"
+      "_singletons-d1fb5791.js"
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-dcafc52b.js",
+    "file": "pages/visualise/model.svelte-03c86d30.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-78deb6b4.js",
-      "_aframe-master-96a99a91.js",
+      "_aframe-master-7f8db9be.js",
       "__commonjsHelpers-56d41998.js",
-      "_gltfStore-f17ea5d9.js",
+      "_gltfStore-6a0dfa4c.js",
       "_index-b55d7b60.js",
       "_contourLineStore-22a814b1.js",
       "_difficultyStore-686b8d7b.js",
+      "_debugStore-9d35858d.js",
       "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
       "_NavigationButton-041fec4a.js",
       "_navigation-0e6511d1.js",
-      "_singletons-d1fb5791.js",
-      "_debugStore-9d35858d.js"
+      "_singletons-d1fb5791.js"
     ],
     "css": [
       "assets/pages/visualise/model.svelte-e4f985c1.css"
@@ -231,11 +231,11 @@
       "_index-b55d7b60.js"
     ]
   },
-  "_aframe-master-96a99a91.js": {
-    "file": "chunks/aframe-master-96a99a91.js",
+  "_aframe-master-7f8db9be.js": {
+    "file": "chunks/aframe-master-7f8db9be.js",
     "imports": [
       "_index-78deb6b4.js",
-      "_gltfStore-f17ea5d9.js",
+      "_gltfStore-6a0dfa4c.js",
       "_contourLineStore-22a814b1.js",
       "_NavigationButton-041fec4a.js",
       "_navigation-0e6511d1.js",
@@ -244,15 +244,16 @@
       "__commonjsHelpers-56d41998.js"
     ],
     "css": [
-      "assets/aframe-master-3126ea4d.css"
+      "assets/aframe-master-c939cebc.css"
     ]
   },
-  "_gltfStore-f17ea5d9.js": {
-    "file": "chunks/gltfStore-f17ea5d9.js",
+  "_gltfStore-6a0dfa4c.js": {
+    "file": "chunks/gltfStore-6a0dfa4c.js",
     "imports": [
       "_index-b55d7b60.js",
       "_contourLineStore-22a814b1.js",
       "_difficultyStore-686b8d7b.js",
+      "_debugStore-9d35858d.js",
       "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
       "_index-78deb6b4.js"
     ]
