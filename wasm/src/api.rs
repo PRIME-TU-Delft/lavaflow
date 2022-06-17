@@ -383,17 +383,17 @@ impl ModelConstructionApi {
 
 			// If any of the four points fall within the distance threshold, we'll have to add both triangles to the gltf.
 			// This is to prevent that we end up with 'parts of triangles'.
-			let dist_sqr_thrhld: f32 = 1.0;
+			let dist_sqr_thrhld: f32 = 6.0;
 			if vs_lava_distance[f.points[0]] <= dist_sqr_thrhld
 				|| vs_lava_distance[f.points[1]] <= dist_sqr_thrhld
 				|| vs_lava_distance[f.points[2]] <= dist_sqr_thrhld
 				|| vs_lava_distance[f.points[3]] <= dist_sqr_thrhld
 			{
 				// Compute the (slightly higher) altitude, increasing as the distance to the lava gets smaller
-				let p0_alt = p0.z + map(vs_lava_distance[f.points[0]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
-				let p1_alt = p1.z + map(vs_lava_distance[f.points[1]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
-				let p2_alt = p2.z + map(vs_lava_distance[f.points[2]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
-				let p3_alt = p3.z + map(vs_lava_distance[f.points[3]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
+				let p0_alt = p0.z + map(vs_lava_distance[f.points[0]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
+				let p1_alt = p1.z + map(vs_lava_distance[f.points[1]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
+				let p2_alt = p2.z + map(vs_lava_distance[f.points[2]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
+				let p3_alt = p3.z + map(vs_lava_distance[f.points[3]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
 
 				// Create the four points for the triangles, including the color
 				let tri00 = ([p0.x, p0_alt, p0.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
