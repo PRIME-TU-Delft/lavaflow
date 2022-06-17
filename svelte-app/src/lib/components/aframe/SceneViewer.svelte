@@ -72,12 +72,11 @@
 			</slot>
 		</div>
 
-
 		<div class="button rightButton">
 			<slot name="targetButton">
 				<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 			</slot>
-		
+
 			{#if $targetLocations.length > 0}
 				{#if lava_revealed}
 					<Button secondary on:click={hideLava}>Hide lava</Button>
@@ -89,10 +88,6 @@
 				<Button disabled secondary>Place targets to begin</Button>
 			{/if}
 		</div>
-
-		<!-- <div class="button placeTargets">
-			<NavigationButton to="/targetplacement">Place targets</NavigationButton>
-		</div> -->
 	</slot>
 
 	<a-entity light="type: ambient; color: #fff" />
@@ -113,13 +108,13 @@
 			{/if}
 
 			<a-entity class="clickable" gesture-handler>
-				<AframeModels {scale} />
+				<AframeModels {scale} {lava_revealed} />
 			</a-entity>
 		</a-marker>
 
 		<a-entity camera />
 	{:else}
-		<AframeModels {scale} />
+		<AframeModels {scale} {lava_revealed} />
 
 		<a-camera position="4 2 7" />
 	{/if}

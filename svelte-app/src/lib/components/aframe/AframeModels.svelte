@@ -3,7 +3,7 @@
 	import { targetLocations } from '$lib/stores/locationStore';
 
 	export let scale: [number, number, number];
-	//export let lava_revealed: boolean = false;
+	export let lava_revealed: boolean = false;
 
 	$: scaleString = scale.join(' ');
 </script>
@@ -13,6 +13,7 @@
 	--        				SUPER ENTITY							--
 	------------------------------------------------------------------>
 	<a-entity scale={scaleString}>
+
 		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>
@@ -25,6 +26,10 @@
 		--                    MOUNTAIN									--
 		------------------------------------------------------------------>
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
+		{#if lava_revealed}
+			<!--LAVA gltf model-->
+			<a-entity gltf-model="url({$gltfStore.lava_gltf_url})" />
+		{/if}
 
 		<!----------------------------------------------------------------
 		--    CRATERS removed because now loaded with gltf              --

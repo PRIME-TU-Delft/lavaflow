@@ -6,6 +6,7 @@
 	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 
 	import '@ar-js-org/ar.js';
+
 	import { onDestroy } from 'svelte';
 
 	// TODO: make type more specific
