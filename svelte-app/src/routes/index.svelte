@@ -25,6 +25,14 @@
 	let meet_developers_container_height = 0;
 	let page_shift_top = 0;
 
+	let scrolling_animation_initialized = false;
+	function initialize_scrolling_animation() {
+		if (!scrolling_animation_initialized) {
+			goto_landing_page();
+			scrolling_animation_initialized = true;
+		}
+	}
+
 	function goto_landing_page() {
 		header_height = 20;
 		page_shift_top = 0;
@@ -55,7 +63,7 @@
 	});
 
 	// Listen for the initialisation of the clientHeight of the landing page (first page) and then update accordingly.
-	$: landing_page_container_height, goto_landing_page();
+	$: landing_page_container_height, initialize_scrolling_animation();
 </script>
 
 <header style="height:{header_height}rem;">

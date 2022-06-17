@@ -8,7 +8,7 @@
         </div>
         <div class="grid-item text-container">
             <h4>Abel de Bruijn</h4>
-            <p>Developer Frontend</p>
+            <p>Developer User Interface and Augmented Reality</p>
         </div>
 
         <div class="grid-item image-container">
@@ -16,7 +16,7 @@
         </div>
         <div class="grid-item text-container">
             <h4>Rens Dur</h4>
-            <p>Developer Rust and Frontend</p>
+            <p>Developer Model Construction and User Interface</p>
         </div>
 
         <div class="grid-item image-container">
@@ -24,7 +24,7 @@
         </div>
         <div class="grid-item text-container">
             <h4>Pauline Hengst</h4>
-            <p>Developer Rust and Graphics</p>
+            <p>Developer Model Construction and Model Graphics</p>
         </div>
 
         <div class="grid-item image-container">
@@ -32,7 +32,7 @@
         </div>
         <div class="grid-item text-container">
             <h4>Julia van der Kris</h4>
-            <p>Are you a Full Stack Developer? --PFFFFFFFFF</p>
+            <p></p>
         </div>
 
         <div class="grid-item image-container">
@@ -114,7 +114,7 @@
     }
 
     .phengst {
-        background-image: url(/profile-images/jvanmarrewijk.jpeg);
+        background-image: url(/profile-images/phengst.jpeg);
     }
 
     .jvanderkris {
