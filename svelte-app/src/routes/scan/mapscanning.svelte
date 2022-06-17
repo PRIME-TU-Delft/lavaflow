@@ -79,7 +79,7 @@
 
 		<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream} />
 
-		<div slot="footer">
+		<svelte:fragment slot="footer">
 			{#if !instructionVisible}
 				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstruction}>
 					Read scan instructions
@@ -88,7 +88,7 @@
 			<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>
 				Capture photo of map
 			</Button>
-		</div>
+		</svelte:fragment>
 	</Page>
 </VideoStream>
 

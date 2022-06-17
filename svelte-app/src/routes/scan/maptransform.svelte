@@ -23,7 +23,7 @@
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/p5/P5Transform.svelte';
-	import { mdiInformation, mdiChevronRight, mdiBookOpenVariant } from '@mdi/js';
+	import { mdiChevronRight, mdiBookOpenVariant } from '@mdi/js';
 
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
@@ -108,7 +108,7 @@
 
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
-	<div slot="footer">
+	<svelte:fragment slot="footer">
 		<Button secondary small icon={mdiBookOpenVariant} on:click={toggleInstruction}>
 			Read instructions
 		</Button>
@@ -117,7 +117,7 @@
 			<span>Preview transformation</span>
 			<Icon path={mdiChevronRight} />
 		</Button>
-	</div>
+	</svelte:fragment>
 </Page>
 
 <style>

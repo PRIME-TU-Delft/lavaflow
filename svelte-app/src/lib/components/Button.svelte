@@ -9,13 +9,11 @@
 	export let secondary = false;
 	export let green = false;
 	export let icon: string = '';
-	export let noMargin = false;
 </script>
 
 <button
 	disabled={disabled || loading}
 	class:disabled={disabled || loading}
-	class:noMargin
 	class:large
 	class:small
 	class:secondary
@@ -34,12 +32,6 @@
 			{/if}
 			<slot />
 		</div>
-
-		{#if $$slots.content}
-			<div class="content">
-				<slot name="content" />
-			</div>
-		{/if}
 	{/if}
 </button>
 
@@ -55,22 +47,19 @@
 		font-size: 1rem;
 		text-align: left;
 		border: none;
-		margin-block: 0.5rem;
+		margin: var(--margin, 0 0 0 0);
 		border-radius: 0.3rem;
 		cursor: pointer;
+		white-space: nowrap;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
-	}
-
-	button.noMargin {
-		margin-block: 0;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 
 	button.disabled {
-		background: grey;
+		background: grey !important;
 	}
 
 	.title {
@@ -78,11 +67,6 @@
 		display: flex;
 		align-items: center;
 		gap: 0.25rem;
-	}
-
-	.content {
-		margin-top: 0.25rem;
-		font-size: 0.9rem;
 	}
 
 	.large {

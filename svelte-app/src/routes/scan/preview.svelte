@@ -52,7 +52,7 @@
 		</div>
 	{/if}
 
-	<div slot="footer">
+	<svelte:fragment slot="footer">
 		<Button secondary loading={!gltfLoaded} on:click={() => goto('/visualise/model')}>
 			<span>Visualise as model</span>
 			<Icon path={mdiChevronRight} />
@@ -61,7 +61,7 @@
 			<span>Visualise in AR</span>
 			<Icon path={mdiChevronRight} />
 		</Button>
-	</div>
+	</svelte:fragment>
 </Page>
 
 <style>
@@ -71,5 +71,7 @@
 		position: absolute;
 		top: 0;
 		touch-action: none;
+		border-radius: 0.5rem;
+		overflow: hidden;
 	}
 </style>

@@ -13,29 +13,21 @@
 
 <a href={to}>
 	<Button {disabled} {large} {secondary}>
-		<div class="button">
-			{#if back}
-				<Icon path={mdiChevronLeft} color="var(--text-color)" />
-			{/if}
+		{#if back}
+			<Icon path={mdiChevronLeft} color="var(--text-color)" />
+		{/if}
 
-			<div class="text">
-				<slot />
-			</div>
+		<span class="text">
+			<slot />
+		</span>
 
-			{#if !back}
-				<Icon path={mdiChevronRight} color="var(--text-color)" />
-			{/if}
-		</div>
+		{#if !back}
+			<Icon path={mdiChevronRight} color="var(--text-color)" />
+		{/if}
 	</Button>
 </a>
 
 <style>
-	.button {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
 	.text {
 		width: 100%;
 	}

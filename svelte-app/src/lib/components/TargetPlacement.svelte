@@ -13,13 +13,11 @@
 	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
 	import Draggable from '$lib/data/draggable';
 
-	import { mdiPin, mdiTrashCan, mdiBookOpenVariant } from '@mdi/js';
+	import { mdiPin, mdiTrashCan } from '@mdi/js';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 
 	let targetSelected = -1;
 	let instructionVisible = false;
-
-	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	function addTarget(x: number, y: number, viewportwidth: number, viewportheight: number) {
 		// If the maximum amount of steam turbines has been reached, don't add more
@@ -126,6 +124,8 @@
 <Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
 	<div slot="background" style="background:#aaa;" />
 
+	<div slot="headerButton"><slot /></div>
+
 	{#if $contourLines?.curves && $difficultyStore && $targetLocations}
 		<div class="sketch">
 			<P5TargetPlacement
@@ -137,10 +137,7 @@
 		</div>
 	{/if}
 
-	<div slot="footer">
-		<!-- <Button icon={mdiBookOpenVariant} on:click={() => toggleInstruction()}>
-			Read instructions
-		</Button> -->
+	<svelte:fragment slot="footer">
 		{#if $contourLines}
 			{#if targetSelected != -1 && $targetLocations.length > $difficultyStore.min_steam_turbines}
 				<Button secondary icon={mdiTrashCan} on:click={removeTarget}>
@@ -170,7 +167,7 @@
 				No image found. Go to map scanning
 			</NavigationButton>
 		{/if}
-	</div>
+	</svelte:fragment>
 </Page>
 
 <style>
@@ -178,9 +175,9 @@
 		height: 100%;
 		touch-action: none;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 </style>

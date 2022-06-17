@@ -20,7 +20,7 @@
 	<div class="foreground" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 		<header>
 			<slot name="headerButton">
-				<Button noMargin on:click={() => history.back()}>
+				<Button on:click={() => history.back()}>
 					<Icon path={mdiChevronLeft} color="var(--text-color)" />
 					Back
 				</Button>
@@ -50,10 +50,10 @@
 		align-items: center;
 		justify-items: center;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 		touch-action: none;
 	}
 
@@ -119,10 +119,10 @@
 		border-radius: 0.3rem;
 		cursor: pointer;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 
 	main {
@@ -137,10 +137,10 @@
 	.fullscreen {
 		display: block;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 
 	footer {
@@ -151,6 +151,9 @@
 		left: 50%;
 		transform: translateX(-50%);
 		bottom: -1.5rem;
+		display: flex;
+		gap: 0.5rem;
+		flex-direction: column;
 	}
 
 	/* if backdrop support: very transparent and blurred */

@@ -243,7 +243,7 @@
 	</a>
 
 	<!-- Custom target button -->
-	<a slot="targetButton" sveltekit:reload href="/targetplacement">
+	<a slot="targetButton" sveltekit:reload href="/targetplacement/ar">
 		<Button>
 			<span>Place targets</span>
 
