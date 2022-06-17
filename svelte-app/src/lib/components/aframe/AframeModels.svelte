@@ -27,6 +27,7 @@
 		------------------------------------------------------------------>
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
 		{#if lava_revealed}
+			<!--LAVA gltf model-->
 			<a-entity gltf-model="url({$gltfStore.lava_gltf_url})" />
 		{/if}
 
