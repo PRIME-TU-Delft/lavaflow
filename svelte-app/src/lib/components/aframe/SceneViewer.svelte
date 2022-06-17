@@ -4,7 +4,7 @@
 	import Button from '$lib/components/Button.svelte';
 
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
@@ -56,6 +56,10 @@
 		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
 		gltfStore.build($contourLines);
 	});
+
+	onDestroy(() => {
+
+	})
 </script>
 
 <a-scene
@@ -64,6 +68,7 @@
 	vr-mode-ui="enabled: false"
 	gesture-detector
 	arjs="trackingMethod: best; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+	stats={$debugMode}
 >
 	<slot name="overlay">
 		<div class="button backButton">
@@ -72,12 +77,11 @@
 			</slot>
 		</div>
 
-
 		<div class="button rightButton">
 			<slot name="targetButton">
 				<NavigationButton to="/targetplacement">Place targets</NavigationButton>
 			</slot>
-		
+
 			{#if $targetLocations.length > 0}
 				{#if lava_revealed}
 					<Button secondary on:click={hideLava}>Hide lava</Button>
@@ -145,5 +149,9 @@
 	.rightButton {
 		top: 1rem;
 		right: 1rem;
+	}
+
+	:global(.rs-base) {
+		top: 50vh;
 	}
 </style>

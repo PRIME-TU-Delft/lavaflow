@@ -10,6 +10,7 @@ import type { CurveTree } from '$lib/stores/contourLineStore';
 import { craterLocations } from '$lib/stores/locationStore';
 import { difficultyStore } from '$lib/stores/difficultyStore';
 import { targetLocations } from '$lib/stores/locationStore';
+import { debugMode } from '$lib/stores/debugStore';
 import { get } from 'svelte/store';
 
 import ApiSettings from '$lib/data/apiSettings';
@@ -117,7 +118,10 @@ function createGltfStore() {
 		},
 		build: (curveTree: CurveTree) => {
 			// Call the wasm api to build the model
+			let time_before = performance.now();
 			model = api.build().to_js() as Model;
+			let time_after = performance.now();
+			if (get(debugMode)) alert(`Generated GLTF model in ${time_after-time_before}ms`);
 			model.gltf_url = gltfStringToUrl(model.gltf);
 
 			model.craters = model.craters.map((c) => [
