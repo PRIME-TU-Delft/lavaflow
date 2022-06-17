@@ -16,16 +16,23 @@
 	import { contourLines } from '$lib/stores/contourLineStore';
 
 	let header_height = 20;
+	let header_width = 0;
+	let main_height = 0;
+	let main_width = 0;
+	let landing_page_container_height = 0;
+	let get_started_container_height = 0;
 	let page_shift_top = 0;
 
 	function get_started() {
 		header_height = 10;
 		page_shift_top = -1;
+		main_height = get_started_container_height;
 	}
 
 	function go_back_up() {
 		header_height = 20;
 		page_shift_top = 0;
+		main_height = landing_page_container_height;
 	}
 
 	onMount(() => {
@@ -36,13 +43,16 @@
 		targetLocations.clear(); // clear target locations
 		craterLocations.clear(); // clear crater locations
 		contourLines.clear(); // clear contour lines
+
 	});
+
+	// Listen for the initialisation of the clientHeight of the landing page (first page) and then update accordingly.
+	$: landing_page_container_height, go_back_up();
 </script>
 
-<div class="tudelftLogo" />
-<div class="primelogo" />
-
 <header style="height:{header_height}rem;">
+	<div class="logo tudelftLogo" />
+	<div class="logo primelogo" />
 	<div class="img" />
 	<div class="img backdrop" />
 	<div class="title">
@@ -50,10 +60,11 @@
 	</div>
 </header>
 
-<main>
+<main style="height:calc({main_height}px + {header_height}rem);">
 	<div
 		class="landing_page_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem)); "
+		bind:clientHeight={landing_page_container_height}
 	>
 		<div class="introduction">
 			The climate crisis is upon us! Lava tends to very precisely follow the steepest downwards
@@ -61,7 +72,7 @@
 			opportunity to generate electricity for nearby cities. Your job is to predict where the lava
 			will flow and place steam turbines on its paths. The steam turbines generate higher amounts of
 			electricity as the lava reaches closer. Save the world by using this amazing sustainable
-			energy-soruce!
+			energy-source!
 		</div>
 
 		<div class="get_started_button">
@@ -70,7 +81,8 @@
 	</div>
 	<div
 		class="get_started_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top} * var(--vh));height:calc(var(--vh) - {header_height}rem);"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top+1} * {header_height}rem);"
+		bind:clientHeight={get_started_container_height}
 	>
 		<Button secondary small on:click={go_back_up}>Back to starting page</Button>
 
@@ -118,7 +130,7 @@
 		left: 0;
 		top: 0;
 
-		height: var(--vh);
+		min-height: calc(var(--vh) - 2rem);
 
 		overflow: hidden;
 
@@ -129,30 +141,6 @@
 
 		margin-left: 50vw;
 		transform: translate(-50%, 0);
-	}
-
-	.tudelftLogo {
-		position: fixed;
-		top: 1.3rem;
-		left: 1rem;
-		background: url(/TU_P5_white.png);
-		background-size: contain;
-		background-repeat: no-repeat;
-		width: 6rem;
-		height: 4rem;
-		z-index: 1000;
-	}
-
-	.primelogo {
-		position: fixed;
-		top: 1rem;
-		left: calc(100vw - 1rem - 6rem);
-		background: url(/primeLogo.svg);
-		background-size: contain;
-		background-repeat: no-repeat;
-		width: 6rem;
-		height: 3rem;
-		z-index: 1000;
 	}
 
 	header {
@@ -181,6 +169,29 @@
 			z-index: 0;
 			border-radius: 50%;
 		}
+		.tudelftLogo {
+			position: absolute;
+			top: 1.3rem;
+			left: calc(max(1rem, 50vw - 17rem));
+			background: url(/TU_P5_white.png);
+			background-size: contain;
+			background-repeat: no-repeat;
+			width: 6rem;
+			height: 4rem;
+			z-index: 1000;
+		}
+
+		.primelogo {
+			position: absolute;
+			top: 1rem;
+			left: calc(min(100vw - 1rem - 6rem, 50vw + 11rem));
+			background: url(/primeLogo.svg);
+			background-size: contain;
+			background-repeat: no-repeat;
+			width: 6rem;
+			height: 3rem;
+			z-index: 1000;
+		}
 
 		.backdrop {
 			background: #dc494936;
@@ -201,6 +212,7 @@
 
 	.landing_page_container {
 		position: relative;
+		height: auto;
 
 		transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
 		-webkit-transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
@@ -220,6 +232,7 @@
 
 	.get_started_container {
 		position: relative;
+		height: auto;
 
 		transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
 		-webkit-transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
@@ -260,7 +273,7 @@
 			}
 
 			.difficulty_description_container {
-				height: 5rem;
+				height: auto;
 			}
 		}
 

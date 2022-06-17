@@ -531,14 +531,13 @@ impl ModelConstructionApi {
 		let (d_row, d_col) = (a_row + 1, a_col + 1);
 
 		// Transform these indices to points
-		let a_point = raster.get_point(a_row, a_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
-		let b_point = raster.get_point(b_row, b_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
-		let c_point = raster.get_point(c_row, c_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
-		let d_point = raster.get_point(d_row, d_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
+		let a_point = raster.get_point(a_row, a_col).map_err(|e| e.to_string())?;
+		let b_point = raster.get_point(b_row, b_col).map_err(|e| e.to_string())?;
+		let c_point = raster.get_point(c_row, c_col).map_err(|e| e.to_string())?;
+		let d_point = raster.get_point(d_row, d_col).map_err(|e| e.to_string())?;
 
-		// Construct the two triangles ABC and DCB
+		// Construct the triangle ABC
 		let abc_triangle = Triangle::new(&a_point, &b_point, &c_point);
-		let dcb_triangle = Triangle::new(&d_point, &c_point, &b_point);
 
 		// 3. Determine in which triangle of this rectangle this point lies
 		// 4. Compute vectors a and b, as described above the signature of this function
