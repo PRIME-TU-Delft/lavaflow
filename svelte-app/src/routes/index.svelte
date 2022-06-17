@@ -12,6 +12,8 @@
 	import { difficulty_modes } from '$lib/data/difficultyModes';
 	import { onMount } from 'svelte';
 	import { dev } from '$app/env';
+	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
+	import { contourLines } from '$lib/stores/contourLineStore';
 
 	let header_height = 20;
 	let page_shift_top = 0;
@@ -30,7 +32,10 @@
 		difficultyStore.clear();
 
 		if (dev) return;
-		// TODO clear all other stores
+
+		targetLocations.clear(); // clear target locations
+		craterLocations.clear(); // clear crater locations
+		contourLines.clear(); // clear contour lines
 	});
 </script>
 

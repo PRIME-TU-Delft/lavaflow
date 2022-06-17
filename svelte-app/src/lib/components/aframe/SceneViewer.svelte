@@ -15,6 +15,7 @@
 
 	export let arMode = false;
 	export let scale: [number, number, number] = [0.05, 0.025, 0.05];
+	export let rotation: number = 0;
 
 	let lava_revealed = false;
 	let obtained_points = 0;
@@ -42,17 +43,17 @@
 			return;
 		}
 
-		// If debug mode is enabled -> load hardcoded data
-		console.warn('SCENE VIEWER: gltf is loaded from hardcoded data');
-
 		if (!$contourLines) {
-			contourLines.set({
+			// If debug mode is enabled -> load hardcoded data
+			console.warn('SCENE VIEWER: gltf is loaded from hardcoded data');
+			contourLines.setup({
 				curves: hc_curves,
 				hierarchy: hc_hierarchy,
 				size: { width: 800, height: 960 }
 			});
 		}
 
+		// TODO: Optimisation this should only be needed when the user is in debug mode
 		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
 		gltfStore.build($contourLines);
 	});
@@ -114,9 +115,9 @@
 
 		<a-entity camera />
 	{:else}
-		<AframeModels {scale} {lava_revealed} />
+		<AframeModels {scale} {rotation} {lava_revealed} />
 
-		<a-camera position="4 2 7" />
+		<a-camera position="0 3 3" />
 	{/if}
 </a-scene>
 

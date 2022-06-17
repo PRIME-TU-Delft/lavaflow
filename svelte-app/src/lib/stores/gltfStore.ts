@@ -68,7 +68,7 @@ export function gltfStringToUrl(gltf: string): string {
 function createGltfStore() {
 	const { subscribe, set } = writable<Model>();
 	let api: wasm.ModelConstructionApi;
-	let paperSize: { width: number; height: number };
+	let innerWindowSize: { width: number; height: number };
 
 	let isSetup = false;
 	let model: Model;
@@ -83,9 +83,7 @@ function createGltfStore() {
 				isSetup = true;
 			}
 
-			paperSize = curveTree.size;
-
-			// TODO: add paperSize cache just in case
+			innerWindowSize = curveTree.size;
 
 			// Create a wasm tree out of openCV contour tree
 			const tree = new wasm.OpenCVTree({
@@ -141,8 +139,8 @@ function createGltfStore() {
 
 			if (!noAdjustAxis) {
 				// Rust creates a 100*100 grid, so we need to convert the marker coordinates to this grid
-				adjustedX = (marker.x / paperSize.width) * 100;
-				adjustedY = (marker.y / paperSize.height) * 100;
+				adjustedX = (marker.x / innerWindowSize.width) * 100;
+				adjustedY = (marker.y / innerWindowSize.height) * 100;
 			}
 
 			// ask api to get altitude and gradient for a certain point
@@ -162,14 +160,16 @@ function createGltfStore() {
 			if (!api) return 0;
 
 			// TODO: add cache
-			const {width, height} = paperSize;
+			const { width, height } = innerWindowSize;
 
-			return api.compute_player_points(new wasm.LavaPathTurbineInput({
-				lava_paths: model.lava_paths,
-				turbines: get(targetLocations).map(l => [l.x/width*100, l.y/height*100]),
-				max_lava_distance: get(difficultyStore).max_lava_distance,
-				max_points_total: max_points_total
-			}));
+			return api.compute_player_points(
+				new wasm.LavaPathTurbineInput({
+					lava_paths: model.lava_paths,
+					turbines: get(targetLocations).map((l) => [(l.x / width) * 100, (l.y / height) * 100]),
+					max_lava_distance: get(difficultyStore).max_lava_distance,
+					max_points_total: max_points_total
+				})
+			);
 		}
 	};
 }

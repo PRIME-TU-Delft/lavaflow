@@ -28,12 +28,17 @@ function contourLineStore() {
 
 	return {
 		subscribe,
-		set: (curveTree: CurveTree) => {
+		setup: (curveTree: CurveTree) => {
 			localStorage.setItem('contourlines', JSON.stringify(curveTree));
 
 			set(curveTree);
 			targetLocations.clear();
 			setup = true;
+		},
+		clear: () => {
+			setup = false;
+
+			localStorage.removeItem('contourlines');
 		}
 	};
 }
