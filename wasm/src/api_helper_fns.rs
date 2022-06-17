@@ -5,7 +5,6 @@ pub fn map(val: f32, from_min: f32, from_max: f32, to_min: f32, to_max: f32) -> 
 }
 
 pub fn cap(val: f32, from: f32, to: f32) -> f32 {
-        
 	if val < from {
 		from
 	} else if val > to {
