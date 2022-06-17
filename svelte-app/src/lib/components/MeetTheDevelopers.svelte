@@ -32,7 +32,7 @@
         </div>
         <div class="grid-item text-container">
             <h4>Julia van der Kris</h4>
-            <p></p>
+            <p>"Full-stack developer"</p>
         </div>
 
         <div class="grid-item image-container">
@@ -118,7 +118,7 @@
     }
 
     .jvanderkris {
-        background-image: url(/profile-images/jvanmarrewijk.jpeg);
+        background-image: url(/profile-images/jvanderkris.jpg);
     }
 
     .jvanmarrewijk {
