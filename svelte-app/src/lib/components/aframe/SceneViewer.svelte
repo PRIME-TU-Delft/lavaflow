@@ -117,7 +117,7 @@
 	{:else}
 		<AframeModels {scale} {rotation} {lava_revealed} />
 
-		<a-camera position="4 2 7" />
+		<a-camera position="0 3 3" />
 	{/if}
 </a-scene>
 
