@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-e48d0663.js",
+    "file": "start-f3cd710d.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -43,15 +43,15 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-bf3f598e.js",
+    "file": "pages/demo.svelte-eb656a82.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-e68930ae.js",
-      "_aframe-master-3116ac09.js",
-      "_gltfStore-ba771f2f.js",
-      "_contourLineStore-1c6f2929.js",
+      "_aframe-master-60fb6951.js",
+      "_gltfStore-23a16178.js",
+      "_contourLineStore-c10ba72d.js",
       "_index-05c9b9b1.js",
       "_NavigationButton-a585e3a7.js",
       "_navigation-0e6511d1.js",
@@ -63,7 +63,7 @@
     ]
   },
   "src/routes/index.svelte": {
-    "file": "pages/index.svelte-786e0047.js",
+    "file": "pages/index.svelte-541400a4.js",
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -72,7 +72,7 @@
       "_difficultyStore-fde82265.js",
       "_NavigationButton-a585e3a7.js",
       "_Dropdown-d505fd1f.js",
-      "_contourLineStore-1c6f2929.js",
+      "_contourLineStore-c10ba72d.js",
       "_index-05c9b9b1.js"
     ],
     "css": [
@@ -100,7 +100,7 @@
     ]
   },
   "src/routes/scan/maptransform.svelte": {
-    "file": "pages/scan/maptransform.svelte-7d1dd8fd.js",
+    "file": "pages/scan/maptransform.svelte-4a4d79b8.js",
     "src": "src/routes/scan/maptransform.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -110,7 +110,7 @@
       "_Page-5d16365d.js",
       "_Modal-008d343e.js",
       "_imageStore-d44a0a04.js",
-      "_contourLineStore-1c6f2929.js",
+      "_contourLineStore-c10ba72d.js",
       "_navigation-0e6511d1.js",
       "__commonjsHelpers-56d41998.js",
       "_P5-6f1bf296.js",
@@ -123,7 +123,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-a42385f2.js",
+    "file": "pages/scan/preview.svelte-69cc4d57.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -133,8 +133,8 @@
       "_NavigationButton-a585e3a7.js",
       "_Page-5d16365d.js",
       "_navigation-0e6511d1.js",
-      "_contourLineStore-1c6f2929.js",
-      "_gltfStore-ba771f2f.js",
+      "_contourLineStore-c10ba72d.js",
+      "_gltfStore-23a16178.js",
       "_difficultyStore-fde82265.js",
       "_debugStore-83cd0e31.js",
       "_preload-helper-60cab3ee.js",
@@ -147,7 +147,7 @@
     ]
   },
   "src/routes/targetplacement.svelte": {
-    "file": "pages/targetplacement.svelte-c554a63d.js",
+    "file": "pages/targetplacement.svelte-d8b59320.js",
     "src": "src/routes/targetplacement.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -155,7 +155,7 @@
       "_index-e68930ae.js",
       "_NavigationButton-a585e3a7.js",
       "_P5-6f1bf296.js",
-      "_contourLineStore-1c6f2929.js",
+      "_contourLineStore-c10ba72d.js",
       "_difficultyStore-fde82265.js",
       "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
       "_Page-5d16365d.js",
@@ -168,18 +168,18 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-a49bb667.js",
+    "file": "pages/visualise/ar.svelte-26c841d2.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-e68930ae.js",
       "_NavigationButton-a585e3a7.js",
-      "_aframe-master-3116ac09.js",
+      "_aframe-master-60fb6951.js",
       "__commonjsHelpers-56d41998.js",
-      "_gltfStore-ba771f2f.js",
+      "_gltfStore-23a16178.js",
       "_index-05c9b9b1.js",
-      "_contourLineStore-1c6f2929.js",
+      "_contourLineStore-c10ba72d.js",
       "_difficultyStore-fde82265.js",
       "_debugStore-83cd0e31.js",
       "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
@@ -191,17 +191,17 @@
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-3b49c7f1.js",
+    "file": "pages/visualise/model.svelte-96a5a0a6.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-e68930ae.js",
-      "_aframe-master-3116ac09.js",
+      "_aframe-master-60fb6951.js",
       "__commonjsHelpers-56d41998.js",
-      "_gltfStore-ba771f2f.js",
+      "_gltfStore-23a16178.js",
       "_index-05c9b9b1.js",
-      "_contourLineStore-1c6f2929.js",
+      "_contourLineStore-c10ba72d.js",
       "_difficultyStore-fde82265.js",
       "_debugStore-83cd0e31.js",
       "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
@@ -234,12 +234,12 @@
       "_index-05c9b9b1.js"
     ]
   },
-  "_aframe-master-3116ac09.js": {
-    "file": "chunks/aframe-master-3116ac09.js",
+  "_aframe-master-60fb6951.js": {
+    "file": "chunks/aframe-master-60fb6951.js",
     "imports": [
       "_index-e68930ae.js",
-      "_gltfStore-ba771f2f.js",
-      "_contourLineStore-1c6f2929.js",
+      "_gltfStore-23a16178.js",
+      "_contourLineStore-c10ba72d.js",
       "_NavigationButton-a585e3a7.js",
       "_navigation-0e6511d1.js",
       "_difficultyStore-fde82265.js",
@@ -250,11 +250,11 @@
       "assets/aframe-master-590ad1d2.css"
     ]
   },
-  "_gltfStore-ba771f2f.js": {
-    "file": "chunks/gltfStore-ba771f2f.js",
+  "_gltfStore-23a16178.js": {
+    "file": "chunks/gltfStore-23a16178.js",
     "imports": [
       "_index-05c9b9b1.js",
-      "_contourLineStore-1c6f2929.js",
+      "_contourLineStore-c10ba72d.js",
       "_difficultyStore-fde82265.js",
       "_debugStore-83cd0e31.js",
       "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
@@ -276,8 +276,8 @@
       "_singletons-d1fb5791.js"
     ]
   },
-  "_contourLineStore-1c6f2929.js": {
-    "file": "chunks/contourLineStore-1c6f2929.js",
+  "_contourLineStore-c10ba72d.js": {
+    "file": "chunks/contourLineStore-c10ba72d.js",
     "imports": [
       "_index-05c9b9b1.js"
     ]
