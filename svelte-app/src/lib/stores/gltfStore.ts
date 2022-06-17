@@ -22,6 +22,8 @@ type Vec3 = [number, number, number];
 export interface Model {
 	gltf: string;
 	gltf_url: string;
+	lava_gltf: string;
+	lava_gltf_url: string;
 	lava_paths: Vec3[][];
 	craters: Vec2[];
 }
@@ -119,6 +121,7 @@ function createGltfStore() {
 			// Call the wasm api to build the model
 			model = api.build().to_js() as Model;
 			model.gltf_url = gltfStringToUrl(model.gltf);
+			model.lava_gltf_url = gltfStringToUrl(model.lava_gltf);
 
 			model.craters = model.craters.map((c) => [
 				(c[0] * curveTree.size.width) / 100,

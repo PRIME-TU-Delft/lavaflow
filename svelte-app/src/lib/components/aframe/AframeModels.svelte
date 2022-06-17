@@ -30,6 +30,9 @@
 		--                    MOUNTAIN									--
 		------------------------------------------------------------------>
 		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
+		{#if lava_revealed}
+			<a-entity gltf-model="url({$gltfStore.lava_gltf_url})" />
+		{/if}
 
 		<!----------------------------------------------------------------
 		--    CRATERS removed because now loaded with gltf              --

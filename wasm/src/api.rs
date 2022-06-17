@@ -9,6 +9,7 @@ use miette::Result;
 use serde::{Deserialize, Serialize};
 
 // Internal imports
+use crate::api_helper_fns::{map, cap};
 use crate::gltf_conversion::generate_gltf;
 use crate::model_construction::constructor::ModelConstructor;
 use crate::model_construction::smoother::Smoother;
@@ -50,6 +51,7 @@ impl OpenCVTree {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ModelConstructionResult {
 	gltf: String,
+	lava_gltf: String,
 	lava_paths: Vec<Vec<(f32, f32, f32)>>,
 	craters: Vec<(f32, f32)>,
 }
@@ -334,8 +336,38 @@ impl ModelConstructionApi {
 			}
 		}
 
+		//
+		// Lava paths: for each vertex in 'vs', compute its distance to the closest lava path
+		//
+
+		let mut vs_lava_distance: Vec<f32> = Vec::new();
+		for v in &vs {
+			// For this vertex, compute the distance to the closest lava path
+			let mut vertex_dist = f32::MAX;
+			for lava_path in &lava_path_triples {
+				for (lpx, lpy, lpz) in lava_path {
+					let dx = v.x - lpx;
+					let dy = v.y - lpy;
+					let dz = v.z - lpz;
+					let dist_sqr = dx * dx + dy * dy + dz * dz;
+					if dist_sqr < vertex_dist {
+						vertex_dist = dist_sqr;
+					}
+				}
+			}
+
+			// Register this distance in the vector
+			vs_lava_distance.push(vertex_dist);
+		}
+
+		// Lava color
+		let color_lava_flow = (map(255.0, 0.0, 255.0, 0.0, 1.0), map(32.0, 0.0, 255.0, 0.0, 1.0), map(21.0, 0.0, 255.0, 0.0, 1.0));
+		let color_crater_center = (map(242.0, 0.0, 255.0, 0.0, 1.0), map(231.0, 0.0, 255.0, 0.0, 1.0), map(73.0, 0.0, 255.0, 0.0, 1.0));
+
+
 		//Turn faces of model into triangles
 		let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
+		let mut lava_path_final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 		for f in fs {
 			if f.points.len() != 4 {
 				return Err(JsValue::from("surface subdivision returns face with incorrect amount of points"));
@@ -349,10 +381,14 @@ impl ModelConstructionApi {
 			//rgb green = 0, 153, 51
 			//rgb orange = 255, 153, 51
 
-			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z, p0, &lava_craters, &lava_path_triples));
-			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z, p3, &lava_craters, &lava_path_triples));
-			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z, p1, &lava_craters, &lava_path_triples));
-			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z, p2, &lava_craters, &lava_path_triples));
+			//
+			// Add these points to the final_points gltf, together creating the gltf for the mountain itself
+			//
+
+			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude(0.0, 100.0, p0.z, p0, &lava_craters, color_crater_center, color_lava_flow));
+			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude(0.0, 100.0, p3.z, p3, &lava_craters, color_crater_center, color_lava_flow));
+			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude(0.0, 100.0, p1.z, p1, &lava_craters, color_crater_center, color_lava_flow));
+			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude(0.0, 100.0, p2.z, p2, &lava_craters, color_crater_center, color_lava_flow));
 
 			// Add the first triangle
 			final_points.push(tri00);
@@ -367,11 +403,47 @@ impl ModelConstructionApi {
 			final_points.push(tri11);
 
 			final_points.push(tri10);
+
+			//
+			// Use these points to also generate a separate gltf for the lava paths
+			//
+
+			// If any of the four points fall within the distance threshold, we'll have to add both triangles to the gltf.
+			// This is to prevent that we end up with 'parts of triangles'.
+			let dist_sqr_thrhld: f32 = 1.0;
+			if vs_lava_distance[f.points[0]] <= dist_sqr_thrhld
+				|| vs_lava_distance[f.points[1]] <= dist_sqr_thrhld
+				|| vs_lava_distance[f.points[2]] <= dist_sqr_thrhld
+				|| vs_lava_distance[f.points[3]] <= dist_sqr_thrhld
+			{
+				// Compute the (slightly higher) altitude, increasing as the distance to the lava gets smaller
+				let p0_alt = p0.z + cap(map(vs_lava_distance[f.points[0]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
+				let p1_alt = p1.z + cap(map(vs_lava_distance[f.points[1]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
+				let p2_alt = p2.z + cap(map(vs_lava_distance[f.points[2]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
+				let p3_alt = p3.z + cap(map(vs_lava_distance[f.points[3]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
+
+				// Create the four points for the triangles, including the color
+				let tri00 = ([p0.x, p0_alt, p0.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+				let tri10 = ([p3.x, p3_alt, p3.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+				let tri01 = ([p1.x, p1_alt, p1.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+				let tri11 = ([p2.x, p2_alt, p2.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+
+				// Add the first triangle
+				lava_path_final_points.push(tri00);
+				lava_path_final_points.push(tri01);
+				lava_path_final_points.push(tri11);
+
+				// Add the second triangle
+				lava_path_final_points.push(tri00);
+				lava_path_final_points.push(tri11);
+				lava_path_final_points.push(tri10);
+			}
 		}
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
 			gltf: generate_gltf(&final_points).map_err(|e| e.to_string())?,
+			lava_gltf: generate_gltf(&lava_path_final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
 			craters: lava_craters,
 		})
