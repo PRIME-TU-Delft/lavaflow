@@ -114,7 +114,7 @@
 		</Button>
 
 		<Button on:click={() => gotoPreview(foregroundWidth, foregroundHeight)}>
-			<span>Preview transformation</span>
+			<span>Apply selection</span>
 			<Icon path={mdiChevronRight} />
 		</Button>
 	</div>

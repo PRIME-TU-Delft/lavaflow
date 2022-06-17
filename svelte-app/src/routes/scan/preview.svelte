@@ -33,7 +33,7 @@
 	});
 </script>
 
-<Page title="Result of transformation">
+<Page title="Result of scan">
 	<NavigationButton slot="headerButton" to="/scan/maptransform" back>
 		Redraw borders
 	</NavigationButton>
@@ -54,7 +54,7 @@
 
 	<div slot="footer">
 		<Button secondary loading={!gltfLoaded} on:click={() => goto('/visualise/model')}>
-			<span>Visualise as model</span>
+			<span>Visualise as 3D model</span>
 			<Icon path={mdiChevronRight} />
 		</Button>
 		<Button loading={!gltfLoaded} on:click={() => goto('/visualise/ar')}>
