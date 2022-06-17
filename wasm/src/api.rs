@@ -9,7 +9,7 @@ use miette::Result;
 use serde::{Deserialize, Serialize};
 
 // Internal imports
-use crate::api_helper_fns::{cap, map};
+use crate::api_helper_fns::map;
 use crate::gltf_conversion::generate_gltf;
 use crate::model_construction::constructor::ModelConstructor;
 use crate::model_construction::smoother::Smoother;
@@ -416,10 +416,10 @@ impl ModelConstructionApi {
 				|| vs_lava_distance[f.points[3]] <= dist_sqr_thrhld
 			{
 				// Compute the (slightly higher) altitude, increasing as the distance to the lava gets smaller
-				let p0_alt = p0.z + cap(map(vs_lava_distance[f.points[0]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
-				let p1_alt = p1.z + cap(map(vs_lava_distance[f.points[1]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
-				let p2_alt = p2.z + cap(map(vs_lava_distance[f.points[2]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
-				let p3_alt = p3.z + cap(map(vs_lava_distance[f.points[3]], 0.0, dist_sqr_thrhld, 5.0, -5.0), -5.0, 5.0);
+				let p0_alt = p0.z + map(vs_lava_distance[f.points[0]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
+				let p1_alt = p1.z + map(vs_lava_distance[f.points[1]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
+				let p2_alt = p2.z + map(vs_lava_distance[f.points[2]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
+				let p3_alt = p3.z + map(vs_lava_distance[f.points[3]], 0.0, dist_sqr_thrhld, 5.0, -5.0).clamp(-5.0, 5.0);
 
 				// Create the four points for the triangles, including the color
 				let tri00 = ([p0.x, p0_alt, p0.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
