@@ -28,11 +28,7 @@
 
 	let scrolling_animation_initialized = false;
 	function initialize_scrolling_animation() {
-		if (!scrolling_animation_initialized) {
-			goto_landing_page();
-
-			scrolling_animation_initialized = true;
-		}
+		goto_landing_page();
 	}
 
 	function goto_landing_page() {
