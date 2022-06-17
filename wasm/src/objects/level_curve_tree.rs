@@ -251,8 +251,8 @@ impl<'a> LevelCurveTree<'a> {
 
 		// 3. Combine the level-curves into one level curve set
 		let mut result: LevelCurveSet = LevelCurveSet::new(altitude_step);
-		for (i, lc_set) in resulting_level_curve_sets.iter().enumerate() {
-			for (j, lc) in lc_set.level_curves.iter().enumerate() {
+		for (_, lc_set) in resulting_level_curve_sets.iter().enumerate() {
+			for (_, lc) in lc_set.level_curves.iter().enumerate() {
 				result.add_level_curve(lc.clone());
 			}
 		}

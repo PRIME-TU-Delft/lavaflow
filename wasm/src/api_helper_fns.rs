@@ -19,9 +19,9 @@ impl ModelConstructionApi {
 		// Initialisation: tuples for every color that we'd like to use
 		let color_rock_dark = (map(30.0, 0.0, 255.0, 0.0, 1.0), map(15.0, 0.0, 255.0, 0.0, 1.0), map(25.0, 0.0, 255.0, 0.0, 1.0));
 
-		let color_rock_light = (map(45.0, 0.0, 255.0, 0.0, 1.0), map(28.0, 0.0, 255.0, 0.0, 1.0), map(34.0, 0.0, 255.0, 0.0, 1.0));
+		let _color_rock_light = (map(45.0, 0.0, 255.0, 0.0, 1.0), map(28.0, 0.0, 255.0, 0.0, 1.0), map(34.0, 0.0, 255.0, 0.0, 1.0));
 
-		let color_healthy_grass = (map(42.0, 0.0, 255.0, 0.0, 1.0), map(48.0, 0.0, 255.0, 0.0, 1.0), map(10.0, 0.0, 255.0, 0.0, 1.0));
+		let _color_healthy_grass = (map(42.0, 0.0, 255.0, 0.0, 1.0), map(48.0, 0.0, 255.0, 0.0, 1.0), map(10.0, 0.0, 255.0, 0.0, 1.0));
 
 		let color_dry_grass = (map(147.0, 0.0, 255.0, 0.0, 1.0), map(120.0, 0.0, 255.0, 0.0, 1.0), map(0.0, 0.0, 255.0, 0.0, 1.0));
 
@@ -72,7 +72,7 @@ impl ModelConstructionApi {
 		for lava_path in lava_path_triples {
 			let mut current_lava_distance = f32::MAX;
 
-			for (lpx, lpy, lpz) in lava_path {
+			for (lpx, lpy, _lpz) in lava_path {
 				let dx = turbine.0 - lpx;
 				let dy = turbine.1 - lpy;
 				let dist = f32::sqrt(dx * dx + dy * dy);
