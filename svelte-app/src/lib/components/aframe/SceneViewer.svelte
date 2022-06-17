@@ -145,6 +145,6 @@
 	}
 
 	:global(.rs-base) {
-		top: 50vh;
+		top: 50vh !important
 	}
 </style>
