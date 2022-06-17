@@ -94,7 +94,7 @@ function createGltfStore() {
 
 			// Set api and parameters
 			api = new wasm.ModelConstructionApi();
-
+			// svc distance = (the largest image dimension/ number of rows or columns) / 1.5
 			const api_settings = new ApiSettings(
 				/*				 OpenCV tree */ tree,
 				/*						Rows */ 45,
@@ -102,7 +102,7 @@ function createGltfStore() {
 				/*					   Width */ curveTree.size.width,
 				/*					  Height */ curveTree.size.height,
 				/*	  Curve Point Separation */ 5,
-				/*		  		SVC Distance */ Math.min(Math.max(curveTree.size.width , curveTree.size.height)) / (45 *1.5),
+				/*		  		SVC Distance */ Math.max(curveTree.size.width , curveTree.size.height) / (45 *1.5),
 				/*	Catmull Clark Iterations */ 1,
 				/*			Lava Path Length */ 20,
 				/*		   Lava Path Forking */ lava_path_forking,
