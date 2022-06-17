@@ -4,11 +4,12 @@ pub fn map(val: f32, from_min: f32, from_max: f32, to_min: f32, to_max: f32) -> 
 	to_min + ((val - from_min) / (from_max - from_min) * (to_max - to_min))
 }
 
-pub fn cap(val: f32, between: f32, and: f32) -> f32 {
-	if val < between {
-		between
-	} else if val > and {
-		and
+pub fn cap(val: f32, from: f32, to: f32) -> f32 {
+        
+	if val < from {
+		from
+	} else if val > to {
+		to
 	} else {
 		val
 	}
