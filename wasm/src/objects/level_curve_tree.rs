@@ -69,45 +69,6 @@ impl<'a> LevelCurveTree<'a> {
 	// PUBLIC METHODS
 	//
 
-	/// Method: Get the current perspective index (testing purposes)
-	pub fn get_current_perspective(&self) -> usize {
-		self.own_index
-	}
-
-	/// Method: Set the current perspective index (testing purposes)
-	pub fn set_current_perspective(&mut self, perspective: usize) {
-		self.own_index = perspective;
-	}
-
-	/// Method: Get the parent of this node
-	pub fn get_parent(&self) -> Option<LevelCurveTree> {
-		self.parent_relations[self.own_index]?;
-
-		let result: LevelCurveTree = self.from_perspective_index(self.parent_relations[self.own_index]?);
-
-		Some(result)
-	}
-
-	/// Method: `is_parent_of`
-	/// Similar to: `is_child_of`
-	pub fn is_parent_of(&self, child: &LevelCurveTree) -> bool {
-		let parent = self.parent_relations[child.own_index];
-		match parent {
-			None => false,
-			Some(p) => p == self.own_index,
-		}
-	}
-
-	/// Method: `is_child_of`
-	/// Similar to: `is_parent_of`
-	pub fn is_child_of(&self, parent: &LevelCurveTree) -> bool {
-		let child = self.parent_relations[self.own_index];
-		match child {
-			None => false,
-			Some(c) => c == parent.own_index,
-		}
-	}
-
 	/// Method: `get_children`
 	pub fn get_children(&self) -> Vec<LevelCurveTree> {
 		let mut result: Vec<LevelCurveTree> = Vec::new();
@@ -124,20 +85,6 @@ impl<'a> LevelCurveTree<'a> {
 		result
 	}
 
-	/// Method: Check whether a certain point is in the set
-	pub fn contains_pixel(&self, x: u64, y: u64) -> bool {
-		for p in &self.pixels_per_curve[self.own_index] {
-			if p.0 == x && p.1 == y {
-				return true;
-			}
-		}
-		false
-	}
-
-	/// Method: Retrieve the first pixel in this level-curve
-	pub fn get_first_pixel(&self) -> Option<(u64, u64)> {
-		self.pixels_per_curve.get(self.own_index).map(|v| v[0])
-	}
 	/// Method: Retrieve pixels in curve at current top of tree
 	pub fn get_pixels_for_curve(&self) -> Option<&Vec<(u64, u64)>> {
 		self.pixels_per_curve.get(self.own_index)
