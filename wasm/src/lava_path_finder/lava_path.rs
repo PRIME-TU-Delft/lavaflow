@@ -17,7 +17,7 @@ pub fn get_lava_paths_super<'a>(max_length: usize, fork_val: f32, min_altitude: 
 		all_paths: Vec::new(),
 		lava_start_points: Vec::new(),
 	};
-	let start_point = get_start(vs, es)?;
+	let start_point = get_start(vs)?;
 	paths.lava_start_points.push(&vs[start_point]);
 	paths.get_lava_path(start_point, max_length, fork_val, min_altitude, vs, es)?;
 	Ok((paths.all_paths, paths.lava_start_points))
@@ -133,7 +133,7 @@ fn gradient_between_points(from: &Point, to: &Point) -> f32 {
 /// # Return
 /// *  `Result<usize>, String>` - Result of index of start point of lava path.
 ///
-fn get_start(vs: &[Point], edges: &[Vec<usize>]) -> Result<usize, String> {
+fn get_start(vs: &[Point]) -> Result<usize, String> {
 	if vs.is_empty() {
 		return Err(String::from("lava path: cannot find highest point because no points exist above top contour line."));
 	}
