@@ -39,12 +39,12 @@
 			// console.log({ gltf: $gltfStore?.craters, $craterLocations });
 			for (let crater of $craterLocations) {
 				p5.strokeWeight(1);
-				p5.stroke('#f2682c');
+				p5.stroke('#e15f55f0');
 
 				const [posX, posY] = crater;
 
 				// Inner ring
-				p5.fill('#f2682c');
+				p5.fill('#e15f55f0');
 				p5.ellipse(posX, posY, 50, 50);
 				p5.noFill();
 
