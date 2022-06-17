@@ -19,7 +19,7 @@
 				<a-entity lava-path />
 			{/if}
 
-			<!----------------------------------------------------------------
+		<!----------------------------------------------------------------
 		--  Place "soccer" spotlights on each corner of the model		--
 		------------------------------------------------------------------>
 			<a-entity light="color: #ddf; intensity: 0.75" position="-100 150 -100" />
@@ -30,7 +30,11 @@
 			<!----------------------------------------------------------------
 		--                    MOUNTAIN									--
 		------------------------------------------------------------------>
-			<a-entity gltf-model="url({$gltfStore.gltf_url})" />
+		<a-entity gltf-model="url({$gltfStore.gltf_url})" />
+		{#if lava_revealed}
+			<!--LAVA gltf model-->
+			<a-entity gltf-model="url({$gltfStore.lava_gltf_url})" />
+		{/if}
 
 			<!----------------------------------------------------------------
 		--    CRATERS removed because now loaded with gltf              --

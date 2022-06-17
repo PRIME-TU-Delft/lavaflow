@@ -65,7 +65,7 @@
 			max-width: 90%;
 			margin: auto;
 
-			h1 {
+			h2 {
 				width: max-content;
 				margin: auto;
 			}
