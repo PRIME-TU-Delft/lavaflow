@@ -122,7 +122,7 @@ fn gradient_between_points(from: &Point, to: &Point) -> f32 {
 	//gradient = z diff divided by length of edge
 	(from.z - to.z) / ((from.x - to.x).powf(2.0) + (from.y - to.y).powf(2.0) + (from.z - to.z).powf(2.0)).sqrt()
 }
-/// Given list of indexes (Desired is list of index of points that can be the top of the model), find the correct start point. The correct start point is the upper point of the steepest edge in the set of possible start points.
+/// Given list of indexes (Desired is list of index of points that can be the top of the model), find the correct start point. The correct start point is the highest point on the model.
 ///
 /// # Arguments
 ///
