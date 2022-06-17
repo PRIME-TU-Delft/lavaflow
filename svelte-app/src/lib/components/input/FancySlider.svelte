@@ -22,6 +22,12 @@
 		padding: 0.5rem 1rem;
 
 		background: #e15f55;
+		touch-action: none;
+		user-select: none;
+
+		& > div {
+			user-select: none;
+		}
 	}
 
 	input[type='range'] {
