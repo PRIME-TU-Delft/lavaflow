@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-da2119da.js",
+    "file": "start-89df1b99.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -43,13 +43,13 @@
     ]
   },
   "src/routes/demo.svelte": {
-    "file": "pages/demo.svelte-41e5618d.js",
+    "file": "pages/demo.svelte-a00f92f4.js",
     "src": "src/routes/demo.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-78deb6b4.js",
-      "_aframe-master-7f8db9be.js",
+      "_aframe-master-9f6675ca.js",
       "_gltfStore-6a0dfa4c.js",
       "_contourLineStore-22a814b1.js",
       "_index-b55d7b60.js",
@@ -168,14 +168,14 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-5f542979.js",
+    "file": "pages/visualise/ar.svelte-0856fb2c.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-78deb6b4.js",
       "_NavigationButton-041fec4a.js",
-      "_aframe-master-7f8db9be.js",
+      "_aframe-master-9f6675ca.js",
       "__commonjsHelpers-56d41998.js",
       "_gltfStore-6a0dfa4c.js",
       "_index-b55d7b60.js",
@@ -188,13 +188,13 @@
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-03c86d30.js",
+    "file": "pages/visualise/model.svelte-47e18ed5.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-78deb6b4.js",
-      "_aframe-master-7f8db9be.js",
+      "_aframe-master-9f6675ca.js",
       "__commonjsHelpers-56d41998.js",
       "_gltfStore-6a0dfa4c.js",
       "_index-b55d7b60.js",
@@ -231,8 +231,8 @@
       "_index-b55d7b60.js"
     ]
   },
-  "_aframe-master-7f8db9be.js": {
-    "file": "chunks/aframe-master-7f8db9be.js",
+  "_aframe-master-9f6675ca.js": {
+    "file": "chunks/aframe-master-9f6675ca.js",
     "imports": [
       "_index-78deb6b4.js",
       "_gltfStore-6a0dfa4c.js",
@@ -244,7 +244,7 @@
       "__commonjsHelpers-56d41998.js"
     ],
     "css": [
-      "assets/aframe-master-c939cebc.css"
+      "assets/aframe-master-590ad1d2.css"
     ]
   },
   "_gltfStore-6a0dfa4c.js": {
