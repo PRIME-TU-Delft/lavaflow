@@ -15,7 +15,7 @@
 	<a-entity scale={scaleString}>
 
 		{#if lava_revealed}
-		<a-entity lava-path />
+			<!-- <a-entity lava-path /> -->
 		{/if}
 
 		<!----------------------------------------------------------------
