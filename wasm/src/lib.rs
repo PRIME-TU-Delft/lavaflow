@@ -1,5 +1,3 @@
-#![allow(dead_code)] // TODO: remove this!
-#![allow(unused_variables)] // TODO: remove this!
 mod lava_path_finder;
 mod model_construction;
 mod objects;
