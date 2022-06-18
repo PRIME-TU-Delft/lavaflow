@@ -99,28 +99,6 @@
 		width: 15rem;
 	}
 
-	.title {
-		background: var(--secondary-color);
-		color: white;
-		width: 100%;
-		max-width: 20rem;
-		padding: 0.75rem 1.1rem;
-		display: grid;
-		align-items: center;
-
-		font-size: 1rem;
-		text-align: left;
-		border: none;
-		margin: 0 0 0 auto;
-		border-radius: 0.3rem;
-		cursor: pointer;
-		user-select: none;
-		-moz-user-select: none;
-		-khtml-user-select: none;
-		-webkit-user-select: none;
-		-o-user-select: none;
-	}
-
 	main {
 		height: 100%;
 		border-radius: 1rem;
