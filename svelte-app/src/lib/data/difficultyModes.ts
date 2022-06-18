@@ -46,7 +46,7 @@ export const difficulty_modes = [
 		'Tutorial',
 		'This is the easiest level of difficulty, which is meant to get you familiarised with the game.',
 		10,
-		0.6,
+		0.4,
 		2,
 		25,
 		30
@@ -64,7 +64,7 @@ export const difficulty_modes = [
 		'Medium',
 		'There is less lava and it must reach closer to the steam turbines. Steam turbines should be placed further apart from each other.',
 		8,
-		0.4,
+		0.2,
 		4,
 		50,
 		30
@@ -73,7 +73,7 @@ export const difficulty_modes = [
 		'Hard',
 		"The lava must reach even closer to the steam turbines and you'll have to place them even further apart.",
 		5,
-		0.3,
+		0.06,
 		7,
 		65,
 		50
@@ -82,7 +82,7 @@ export const difficulty_modes = [
 		'Impossible',
 		'Only Dennis can solve this level.',
 		3,
-		0.2, 
+		0.02, 
 		10,
 		75,
 		100

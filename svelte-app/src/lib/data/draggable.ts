@@ -163,7 +163,7 @@ export default class Draggable {
 		if (p5.mouseX >= p5.width || p5.mouseY >= p5.height) return;
 
 		if (this.dragging && !this.drag_translated) {
-			this.y -= 50;
+			this.y -= 35;
 			this.drag_translated = true;
 		}
 	}
@@ -375,10 +375,15 @@ export default class Draggable {
 	 * check if one of the boxes is being dragged
 	 * @param p5 Instance of a p5 sketch
 	 */
-	pressed(p5: p5) {
+	pressed(p5: p5, incorporateTag?: boolean) {
 		// Check if mouse is over this object when global mouse is pressed
-		const xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < this.x + this.size / 2;
+		let xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < this.x + this.size / 2;
 		const yBounded = p5.mouseY > this.y - this.size / 2 && p5.mouseY < this.y + this.size / 2;
+
+		if (incorporateTag) {
+			xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < (this.x + this.size / 2 + 50);
+		}
+
 		if (xBounded && yBounded) {
 			// if so, set this object to be dragged
 			this.dragging = true;

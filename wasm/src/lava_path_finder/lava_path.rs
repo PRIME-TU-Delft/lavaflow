@@ -19,7 +19,12 @@ pub fn get_lava_paths_super<'a>(max_length: usize, fork_val: f32, min_altitude: 
 	};
 	let start_point = get_start(vs)?;
 	paths.lava_start_points.push(&vs[start_point]);
-	paths.get_lava_path(start_point, max_length, fork_val, min_altitude, vs, es)?;
+
+	//for first point, start lava from all sides
+	for neighbor in &es[start_point] {
+		paths.get_lava_path(*neighbor, max_length, fork_val, min_altitude, vs, es)?;
+	}
+
 	Ok((paths.all_paths, paths.lava_start_points))
 }
 
