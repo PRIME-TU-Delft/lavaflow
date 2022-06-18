@@ -13,13 +13,11 @@
 	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
 	import Draggable from '$lib/data/draggable';
 
-	import { mdiPin, mdiTrashCan, mdiBookOpenVariant } from '@mdi/js';
+	import { mdiPin, mdiTrashCan, mdiHelpCircle } from '@mdi/js';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 
 	let targetSelected = -1;
 	let instructionVisible = false;
-
-	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	function addTarget(x: number, y: number, viewportwidth: number, viewportheight: number) {
 		// If the maximum amount of steam turbines has been reached, don't add more
@@ -44,8 +42,6 @@
 
 		let is_too_close = false;
 		let too_close_relative: Draggable = newTarget;
-
-		let count = 0;
 
 		while (true) {
 			is_too_close = false;
@@ -115,7 +111,10 @@
 			added_turbines = true;
 		}
 
-		return added_turbines;
+		// If the while loop above was not able to add enough steam-turbines, we'll add one more
+		if (!added_turbines) {
+			addTarget(foregroundWidth / 8, foregroundHeight / 8, foregroundWidth, foregroundHeight - 100);
+		}
 	}
 </script>
 
@@ -123,8 +122,10 @@
 	<Instructions />
 </Modal>
 
-<Page title="Placing steam turbines" let:foregroundHeight let:foregroundWidth>
+<Page let:foregroundHeight let:foregroundWidth>
 	<div slot="background" style="background:#aaa;" />
+
+	<div slot="headerButton"><slot /></div>
 
 	{#if $contourLines?.curves && $difficultyStore && $targetLocations}
 		<div class="sketch">
@@ -137,40 +138,34 @@
 		</div>
 	{/if}
 
-	<div slot="footer">
-		<!-- <Button icon={mdiBookOpenVariant} on:click={() => toggleInstruction()}>
-			Read instructions
-		</Button> -->
+	<svelte:fragment slot="footer">
+		<Button
+			secondary
+			icon={mdiHelpCircle}
+			on:click={() => (instructionVisible = !instructionVisible)}
+		>
+			Place turbine | Instructions
+		</Button>
+
 		{#if $contourLines}
-			{#if targetSelected != -1 && $targetLocations.length > $difficultyStore.min_steam_turbines}
-				<Button secondary icon={mdiTrashCan} on:click={removeTarget}>
-					Remove steam turbine {targetSelected + 1}
+			<div class="editTurbines">
+				{#if $targetLocations.length > 0}
+					<Button secondary icon={mdiTrashCan} on:click={clearTargets}>Clear all</Button>
+				{/if}
+
+				<Button
+					icon={mdiPin}
+					on:click={() => addMinimalAmountOfTurbines(foregroundWidth, foregroundHeight - 100)}
+				>
+					Add steam turbine
 				</Button>
-			{:else if $targetLocations.length > 0}
-				<Button secondary icon={mdiTrashCan} on:click={clearTargets}>
-					Clear all steam turbines
-				</Button>
-			{/if}
-			<Button
-				icon={mdiPin}
-				on:click={() => {
-					if (!addMinimalAmountOfTurbines(foregroundWidth, foregroundHeight - 100))
-						addTarget(
-							foregroundWidth / 8,
-							foregroundHeight / 8,
-							foregroundWidth,
-							foregroundHeight - 100
-						);
-				}}
-			>
-				Add steam turbine
-			</Button>
+			</div>
 		{:else}
 			<NavigationButton back to="/scan/mapscanning">
 				No image found. Go to map scanning
 			</NavigationButton>
 		{/if}
-	</div>
+	</svelte:fragment>
 </Page>
 
 <style>
@@ -178,9 +173,15 @@
 		height: 100%;
 		touch-action: none;
 		user-select: none;
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        -o-user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
+	}
+
+	.editTurbines {
+		display: flex;
+		gap: 0.5rem;
+		overflow-x: auto;
 	}
 </style>

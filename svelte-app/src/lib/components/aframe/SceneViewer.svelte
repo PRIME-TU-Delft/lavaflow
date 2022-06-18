@@ -1,8 +1,10 @@
 <script lang="ts">
 	import AframeModels from '$lib/components/aframe/AframeModels.svelte';
-	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import Icon from '$lib/components/Icon.svelte';
+	import NavigationButton from '$lib/components/NavigationButton.svelte';
 
+	import { mdiLavaLamp } from '@mdi/js';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
@@ -76,7 +78,9 @@
 
 		<div class="button rightButton">
 			<slot name="targetButton">
-				<NavigationButton to="/targetplacement">Place targets</NavigationButton>
+				<NavigationButton to="/targetplacement/{arMode ? 'ar' : 'model'}">
+					Place targets
+				</NavigationButton>
 			</slot>
 
 			{#if $targetLocations.length > 0}
@@ -84,7 +88,8 @@
 					<Button secondary on:click={hideLava}>Hide lava</Button>
 					<Button green>Points: {obtained_points} / {max_points}</Button>
 				{:else}
-					<Button on:click={revealLava}>Reveal lava</Button>
+					<Button on:click={revealLava}><span>Reveal lava</span> <Icon path={mdiLavaLamp} /></Button
+					>
 				{/if}
 			{:else}
 				<Button disabled secondary>Place targets to begin</Button>
@@ -142,9 +147,12 @@
 	.rightButton {
 		top: 1rem;
 		right: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	:global(.rs-base) {
-		top: 50vh !important
+		top: 50vh !important;
 	}
 </style>
