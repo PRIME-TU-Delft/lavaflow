@@ -33,9 +33,9 @@
 	});
 </script>
 
-<Page title="Result of transformation">
+<Page>
 	<NavigationButton slot="headerButton" to="/scan/maptransform" back>
-		Redraw borders
+		Back to selection
 	</NavigationButton>
 
 	<div slot="background" style="background:#aaa;" />

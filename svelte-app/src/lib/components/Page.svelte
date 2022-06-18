@@ -4,7 +4,6 @@
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
-	export let title = '';
 	export let fullscreen = false;
 
 	let foregroundWidth: number;
@@ -25,9 +24,6 @@
 					Back
 				</Button>
 			</slot>
-			<div class="title">
-				{title}
-			</div>
 
 			<slot name="options" />
 		</header>

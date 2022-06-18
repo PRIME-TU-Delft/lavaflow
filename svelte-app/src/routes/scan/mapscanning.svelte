@@ -12,7 +12,7 @@
 	import VideoStream from '$lib/components/VideoStream.svelte';
 	import Video from '$lib/components/Video.svelte';
 
-	import { mdiCamera, mdiBookOpenVariant } from '@mdi/js';
+	import { mdiCamera, mdiHelpCircle } from '@mdi/js';
 	import { goto } from '$app/navigation';
 	import { rawImage } from '$lib/stores/imageStore';
 
@@ -56,7 +56,7 @@
 </Modal>
 
 <VideoStream {deviceId} let:loading let:stream let:error let:cameraOptions>
-	<Page fullscreen={!loading} title={'Capture the image'}>
+	<Page fullscreen={!loading}>
 		<NavigationButton slot="headerButton" back to="/">Back home</NavigationButton>
 
 		<div slot="background">
@@ -81,8 +81,8 @@
 
 		<svelte:fragment slot="footer">
 			{#if !instructionVisible}
-				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstruction}>
-					Read scan instructions
+				<Button secondary icon={mdiHelpCircle} on:click={toggleInstruction}>
+					Image capture | Instructions
 				</Button>
 			{/if}
 			<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>

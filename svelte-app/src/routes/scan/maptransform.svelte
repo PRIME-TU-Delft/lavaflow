@@ -86,7 +86,7 @@
 	<Instructions />
 </Modal>
 
-<Page title="Select the level curves" let:foregroundHeight let:foregroundWidth>
+<Page let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="/scan/mapscanning" back>Rescan image</NavigationButton>
 
 	<div slot="background">
@@ -110,7 +110,7 @@
 
 	<svelte:fragment slot="footer">
 		<Button secondary small icon={mdiBookOpenVariant} on:click={toggleInstruction}>
-			Read instructions
+			Select markers | Instructions
 		</Button>
 
 		<Button on:click={() => gotoPreview(foregroundWidth, foregroundHeight)}>
