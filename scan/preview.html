@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="../favicon.png" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@200;400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+
+		<style>
+			body {
+				background: #1a1717;
+				color: white;
+				padding: 0;
+				margin: 0;
+				box-sizing: border-box;
+				font-family: 'Arial', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans,
+					Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+			}
+
+			body > div {
+				height: var(--vh);
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				font-family: 'Roboto Slab';
+			}
+
+			h1 {
+				font-weight: 700;
+				font-size: 3em;
+			}
+
+			h2 {
+				font-weight: 700;
+				font-size: 2em;
+			}
+
+			h3 {
+				font-weight: 600;
+				font-size: 1.6em;
+			}
+
+			h4 {
+				font-weight: 600;
+				font-size: 1.1em;
+			}
+
+			h5 {
+				font-weight: 400;
+				font-size: 1em;
+			}
+
+			h6 {
+				font-weight: 400;
+				font-size: 1em;
+			}
+
+			:root {
+				--primary-color: rgb(225 95 85 / 90%);
+				--secondary-color: rgb(144 53 44 / 90%);
+				/* --text-color: rgba(94, 14, 14, 100%); */
+				--text-color: rgb(255, 255, 255);
+				--text-color-secondary: rgb(230 223 223);
+			}
+		</style>
+
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+
+		<meta http-equiv="content-security-policy" content="">
+	<link rel="stylesheet" href="/_app/immutable/assets/pages/scan/preview.svelte-f802f904.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/NavigationButton-86431f37.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/Page-d8f34bd9.css">
+	<link rel="modulepreload" href="/_app/immutable/start-a1f93e14.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-e50d45aa.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-ca69d11e.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-60cab3ee.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/singletons-d1fb5791.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-79a93977.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/debugStore-b63444ef.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/scan/preview.svelte-d450c8ac.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/P5-bd5cfe29.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/NavigationButton-d591ec72.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/Page-c4546c49.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/navigation-0e6511d1.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/contourLineStore-67ef1863.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/gltfStore-d6d1bd39.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/difficultyStore-0791473c.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/@vite-plugin-wasm-pack@wasm-9c455baf.js">
+	</head>
+	<body>
+		<div>
+
+
+<div class="page svelte-pv35ke"><div class="background svelte-pv35ke"><div slot="background" style="background:#aaa;"></div>
+		<div class="backdrop svelte-pv35ke"></div></div>
+
+	<div class="foreground svelte-pv35ke"><header class="svelte-pv35ke"><a href="/scan/maptransform"><button  class="svelte-30pcob"><div class="title svelte-30pcob">
+			<svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:var(--text-color);" class="svelte-z4mprv"><path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"></path></svg>
+
+		<span class="text svelte-znqqbb">Back to selection
+	</span>
+
+		</div>
+</button>
+</a>
+
+			</header>
+
+		<main class="svelte-pv35ke"></main>
+
+		<footer class="svelte-pv35ke"><button disabled class="svelte-30pcob disabled   secondary"><div class="title svelte-30pcob"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><style>@keyframes spin {
+					to {
+						transform: rotate(360deg);
+					}
+				}
+			</style>
+		<g style="animation: spin linear 1s infinite; transform-origin: center"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"></path></g></svg>
+			Loading...
+		</div>
+</button>
+		<button disabled class="svelte-30pcob disabled"><div class="title svelte-30pcob"><svg viewBox="0 0 24 24" style=" width:1.5rem; height:1.5rem; fill:currentColor;" class="svelte-z4mprv"><style>@keyframes spin {
+					to {
+						transform: rotate(360deg);
+					}
+				}
+			</style>
+		<g style="animation: spin linear 1s infinite; transform-origin: center"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"></path></g></svg>
+			Loading...
+		</div>
+</button>
+	</footer></div>
+</div>
+
+
+		<script type="module" data-sveltekit-hydrate="g3p0o3">
+		import { start } from "/_app/immutable/start-a1f93e14.js";
+		start({
+			target: document.querySelector('[data-sveltekit-hydrate="g3p0o3"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: false,
+			trailing_slash: "never",
+			hydrate: {
+				status: 200,
+				error: null,
+				nodes: [0, 5],
+				params: {},
+				routeId: "scan/preview"
+			}
+		});
+	</script></div>
+	</body>
+</html>
