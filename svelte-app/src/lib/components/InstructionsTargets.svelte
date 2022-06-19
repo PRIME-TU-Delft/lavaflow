@@ -9,6 +9,10 @@
 		amount of targets you need to place, which also depends on your difficulty mode. You
 		can never place more than 10 targets.
 	</div>
+
+	<div class="instruction">
+		Points are based on how close the steam turbine is placed to the lava stream, divided by the number of turbines. The points represent how much energy the average steam turbine generates, measured in megawatts.
+	</div>
 </div>
 
 <style lang="scss">
