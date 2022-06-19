@@ -4,6 +4,8 @@ use super::constructor::ModelConstructor;
 
 use miette::{miette, Result};
 
+use crate::utils::log;
+
 /// # Struct: Smoother
 /// The Smoother is a struct that allows for applying mountain-smoothing in a much more controlled manner.
 /// For example, it enables smoothing per altitude-group of level-curves. Developers can detach specific parts of
@@ -26,7 +28,7 @@ impl<'a> Smoother<'a> {
 	/// After this is completed, create a `Smoother` instance and use it to run specialised smoothing.
 	///
 	/// ### Parameters
-	/// - `model_constructor`: Instance of a ModelConstructor, as a mutable reference with lifetime specifier.
+	/// - `model_constructor`: Instance of a `ModelConstructor`, as a mutable reference with lifetime specifier.
 	pub fn new(model_constructor: &'a mut ModelConstructor) -> Result<Self> {
 		// Construct the list of point-indices per layer.
 		// Construct the list of booleans, specifying whether a layer is a mountain-top.
@@ -36,7 +38,7 @@ impl<'a> Smoother<'a> {
 		let mut altitude_of_layer: Vec<f32> = Vec::new();
 
 		// Initialize the lists, by pushing empty lists for every level curve
-		for _lc in 0..model_constructor.level_curve_map.level_curves.len() + 1 {
+		for _ in 0..=model_constructor.level_curve_map.level_curves.len() {
 			point_indices_per_layer.push(Vec::new());
 			layer_is_top.push(false);
 			altitude_of_layer.push(0.0);
@@ -155,7 +157,7 @@ impl<'a> Smoother<'a> {
 		}
 
 		// Initialize the array of altitude-groups, by computing how many layers we will have
-		for _i in 0..((f32::round(max_altitude / model_constructor.level_curve_map.altitude_step) as usize) + 1) {
+		for _i in 0..=(f32::round(max_altitude / model_constructor.level_curve_map.altitude_step) as usize) {
 			altitude_groups.push(Vec::new());
 		}
 
@@ -646,8 +648,10 @@ impl<'a> Smoother<'a> {
 	/// ### Returns
 	/// This method returns a `Result` and will throw an error if anything goes wrong. Other than that, this method returns `void`.
 	pub fn increase_altitude_for_mountain_tops(&mut self, percentage_of_altitude_step: f32, allow_svc_change: bool) -> Result<()> {
+		log!("Increase altitude for mountain tops was called");
 		for i in 0..self.layer_is_top.len() {
 			if self.layer_is_top[i] {
+				log!("Increasing altitude of layer {}", i);
 				self.set_altitude_for_layer(i, self.altitude_of_layer[i] + self.altitude_step * percentage_of_altitude_step, allow_svc_change)?;
 			}
 		}

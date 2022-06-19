@@ -9,10 +9,12 @@
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import Instructions from '$lib/components/InstructionsTransformation.svelte';
 
 	import type Draggable from '$lib/data/draggable';
-	import { rawImage, perspectiveImage } from '$lib/stores/imageStore';
+	import { rawImage } from '$lib/stores/imageStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { goto } from '$app/navigation';
 	import removePerspective from '$lib/opencv/removePerspective';
@@ -21,10 +23,13 @@
 	import cv from 'opencv-ts';
 	import { onMount } from 'svelte';
 	import P5Transform from '$lib/components/p5/P5Transform.svelte';
-	import { mdiInformation, mdiChevronRight } from '@mdi/js';
+	import { mdiChevronRight, mdiBookOpenVariant } from '@mdi/js';
 
 	let outputCanvas: HTMLCanvasElement;
 	let points: Draggable[] = [];
+	let instructionVisible = false;
+
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	function gotoPreview(width: number, height: number) {
 		const mat = cv.imread('foregroundImage');
@@ -39,39 +44,36 @@
 		// Apply the perspective transformation using the selected marker coords
 		const result = removePerspective(mat, markerCoords, width, height);
 
-		// Set contour line store to the detected contour lines with hirarchy
-		const { curves, hierarchy } = getCurves(result);
+		try {
+			// Set contour line store to the detected contour lines with hierarchy
+			const { curves, hierarchy } = getCurves(result);
 
-		if (curves.length == 0 || hierarchy.length == 0) {
-			alert('No contours found');
-			return;
+			// Convert the OpenCV Mat to a array of tuples for mountain model construction
+			const contourTuples: [number, number][][] = curves.map((contour) => {
+				let contourTuple: [number, number][] = [];
+
+				for (let i = 0; i < contour.length - 1; i += 2) {
+					contourTuple.push([contour[i], contour[i + 1]]);
+				}
+
+				return contourTuple;
+			});
+
+			contourLines.setup({
+				curves: contourTuples,
+				hierarchy: hierarchy,
+				size: { width, height }
+			});
+
+			cv.imshow('canvasOutput', result);
+
+			goto('/scan/preview');
+		} catch (message) {
+			alert(message);
 		}
-
-		// Convert the OpenCV Mat to a array of tuples for mountain model construction
-		const contourTuples: [number, number][][] = curves.map((contour) => {
-			let contourTuple: [number, number][] = [];
-
-			for (let i = 0; i < contour.length - 1; i += 2) {
-				contourTuple.push([contour[i], contour[i + 1]]);
-			}
-
-			return contourTuple;
-		});
-
-		contourLines.set({
-			curves: contourTuples,
-			hierarchy: hierarchy
-		});
-
-		cv.imshow('canvasOutput', result);
-
-		// set the output image to a store
-		perspectiveImage.set(outputCanvas.toDataURL());
 
 		result.delete();
 		mat.delete();
-
-		goto('/scan/preview');
 	}
 
 	onMount(() => {
@@ -80,7 +82,11 @@
 	});
 </script>
 
-<Page title="Image transformation" let:foregroundHeight let:foregroundWidth>
+<Modal title="transformation instructions" closeButtons="top" bind:visible={instructionVisible}>
+	<Instructions />
+</Modal>
+
+<Page let:foregroundHeight let:foregroundWidth>
 	<NavigationButton slot="headerButton" to="/scan/mapscanning" back>Rescan image</NavigationButton>
 
 	<div slot="background">
@@ -102,22 +108,27 @@
 
 	<canvas bind:this={outputCanvas} id="canvasOutput" />
 
-	<div slot="footer">
-		<Button secondary icon={mdiInformation}>
-			Drag each marker to the correct corner on the map
+	<svelte:fragment slot="footer">
+		<Button secondary small icon={mdiBookOpenVariant} on:click={toggleInstruction}>
+			Select markers | Instructions
 		</Button>
 
 		<Button on:click={() => gotoPreview(foregroundWidth, foregroundHeight)}>
-			<span>Preview transformation</span>
+			<span>Apply selection</span>
 			<Icon path={mdiChevronRight} />
 		</Button>
-	</div>
+	</svelte:fragment>
 </Page>
 
 <style>
 	.sketch {
 		height: 100%;
 		touch-action: none;
+		user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 
 	#backgroundImage {
@@ -125,5 +136,10 @@
 		width: 100%;
 		object-fit: cover;
 		touch-action: none;
+		user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 </style>

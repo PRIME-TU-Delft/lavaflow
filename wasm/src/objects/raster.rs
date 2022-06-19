@@ -83,6 +83,25 @@ impl Raster {
 		(f32::floor(y / self.row_height) as usize, f32::floor(x / self.column_width) as usize)
 	}
 
+	///##Instance Method
+	/// Get the highest occurring altitude in a raster
+	pub fn get_highest_altitude(&self) -> &f32 {
+		let mut max = &f32::MIN;
+		for row in &self.altitudes {
+			for height in row {
+				match height {
+					Some(x) => {
+						if x > max {
+							max = x;
+						}
+					}
+					None => (),
+				}
+			}
+		}
+		max
+	}
+
 	/// ## Instance Method
 	/// Normalise the dimensions of this mountain, while maintaining all altitude-information.
 	///
@@ -94,10 +113,10 @@ impl Raster {
 	/// After having performed all these operations, the volcano will fit exactly in a cube of 100.0 x 100.0 x 100.0.
 	///
 	/// This method changes the state of the raster and returns void.
-	pub fn normalise(&mut self) -> Result<()> {
+	pub fn normalise(&mut self, x: f32, y: f32, z: f32) -> Result<()> {
 		// Set the width and height to 100.0 by 100.0
-		self.row_height = 100.0 / (self.rows as f32);
-		self.column_width = 100.0 / (self.columns as f32);
+		self.row_height = y / (self.rows as f32);
+		self.column_width = x / (self.columns as f32);
 
 		// If this raster does not contain any information (aka self.altitudes is empty or not defined), throw an error
 		if self.altitudes.is_empty() || self.altitudes[0].is_empty() {
@@ -110,13 +129,13 @@ impl Raster {
 			self.altitudes[0][0].ok_or_else(|| miette!("Cannot normalise empty raster"))?,
 		);
 
-		for (row, _) in self.altitudes.iter().enumerate() {
-			for (col, _) in self.altitudes[row].iter().enumerate() {
-				if self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))? < min_max.0 {
-					min_max.0 = self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))?;
+		for row in &self.altitudes {
+			for point in row {
+				if point.ok_or_else(|| miette!("Cannot normalise empty raster"))? < min_max.0 {
+					min_max.0 = point.ok_or_else(|| miette!("Cannot normalise empty raster"))?;
 				}
-				if self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))? > min_max.1 {
-					min_max.1 = self.altitudes[row][col].ok_or_else(|| miette!("Cannot normalise empty raster"))?;
+				if point.ok_or_else(|| miette!("Cannot normalise empty raster"))? > min_max.1 {
+					min_max.1 = point.ok_or_else(|| miette!("Cannot normalise empty raster"))?;
 				}
 			}
 		}
@@ -129,7 +148,7 @@ impl Raster {
 			updated_altitudes.push(Vec::new());
 			for (col, _) in self.altitudes[row].iter().enumerate() {
 				updated_altitudes[row].push(None);
-				updated_altitudes[row][col] = Raster::map(self.altitudes[row][col], min_max.0, min_max.1, 0.0, 100.0);
+				updated_altitudes[row][col] = Raster::map(self.altitudes[row][col], min_max.0, min_max.1, 0.0, z);
 			}
 		}
 
@@ -141,7 +160,7 @@ impl Raster {
 
 	/// ## Private Static Method
 	/// Map an Option<f32> value to a new range, return None if the input is None.
-	fn map(val: Option<f32>, from_min: f32, from_max: f32, to_min: f32, to_max: f32) -> Option<f32> {
+	pub fn map(val: Option<f32>, from_min: f32, from_max: f32, to_min: f32, to_max: f32) -> Option<f32> {
 		// If this value is None, return None
 		if val.is_none() {
 			None
@@ -177,10 +196,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 0
@@ -194,10 +213,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 1 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 10
@@ -211,10 +230,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | 5 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 5 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 50
@@ -228,10 +247,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 11 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 110
@@ -245,10 +264,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | -1 |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** -10
@@ -262,10 +281,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | 0 |
-	/// | from_min  | -10 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | -10 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** 50
@@ -279,10 +298,10 @@ mod tests {
 	/// | Parameter | Value |
 	/// | --------- | ----- |
 	/// | val       | None |
-	/// | from_min  | 0 |
-	/// | from_max  | 10 |
-	/// | to_min    | 0 |
-	/// | to_max    | 100 |
+	/// | `from_min`  | 0 |
+	/// | `from_max`  | 10 |
+	/// | `to_min`    | 0 |
+	/// | `to_max`    | 100 |
 	///
 	/// ### Expected output
 	/// **Return:** None
@@ -305,7 +324,7 @@ mod tests {
 		raster.set(1, 1, 0.0);
 
 		// Perform normalisation
-		assert!(raster.normalise().is_ok());
+		assert!(raster.normalise(100., 100., 100.).is_ok());
 
 		// Assertions
 		assert_float_eq(Some(raster.row_height), Some(50.0));

@@ -9,6 +9,7 @@ use miette::Result;
 use serde::{Deserialize, Serialize};
 
 // Internal imports
+use crate::api_helper_fns::map;
 use crate::gltf_conversion::generate_gltf;
 use crate::model_construction::constructor::ModelConstructor;
 use crate::model_construction::smoother::Smoother;
@@ -34,7 +35,7 @@ pub struct OpenCVTree {
 #[wasm_bindgen]
 impl OpenCVTree {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<OpenCVTree, JsValue> {
+	pub fn new(val: &JsValue) -> Result<OpenCVTree, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
 	}
 
@@ -50,13 +51,15 @@ impl OpenCVTree {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ModelConstructionResult {
 	gltf: String,
+	lava_gltf: String,
 	lava_paths: Vec<Vec<(f32, f32, f32)>>,
+	craters: Vec<(f32, f32)>,
 }
 
 #[wasm_bindgen]
 impl ModelConstructionResult {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<ModelConstructionResult, JsValue> {
+	pub fn new(val: &JsValue) -> Result<ModelConstructionResult, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid ModelConstructionResult"))
 	}
 
@@ -84,7 +87,7 @@ pub struct AltitudeGradientPair {
 #[wasm_bindgen]
 impl AltitudeGradientPair {
 	#[wasm_bindgen(constructor)]
-	pub fn new(val: JsValue) -> Result<AltitudeGradientPair, JsValue> {
+	pub fn new(val: &JsValue) -> Result<AltitudeGradientPair, JsValue> {
 		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid AltitudeGradientPair"))
 	}
 
@@ -94,6 +97,23 @@ impl AltitudeGradientPair {
 
 	pub fn to_js(&self) -> Result<JsValue, JsValue> {
 		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize AltitudeGradientPair"))
+	}
+}
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LavaPathTurbineInput {
+	lava_paths: Vec<Vec<(f32, f32, f32)>>,
+	turbines: Vec<(f32, f32)>,
+	max_lava_distance: f32,
+	max_points_total: usize,
+}
+
+#[wasm_bindgen]
+impl LavaPathTurbineInput {
+	#[wasm_bindgen(constructor)]
+	pub fn new(val: &JsValue) -> Result<LavaPathTurbineInput, JsValue> {
+		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid LavaPathTurbineInput"))
 	}
 }
 
@@ -140,13 +160,14 @@ impl ModelConstructionApi {
 	/// If the user of the API wants, the parameters for the algorithm can be changed by calling other methods afterwards.
 	#[wasm_bindgen(constructor)]
 	pub fn new() -> Self {
+		crate::utils::set_panic_hook();
 		// The presented values below are the default values for the different parameters
 		Self {
 			rows: 10,
 			columns: 10,
 			width: 100.0,
 			height: 100.0,
-			altitude_step: 10.0,
+			altitude_step: 25.0,
 			curve_point_separation: 10.0,
 			svc_distance: 10.0,
 			catmull_clark_iterations: 0,
@@ -235,6 +256,8 @@ impl ModelConstructionApi {
 		// determine heights
 		model_constructor.construct().map_err(|e| e.to_string())?;
 
+		//log!("construction complete");
+
 		// Construct smoother instance
 		let mut smoother = Smoother::new(&mut model_constructor).map_err(|e| e.to_string())?;
 
@@ -242,9 +265,14 @@ impl ModelConstructionApi {
 		for operation in &self.smoothing_operations_queue {
 			operation.apply(&mut smoother).map_err(|e| e.to_string())?;
 		}
+		//log!("smoothing complete");
+		//get max alt before normalization, to be used later
+		let max_altitude = *smoother.raster.get_highest_altitude();
 
 		// Apply raster normalisation, so it will be contained within a 100x100x100 pixel box
-		smoother.raster.normalise().map_err(|e| e.to_string())?;
+		let num_layers = level_curve_set.get_level_curves().len() as f32;
+		let max_height_after_normalisation = f32::min(self.altitude_step * num_layers, 100.0);
+		smoother.raster.normalise(100.0, 100.0, max_height_after_normalisation).map_err(|e| e.to_string())?;
 
 		//
 		// All smoothing operations have been applied, thereofore the final raster has been computed.
@@ -253,33 +281,23 @@ impl ModelConstructionApi {
 		self.computed_model_raster = Some(smoother.raster.clone());
 
 		//apply surface subdivision
-		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, &model_constructor.is_svc, model_constructor.raster, false)?;
+		let (vs, fs, edge_map) = crate::surface_subdivision::catmull_clark::catmull_clark_super(self.catmull_clark_iterations, smoother.raster)?;
 
-		//for lava path generation : find point index of the highest point in the model
+		//STEP: find lava path from the highest point of the model
 
-		let mut top_height = f32::MIN;
-		for curve in &level_curve_set.level_curves {
-			if curve.altitude > top_height {
-				top_height = curve.altitude;
-			}
-		}
-		//top_height -= level_curve_map.altitude_step;
+		//min alt determines at which alitude a lava path stops : currently halfway between surface and 1st curve
+		let min_altitude = map(level_curve_set.altitude_step, 0.0, max_altitude, 0.0, 100.0) / 2.0;
 
-		//for lava path generation : get list of indexes of points above or on highest level curve
-		let mut highest_points = Vec::new();
-		for (i, v) in vs.iter().enumerate() {
-			if v.z >= top_height {
-				highest_points.push(i);
-			}
-		}
-
-		//find lava path from the highest point of the model
-		//min alt determines at which alitude a lava path stops
-		let min_altitude = level_curve_set.altitude_step / 2.0;
 		//fork factor should be between 0.5 and 0. (0.1 reccommended), 0 = no forking
-		// 0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
-		let computed_lava_paths: Vec<Vec<&Point>> = Vec::new();
-		// crate::lava_path_finder::lava_path::get_lava_paths_super(&highest_points, self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+		//0.1 is nice for thic path, 0.02 for thin, 0.0 for one path
+		let (computed_lava_paths, lava_start_points): (Vec<Vec<&Point>>, Vec<&Point>) =
+			crate::lava_path_finder::lava_path::get_lava_paths_super(self.lava_path_length, self.lava_path_fork_val, min_altitude, &vs, &edge_map)?;
+
+		// Extract the crater by selecting the start points in the lava-paths
+		let mut lava_craters: Vec<(f32, f32)> = Vec::new();
+		for p in &lava_start_points {
+			lava_craters.push((p.x, p.y));
+		}
 
 		// Transform these lava-paths to an array that can be returned towards JavaScript
 		let mut lava_path_triples: Vec<Vec<(f32, f32, f32)>> = Vec::new();
@@ -292,8 +310,37 @@ impl ModelConstructionApi {
 			}
 		}
 
+		//
+		// Lava paths: for each vertex in 'vs', compute its distance to the closest lava path
+		//
+
+		let mut vs_lava_distance: Vec<f32> = Vec::new();
+		for v in &vs {
+			// For this vertex, compute the distance to the closest lava path
+			let mut vertex_dist = f32::MAX;
+			for lava_path in &lava_path_triples {
+				for (lpx, lpy, lpz) in lava_path {
+					let dx = v.x - lpx;
+					let dy = v.y - lpy;
+					let dz = v.z - lpz;
+					let dist_sqr = dx * dx + dy * dy + dz * dz;
+					if dist_sqr < vertex_dist {
+						vertex_dist = dist_sqr;
+					}
+				}
+			}
+
+			// Register this distance in the vector
+			vs_lava_distance.push(vertex_dist);
+		}
+
+		// Lava color : rgb(227, 59, 53)
+		let color_lava_flow = (map(227.0, 0.0, 255.0, 0.0, 1.0), map(59.0, 0.0, 255.0, 0.0, 1.0), map(53.0, 0.0, 255.0, 0.0, 1.0));
+		let color_crater_center = (map(242.0, 0.0, 255.0, 0.0, 1.0), map(231.0, 0.0, 255.0, 0.0, 1.0), map(73.0, 0.0, 255.0, 0.0, 1.0));
+
 		//Turn faces of model into triangles
 		let mut final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
+		let mut lava_path_final_points: Vec<([f32; 3], [f32; 3])> = Vec::new();
 		for f in fs {
 			if f.points.len() != 4 {
 				return Err(JsValue::from("surface subdivision returns face with incorrect amount of points"));
@@ -307,10 +354,14 @@ impl ModelConstructionApi {
 			//rgb green = 0, 153, 51
 			//rgb orange = 255, 153, 51
 
-			let tri00 = ([p0.x, p0.z, p0.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri10 = ([p3.x, p3.z, p3.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri01 = ([p1.x, p1.z, p1.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
-			let tri11 = ([p2.x, p2.z, p2.y], [0.0 / 255.0, 153.0 / 255.0, 51.0 / 255.0]);
+			//
+			// Add these points to the final_points gltf, together creating the gltf for the mountain itself
+			//
+
+			let tri00 = ([p0.x, p0.z, p0.y], self.color_for_altitude((0.0, 100.0), p0.z, p0, &lava_craters, color_crater_center, color_lava_flow));
+			let tri10 = ([p3.x, p3.z, p3.y], self.color_for_altitude((0.0, 100.0), p3.z, p3, &lava_craters, color_crater_center, color_lava_flow));
+			let tri01 = ([p1.x, p1.z, p1.y], self.color_for_altitude((0.0, 100.0), p1.z, p1, &lava_craters, color_crater_center, color_lava_flow));
+			let tri11 = ([p2.x, p2.z, p2.y], self.color_for_altitude((0.0, 100.0), p2.z, p2, &lava_craters, color_crater_center, color_lava_flow));
 
 			// Add the first triangle
 			final_points.push(tri00);
@@ -325,12 +376,49 @@ impl ModelConstructionApi {
 			final_points.push(tri11);
 
 			final_points.push(tri10);
+
+			//
+			// Use these points to also generate a separate gltf for the lava paths
+			//
+
+			// If any of the four points fall within the distance threshold, we'll have to add both triangles to the gltf.
+			// This is to prevent that we end up with 'parts of triangles'.
+			let dist_sqr_thrhld: f32 = 6.0;
+			if vs_lava_distance[f.points[0]] <= dist_sqr_thrhld
+				|| vs_lava_distance[f.points[1]] <= dist_sqr_thrhld
+				|| vs_lava_distance[f.points[2]] <= dist_sqr_thrhld
+				|| vs_lava_distance[f.points[3]] <= dist_sqr_thrhld
+			{
+				// Compute the (slightly higher) altitude, increasing as the distance to the lava gets smaller
+				let p0_alt = p0.z + map(vs_lava_distance[f.points[0]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
+				let p1_alt = p1.z + map(vs_lava_distance[f.points[1]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
+				let p2_alt = p2.z + map(vs_lava_distance[f.points[2]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
+				let p3_alt = p3.z + map(vs_lava_distance[f.points[3]], 0.0, dist_sqr_thrhld, 2.0, -1.0).clamp(-1.0, 2.0);
+
+				// Create the four points for the triangles, including the color
+				let tri00 = ([p0.x, p0_alt, p0.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+				let tri10 = ([p3.x, p3_alt, p3.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+				let tri01 = ([p1.x, p1_alt, p1.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+				let tri11 = ([p2.x, p2_alt, p2.y], [color_lava_flow.0, color_lava_flow.1, color_lava_flow.2]);
+
+				// Add the first triangle
+				lava_path_final_points.push(tri00);
+				lava_path_final_points.push(tri01);
+				lava_path_final_points.push(tri11);
+
+				// Add the second triangle
+				lava_path_final_points.push(tri00);
+				lava_path_final_points.push(tri11);
+				lava_path_final_points.push(tri10);
+			}
 		}
 
 		// Return the result in the form of a ModelConstructionResult
 		Ok(ModelConstructionResult {
-			gltf: generate_gltf(final_points).map_err(|e| e.to_string())?,
+			gltf: generate_gltf(&final_points).map_err(|e| e.to_string())?,
+			lava_gltf: generate_gltf(&lava_path_final_points).map_err(|e| e.to_string())?,
 			lava_paths: lava_path_triples,
+			craters: lava_craters,
 		})
 	}
 
@@ -374,6 +462,9 @@ impl ModelConstructionApi {
 	///
 	///	The normal vector of this plane can now be computed with a cross-product a x b
 	pub fn get_altitude_and_gradient_for_point(&self, x: f32, y: f32) -> Result<AltitudeGradientPair, JsValue> {
+		let dx: isize = 1;
+		let dy: isize = 1;
+
 		// Prebase: convert (x, y) to a Point instance, with z=0
 		let query_point = Point { x, y, z: 0.0 };
 
@@ -383,21 +474,70 @@ impl ModelConstructionApi {
 			.as_ref()
 			.ok_or_else(|| JsValue::from("Cannot compute altitude and gradient before rendering the model"))?;
 
+		// Compute the row/column pair that corresponds to this point
+		let row_col_pair = raster.get_row_col(x, y);
+		let row = row_col_pair.0 as isize;
+		let col = row_col_pair.1 as isize;
+
+		// Collect the altitude/gradient computations for every neighbour
+		let mut neighbour_results: Vec<AltitudeGradientPair> = Vec::new();
+
+		for i in -dx..dx {
+			for j in -dy..dy {
+				neighbour_results.push(self.get_altitude_and_gradient_for_point_helper(col + i, row + j, &query_point)?);
+			}
+		}
+
+		// Compute the average of all attributes
+		let mut altitude: f32 = 0.0;
+		let mut gradient: (f32, f32, f32) = (0.0, 0.0, 0.0);
+
+		for n in &neighbour_results {
+			altitude += n.altitude;
+			gradient.0 += n.gradient.0;
+			gradient.1 += n.gradient.1;
+			gradient.2 += n.gradient.2;
+		}
+
+		altitude /= neighbour_results.len() as f32;
+		gradient.0 /= neighbour_results.len() as f32;
+		gradient.1 /= neighbour_results.len() as f32;
+		gradient.2 /= neighbour_results.len() as f32;
+
+		// Return the obtained result
+		Ok(AltitudeGradientPair { x, y, altitude, gradient })
+	}
+	fn get_altitude_and_gradient_for_point_helper(&self, col: isize, row: isize, query_point: &Point) -> Result<AltitudeGradientPair, JsValue> {
+		// 1. If the model has not yet been computed, return an error
+		let raster = self
+			.computed_model_raster
+			.as_ref()
+			.ok_or_else(|| JsValue::from("Cannot compute altitude and gradient before rendering the model"))?;
+
+		// Check: if x or y fall outside of the raster, return all zeroes
+		if col < 0 || row < 0 || col > (raster.columns as isize) || row > (raster.rows as isize) {
+			return Ok(AltitudeGradientPair {
+				x: 0.0,
+				y: 0.0,
+				altitude: 0.0,
+				gradient: (0.0, 0.0, 0.0),
+			});
+		}
+
 		// 2. Determine in which raster-rectangle this point lies
-		let (a_row, a_col) = raster.get_row_col(x, y);
+		let (a_row, a_col) = (row as usize, col as usize);
 		let (b_row, b_col) = (a_row, a_col + 1);
 		let (c_row, c_col) = (a_row + 1, a_col);
 		let (d_row, d_col) = (a_row + 1, a_col + 1);
 
 		// Transform these indices to points
-		let a_point = raster.get_point(a_row, a_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
-		let b_point = raster.get_point(b_row, b_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
-		let c_point = raster.get_point(c_row, c_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
-		let d_point = raster.get_point(d_row, d_col).map_err(|e| JsValue::from("Cannot get point at index in raster"))?;
+		let a_point = raster.get_point(a_row, a_col).map_err(|e| e.to_string())?;
+		let b_point = raster.get_point(b_row, b_col).map_err(|e| e.to_string())?;
+		let c_point = raster.get_point(c_row, c_col).map_err(|e| e.to_string())?;
+		let d_point = raster.get_point(d_row, d_col).map_err(|e| e.to_string())?;
 
-		// Construct the two triangles ABC and DCB
+		// Construct the triangle ABC
 		let abc_triangle = Triangle::new(&a_point, &b_point, &c_point);
-		let dcb_triangle = Triangle::new(&d_point, &c_point, &b_point);
 
 		// 3. Determine in which triangle of this rectangle this point lies
 		// 4. Compute vectors a and b, as described above the signature of this function
@@ -411,7 +551,7 @@ impl ModelConstructionApi {
 		let v2: &Point;
 
 		// Determine which triangle contains the query point and set a and b according to the RustDoc above this function
-		if abc_triangle.contains_point(&query_point) {
+		if abc_triangle.contains_point(query_point) {
 			a_vector = Vector::from_point_to_point(&a_point, &c_point);
 			b_vector = Vector::from_point_to_point(&a_point, &b_point);
 
@@ -449,11 +589,27 @@ impl ModelConstructionApi {
 		let altitude = (v0.z * factor_a + v1.z * factor_b + v2.z * factor_b) / (factor_a + factor_b + factor_c);
 
 		Ok(AltitudeGradientPair {
-			x,
-			y,
+			x: 0.0,
+			y: 0.0,
 			altitude,
 			gradient: (rotation_angle_x, rotation_angle_y, rotation_angle_z),
 		})
+	}
+
+	/// Compute the points that the player obtained
+	///
+	///
+	pub fn compute_player_points(&self, input: LavaPathTurbineInput) -> usize {
+		let max_points_per_turbine: usize = input.max_points_total / input.turbines.len();
+		let mut result: usize = 1;
+
+		// 1. Loop over all the steam-turbines and determine the number of points per steam-turbine
+		for turbine in input.turbines {
+			// 2. Determine the number of points for this specific turbine and sum the points
+			result += ModelConstructionApi::points_for_turbine(turbine, &input.lava_paths, input.max_lava_distance, max_points_per_turbine);
+		}
+
+		result
 	}
 
 	//
@@ -479,7 +635,8 @@ impl Default for ModelConstructionApi {
 
 use smoothing_operation_derive::SmoothingOperation;
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToLayer {
 	pub layer: usize,
 	pub strength: f32,
@@ -488,14 +645,16 @@ pub struct SmoothingOperationApplySmoothToLayer {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationSetAltitudeForLayer {
 	pub layer: usize,
 	pub altitude: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToAltitudeGroup {
 	pub altitude_group: usize,
 	pub strength: f32,
@@ -504,14 +663,16 @@ pub struct SmoothingOperationApplySmoothToAltitudeGroup {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationIncreaseAltitudeForAltitudeGroup {
 	pub altitude_group: usize,
 	pub percentage_of_altitude_step: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToMiddleLayers {
 	pub strength: f32,
 	pub coverage: usize,
@@ -519,7 +680,8 @@ pub struct SmoothingOperationApplySmoothToMiddleLayers {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToMountainTops {
 	pub strength: f32,
 	pub coverage: usize,
@@ -527,13 +689,15 @@ pub struct SmoothingOperationApplySmoothToMountainTops {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationIncreaseAltitudeForMountainTops {
 	pub percentage_of_altitude_step: f32,
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationApplySmoothToAll {
 	pub strength: f32,
 	pub coverage: usize,
@@ -541,5 +705,6 @@ pub struct SmoothingOperationApplySmoothToAll {
 	pub allow_svc_change: bool,
 }
 
-#[derive(SmoothingOperation)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Debug, SmoothingOperation)]
 pub struct SmoothingOperationCorrectForAltitudeConstraintsToAllLayers {}

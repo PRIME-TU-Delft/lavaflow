@@ -5,7 +5,9 @@
 	export let loading = false;
 	export let disabled = false;
 	export let large = false;
+	export let small = false;
 	export let secondary = false;
+	export let green = false;
 	export let icon: string = '';
 </script>
 
@@ -13,7 +15,9 @@
 	disabled={disabled || loading}
 	class:disabled={disabled || loading}
 	class:large
+	class:small
 	class:secondary
+	class:green
 	on:click
 >
 	{#if loading}
@@ -28,12 +32,6 @@
 			{/if}
 			<slot />
 		</div>
-
-		{#if $$slots.content}
-			<div class="content">
-				<slot name="content" />
-			</div>
-		{/if}
 	{/if}
 </button>
 
@@ -44,16 +42,24 @@
 		width: 100%;
 		padding: 0.75rem 1.1rem;
 
+		font-family: 'Roboto Slab';
+		font-weight: 700;
 		font-size: 1rem;
 		text-align: left;
 		border: none;
-		margin-block: 0.5rem;
+		margin: var(--margin, 0 0 0 0);
 		border-radius: 0.3rem;
 		cursor: pointer;
+		white-space: nowrap;
+		user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
 	}
 
 	button.disabled {
-		background: grey;
+		background: grey !important;
 	}
 
 	.title {
@@ -63,18 +69,22 @@
 		gap: 0.25rem;
 	}
 
-	.content {
-		margin-top: 0.25rem;
-		font-size: 0.9rem;
-	}
-
 	.large {
 		padding: 1rem 1.5rem;
+	}
+
+	.small {
+		padding: 0.5rem 1.5rem;
 	}
 
 	.secondary {
 		background: var(--secondary-color);
 		color: var(--text-color-secondary);
+	}
+
+	.green {
+		background: #308167;
+		color: #fff;
 	}
 
 	:global(button > .title > span) {

@@ -46,11 +46,6 @@ pub struct Vector {
 }
 
 impl Vector {
-	/// Constructor
-	pub fn new(x: f32, y: f32, z: f32) -> Self {
-		Self { x, y, z }
-	}
-
 	/// Static Method: Vector from point A to point B
 	pub fn from_point_to_point(a: &Point, b: &Point) -> Self {
 		Self {
@@ -60,11 +55,6 @@ impl Vector {
 		}
 	}
 
-	/// Static Method: Vector from point A to point B, disgarding z-axis
-	pub fn from_point_to_point_flat(a: &Point, b: &Point) -> Self {
-		Self { x: b.x - a.x, y: b.y - a.y, z: 0.0 }
-	}
-
 	/// Static Method: Cross product of vectors a and b: a x b
 	pub fn cross_product(a: &Vector, b: &Vector) -> Self {
 		Self {
@@ -72,17 +62,6 @@ impl Vector {
 			y: a.z * b.x - a.x * b.z,
 			z: a.x * b.y - a.y * b.x,
 		}
-	}
-
-	// Static Method: Compute the dot product between two vectors
-	pub fn dot(a: &Vector, b: &Vector) -> f32 {
-		a.x * b.x + a.y * b.y + a.z * b.z
-	}
-
-	/// Static Method: Compute the angle between two vectors
-	pub fn angle(a: &Vector, b: &Vector) -> f32 {
-		let cos_angle = Vector::dot(a, b) / (a.len() * b.len());
-		f32::acos(cos_angle)
 	}
 
 	/// Instance Method: length

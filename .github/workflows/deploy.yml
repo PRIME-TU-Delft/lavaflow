@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - main
+      - dev
   workflow_dispatch:
 
 
@@ -21,6 +22,8 @@ jobs:
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v1
+        with:
+          working-directory: wasm
 
       - name: Install node.js
         uses: actions/setup-node@v3
@@ -41,7 +44,9 @@ jobs:
 
       - name: Build (Svelte)
         working-directory: svelte-app
-        run: yarn build
+        run: |
+          echo -e "${{ github.sha }}\n$(date)" > static/version.txt && \
+          yarn build
 
       - name: Deploy to GitHub pages
         uses: peaceiris/actions-gh-pages@v3

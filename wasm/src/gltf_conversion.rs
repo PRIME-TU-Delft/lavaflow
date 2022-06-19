@@ -56,7 +56,7 @@ fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
 	new_vec
 }
 
-pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<String> {
+pub fn generate_gltf(triangle_vertices: &[([f32; 3], [f32; 3])]) -> Result<String> {
 	let triangle_vertices: Vec<Vertex> = triangle_vertices.iter().map(|v| Vertex { position: v.0, color: v.1 }).collect();
 	let triangle_vertices_len = triangle_vertices.len();
 
@@ -113,6 +113,9 @@ pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<Str
 		sparse: None,
 	};
 
+	let mut material = json::Material::default();
+	material.pbr_metallic_roughness.metallic_factor.0 = 0.3;
+
 	let primitive = json::mesh::Primitive {
 		attributes: {
 			let mut map = std::collections::HashMap::new();
@@ -123,7 +126,7 @@ pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<Str
 		extensions: Default::default(),
 		extras: Default::default(),
 		indices: None,
-		material: None,
+		material: Some(json::Index::new(0)),
 		mode: Valid(json::mesh::Mode::Triangles),
 		targets: None,
 	};
@@ -163,6 +166,7 @@ pub fn generate_gltf(triangle_vertices: Vec<([f32; 3], [f32; 3])>) -> Result<Str
 			name: None,
 			nodes: vec![json::Index::new(0)],
 		}],
+		materials: vec![material],
 		..Default::default()
 	};
 

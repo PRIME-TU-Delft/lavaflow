@@ -1,17 +1,13 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { mdiChevronLeft, mdiClose } from '@mdi/js';
+	import { mdiChevronLeft } from '@mdi/js';
 
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
-	export let title = '';
-	export let closeButton = false;
+	export let fullscreen = false;
 
 	let foregroundWidth: number;
 	let foregroundHeight: number;
-
-	const dispatch = createEventDispatcher();
 </script>
 
 <div class="page">
@@ -23,24 +19,16 @@
 	<div class="foreground" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 		<header>
 			<slot name="headerButton">
-				{#if closeButton}
-					<Button on:click={() => dispatch('close')}>
-						<Icon path={mdiClose} color="var(--text-color)" />
-						Close
-					</Button>
-				{:else}
-					<Button on:click={() => history.back()}>
-						<Icon path={mdiChevronLeft} color="var(--text-color)" />
-						Back
-					</Button>
-				{/if}
+				<Button on:click={() => history.back()}>
+					<Icon path={mdiChevronLeft} color="var(--text-color)" />
+					Back
+				</Button>
 			</slot>
-			<div class="title">
-				{title}
-			</div>
+
+			<slot name="options" />
 		</header>
 
-		<main><slot {foregroundWidth} {foregroundHeight} /></main>
+		<main class:fullscreen><slot {foregroundWidth} {foregroundHeight} /></main>
 
 		<footer>
 			<slot name="footer" />
@@ -57,6 +45,12 @@
 		display: grid;
 		align-items: center;
 		justify-items: center;
+		user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
+		touch-action: none;
 	}
 
 	.background,
@@ -70,8 +64,7 @@
 		z-index: -1;
 	}
 	.backdrop {
-		backdrop-filter: blur(4rem);
-		-webkit-backdrop-filter: blur(4rem);
+		background: rgba(255, 255, 255, 0.5);
 		z-index: 1;
 	}
 
@@ -96,29 +89,14 @@
 		width: calc(100% - 1rem);
 		top: -2rem;
 		left: 0.5rem;
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
 		z-index: 10;
 	}
 
 	:global(.page header button) {
-		width: initial;
-	}
-
-	.title {
-		background: var(--secondary-color);
-		color: white;
-		width: 100%;
-		max-width: 20rem;
-		padding: 0.75rem 1.1rem;
-
-		font-size: 1rem;
-		text-align: left;
-		border: none;
-		margin-block: 0.5rem;
-		border-radius: 0.3rem;
-		cursor: pointer;
+		width: 15rem;
 	}
 
 	main {
@@ -130,6 +108,15 @@
 		align-items: center;
 	}
 
+	.fullscreen {
+		display: block;
+		user-select: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-o-user-select: none;
+	}
+
 	footer {
 		position: absolute;
 		width: calc(100% - 1rem);
@@ -138,5 +125,16 @@
 		left: 50%;
 		transform: translateX(-50%);
 		bottom: -1.5rem;
+		display: flex;
+		gap: 0.5rem;
+		flex-direction: column;
+	}
+
+	/* if backdrop support: very transparent and blurred */
+	@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+		.backdrop {
+			-webkit-backdrop-filter: blur(2em);
+			backdrop-filter: blur(2em);
+		}
 	}
 </style>

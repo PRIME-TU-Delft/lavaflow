@@ -23,12 +23,20 @@
 		p5.setup = () => {
 			p5.createCanvas(foregroundWidth, foregroundHeight);
 
-			const size = 100; // size of draggble surface
+			const size = 100; // size of draggble surface'
+
+			points = []; // make sure the array is empty to make sure it does not add more than 4 points
 
 			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // []
 			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // ><
 			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.8, size)); // /\
 			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // ()
+
+			// Display an instruction at the rectangle
+			points[0].setInstruction("Drag me to the rectangle\non the paper.", 190, 40);
+			points[1].setInstruction("Drag me to the cross\non the paper.", 190, 40);
+			points[2].setInstruction("Drag me to the triangle\non the paper.", 190, 40);
+			points[3].setInstruction("Drag me to the circle\non the paper.", 190, 40, true);
 		};
 
 		/**
@@ -37,7 +45,8 @@
 		 * @param p2 - point2 with x and y coordinates and width and height
 		 */
 		function drawLine(p1: Draggable, p2: Draggable) {
-			p5.line(p1.x + p1.size / 2, p1.y + p1.size / 2, p2.x + p2.size / 2, p2.y + p2.size / 2);
+			p5.strokeWeight(10);
+			p5.line(p1.x, p1.y, p2.x, p2.y);
 		}
 
 		p5.draw = () => {

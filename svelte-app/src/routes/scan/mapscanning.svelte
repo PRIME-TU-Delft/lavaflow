@@ -4,22 +4,26 @@
 
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
+	import NavigationButton from '$lib/components/NavigationButton.svelte';
+	import Dropdown from '$lib/components/input/Dropdown.svelte';
 	import Instructions from '$lib/components/Instructions.svelte';
 	import Page from '$lib/components/Page.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import VideoStream from '$lib/components/VideoStream.svelte';
 	import Video from '$lib/components/Video.svelte';
 
-	import { mdiCamera, mdiBookOpenVariant } from '@mdi/js';
+	import { mdiCamera, mdiHelpCircle } from '@mdi/js';
 	import { goto } from '$app/navigation';
 	import { rawImage } from '$lib/stores/imageStore';
 
-	let instructionVisible = false;
+	let instructionVisible: boolean;
 	let videoSource: HTMLVideoElement;
+	let cameraSelected: MediaDeviceInfo;
 	let canvas: HTMLCanvasElement;
 	let loadingNextPage: boolean = false;
-	$: title = instructionVisible ? 'Instructions' : 'Map Scanning';
+	let deviceId: string;
 
-	const toggleInstuction = () => (instructionVisible = !instructionVisible);
+	const toggleInstruction = () => (instructionVisible = !instructionVisible);
 
 	/**
 	 * Goto scan/maptransform
@@ -41,30 +45,50 @@
 
 		goto('/scan/maptransform');
 	}
+
+	function updateCamera() {
+		deviceId = cameraSelected.deviceId;
+	}
 </script>
 
-<VideoStream let:loading let:stream let:error>
-	<Page {title} closeButton={instructionVisible} on:close={toggleInstuction}>
+<Modal title="scan instructions" bind:visible={instructionVisible}>
+	<Instructions />
+</Modal>
+
+<VideoStream {deviceId} let:loading let:stream let:error let:cameraOptions>
+	<Page fullscreen={!loading}>
+		<NavigationButton slot="headerButton" back to="/">Back home</NavigationButton>
+
 		<div slot="background">
 			<Video {loading} {stream} />
 		</div>
 
-		{#if instructionVisible}
-			<Instructions />
-		{:else}
-			<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream} />
-		{/if}
-
-		<div slot="footer">
-			{#if !instructionVisible}
-				<Button secondary icon={mdiBookOpenVariant} on:click={toggleInstuction}>
-					Read scan instructions
-				</Button>
-				<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>
-					Capture photo of map
-				</Button>
+		<div slot="options">
+			{#if !instructionVisible && cameraOptions?.length > 1}
+				<Dropdown
+					bind:value={cameraSelected}
+					options={cameraOptions}
+					let:option
+					let:index
+					on:change={updateCamera}
+				>
+					{option.label || 'Camera ' + (index + 1)}
+				</Dropdown>
 			{/if}
 		</div>
+
+		<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream} />
+
+		<svelte:fragment slot="footer">
+			{#if !instructionVisible}
+				<Button secondary icon={mdiHelpCircle} on:click={toggleInstruction}>
+					Image capture | Instructions
+				</Button>
+			{/if}
+			<Button loading={loadingNextPage} icon={mdiCamera} on:click={gotoTransform}>
+				Capture photo of map
+			</Button>
+		</svelte:fragment>
 	</Page>
 </VideoStream>
 
