@@ -86,7 +86,7 @@
 			{#if $targetLocations.length > 0}
 				{#if lava_revealed}
 					<Button secondary on:click={hideLava}>Hide lava</Button>
-					<Button green>Points: {obtained_points} / {max_points}</Button>
+					<Button green>Energy: {obtained_points} / {max_points} megawatts</Button>
 				{:else}
 					<Button on:click={revealLava}><span>Reveal lava</span> <Icon path={mdiLavaLamp} /></Button
 					>
