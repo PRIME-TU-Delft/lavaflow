@@ -1,4 +1,4 @@
-# LavaFlow
+# AR LavaFlow
 
 ## Repository structure
 The production-ready part of this project is split into two folders: `wasm` and `svelte-app`. The `wasm` folder contains the model generation and smoothing code, which was written in Rust for performance reasons. `svelte-app` is our frontend, which contains the image processing, and the Augmented Reality visualization of the generated model.
