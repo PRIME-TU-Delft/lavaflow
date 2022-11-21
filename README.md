@@ -31,3 +31,13 @@ watchexec -cr -w wasm/src/ -- "wasm-pack -v build ../wasm --target web && yarn d
 This repository is currently being mirrored to GitHub, where a pipeline is run to deploy it to GitHub pages. But if this changes in the future, you can run follow the instructions for setting up a development server, but run `yarn build` instead of `yarn dev`.
 
 This will build a static website in `svelte-app/build/`, which can be deloyed on a webserver of choice. Though keep in mind that GitHub pages requires some further magic, such as adding a `.nojekyll` file to make sure folders starting with an underscore are served normally.
+
+---
+
+AR LavaFlow (c) by PRIME, TU Delft
+
+AR LavaFlow is licensed under a
+Creative Commons Attribution 4.0 International License.
+
+You should have received a copy of the license along with this
+work. If not, see <http://creativecommons.org/licenses/by/4.0/>.
