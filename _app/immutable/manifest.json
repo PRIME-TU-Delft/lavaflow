@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "start-1ded9a77.js",
+    "file": "start-59bcecf3.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -102,7 +102,7 @@
     ]
   },
   "src/routes/scan/preview.svelte": {
-    "file": "pages/scan/preview.svelte-d450c8ac.js",
+    "file": "pages/scan/preview.svelte-a7c44c16.js",
     "src": "src/routes/scan/preview.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -113,20 +113,20 @@
       "_Page-c4546c49.js",
       "_navigation-0e6511d1.js",
       "_contourLineStore-67ef1863.js",
-      "_gltfStore-d6d1bd39.js",
+      "_gltfStore-37f62d63.js",
       "_difficultyStore-0791473c.js",
       "_debugStore-b63444ef.js",
       "_preload-helper-60cab3ee.js",
       "_singletons-d1fb5791.js",
       "_index-ca69d11e.js",
-      "_@vite-plugin-wasm-pack@wasm-9c455baf.js"
+      "_@vite-plugin-wasm-pack@wasm-4cb284bc.js"
     ],
     "css": [
       "assets/pages/scan/preview.svelte-f802f904.css"
     ]
   },
   "src/routes/targetplacement/[slug].svelte": {
-    "file": "pages/targetplacement/_slug_.svelte-05d16344.js",
+    "file": "pages/targetplacement/_slug_.svelte-f616d588.js",
     "src": "src/routes/targetplacement/[slug].svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -136,7 +136,7 @@
       "_P5-bd5cfe29.js",
       "_contourLineStore-67ef1863.js",
       "_difficultyStore-0791473c.js",
-      "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
+      "_@vite-plugin-wasm-pack@wasm-4cb284bc.js",
       "_Page-c4546c49.js",
       "_Modal-15ebe271.js",
       "_preload-helper-60cab3ee.js",
@@ -147,21 +147,21 @@
     ]
   },
   "src/routes/visualise/ar.svelte": {
-    "file": "pages/visualise/ar.svelte-e964e931.js",
+    "file": "pages/visualise/ar.svelte-1f48fee5.js",
     "src": "src/routes/visualise/ar.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-e50d45aa.js",
       "_NavigationButton-d591ec72.js",
-      "_aframe-master-6de47161.js",
+      "_aframe-master-c404f54c.js",
       "__commonjsHelpers-56d41998.js",
-      "_gltfStore-d6d1bd39.js",
+      "_gltfStore-37f62d63.js",
       "_index-ca69d11e.js",
       "_contourLineStore-67ef1863.js",
       "_difficultyStore-0791473c.js",
       "_debugStore-b63444ef.js",
-      "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
+      "_@vite-plugin-wasm-pack@wasm-4cb284bc.js",
       "_navigation-0e6511d1.js",
       "_singletons-d1fb5791.js"
     ],
@@ -170,21 +170,21 @@
     ]
   },
   "src/routes/visualise/model.svelte": {
-    "file": "pages/visualise/model.svelte-1db13038.js",
+    "file": "pages/visualise/model.svelte-96efdf9f.js",
     "src": "src/routes/visualise/model.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
     "imports": [
       "_index-e50d45aa.js",
-      "_aframe-master-6de47161.js",
+      "_aframe-master-c404f54c.js",
       "__commonjsHelpers-56d41998.js",
       "_NavigationButton-d591ec72.js",
-      "_gltfStore-d6d1bd39.js",
+      "_gltfStore-37f62d63.js",
       "_index-ca69d11e.js",
       "_contourLineStore-67ef1863.js",
       "_difficultyStore-0791473c.js",
       "_debugStore-b63444ef.js",
-      "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
+      "_@vite-plugin-wasm-pack@wasm-4cb284bc.js",
       "_navigation-0e6511d1.js",
       "_singletons-d1fb5791.js"
     ],
@@ -288,25 +288,25 @@
       "_p5.min-0883924f.js"
     ]
   },
-  "_gltfStore-d6d1bd39.js": {
-    "file": "chunks/gltfStore-d6d1bd39.js",
+  "_gltfStore-37f62d63.js": {
+    "file": "chunks/gltfStore-37f62d63.js",
     "imports": [
       "_index-ca69d11e.js",
       "_contourLineStore-67ef1863.js",
       "_difficultyStore-0791473c.js",
       "_debugStore-b63444ef.js",
-      "_@vite-plugin-wasm-pack@wasm-9c455baf.js",
+      "_@vite-plugin-wasm-pack@wasm-4cb284bc.js",
       "_index-e50d45aa.js"
     ]
   },
-  "_@vite-plugin-wasm-pack@wasm-9c455baf.js": {
-    "file": "chunks/@vite-plugin-wasm-pack@wasm-9c455baf.js"
+  "_@vite-plugin-wasm-pack@wasm-4cb284bc.js": {
+    "file": "chunks/@vite-plugin-wasm-pack@wasm-4cb284bc.js"
   },
-  "_aframe-master-6de47161.js": {
-    "file": "chunks/aframe-master-6de47161.js",
+  "_aframe-master-c404f54c.js": {
+    "file": "chunks/aframe-master-c404f54c.js",
     "imports": [
       "_index-e50d45aa.js",
-      "_gltfStore-d6d1bd39.js",
+      "_gltfStore-37f62d63.js",
       "_contourLineStore-67ef1863.js",
       "_NavigationButton-d591ec72.js",
       "_navigation-0e6511d1.js",
