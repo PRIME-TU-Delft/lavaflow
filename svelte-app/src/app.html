@@ -3,7 +3,27 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-		<meta name="viewport" content="width=device-width" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@200;400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+
 		%sveltekit.head%
 	</head>
 	<body>

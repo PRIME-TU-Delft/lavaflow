@@ -31,6 +31,8 @@
 	"type": "module",
 	"dependencies": {
 		"@mdi/js": "^7.0.96",
+		"konami.js": "^1.0.0",
+		"node-sass": "^8.0.0",
 		"opencv-ts": "^1.3.6",
 		"p5": "^1.5.0",
 		"svelte-sortable-list": "^1.1.0"
