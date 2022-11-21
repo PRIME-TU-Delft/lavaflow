@@ -56,15 +56,13 @@ export class SmoothParameters {
 	setValue(key: string, value: any) {
 		if (!(key in this)) return;
 
-		// @ts-ignore
-		this[key] = value;
+		this[key] = value; // @eslint-disable-line
 	}
 
 	getValue(key: string) {
 		if (!(key in this)) return;
 
-		// @ts-ignore
-		return this[key];
+		return this[key]; // @eslint-disable-line
 	}
 
 	toArray() {

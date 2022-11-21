@@ -46,7 +46,12 @@ export default class Draggable {
 	 * Set the instruction-value of this draggable
 	 * @param instruction The instruction to display
 	 */
-	setInstruction(instruction: string, instruction_w?: number, instruction_h?: number, initial?: boolean) {
+	setInstruction(
+		instruction: string,
+		instruction_w?: number,
+		instruction_h?: number,
+		initial?: boolean
+	) {
 		this.instruction = instruction;
 		if (instruction_w != undefined) {
 			this.instruction_width = instruction_w;
@@ -77,7 +82,7 @@ export default class Draggable {
 	 * Check if this draggable is too close to another
 	 * @param other the other draggable
 	 * @param max_dist the max distance it may be away
-	 * @returns 
+	 * @returns
 	 */
 	isTooCloseTo(x: number, y: number, max_dist: number) {
 		const dx = x - this.x;
@@ -184,7 +189,6 @@ export default class Draggable {
 	 */
 	drawInstruction(p5: p5, markerSize: number) {
 		if (this.instruction.length > 0 && (this.dragging || this.instruction_show_initially)) {
-
 			// After the user has started to drag the markers around, stop showing the markers 'initially'
 			if (this.dragging) {
 				this.instruction_show_initially = false;
@@ -381,7 +385,7 @@ export default class Draggable {
 		const yBounded = p5.mouseY > this.y - this.size / 2 && p5.mouseY < this.y + this.size / 2;
 
 		if (incorporateTag) {
-			xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < (this.x + this.size / 2 + 50);
+			xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < this.x + this.size / 2 + 50;
 		}
 
 		if (xBounded && yBounded) {

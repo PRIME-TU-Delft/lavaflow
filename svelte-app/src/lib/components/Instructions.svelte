@@ -44,9 +44,9 @@
 	<div class="instruction">
 		<div class="title">Proper lighting</div>
 		<div class="description">
-			Level curves are hard to distinguish from the background in a low light setting. Try to use natural
-			daylight or a propper ceiling light for the best results. Be careful of sharp or dark shadows on
-			the drawing, as they might get interpreted as part of your drawing.
+			Level curves are hard to distinguish from the background in a low light setting. Try to use
+			natural daylight or a propper ceiling light for the best results. Be careful of sharp or dark
+			shadows on the drawing, as they might get interpreted as part of your drawing.
 		</div>
 	</div>
 </div>
@@ -65,12 +65,12 @@
 		.instruction {
 			margin: 0.5rem auto;
 			.title {
-				font-family: "Roboto Slab";
+				font-family: 'Roboto Slab';
 				font-size: 1.2rem;
 			}
 		}
 		.section {
-			font-family: "Roboto Slab";
+			font-family: 'Roboto Slab';
 			font-size: 1.8rem;
 		}
 	}

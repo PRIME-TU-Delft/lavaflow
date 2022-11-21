@@ -2,7 +2,7 @@
 	/**
 	 * Dragging marker over an image to transform it.
 	 */
-	import P5 from 'p5-svelte';
+	import P5 from './P5.svelte';
 	import type p5 from 'p5';
 
 	import Draggable from '$lib/data/draggable';
@@ -33,10 +33,10 @@
 			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // ()
 
 			// Display an instruction at the rectangle
-			points[0].setInstruction("Drag me to the rectangle\non the paper.", 190, 40);
-			points[1].setInstruction("Drag me to the cross\non the paper.", 190, 40);
-			points[2].setInstruction("Drag me to the triangle\non the paper.", 190, 40);
-			points[3].setInstruction("Drag me to the circle\non the paper.", 190, 40, true);
+			points[0].setInstruction('Drag me to the rectangle\non the paper.', 190, 40);
+			points[1].setInstruction('Drag me to the cross\non the paper.', 190, 40);
+			points[2].setInstruction('Drag me to the triangle\non the paper.', 190, 40);
+			points[3].setInstruction('Drag me to the circle\non the paper.', 190, 40, true);
 		};
 
 		/**

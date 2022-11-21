@@ -102,7 +102,7 @@ function createGltfStore() {
 				/*					   Width */ curveTree.size.width,
 				/*					  Height */ curveTree.size.height,
 				/*	  Curve Point Separation */ 5,
-				/*		  		SVC Distance */ Math.max(curveTree.size.width , curveTree.size.height) / (45 *1.5),
+				/*		  		SVC Distance */ Math.max(curveTree.size.width, curveTree.size.height) / (45 * 1.5),
 				/*	Catmull Clark Iterations */ 1,
 				/*			Lava Path Length */ 20,
 				/*		   Lava Path Forking */ lava_path_forking,
@@ -121,7 +121,7 @@ function createGltfStore() {
 			let time_before = performance.now();
 			model = api.build().to_js() as Model;
 			let time_after = performance.now();
-			if (get(debugMode)) alert(`Generated GLTF model in ${time_after-time_before}ms`);
+			if (get(debugMode)) alert(`Generated GLTF model in ${time_after - time_before}ms`);
 			model.gltf_url = gltfStringToUrl(model.gltf);
 			model.lava_gltf_url = gltfStringToUrl(model.lava_gltf);
 
