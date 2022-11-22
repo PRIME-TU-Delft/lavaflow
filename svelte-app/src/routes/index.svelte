@@ -158,7 +158,7 @@
 </main>
 
 <div class="copyright" style="height:{copyright_height}px">
-	<p>Copyright &copy; 2022 PRIME, TU Delft. All rights reserved.</p>
+	<p>AR LavaFlow is an application by PRIME, TU Delft.</p>
 </div>
 
 <style lang="scss">
