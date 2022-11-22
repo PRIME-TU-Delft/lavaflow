@@ -17,16 +17,13 @@
 	import { contourLines } from '$lib/stores/contourLineStore';
 
 	let header_height = 20;
-	let header_width = 0;
 	let main_height = 0;
-	let main_width = 0;
 	let landing_page_container_height = 0;
 	let get_started_container_height = 0;
 	let meet_developers_container_height = 0;
 	let page_shift_top = 0;
 	let copyright_height = 35;
 
-	let scrolling_animation_initialized = false;
 	function initialize_scrolling_animation() {
 		goto_landing_page();
 	}
