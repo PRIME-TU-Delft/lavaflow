@@ -16,7 +16,7 @@
 	import { goto } from '$app/navigation';
 	import { rawImage } from '$lib/stores/imageStore';
 
-	let instructionVisible: boolean;
+	let instructionVisible: boolean = false;
 	let videoSource: HTMLVideoElement;
 	let cameraSelected: MediaDeviceInfo;
 	let canvas: HTMLCanvasElement;
@@ -59,9 +59,9 @@
 	<Page fullscreen={!loading}>
 		<NavigationButton slot="headerButton" back to="/">Back home</NavigationButton>
 
-		<div slot="background">
+		<svelte:fragment slot="background">
 			<Video {loading} {stream} />
-		</div>
+		</svelte:fragment>
 
 		<div slot="options">
 			{#if !instructionVisible && cameraOptions?.length > 1}

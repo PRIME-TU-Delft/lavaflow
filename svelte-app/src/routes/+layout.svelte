@@ -10,6 +10,8 @@
 			console.log($debugMode);
 		});
 	});
+
+	import '../app.css';
 </script>
 
 <slot />

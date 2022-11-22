@@ -12,14 +12,14 @@
 	import { mdiMagnifyMinus, mdiMagnifyPlus } from '@mdi/js';
 
 	let rotation = 0;
-	let scale = [0.05, 0.025, 0.05];
+	let scale: [number, number, number] = [0.05, 0.025, 0.05];
 
 	function increaseScale() {
-		scale = scale.map((axis) => axis * 1.1);
+		scale = scale.map((axis) => axis * 1.1) as [number, number, number];
 	}
 
 	function decreaseScale() {
-		scale = scale.map((axis) => axis / 1.1);
+		scale = scale.map((axis) => axis / 1.1) as [number, number, number];
 	}
 </script>
 

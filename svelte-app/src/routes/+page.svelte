@@ -12,21 +12,18 @@
 
 	import { difficulty_modes } from '$lib/data/difficultyModes';
 	import { onMount } from 'svelte';
-	import { dev } from '$app/env';
+	import { dev } from '$app/environment';
 	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
 
 	let header_height = 20;
-	let header_width = 0;
 	let main_height = 0;
-	let main_width = 0;
 	let landing_page_container_height = 0;
 	let get_started_container_height = 0;
 	let meet_developers_container_height = 0;
 	let page_shift_top = 0;
 	let copyright_height = 35;
 
-	let scrolling_animation_initialized = false;
 	function initialize_scrolling_animation() {
 		goto_landing_page();
 	}
@@ -57,7 +54,6 @@
 		targetLocations.clear(); // clear target locations
 		craterLocations.clear(); // clear crater locations
 		contourLines.clear(); // clear contour lines
-
 	});
 
 	// Listen for the initialisation of the clientHeight of the landing page (first page) and then update accordingly.
@@ -94,11 +90,10 @@
 		</div>
 	</div>
 
-
-
 	<div
 		class="get_started_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top+1} * 2 * {header_height}rem);"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top +
+			1} * 2 * {header_height}rem);"
 		bind:clientHeight={get_started_container_height}
 	>
 		<Button secondary small on:click={goto_landing_page}>Back to starting page</Button>
@@ -140,15 +135,17 @@
 		</div>
 
 		<div class="meet_the_developers">
-			<p on:click={goto_meet_developers_page}>Meet the developers</p>
+			<p on:click={goto_meet_developers_page} on:keydown={goto_meet_developers_page}>
+				Meet the developers
+			</p>
 		</div>
 	</div>
 
-
-
 	<div
 		class="meet_developers_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top+1} * ({landing_page_container_height + get_started_container_height}px + 2*{header_height}rem)); "
+		style="margin-top:{header_height}rem;top:calc({page_shift_top +
+			1} * ({landing_page_container_height +
+			get_started_container_height}px + 2*{header_height}rem)); "
 		bind:clientHeight={meet_developers_container_height}
 	>
 		<Button secondary small on:click={goto_get_started_page}>Back to the game</Button>
@@ -335,7 +332,6 @@
 		p:hover {
 			cursor: pointer;
 		}
-
 	}
 
 	.meet_developers_container {
@@ -344,18 +340,6 @@
 
 		transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
 		-webkit-transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
-
-		.introduction {
-			margin: 1rem 0;
-			font-size: 1.1rem;
-			line-height: 1.5rem;
-
-			position: relative;
-		}
-
-		.get_started_button {
-			position: relative;
-		}
 	}
 
 	.copyright {
@@ -371,7 +355,7 @@
 			margin: 0;
 			padding: 0;
 
-			font-family: "Roboto Slab";
+			font-family: 'Roboto Slab';
 			font-weight: 200;
 			font-size: 10pt;
 			color: #999;

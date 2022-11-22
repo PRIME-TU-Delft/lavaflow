@@ -11,9 +11,9 @@
 </script>
 
 <div class="page">
+	<div class="backdrop" />
 	<div class="background">
 		<slot name="background" />
-		<div class="backdrop" />
 	</div>
 
 	<div class="foreground" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
@@ -38,14 +38,9 @@
 
 <style>
 	.page {
-		height: 100vh;
-		height: var(--vh);
-		width: 100vw;
-		overflow: hidden;
-		display: grid;
-		align-items: center;
-		justify-items: center;
+		height: 100%;
 		user-select: none;
+		overflow: hidden;
 		-moz-user-select: none;
 		-khtml-user-select: none;
 		-webkit-user-select: none;
@@ -53,28 +48,30 @@
 		touch-action: none;
 	}
 
-	.background,
+	.background {
+		height: calc(100% - 1rem);
+	}
+
 	.backdrop {
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 100vh;
-		height: min(var(--vh), 100vh);
-		z-index: -1;
-	}
-	.backdrop {
-		background: rgba(255, 255, 255, 0.5);
-		z-index: 1;
-	}
-
-	:global(.background > div) {
 		height: 100%;
+		background: var(--background-color);
+		/* opacity: 0.5; */
+
+		--tw-backdrop-blur: blur(2em);
+		backdrop-filter: var(--tw-backdrop-blur);
+		-webkit-backdrop-filter: blur(2em);
 	}
 
 	.foreground {
-		position: relative;
+		position: absolute;
 		background: coral;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
 		width: calc(100vw - 2rem);
 		max-width: 60rem;
 		height: calc(100vh - 5rem);
@@ -103,9 +100,6 @@
 		height: 100%;
 		border-radius: 1rem;
 		overflow: hidden;
-		display: grid;
-		justify-content: center;
-		align-items: center;
 	}
 
 	.fullscreen {
@@ -128,13 +122,5 @@
 		display: flex;
 		gap: 0.5rem;
 		flex-direction: column;
-	}
-
-	/* if backdrop support: very transparent and blurred */
-	@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
-		.backdrop {
-			-webkit-backdrop-filter: blur(2em);
-			backdrop-filter: blur(2em);
-		}
 	}
 </style>

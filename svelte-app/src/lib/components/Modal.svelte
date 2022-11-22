@@ -21,8 +21,8 @@
 </script>
 
 {#if visible}
-	<div class="background" on:click={closeModal}>
-		<div class="modal" on:click|stopPropagation>
+	<div class="background" on:click={closeModal} on:keydown={closeModal}>
+		<div class="modal" on:click|stopPropagation on:keydown|stopPropagation>
 			{#if closeButtons == 'both' || closeButtons == 'top'}
 				<Button on:click={closeModal}>Close {title}</Button>
 			{/if}
