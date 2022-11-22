@@ -15,8 +15,6 @@
 	<div class="background">
 		<slot name="background" />
 	</div>
-	
-	
 
 	<div class="foreground" bind:clientWidth={foregroundWidth} bind:clientHeight={foregroundHeight}>
 		<header>
@@ -125,5 +123,4 @@
 		gap: 0.5rem;
 		flex-direction: column;
 	}
-
 </style>

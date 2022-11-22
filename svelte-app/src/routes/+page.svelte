@@ -57,7 +57,6 @@
 		targetLocations.clear(); // clear target locations
 		craterLocations.clear(); // clear crater locations
 		contourLines.clear(); // clear contour lines
-
 	});
 
 	// Listen for the initialisation of the clientHeight of the landing page (first page) and then update accordingly.
@@ -94,11 +93,10 @@
 		</div>
 	</div>
 
-
-
 	<div
 		class="get_started_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top+1} * 2 * {header_height}rem);"
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem) + {page_shift_top +
+			1} * 2 * {header_height}rem);"
 		bind:clientHeight={get_started_container_height}
 	>
 		<Button secondary small on:click={goto_landing_page}>Back to starting page</Button>
@@ -140,15 +138,17 @@
 		</div>
 
 		<div class="meet_the_developers">
-			<p on:click={goto_meet_developers_page} on:keydown={goto_meet_developers_page}>Meet the developers</p>
+			<p on:click={goto_meet_developers_page} on:keydown={goto_meet_developers_page}>
+				Meet the developers
+			</p>
 		</div>
 	</div>
 
-
-
 	<div
 		class="meet_developers_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top+1} * ({landing_page_container_height + get_started_container_height}px + 2*{header_height}rem)); "
+		style="margin-top:{header_height}rem;top:calc({page_shift_top +
+			1} * ({landing_page_container_height +
+			get_started_container_height}px + 2*{header_height}rem)); "
 		bind:clientHeight={meet_developers_container_height}
 	>
 		<Button secondary small on:click={goto_get_started_page}>Back to the game</Button>
@@ -335,7 +335,6 @@
 		p:hover {
 			cursor: pointer;
 		}
-
 	}
 
 	.meet_developers_container {
@@ -359,7 +358,7 @@
 			margin: 0;
 			padding: 0;
 
-			font-family: "Roboto Slab";
+			font-family: 'Roboto Slab';
 			font-weight: 200;
 			font-size: 10pt;
 			color: #999;

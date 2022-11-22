@@ -1,5 +1,5 @@
 <script lang="ts">
-	import P5 from './P5.svelte'
+	import P5 from './P5.svelte';
 	import type p5 from 'p5';
 
 	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
