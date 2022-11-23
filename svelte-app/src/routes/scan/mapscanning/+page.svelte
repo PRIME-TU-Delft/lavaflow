@@ -77,7 +77,7 @@
 			{/if}
 		</div>
 
-		<Video bind:videoSource --corner-radius="1rem" {error} {loading} {stream} />
+		<Video bind:videoSource roundCorner {error} {loading} {stream} />
 
 		<svelte:fragment slot="footer">
 			{#if !instructionVisible}

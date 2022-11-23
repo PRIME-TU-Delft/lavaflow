@@ -6,6 +6,7 @@
 	export let style: string = '';
 	export let loading: boolean = true;
 	export let error: string = '';
+	export let roundCorner: boolean = false;
 
 	export let videoSource: HTMLVideoElement | undefined = undefined;
 
@@ -18,7 +19,7 @@
 </script>
 
 {#if loading}
-	<div class="loadingVideo">
+	<div class="loadingVideo" class:roundCorner>
 		<div>
 			<h2>Loading video...</h2>
 
@@ -40,6 +41,7 @@
 		preload="auto"
 		type="video/mp4"
 		bind:this={videoSource}
+		class:roundCorner
 	/>
 {/if}
 
@@ -55,7 +57,6 @@
 	.loadingVideo {
 		height: 100%;
 		width: 100%;
-		border-radius: var(--corner-radius, 0);
 		display: grid;
 		align-items: center;
 		justify-content: center;
@@ -70,5 +71,9 @@
 				margin: auto;
 			}
 		}
+	}
+
+	.roundCorner {
+		border-radius: 1rem;
 	}
 </style>
