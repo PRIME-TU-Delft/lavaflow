@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@200;400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+
+		<meta http-equiv="content-security-policy" content="">
+		<link rel="modulepreload" href="/_app/immutable/start-621469d8.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/index-5adb68ea.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/singletons-a004736a.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-b21cceae.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/control-ba37bfb4.js">
+	</head>
+	<body>
+		<div style="display: contents">
+		<script type="module" data-sveltekit-hydrate="45h">
+			import { start } from "/_app/immutable/start-621469d8.js";
+
+			start({
+				env: {},
+				hydrate: null,
+				paths: {"base":"","assets":""},
+				target: document.querySelector('[data-sveltekit-hydrate="45h"]').parentNode,
+				version: "1669225955609"
+			});
+		</script></div>
+	</body>
+</html>
