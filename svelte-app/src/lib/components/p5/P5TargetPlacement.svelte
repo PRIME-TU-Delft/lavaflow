@@ -1,8 +1,7 @@
 <script lang="ts">
-	import P5 from 'p5-svelte';
+	import P5 from './P5.svelte';
 	import type p5 from 'p5';
 
-	import { gltfStore } from '$lib/stores/gltfStore';
 	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 

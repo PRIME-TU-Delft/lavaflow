@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let label: string;
 	export let name: string | null = null;
-	export let value: any;
+	export let value: any; // @eslint-disable-line @typescript-eslint/no-explicit-any
 
 	const initialValue = value;
 

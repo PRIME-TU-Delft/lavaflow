@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { mdiChevronDown } from '@mdi/js';
-
 	type T = $$Generic;
 
 	/**

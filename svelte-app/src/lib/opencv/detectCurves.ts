@@ -13,21 +13,21 @@ export type ContourTreeObject = {
 
 // this function binarizes the input, then uses cv.findContours to find edges in the image
 export function detectCurves(image: Mat): [MatVector, Mat] {
-	let gray = new cv.Mat(); // create empty image for holding the grayscale image
+	const gray = new cv.Mat(); // create empty image for holding the grayscale image
 	cv.cvtColor(image, gray, cv.COLOR_RGBA2GRAY, 0); // convert image to grayscale
 
-	let blurred = new cv.Mat(); // create image to hold blurred image
+	const blurred = new cv.Mat(); // create image to hold blurred image
 	const kernelSize = new cv.Size(5, 5); // set the size of the blur
 	cv.GaussianBlur(gray, blurred, kernelSize, 0, 0, cv.BORDER_DEFAULT); // blur the image
 
-	let sharpened = new cv.Mat(); // create new image to hold sharpened image
+	const sharpened = new cv.Mat(); // create new image to hold sharpened image
 	cv.addWeighted(gray, 1.5, blurred, -0.5, 0, sharpened); //create a sharpened image by subtracting the original image
 
-	let thresholded = new cv.Mat(); // create empty image for holding the thresholded image
+	const thresholded = new cv.Mat(); // create empty image for holding the thresholded image
 	cv.threshold(sharpened, thresholded, 127, 255, cv.THRESH_BINARY | cv.THRESH_OTSU); // binarize the image by thresholding it
 
-	let contours = new cv.MatVector(); // this will be used to hold the contours
-	let hierarchy = new cv.Mat(); // this will be used to hold the hierarchy of the contours
+	const contours = new cv.MatVector(); // this will be used to hold the contours
+	const hierarchy = new cv.Mat(); // this will be used to hold the hierarchy of the contours
 	cv.findContours(thresholded, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE); // get contours out of the image
 
 	// delete Mats to prevent memory leaks
