@@ -118,10 +118,9 @@ function createGltfStore() {
 		},
 		build: (curveTree: CurveTree) => {
 			// Call the wasm api to build the model
-			const time_before = performance.now();
+
 			model = api.build().to_js() as Model;
-			const time_after = performance.now();
-			if (get(debugMode)) alert(`Generated GLTF model in ${time_after - time_before}ms`);
+
 			model.gltf_url = gltfStringToUrl(model.gltf);
 			model.lava_gltf_url = gltfStringToUrl(model.lava_gltf);
 
