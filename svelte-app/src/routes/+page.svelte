@@ -96,7 +96,7 @@
 				secondary
 				large
 				on:click={() => goto('https://apps.apple.com/nl/app/webxr-viewer/id1295998056')}
-				>click here to download AR browser</Button
+				>Click here to download AR browser</Button
 			>
 		{/if}
 

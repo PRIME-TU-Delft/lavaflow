@@ -72,7 +72,7 @@
 <a id="myEnterVRButton" style="display:none" />
 
 <!-- svelte-ignore a11y-invalid-attribute -->
-<a id="myEnterARButton" href="">
+<a id="myEnterARButton" href="" style="z-index: 200000">
 	<Button icon={mdiCubeScan}>Native AR Mode</Button>
 </a>
 

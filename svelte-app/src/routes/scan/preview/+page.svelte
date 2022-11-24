@@ -78,7 +78,7 @@
 				loading={!gltfLoaded}
 				on:click={() => goto('https://apps.apple.com/nl/app/webxr-viewer/id1295998056')}
 			>
-				<span>WebXR not supported: Download here</span>
+				<span>Download webXR browser for AR</span>
 				<Icon path={mdiChevronRight} />
 			</Button>
 		{/if}
