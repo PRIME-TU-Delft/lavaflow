@@ -205,6 +205,19 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
+"@types/aframe@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@types/aframe/-/aframe-1.2.1.tgz#8951869a1285900583296c43e46f502e32812114"
+  integrity sha512-Y1cLyiFeflVEWY7whHAmj3QsEn3SM6aP1D8YPhZ6J2JDyejao1FqYAyqrqcqZDKAAZgrfug1RXE3S9uraGiXsA==
+  dependencies:
+    "@types/animejs" "*"
+    "@types/three" "*"
+
+"@types/animejs@*":
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/@types/animejs/-/animejs-3.1.6.tgz#cdcb8bcfd0c0d1642c8951973b8d6ea6d578908c"
+  integrity sha512-jYlEdbVTOOLBz1mauqhrigFUFAGde2KCdO/99asxHpF+5zOdz/VjNKbnpNa0oNBhsDNFzmMvvE+V4C8ZkvJdKg==
+
 "@types/cookie@^0.5.1":
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.5.1.tgz#b29aa1f91a59f35e29ff8f7cb24faf1a3a750554"
@@ -246,6 +259,18 @@
   version "7.3.13"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.3.13.tgz#da4bfd73f49bd541d28920ab0e2bf0ee80f71c91"
   integrity sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==
+
+"@types/three@*":
+  version "0.146.0"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.146.0.tgz#83813ba0d2fff6bdc6d7fda3a77993a932bba45f"
+  integrity sha512-75AgysUrIvTCB054eQa2pDVFurfeFW8CrMQjpzjt3yHBfuuknoSvvsESd/3EhQxPrz9si3+P0wiDUVsWUlljfA==
+  dependencies:
+    "@types/webxr" "*"
+
+"@types/webxr@*":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@types/webxr/-/webxr-0.5.0.tgz#aae1cef3210d88fd4204f8c33385a0bbc4da07c9"
+  integrity sha512-IUMDPSXnYIbEO2IereEFcgcqfDREOgmbGqtrMpVPpACTU6pltYLwHgVkrnYv0XhWEcjio9sYEfIEzgn3c7nDqA==
 
 "@typescript-eslint/eslint-plugin@^5.27.0":
   version "5.44.0"

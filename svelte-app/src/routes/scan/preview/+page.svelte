@@ -25,6 +25,9 @@
 	let foregroundHeight: number;
 
 	let gltfLoaded = false;
+	let webXRSupport = false;
+
+	$: isIOS = /iPhone|iPod|iPad/.test(navigator?.userAgent || navigator?.platform || 'unknown');
 
 	onMount(async () => {
 		if (!$contourLines.curves || !$contourLines.hierarchy) {
@@ -32,6 +35,8 @@
 		}
 		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
 		gltfStore.build($contourLines);
+
+		webXRSupport = (await navigator?.xr?.isSessionSupported('immersive-ar')) ?? false;
 
 		gltfLoaded = true;
 	});
@@ -61,10 +66,22 @@
 			<span>Visualise as 3D model</span>
 			<Icon path={mdiChevronRight} />
 		</Button>
-		<Button loading={!gltfLoaded} on:click={() => goto('/visualise/ar')}>
-			<span>Visualise in AR</span>
-			<Icon path={mdiChevronRight} />
-		</Button>
+
+		{#if webXRSupport}
+			<Button secondary loading={!gltfLoaded} on:click={() => goto('/visualise/ar')}>
+				<span>Visualise in AR {isIOS ? '! Experimental !' : ''}</span>
+				<Icon path={mdiChevronRight} />
+			</Button>
+		{:else}
+			<Button
+				secondary
+				loading={!gltfLoaded}
+				on:click={() => goto('https://apps.apple.com/nl/app/webxr-viewer/id1295998056')}
+			>
+				<span>Download webXR browser for AR</span>
+				<Icon path={mdiChevronRight} />
+			</Button>
+		{/if}
 	</svelte:fragment>
 </Page>
 
