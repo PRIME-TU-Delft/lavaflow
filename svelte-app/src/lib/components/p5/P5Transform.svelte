@@ -27,10 +27,10 @@
 
 			points = []; // make sure the array is empty to make sure it does not add more than 4 points
 
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // []
-			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // ><
-			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.8, size)); // /\
-			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // ()
+			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.2, size)); // []
+			points.push(new Draggable(foregroundWidth * 0.8, foregroundHeight * 0.8, size)); // ><
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.8, size)); // /\
+			points.push(new Draggable(foregroundWidth * 0.2, foregroundHeight * 0.2, size)); // ()
 
 			// Display an instruction at the rectangle
 			points[0].setInstruction('Drag me to the rectangle\non the paper.', 190, 40);
