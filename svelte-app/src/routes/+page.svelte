@@ -47,7 +47,6 @@
 	}
 
 	onMount(() => {
-		console.log(navigator);
 		difficultyStore.clear();
 
 		if (dev) return;
