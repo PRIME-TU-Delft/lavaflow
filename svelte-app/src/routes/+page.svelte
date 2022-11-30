@@ -6,6 +6,8 @@
 	import Dropdown from '$lib/components/input/Dropdown.svelte';
 	import MeetTheDevelopers from '$lib/components/MeetTheDevelopers.svelte';
 
+	import LevelcurveTemplate from '$lib/assets/Template.pdf';
+
 	import { difficulty_modes } from '$lib/data/difficultyModes';
 	import { onMount } from 'svelte';
 	import { dev } from '$app/environment';
@@ -35,9 +37,23 @@
 	}
 
 	function goto_get_started_page() {
-		header_height = 10;
-		page_shift_top = -1;
-		main_height = get_started_container_height + copyright_height;
+		// Store the scrolled distance from the top
+		let current_scroll = window.scrollY
+
+		// First, scroll to the top of the page. Otherwise, the page glitches to the top before scrolling through to 'Get Started'
+		window.scrollTo({top: 0, behavior: 'smooth'})
+
+		// Wait a short while before continuing with the animation. Otherwise => glitch.
+		// Wait by an amount that is proportional to the size of the user's device. The scrollY (scroll-pixels from top)
+		// was used to determine how far the user has had to scroll from the top to reach the 'get started' button.
+		// Idea:
+		// 		- User that didn't have to scroll at all (iPad, laptop) will not experience weird glitch, because no scrolling was needed.
+		// 		- User with phone will have to scroll down to reach the button by an amount differing per device. This gives a glitch if you don't wait long enough.
+		setTimeout(() => {
+			header_height = 10;
+			page_shift_top = -1;
+			main_height = get_started_container_height + copyright_height;
+		}, current_scroll*1.5)
 	}
 
 	function goto_meet_developers_page() {
@@ -85,10 +101,14 @@
 			energy-source!
 		</div>
 
+		<div class="template-download">
+			Alongside this applet, a printable template was designed on which you can draw your level-curves. Download the template <a href={LevelcurveTemplate} download="AR LavaFlow Template.pdf">here</a>.
+		</div>
+
 		{#if !data.webXRSupport}
 			<div style="color: var(--primary-color)">
-				We have detected that your device does not support webXR nativily. The app is usable however
-				we would recommend you to download a special AR browser
+				We have detected that your device does not support webXR natively. The app is usable, however
+				we would recommend you to download a special AR browser.
 			</div>
 			<Button
 				icon={mdiAlert}
@@ -102,6 +122,7 @@
 		<div class="get_started_button">
 			<Button large on:click={goto_get_started_page}>Get started</Button>
 		</div>
+
 	</div>
 
 	<div
@@ -266,11 +287,23 @@
 		-webkit-transition: top 1s ease-in-out, margin-top 1s ease-in-out, height 1s ease-in-out;
 
 		.introduction {
-			margin: 1rem 0;
+			margin-top: 1rem;
 			font-size: 1.1rem;
 			line-height: 1.5rem;
 
 			position: relative;
+		}
+
+		.template-download {
+			margin-top: 0.2rem;
+			font-size: 1.1rem;
+			line-height: 1.5rem;
+
+			position: relative;
+			
+			a {
+				color: #fff;
+			}
 		}
 
 		.get_started_button {
