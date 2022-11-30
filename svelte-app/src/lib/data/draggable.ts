@@ -104,6 +104,7 @@ export default class Draggable {
 		target_distance?: number,
 		index?: number
 	) {
+		if (p5.mouseIsPressed) this.pressed(p5);
 		if (!this.dragging) return;
 
 		if (p5.mouseX <= 0 || p5.mouseY <= 0) return;

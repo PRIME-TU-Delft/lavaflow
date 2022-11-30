@@ -1,8 +1,4 @@
-<script context="module" lang="ts">
-	export const prerender = true;
-</script>
-
-<script>
+<script lang="ts">
 	import { difficultyStore, cacheDifficultyStore } from '$lib/stores/difficultyStore';
 
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
@@ -15,6 +11,10 @@
 	import { dev } from '$app/environment';
 	import { craterLocations, targetLocations } from '$lib/stores/locationStore';
 	import { contourLines } from '$lib/stores/contourLineStore';
+	import { goto } from '$app/navigation';
+	import { mdiAlert } from '@mdi/js';
+
+	export let data: import('.svelte-kit/types/src/routes/$types').PageData;
 
 	let header_height = 20;
 	let main_height = 0;
@@ -73,7 +73,7 @@
 <main style="height:calc({main_height}px + {header_height}rem);">
 	<div
 		class="landing_page_container"
-		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem)); "
+		style="margin-top:{header_height}rem;top:calc({page_shift_top} * ({landing_page_container_height}px + {header_height}rem)); display: flex; flex-direction: column; gap: 1rem;"
 		bind:clientHeight={landing_page_container_height}
 	>
 		<div class="introduction">
@@ -84,6 +84,20 @@
 			electricity as the lava reaches closer. Save the world by using this amazing sustainable
 			energy-source!
 		</div>
+
+		{#if !data.webXRSupport}
+			<div style="color: var(--primary-color)">
+				We have detected that your device does not support webXR nativily. The app is usable however
+				we would recommend you to download a special AR browser
+			</div>
+			<Button
+				icon={mdiAlert}
+				secondary
+				large
+				on:click={() => goto('https://apps.apple.com/nl/app/webxr-viewer/id1295998056')}
+				>Click here to download AR browser</Button
+			>
+		{/if}
 
 		<div class="get_started_button">
 			<Button large on:click={goto_get_started_page}>Get started</Button>
@@ -219,7 +233,7 @@
 			position: absolute;
 			top: 1rem;
 			left: calc(min(100vw - 1rem - 6rem, 50vw + 11rem));
-			background: url("/logo met symbolen wit.svg");
+			background: url('/logo met symbolen wit.svg');
 			background-size: contain;
 			background-repeat: no-repeat;
 			width: 6rem;
