@@ -36,11 +36,11 @@ pub struct OpenCVTree {
 impl OpenCVTree {
 	#[wasm_bindgen(constructor)]
 	pub fn new(val: &JsValue) -> Result<OpenCVTree, JsValue> {
-		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
+		serde_wasm_bindgen::from_value(val.into()).map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid OpenCVTree"))
 	}
 
 	pub fn debug(&self) -> Result<JsValue, JsValue> {
-		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize OpenCVTree"))
+		serde_wasm_bindgen::to_value(self).map_err(|_| JsValue::from("Could not serialize OpenCVTree"))
 	}
 }
 
@@ -60,7 +60,7 @@ pub struct ModelConstructionResult {
 impl ModelConstructionResult {
 	#[wasm_bindgen(constructor)]
 	pub fn new(val: &JsValue) -> Result<ModelConstructionResult, JsValue> {
-		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid ModelConstructionResult"))
+		serde_wasm_bindgen::from_value(val.into()).map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid ModelConstructionResult"))
 	}
 
 	pub fn debug(&self) -> String {
@@ -68,7 +68,7 @@ impl ModelConstructionResult {
 	}
 
 	pub fn to_js(&self) -> Result<JsValue, JsValue> {
-		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize ModelConstructionResult"))
+		serde_wasm_bindgen::to_value(self).map_err(|_| JsValue::from("Could not serialize ModelConstructionResult"))
 	}
 }
 
@@ -88,7 +88,7 @@ pub struct AltitudeGradientPair {
 impl AltitudeGradientPair {
 	#[wasm_bindgen(constructor)]
 	pub fn new(val: &JsValue) -> Result<AltitudeGradientPair, JsValue> {
-		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid AltitudeGradientPair"))
+		serde_wasm_bindgen::from_value(val.into()).map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid AltitudeGradientPair"))
 	}
 
 	pub fn debug(&self) -> String {
@@ -96,7 +96,7 @@ impl AltitudeGradientPair {
 	}
 
 	pub fn to_js(&self) -> Result<JsValue, JsValue> {
-		JsValue::from_serde(self).map_err(|_| JsValue::from("Could not serialize AltitudeGradientPair"))
+		serde_wasm_bindgen::to_value(self).map_err(|_| JsValue::from("Could not serialize AltitudeGradientPair"))
 	}
 }
 
@@ -113,7 +113,7 @@ pub struct LavaPathTurbineInput {
 impl LavaPathTurbineInput {
 	#[wasm_bindgen(constructor)]
 	pub fn new(val: &JsValue) -> Result<LavaPathTurbineInput, JsValue> {
-		val.into_serde().map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid LavaPathTurbineInput"))
+		serde_wasm_bindgen::from_value(val.into()).map_err(|_| JsValue::from("Could not parse input from JavaScript as a valid LavaPathTurbineInput"))
 	}
 }
 
