@@ -1,1 +1,1 @@
-const o=async()=>{var e;return{webXRSupport:await((e=navigator==null?void 0:navigator.xr)==null?void 0:e.isSessionSupported("immersive-ar"))||!1}},r=Object.freeze(Object.defineProperty({__proto__:null,load:o},Symbol.toStringTag,{value:"Module"}));export{r as _,o as l};
+const e=async()=>({webXRSupport:await navigator?.xr?.isSessionSupported("immersive-ar")||!1}),t=Object.freeze(Object.defineProperty({__proto__:null,load:e},Symbol.toStringTag,{value:"Module"}));export{t as _,e as l};
