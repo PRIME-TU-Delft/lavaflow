@@ -6,6 +6,9 @@ const config: UserConfig = {
 	plugins: [wasmPack(['../wasm']), sveltekit()],
 	optimizeDeps: {
 		exclude: ['../wasm']
+	},
+	build: {
+		target: 'es2020'
 	}
 };
 
