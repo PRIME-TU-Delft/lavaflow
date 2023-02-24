@@ -70,7 +70,7 @@
 		</div>
 	</div>
 
-	<slot />
+	<slot name="error" />
 {:else}
 	<!-- svelte-ignore a11y-media-has-caption -->
 	<video
@@ -82,4 +82,6 @@
 		preload="auto"
 		bind:this={videoSource}
 	/>
+
+	<slot {cameraOptions} />
 {/if}
