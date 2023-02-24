@@ -1,0 +1,29 @@
+<script>
+	import { Button, Spinner } from 'flowbite-svelte';
+	import { Icon } from 'mdi-svelte-ts';
+
+	export let icon = '';
+	export let loading = false;
+	export let secondary = false;
+	export let href = '';
+</script>
+
+{#if loading}
+	<Button outline class="flex items-center justify-between !p-4" color="red">
+		<Spinner /> Loading...
+	</Button>
+{:else}
+	<Button
+		{href}
+		outline={secondary}
+		class="flex items-center justify-between !p-4 {secondary ? 'bg-red-50/80' : ''}"
+		on:click
+		color="red"
+	>
+		<slot />
+
+		{#if icon}
+			<Icon path={icon} />
+		{/if}
+	</Button>
+{/if}

@@ -7,8 +7,8 @@
 	export let back = '';
 </script>
 
-<nav class="fixed top-0 left-0 w-full p-4 bg-red-50 flex justify-between items-center">
-	<div class="flex gap-4 items-center">
+<nav class="fixed top-0 left-0 z-10 flex w-full items-center justify-between bg-red-50 p-4">
+	<div class="flex items-center gap-4">
 		{#if back}
 			<Button class="!p-2" href={back} outline color="red">
 				<Icon path={mdiChevronLeft} />

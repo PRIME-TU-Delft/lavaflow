@@ -2,7 +2,8 @@
 	import { goto } from '$app/navigation';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import Video from '$lib/components/Video.svelte';
-	import { rawImage } from '$lib/stores/imageStore';
+	import imageStore from '$lib/stores/imageStore';
+	import sizeStore from '$lib/stores/sizeStore';
 	import { Button, Chevron, Dropdown, DropdownItem } from 'flowbite-svelte';
 	import CaptureMenu from './CaptureMenu.svelte';
 
@@ -35,9 +36,10 @@
 		canvas.remove();
 
 		// Set image in (raw)image store
-		rawImage.set(image);
+		imageStore.set(image);
+		sizeStore.set({ width: canvas.width, height: canvas.height });
 
-		goto('/select-markers/instructions');
+		goto('/select-markers');
 	}
 </script>
 

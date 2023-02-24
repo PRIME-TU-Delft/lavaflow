@@ -4,6 +4,8 @@
 
 	export let iconPrefix: string = '';
 	export let icon: string = '';
+	export let href: string = '';
+	export let outline: boolean = false;
 </script>
 
 <div>
@@ -14,7 +16,7 @@
 	{/if}
 
 	<!-- TODO: implement own button -->
-	<Button color="red" on:click>
+	<Button {href} {outline} color="red" on:click>
 		<p class="flex items-center gap-2">
 			{#if iconPrefix}
 				<Icon path={iconPrefix} />
