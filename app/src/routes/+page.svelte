@@ -3,7 +3,6 @@
 	import Section from '$lib/components/Section.svelte';
 	import VStack from '$lib/components/VStack.svelte';
 	import { mdiDownload } from '@mdi/js';
-	import { Button } from 'flowbite-svelte';
 	import Header from './Header.svelte';
 </script>
 
