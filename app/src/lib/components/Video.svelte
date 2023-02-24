@@ -83,5 +83,5 @@
 		bind:this={videoSource}
 	/>
 
-	<slot {cameraOptions} />
+	<slot {cameraOptions} {videoSource} />
 {/if}

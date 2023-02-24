@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import Video from '$lib/components/Video.svelte';
+	import { rawImage } from '$lib/stores/imageStore';
 	import { Button, Chevron, Dropdown, DropdownItem } from 'flowbite-svelte';
+	import CaptureMenu from './CaptureMenu.svelte';
 
 	let deviceId = '';
+	let loadingNextPage = false;
 
 	function getCameraLabel(cameraOptions: MediaDeviceInfo[]) {
 		if (cameraOptions.length == 0) return 'No camera found';
@@ -11,9 +15,33 @@
 		const camera = cameraOptions.find((camera) => camera.deviceId === deviceId);
 		return camera?.label || 'Select other camera';
 	}
+
+	function gotoTransform(videoSource: HTMLVideoElement | undefined) {
+		loadingNextPage = true;
+
+		console.log({ videoSource });
+		if (!videoSource) return;
+
+		// Create an atificial canvas element
+		const canvas = document.createElement('canvas');
+		const context = canvas.getContext('2d');
+		canvas.height = videoSource.videoHeight;
+		canvas.width = videoSource.videoWidth;
+
+		// Take screenshot of video
+		if (context) context.drawImage(videoSource, 0, 0, canvas.width, canvas.height);
+		const image = canvas.toDataURL('image/png');
+
+		canvas.remove();
+
+		// Set image in (raw)image store
+		rawImage.set(image);
+
+		goto('/select-markers/instructions');
+	}
 </script>
 
-<Video bind:deviceId let:cameraOptions>
+<Video bind:deviceId let:cameraOptions let:videoSource>
 	<Menubar back="capture/instructions" title="Capture">
 		{#if cameraOptions.length > 0}
 			{#key deviceId}
@@ -26,4 +54,6 @@
 			</Dropdown>
 		{/if}
 	</Menubar>
+
+	<CaptureMenu loading={loadingNextPage} on:click={() => gotoTransform(videoSource)} />
 </Video>

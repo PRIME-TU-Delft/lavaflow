@@ -8,14 +8,14 @@
 
 <div>
 	{#if $$slots.label}
-		<div class="text-sm text-zinc-800 my-2">
+		<div class="my-2 text-sm text-zinc-800">
 			<slot name="label" />
 		</div>
 	{/if}
 
 	<!-- TODO: implement own button -->
-	<Button on:click>
-		<p class="flex gap-2 items-center">
+	<Button color="red" on:click>
+		<p class="flex items-center gap-2">
 			{#if iconPrefix}
 				<Icon path={iconPrefix} />
 			{/if}
