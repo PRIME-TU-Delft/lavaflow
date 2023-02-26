@@ -1,6 +1,15 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import type { UserConfig } from 'vite';
+import wasmPack from 'vite-plugin-wasm-pack';
 
-export default defineConfig({
-	plugins: [sveltekit()]
-});
+const config: UserConfig = {
+	plugins: [wasmPack(['../wasm']), sveltekit()],
+	optimizeDeps: {
+		exclude: ['../wasm']
+	},
+	build: {
+		target: 'es2020'
+	} // TODO: Ask @juliavdkris for more info why es2020 is needed
+};
+
+export default config;

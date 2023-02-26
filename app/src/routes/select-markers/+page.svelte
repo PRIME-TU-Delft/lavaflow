@@ -6,6 +6,8 @@
 	import P5Transform from '$lib/components/p5/P5Transform.svelte';
 	import type Draggable from '$lib/data/draggable';
 	import LavaError from '$lib/data/LavaError';
+	import { contourLines } from '$lib/stores/contourLineStore';
+	import { hc_curves, hc_hierarchy } from '$lib/stores/hardCoded';
 	import imageStore from '$lib/stores/imageStore';
 	import sizeStore from '$lib/stores/sizeStore';
 	import { mdiBookInformationVariant, mdiChevronRight } from '@mdi/js';
@@ -19,7 +21,7 @@
 
 	onMount(() => {
 		// If no raw image in cache, go back to scan/mapscanning
-		if (!$imageStore) goto('/capture');
+		if (!$imageStore || !$sizeStore) goto('/capture');
 	});
 
 	function applySelection() {
@@ -34,7 +36,20 @@
 		error = null;
 	}
 
-	function continueWithDefaultMap() {}
+	function continueWithDefaultMap() {
+		const { curves, hierarchy } = { curves: hc_curves, hierarchy: hc_hierarchy };
+		const [hc_width, hc_height] = [800, 667];
+
+		contourLines.setup({
+			curves,
+			hierarchy,
+			size: { width: hc_width, height: hc_height }
+		});
+
+		sizeStore.set({ width: hc_width, height: hc_height });
+
+		goto('/preview');
+	}
 </script>
 
 <Menubar back="/capture" title="Select markers">

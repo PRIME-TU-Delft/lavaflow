@@ -9,7 +9,7 @@
 </script>
 
 {#if loading}
-	<Button outline class="flex items-center justify-between !p-4" color="red">
+	<Button outline={secondary} class="flex items-center justify-between !p-4" color="red">
 		<Spinner /> Loading...
 	</Button>
 {:else}

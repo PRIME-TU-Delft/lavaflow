@@ -20,7 +20,6 @@
 	function gotoTransform(videoSource: HTMLVideoElement | undefined) {
 		loadingNextPage = true;
 
-		console.log({ videoSource });
 		if (!videoSource) return;
 
 		// Create an atificial canvas element

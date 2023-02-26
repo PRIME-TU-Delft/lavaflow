@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	export const prerender = true;
-</script>
-
 <script lang="ts">
 	/**
 	 * This is where the user inspects the level curves that are drawn, to check if the user wants to rescan the image or not
