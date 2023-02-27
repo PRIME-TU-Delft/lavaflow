@@ -13,9 +13,12 @@
 	let webXRSupport = false;
 
 	onMount(async () => {
+		// TODO: move to load() function
 		if (!$contourLines.curves || !$contourLines.hierarchy) {
 			return goto('/capture');
 		}
+
+		console.log($contourLines.curves);
 
 		await gltfStore.setup($contourLines, $difficultyStore.lava_forking);
 		gltfStore.build($contourLines);
@@ -28,12 +31,14 @@
 
 <Menubar title="preview" />
 
-<P5PreviewCurves curves={$contourLines.curves} />
+{#key $contourLines}
+	<P5PreviewCurves curves={$contourLines?.curves} />
+{/key}
 
 <ActionMenu>
-	<ActionButton loading={!gltfLoaded} secondary on:click={() => goto('/visual/3d')}
-		>Show in 3d model</ActionButton
-	>
+	<ActionButton loading={!gltfLoaded} secondary on:click={() => goto('/visual/3d')}>
+		Show in 3d model
+	</ActionButton>
 
 	{#if webXRSupport}
 		<ActionButton loading={!gltfLoaded} on:click={() => goto('/visual/ar')}>

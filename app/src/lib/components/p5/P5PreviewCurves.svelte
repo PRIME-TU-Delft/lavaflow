@@ -10,7 +10,13 @@
 
 	const sketch = (p5: p5) => {
 		p5.setup = () => {
-			const [width, height] = [$sizeStore.width, $sizeStore.height];
+			const [width, height] = [$sizeStore?.width, $sizeStore?.height];
+
+			if (!curves || curves.length === 0 || !width || !height) {
+				console.log("No curves or size available. Can't draw.");
+				return;
+			}
+
 			p5.createCanvas(width, height);
 
 			p5.background(230);
@@ -36,4 +42,6 @@
 	};
 </script>
 
-<P5 {sketch} />
+{#key $sizeStore}
+	<P5 {sketch} />
+{/key}

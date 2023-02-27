@@ -4,6 +4,9 @@ import wasmPack from 'vite-plugin-wasm-pack';
 
 const config: UserConfig = {
 	plugins: [wasmPack(['../wasm']), sveltekit()],
+	ssr: {
+		noExternal: ['three', 'troika-three-text']
+	},
 	optimizeDeps: {
 		exclude: ['../wasm']
 	},
