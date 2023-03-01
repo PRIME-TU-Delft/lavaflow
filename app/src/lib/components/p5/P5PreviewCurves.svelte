@@ -17,11 +17,10 @@
 				return;
 			}
 
+			console.log({ width, height });
 			p5.createCanvas(width, height);
 
-			p5.background(230);
-
-			curves.forEach((layer, index) => {
+			curves.forEach((layer) => {
 				// Add text to the contour: "index (index of parent)"
 				p5.strokeWeight(1);
 				p5.stroke(30);

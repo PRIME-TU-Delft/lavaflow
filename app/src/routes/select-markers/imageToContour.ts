@@ -12,7 +12,7 @@ import { get } from 'svelte/store';
  * @param points Draggable points that are the edges of the sub-image
  * @returns
  */
-export default function imageToCountours(points: Draggable[]) {
+export default function imageToCountours(points: [Draggable, Draggable, Draggable, Draggable]) {
 	const $sizeStore = get(sizeStore);
 	const [width, height] = [$sizeStore.width, $sizeStore.height];
 

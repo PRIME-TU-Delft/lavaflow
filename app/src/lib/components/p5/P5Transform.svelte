@@ -10,7 +10,7 @@
 	import type p5 from 'p5';
 	import P5 from './P5.svelte';
 
-	export let points: Draggable[] = [];
+	export let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	export let detectSize: number = 30;
 	export let markerSize: number = 10;
 
@@ -42,12 +42,12 @@
 			const cvs = p5.createCanvas(width, height);
 			cvs.id('p5-transform');
 
-			points = []; // make sure the array is empty to make sure it does not add more than 4 points
-
-			points.push(new Draggable(width * 0.8, height * 0.35, detectSize)); // []
-			points.push(new Draggable(width * 0.8, height * 0.65, detectSize)); // ><
-			points.push(new Draggable(width * 0.2, height * 0.65, detectSize)); // /\
-			points.push(new Draggable(width * 0.2, height * 0.35, detectSize)); // ()
+			points = [
+				new Draggable(width * 0.8, height * 0.35, detectSize), // [] Square shape
+				new Draggable(width * 0.8, height * 0.65, detectSize), // >< Cross shape
+				new Draggable(width * 0.2, height * 0.65, detectSize), // /\ Triangle shape
+				new Draggable(width * 0.2, height * 0.35, detectSize) // () Circle shape
+			];
 
 			// Display an instruction at the rectangle
 			points[0].setInstruction('Drag me to the rectangle\non the paper.', 190, 40);
@@ -79,6 +79,8 @@
 
 				drawLine(points[i], points[(i + 1) % points.length]); // draw line between points
 			}
+
+			if (points.length !== 4) return;
 
 			points[0].drawRect(p5, markerSize * 1.5);
 			points[1].drawCross(p5, markerSize * 1.5);

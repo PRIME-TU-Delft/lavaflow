@@ -42,6 +42,10 @@ export default class Draggable {
 		this.offsetY = offsetY;
 	}
 
+	clone() {
+		return new Draggable(this.x, this.y, this.size, this.offsetX, this.offsetY);
+	}
+
 	/**
 	 * Set the instruction-value of this draggable
 	 * @param instruction The instruction to display

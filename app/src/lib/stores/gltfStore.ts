@@ -8,7 +8,7 @@
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
 import { craterLocations } from '$lib/stores/locationStore';
-import { difficultyStore } from '$lib/stores/difficultyStore.ts';
+import { difficultyStore } from '$lib/stores/difficultyStore';
 import { targetLocations } from '$lib/stores/locationStore';
 import { get } from 'svelte/store';
 

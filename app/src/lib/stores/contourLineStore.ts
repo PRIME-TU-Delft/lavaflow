@@ -6,7 +6,7 @@
  */
 
 import { writable } from 'svelte/store';
-import { targetLocations } from '$lib/stores/locationStore.ts';
+import { targetLocations } from '$lib/stores/locationStore';
 
 export type CurveTree = {
 	curves: [number, number][][];
