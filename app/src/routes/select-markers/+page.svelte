@@ -25,7 +25,6 @@
 	});
 
 	function applySelection() {
-		// TODO do openCV stuff
 		const cvError = imageToCountours(points);
 
 		if (cvError) {
@@ -53,7 +52,7 @@
 </script>
 
 <Menubar back="/capture" title="Select markers">
-	<!-- TODO: implement todo -->
+	<!-- TODO: implement click -->
 	<Button outline color="red">Reset</Button>
 </Menubar>
 
