@@ -1,11 +1,16 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import ActionMenu from '$lib/components/ActionMenu.svelte';
+	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import Video from '$lib/components/Video.svelte';
 	import imageStore from '$lib/stores/imageStore';
 	import sizeStore from '$lib/stores/sizeStore';
 	import { Button, Chevron, Dropdown, DropdownItem } from 'flowbite-svelte';
+	import type { PageData } from './$types';
 	import CaptureMenu from './CaptureMenu.svelte';
+
+	export let data: PageData;
 
 	let deviceId = '';
 	let loadingNextPage = false;
@@ -56,5 +61,11 @@
 		{/if}
 	</Menubar>
 
-	<CaptureMenu loading={loadingNextPage} on:click={() => gotoTransform(videoSource)} />
+	<ActionMenu>
+		{#if data.error}
+			<ErrorMessage error={data.error} on:dismiss={() => goto('/capture')} />
+		{/if}
+
+		<CaptureMenu loading={loadingNextPage} on:click={() => gotoTransform(videoSource)} />
+	</ActionMenu>
 </Video>

@@ -6,10 +6,8 @@
 	export let loading = false;
 </script>
 
-<div
-	class="w-full md:w-80 bg-red-50 fixed flex gap-4 justify-around items-center bottom-0 right-0 md:right-3 md:bottom-3 md:rounded-lg p-10 md:p-4 "
->
-	<Button href="capture/instructions" class="!p-4 h-min" outline color="red" pill>
+<div class="flex w-full items-center justify-around gap-4 bg-red-50 p-10 md:rounded-lg md:p-4 ">
+	<Button href="capture/instructions" class="h-min !p-4" outline color="red" pill>
 		<Icon path={mdiBookInformationVariant} size={1.2} />
 	</Button>
 
@@ -23,5 +21,5 @@
 		</Button>
 	{/if}
 
-	<Button class="opacity-0 !cursor-default !p-4" />
+	<Button class="!cursor-default !p-4 opacity-0" />
 </div>

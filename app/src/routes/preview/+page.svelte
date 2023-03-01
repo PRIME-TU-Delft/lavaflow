@@ -29,7 +29,9 @@
 	});
 </script>
 
-<Menubar title="preview" />
+<Menubar back="/capture" title="preview">
+	<div slot="backTitle">Re-scan</div>
+</Menubar>
 
 {#key $contourLines}
 	<P5PreviewCurves curves={$contourLines?.curves} />
@@ -38,9 +40,12 @@
 <ActionMenu>
 	<ActionButton loading={!gltfLoaded} secondary on:click={() => goto('/visual/3d')}>
 		Show in 3d model
+		<div slot="loading">Loading contour lines</div>
 	</ActionButton>
 
-	{#if webXRSupport}
+	{#if !gltfLoaded}
+		<!-- Filled with no content -->
+	{:else if webXRSupport}
 		<ActionButton loading={!gltfLoaded} on:click={() => goto('/visual/ar')}>
 			Show in AR {'(Recommended)'}
 		</ActionButton>

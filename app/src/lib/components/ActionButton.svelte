@@ -10,7 +10,8 @@
 
 {#if loading}
 	<Button outline={secondary} class="flex items-center justify-between !p-4" color="red">
-		<Spinner /> Loading...
+		<Spinner />
+		<slot name="loading">Loading...</slot>
 	</Button>
 {:else}
 	<Button

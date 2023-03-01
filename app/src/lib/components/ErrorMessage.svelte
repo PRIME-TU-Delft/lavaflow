@@ -4,16 +4,20 @@
 	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
 	import { createEventDispatcher } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	const dispatch = createEventDispatcher();
 
 	export let error: LavaError;
+	export let hasActions = false;
 
 	const dismiss = () => dispatch('dismiss');
-	const preBuild = () => dispatch('preBuild');
 </script>
 
-<div class="w-full rounded border-2 border-red-900 bg-red-50 p-4">
+<div
+	transition:fade={{ duration: 250 }}
+	class="w-full rounded border-2 border-red-900 bg-red-50 p-4"
+>
 	<div class="flex items-center justify-between gap-2">
 		<p class="w-auto overflow-hidden text-ellipsis whitespace-nowrap font-bold text-red-900">
 			{error.title}
@@ -25,10 +29,9 @@
 
 	<p class="mt-1 text-red-800">{error.message}</p>
 
-	<ButtonGroup class="mt-4 w-full">
-		<Button class="w-full" outline color="red" href="capture">Rescan image</Button>
-		<Button class="w-full grow" outline color="red" on:click={preBuild}>
-			Continue with pre-build contours
-		</Button>
-	</ButtonGroup>
+	{#if hasActions}
+		<ButtonGroup class="mt-4 w-full">
+			<slot />
+		</ButtonGroup>
+	{/if}
 </div>

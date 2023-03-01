@@ -100,7 +100,7 @@
 </script>
 
 <div class="p5Transform pointer-events-none relative h-full select-none overflow-hidden">
-	<P5 {sketch} parentDivStyle="" />
+	<P5 {sketch} />
 	<slot />
 </div>
 
@@ -111,14 +111,5 @@
 
 	.p5Transform {
 		touch-action: none;
-	}
-
-	:global(.p5Canvas canvas) {
-		width: 100% !important;
-		height: unset !important;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
 	}
 </style>

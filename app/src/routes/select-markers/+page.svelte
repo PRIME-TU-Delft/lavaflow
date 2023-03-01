@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
+	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import P5Transform from '$lib/components/p5/P5Transform.svelte';
 	import type Draggable from '$lib/data/draggable';
@@ -13,18 +14,22 @@
 	import { mdiBookInformationVariant, mdiChevronRight } from '@mdi/js';
 	import { Button } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
-	import ErrorMessage from './ErrorMessage.svelte';
 	import imageToCountours from './imageToContour';
 
-	let points: Draggable[] = [];
+	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
 
 	onMount(() => {
 		// If no raw image in cache, go back to scan/mapscanning
+		// TODO: move to load() function
 		if (!$imageStore || !$sizeStore) goto('/capture');
 	});
 
 	function applySelection() {
+		if (points.length !== 4) {
+			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
+			return;
+		}
 		const cvError = imageToCountours(points);
 
 		if (cvError) {
@@ -69,7 +74,12 @@
 
 <ActionMenu>
 	{#if error}
-		<ErrorMessage {error} on:dismiss={() => (error = null)} on:preBuild={continueWithDefaultMap} />
+		<ErrorMessage {error} hasActions on:dismiss={() => (error = null)}>
+			<Button class="w-full" outline color="red" href="capture">Rescan image</Button>
+			<Button class="w-full grow" outline color="red" on:click={continueWithDefaultMap}>
+				Continue with pre-build contours
+			</Button>
+		</ErrorMessage>
 	{/if}
 	<ActionButton secondary href="/select-markers/instructions" icon={mdiBookInformationVariant}>
 		Show instruction
