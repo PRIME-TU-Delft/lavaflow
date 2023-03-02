@@ -1,11 +1,11 @@
 import { goto } from '$app/navigation';
 import type Draggable from '$lib/data/draggable';
 import { contourLines } from '$lib/stores/contourLineStore';
+import sizeStore from '$lib/stores/sizeStore';
 import cv from 'opencv-ts';
+import { get } from 'svelte/store';
 import { getCurves } from './open-cv/detectCurves';
 import removePerspective from './open-cv/removePerspective';
-import sizeStore from '$lib/stores/sizeStore';
-import { get } from 'svelte/store';
 
 /**
  * takes the <img id="foregroundImage" /> and converts it to contour lines with hierarchy.
@@ -14,6 +14,9 @@ import { get } from 'svelte/store';
  */
 export default function imageToCountours(points: [Draggable, Draggable, Draggable, Draggable]) {
 	const $sizeStore = get(sizeStore);
+	if (!$sizeStore.width || !$sizeStore.height)
+		return "No size found for the image. Please go back to the 'Capture' page and try again.";
+
 	const [width, height] = [$sizeStore.width, $sizeStore.height];
 
 	const mat = cv.imread('foregroundImage');

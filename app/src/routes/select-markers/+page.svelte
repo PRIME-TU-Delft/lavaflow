@@ -11,19 +11,14 @@
 	import { hc_curves, hc_hierarchy } from '$lib/stores/hardCoded';
 	import imageStore from '$lib/stores/imageStore';
 	import sizeStore from '$lib/stores/sizeStore';
-	import { mdiBookInformationVariant, mdiChevronRight } from '@mdi/js';
+	import { mdiChevronRight, mdiHelp } from '@mdi/js';
 	import { Button } from 'flowbite-svelte';
-	import { onMount } from 'svelte';
 	import imageToCountours from './imageToContour';
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
 
-	onMount(() => {
-		// If no raw image in cache, go back to scan/mapscanning
-		// TODO: move to load() function
-		if (!$imageStore || !$sizeStore) goto('/capture');
-	});
+	$: hasStores = !!($imageStore && $sizeStore.height && $sizeStore.width);
 
 	function applySelection() {
 		if (points.length !== 4) {
@@ -61,16 +56,20 @@
 	<Button outline color="red">Reset</Button>
 </Menubar>
 
-<P5Transform bind:points on:error={(e) => (error = e.detail.error)} />
+{#if hasStores}
+	<P5Transform bind:points on:error={(e) => (error = e.detail.error)} />
 
-<img
-	style="display:none"
-	height={$sizeStore.height * 2}
-	width={$sizeStore.width * 2}
-	id="foregroundImage"
-	src={$imageStore}
-	alt="background"
-/>
+	<img
+		style="display:none"
+		height={$sizeStore.height * 2}
+		width={$sizeStore.width * 2}
+		id="foregroundImage"
+		src={$imageStore}
+		alt="background"
+	/>
+{:else}
+	<img id="foregroundImage" alt="background" />
+{/if}
 
 <ActionMenu>
 	{#if error}
@@ -81,8 +80,10 @@
 			</Button>
 		</ErrorMessage>
 	{/if}
-	<ActionButton secondary href="/select-markers/instructions" icon={mdiBookInformationVariant}>
+	<ActionButton secondary href="/select-markers/instructions" icon={mdiHelp}>
 		Show instruction
 	</ActionButton>
-	<ActionButton icon={mdiChevronRight} on:click={applySelection}>Apply selection</ActionButton>
+	<ActionButton disabled={!hasStores} icon={mdiChevronRight} on:click={applySelection}>
+		Apply selection
+	</ActionButton>
 </ActionMenu>

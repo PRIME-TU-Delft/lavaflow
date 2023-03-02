@@ -40,7 +40,7 @@
 		{/if}
 
 		<div class="pt-3">
-			<a href="/capture/instructions">Start game</a>
+			<a href="/capture/instructions">Start</a>
 		</div>
 	</Section>
 

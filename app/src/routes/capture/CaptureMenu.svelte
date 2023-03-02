@@ -1,5 +1,5 @@
 <script>
-	import { mdiBookInformationVariant, mdiCamera } from '@mdi/js';
+	import { mdiHelp, mdiCamera } from '@mdi/js';
 	import { Button, Spinner } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
 
@@ -8,7 +8,7 @@
 
 <div class="flex w-full items-center justify-around gap-4 bg-red-50 p-10 md:rounded-lg md:p-4 ">
 	<Button href="capture/instructions" class="h-min !p-4" outline color="red" pill>
-		<Icon path={mdiBookInformationVariant} size={1.2} />
+		<Icon path={mdiHelp} size={1.2} />
 	</Button>
 
 	{#if loading}

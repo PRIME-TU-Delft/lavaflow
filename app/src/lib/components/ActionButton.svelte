@@ -5,6 +5,7 @@
 	export let icon = '';
 	export let loading = false;
 	export let secondary = false;
+	export let disabled = false;
 	export let href = '';
 </script>
 
@@ -17,6 +18,7 @@
 	<Button
 		{href}
 		outline={secondary}
+		{disabled}
 		class="flex items-center justify-between !p-4 {secondary ? 'bg-red-50/80' : ''}"
 		on:click
 		color="red"

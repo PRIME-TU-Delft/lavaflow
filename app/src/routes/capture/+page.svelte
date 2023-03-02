@@ -66,6 +66,9 @@
 			<ErrorMessage error={data.error} on:dismiss={() => goto('/capture')} />
 		{/if}
 
-		<CaptureMenu loading={loadingNextPage} on:click={() => gotoTransform(videoSource)} />
+		<CaptureMenu
+			loading={!data.error && loadingNextPage}
+			on:click={() => gotoTransform(videoSource)}
+		/>
 	</ActionMenu>
 </Video>
