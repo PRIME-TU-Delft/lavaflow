@@ -1,21 +1,24 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
+	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { gltfStore } from '$lib/stores/gltfStore';
+	import { targetLocations } from '$lib/stores/locationStore';
+	import { mdiChevronRight } from '@mdi/js';
 	import { Canvas } from '@threlte/core';
-	import { onMount } from 'svelte';
+	import { Button } from 'flowbite-svelte';
+	import EruptionScore from '../EruptionScore.svelte';
 	import Scene from './Scene.svelte';
 
-	let gltfModel: string;
+	$: deltaTubines = $difficultyStore.min_steam_turbines - $targetLocations.length;
 
-	onMount(async () => {
-		if (!$gltfStore?.gltf_url) {
-			// TODO: display error and ask if user wants to rescan or continue with default mountain
-			return goto('/preview');
-		}
-	});
+	let eruptionScore: number | null = null;
+
+	function startEruption() {
+		// TODO: add eruption score
+		eruptionScore = Math.floor(Math.random() * 1000);
+	}
 </script>
 
 <Menubar title="Visual 3d" back="/preview" />
@@ -29,7 +32,20 @@
 </div>
 
 <ActionMenu>
-	<!-- TODO: make buttons work -->
-	<ActionButton secondary>Start eruption</ActionButton>
-	<ActionButton>Place turbines</ActionButton>
+	{#if deltaTubines > 0}
+		<ActionButton href={'/3d/turbine-placement'} icon={mdiChevronRight}>
+			Place {deltaTubines} more turbines
+		</ActionButton>
+	{:else if !eruptionScore}
+		<ActionButton secondary href={'/3d/turbine-placement'} icon={mdiChevronRight}>
+			Move turbines
+		</ActionButton>
+
+		<ActionButton secondary on:click={startEruption}>Start eruption</ActionButton>
+	{:else}
+		<EruptionScore score={eruptionScore}>
+			<Button href="/capture" outline red>Rescan volcano</Button>
+			<Button href="/3d/turbine-placement" outline red>Place other turbines</Button>
+		</EruptionScore>
+	{/if}
 </ActionMenu>
