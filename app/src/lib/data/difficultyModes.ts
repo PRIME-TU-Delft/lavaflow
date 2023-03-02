@@ -8,6 +8,9 @@ function map(
 	return to_min + ((val - from_min) / (from_max - from_min)) * (to_max - to_min);
 }
 
+export type DifficultyLevelString = {
+	[Property in keyof DifficultyLevel]: string;
+};
 export class DifficultyLevel {
 	name: string;
 	description: string;
@@ -34,6 +37,28 @@ export class DifficultyLevel {
 		this.min_steam_turbines = min_steam_turbines;
 		this.min_steam_turbine_separation = min_steam_turbine_separation;
 		this.min_crater_distance = min_crater_distance;
+	}
+
+	static new({
+		name,
+		description,
+		max_lava_distance,
+		lava_forking,
+		min_steam_turbines,
+		min_steam_turbine_separation,
+		min_crater_distance
+	}: DifficultyLevelString): DifficultyLevel {
+		const defaultLevel = difficulty_modes[0];
+
+		return new DifficultyLevel(
+			name ?? defaultLevel.name,
+			description ?? defaultLevel.description,
+			parseInt(max_lava_distance) ?? defaultLevel.max_lava_distance,
+			parseFloat(lava_forking) ?? defaultLevel.lava_forking,
+			parseInt(min_steam_turbines) ?? defaultLevel.min_steam_turbines,
+			parseInt(min_steam_turbine_separation) ?? defaultLevel.min_steam_turbine_separation,
+			parseInt(min_crater_distance) ?? defaultLevel.min_crater_distance
+		);
 	}
 
 	computePointsForLavaDistance(dist: number): number {

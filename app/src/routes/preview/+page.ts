@@ -3,12 +3,16 @@ import sizeStore from '$lib/stores/sizeStore';
 import { get } from 'svelte/store';
 import type { PageLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
+import { getError } from '$lib/data/getError';
+import LavaError from '$lib/data/LavaError';
 
-export const load = (() => {
+export const load = (({ url }) => {
+	const error = getError(url, (err) => {
+		return new LavaError('Something went wrong', err);
+	});
+
 	if (browser) {
 		const size = get(sizeStore);
-
-		// TODO add check for contour lines
 
 		if (!size.width || !size.height) {
 			const error = encodeURIComponent('Preview is not available without a size');
@@ -17,5 +21,5 @@ export const load = (() => {
 		}
 	}
 
-	return {};
+	return { ...error };
 }) satisfies PageLoad;

@@ -2,18 +2,21 @@
 	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
+	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import P5PreviewCurves from '$lib/components/p5/P5PreviewCurves.svelte';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { onMount } from 'svelte';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 
 	let gltfLoaded = false;
 	let webXRSupport = false;
 
 	onMount(async () => {
-		// TODO: move to load() function
 		if (!$contourLines.curves || !$contourLines.hierarchy) {
 			return goto('/capture');
 		}
@@ -38,6 +41,10 @@
 {/key}
 
 <ActionMenu>
+	{#if data.error}
+		<ErrorMessage error={data.error} on:dismiss={() => goto('/preview')} />
+	{/if}
+
 	<ActionButton loading={!gltfLoaded} secondary on:click={() => goto('/visual/3d')}>
 		Show in 3d model
 		<div slot="loading">Loading contour lines</div>
