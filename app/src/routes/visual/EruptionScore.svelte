@@ -27,7 +27,11 @@
 </script>
 
 {#if score !== null}
-	<ErrorMessage error={new LavaError(scoreTitle, `You scored ${score}/1000 points`)}>
+	<ErrorMessage
+		hasActions
+		error={new LavaError(scoreTitle, `You scored ${score}/1000 points`)}
+		on:dismiss
+	>
 		<slot />
 	</ErrorMessage>
 {/if}

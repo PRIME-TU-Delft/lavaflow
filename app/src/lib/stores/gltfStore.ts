@@ -7,9 +7,8 @@
 
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
-import { craterLocations } from '$lib/stores/locationStore';
 import { difficultyStore } from '$lib/stores/difficultyStore';
-import { targetLocations } from '$lib/stores/locationStore';
+import { turbineLocations, craterLocation } from '$lib/stores/locationStore';
 import { get } from 'svelte/store';
 
 import ApiSettings from '$lib/data/apiSettings';
@@ -130,7 +129,7 @@ function createGltfStore() {
 			]);
 
 			// (re-)set the crater locations
-			craterLocations.set(model.craters);
+			craterLocation.set(model.craters[0]);
 
 			// set the gltf store to the gltf string
 			set(model);
@@ -168,7 +167,7 @@ function createGltfStore() {
 			return api.compute_player_points(
 				new wasm.LavaPathTurbineInput({
 					lava_paths: model.lava_paths,
-					turbines: get(targetLocations).map((l) => [(l.x / width) * 100, (l.y / height) * 100]),
+					turbines: get(turbineLocations).map((l) => [(l.x / width) * 100, (l.y / height) * 100]),
 					max_lava_distance: get(difficultyStore).max_lava_distance,
 					max_points_total: max_points_total
 				})

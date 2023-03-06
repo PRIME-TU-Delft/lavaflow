@@ -3,7 +3,7 @@
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
-	import { targetLocations } from '$lib/stores/locationStore';
+	import { turbineLocations } from '$lib/stores/locationStore';
 	import { mdiChevronRight, mdiHelp, mdiReload, mdiStairsUp } from '@mdi/js';
 	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
@@ -12,19 +12,10 @@
 
 	export let data: PageData;
 
-	$: deltaTubines = $difficultyStore.min_steam_turbines - $targetLocations.length;
-
-	interface Turbine {
-		x: number;
-		y: number;
-		index: string;
-		hasConfirmOpen: boolean;
-	}
-
-	let turbines: Turbine[] = [];
+	$: deltaTubines = $difficultyStore.min_steam_turbines - $turbineLocations.length;
 
 	function resetTurbines() {
-		turbines = [];
+		turbineLocations.clear();
 	}
 </script>
 
@@ -36,7 +27,7 @@
 	</Button>
 </Menubar>
 
-<TurbinePlacement bind:turbines />
+<TurbinePlacement />
 
 <ActionMenu>
 	<!-- Instructions and difficulty selection -->
