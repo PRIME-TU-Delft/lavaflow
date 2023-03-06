@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { Button, Spinner } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
 
@@ -7,6 +7,7 @@
 	export let secondary = false;
 	export let disabled = false;
 	export let href = '';
+	export let twClass = '';
 </script>
 
 {#if loading}
@@ -19,7 +20,7 @@
 		{href}
 		outline={secondary}
 		{disabled}
-		class="flex items-center justify-between !p-4 {secondary ? 'bg-red-50/80' : ''}"
+		class="flex items-center justify-between !p-4 {secondary ? 'bg-red-50/80' : ''} {twClass}"
 		on:click
 		color="red"
 	>
