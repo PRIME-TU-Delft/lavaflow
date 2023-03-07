@@ -2,6 +2,7 @@ use gltf_json as json;
 
 use std::mem;
 
+use base64::{Engine as _, engine::general_purpose as b64};
 use json::validation::Checked::Valid;
 use miette::{miette, IntoDiagnostic, Result};
 
@@ -64,7 +65,7 @@ pub fn generate_gltf(triangle_vertices: &[([f32; 3], [f32; 3])]) -> Result<Strin
 
 	let bin_content = to_padded_byte_vector(triangle_vertices);
 	let mut bin_content_b64 = String::from("data:application/octet-stream;base64,");
-	bin_content_b64.push_str(&base64::encode(bin_content));
+	bin_content_b64.push_str(&b64::STANDARD.encode(bin_content));
 
 	let buffer_length = (triangle_vertices_len * mem::size_of::<Vertex>()) as u32;
 	let buffer = json::Buffer {
