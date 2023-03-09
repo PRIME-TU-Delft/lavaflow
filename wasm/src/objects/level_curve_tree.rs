@@ -108,7 +108,7 @@ impl<'a> LevelCurveTree<'a> {
 
 		//get pixels from tree
 		let pixels = self.get_pixels_for_curve().ok_or_else(|| miette!("Could not get pixels in tree"))?;
-		let first_pixel: &(u64, u64) = pixels.get(0).ok_or_else(|| miette!("Could not get first pixel"))?;
+		let first_pixel: &(u64, u64) = pixels.first().ok_or_else(|| miette!("Could not get first pixel"))?;
 
 		// If there are only 50 pixels, select all of them
 		// TODO: 50 is somewhat arbitrarily chosen, there's probably a better way to do this

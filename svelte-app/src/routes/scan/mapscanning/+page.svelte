@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	export const prerender = true;
-</script>
-
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
 	import NavigationButton from '$lib/components/NavigationButton.svelte';

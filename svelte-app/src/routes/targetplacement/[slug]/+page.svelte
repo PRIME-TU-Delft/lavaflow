@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	export const prerender = true;
-</script>
-
 <script lang="ts">
 	import NavigationButton from '$lib/components/NavigationButton.svelte';
 	import TargetPlacement from '$lib/components/TargetPlacement.svelte';
