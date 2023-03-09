@@ -2,24 +2,51 @@ import { goto } from '$app/navigation';
 import type Draggable from '$lib/data/draggable';
 import { contourLines } from '$lib/stores/contourLineStore';
 import sizeStore from '$lib/stores/sizeStore';
+import imageStore from '$lib/stores/imageStore';
 import cv from 'opencv-ts';
 import { get } from 'svelte/store';
 import { getCurves } from './open-cv/detectCurves';
 import removePerspective from './open-cv/removePerspective';
+import * as gm from 'gammacv'
 
 /**
  * takes the <img id="foregroundImage" /> and converts it to contour lines with hierarchy.
  * @param points Draggable points that are the edges of the sub-image
  * @returns
  */
-export default function imageToCountours(points: [Draggable, Draggable, Draggable, Draggable]) {
+export default async function imageToCountours(imageURL="", points: [Draggable, Draggable, Draggable, Draggable]) {
 	const $sizeStore = get(sizeStore);
 	if (!$sizeStore.width || !$sizeStore.height)
 		return "No size found for the image. Please go back to the 'Capture' page and try again.";
 
 	const [width, height] = [$sizeStore.width, $sizeStore.height];
 
-	const mat = cv.imread('foregroundImage');
+	// Transform the image (from imageStore) into a gammacv tensor
+	const gammacvInputTensor = await gm.imageTensorFromURL(imageURL, "uint8", [$sizeStore.height*2, $sizeStore.width*2, 4])
+
+	const cannyEdgesOperation = gm.cannyEdges(
+		gm.sobelOperator(gm.gaussianBlur(gammacvInputTensor, 3, 1)), 0.25, 0.75
+	)
+
+	// Extract the tensor output
+	const gammacvOutputTensor: any = gm.tensorFrom(cannyEdgesOperation)
+
+	// Create and initialize the GammaCV session, to acquire GPU acceperation
+	const gammacvSession = new gm.Session()
+	gammacvSession.init(cannyEdgesOperation)
+
+	// Run the canny-edges operation
+	gammacvSession.runOp(cannyEdgesOperation, 0, gammacvOutputTensor);
+
+	// Select the canvas from the DOM
+	const hiddenCanvas: any = document.getElementById("foregroundCanvasImage")
+
+	gm.canvasFromTensor(hiddenCanvas, gammacvOutputTensor)
+
+	imageStore.set(hiddenCanvas.toDataURL('image/png'))
+
+	// Grab image from DOM
+	const mat = cv.imread('foregroundCanvasImage');
 
 	// Fetch the marker coordinates of the draggable buttons
 	const markerCoords: number[] = [];

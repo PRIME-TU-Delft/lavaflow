@@ -48,6 +48,7 @@
 		"classnames": "^2.3.2",
 		"flowbite": "^1.6.3",
 		"flowbite-svelte": "^0.30.4",
+		"gammacv": "^0.5.2",
 		"mdi-svelte-ts": "^1.0.0",
 		"opencv-ts": "^1.3.6",
 		"p5": "^1.6.0",
