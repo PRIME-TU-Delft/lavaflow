@@ -11,6 +11,7 @@
 	import P5 from './P5.svelte';
 
 	export let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
+
 	export let detectSize: number = 30;
 	export let markerSize: number = 10;
 
@@ -37,16 +38,17 @@
 				return dispatchError('No size found', 'Please try re-scanning the template');
 			}
 
-			const [width, height] = [$sizeStore.width * 2, $sizeStore.height * 2];
+			const [width, height] = [p5.windowWidth, p5.windowHeight];
 
-			const cvs = p5.createCanvas(width, height);
+			p5.pixelDensity(p5.displayDensity())
+			const cvs = p5.createCanvas(p5.windowWidth, p5.windowHeight);
 			cvs.id('p5-transform');
 
 			points = [
-				new Draggable(width * 0.8, height * 0.35, detectSize), // [] Square shape
-				new Draggable(width * 0.8, height * 0.65, detectSize), // >< Cross shape
-				new Draggable(width * 0.2, height * 0.65, detectSize), // /\ Triangle shape
-				new Draggable(width * 0.2, height * 0.35, detectSize) // () Circle shape
+				new Draggable(width * 0.75, height * 0.25, detectSize), // [] Square shape
+				new Draggable(width * 0.75, height * 0.75, detectSize), // >< Cross shape
+				new Draggable(width * 0.25, height * 0.75, detectSize), // /\ Triangle shape
+				new Draggable(width * 0.25, height * 0.25, detectSize) // () Circle shape
 			];
 
 			// Display an instruction at the rectangle
@@ -67,7 +69,7 @@
 		}
 
 		p5.draw = () => {
-			const [width, height] = [$sizeStore.width * 2, $sizeStore.height * 2];
+			const [width, height] = [p5.windowWidth, p5.windowHeight];
 
 			if (image) {
 				p5.image(image, 0, 0, width, height);
@@ -75,8 +77,9 @@
 
 			// Render all Draggable points
 			for (let i = 0; i < points.length; i++) {
-				points[i].update(p5); // update position
+				points[i].update(p5, undefined, undefined, undefined, undefined, undefined, $sizeStore.width, $sizeStore.height); // update position
 
+				p5.stroke(0, 255, 0);
 				drawLine(points[i], points[(i + 1) % points.length]); // draw line between points
 			}
 

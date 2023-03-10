@@ -25,7 +25,7 @@
 			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
 			return;
 		}
-		const cvError = await imageToCountours($imageStore, points);
+		const cvError = await imageToCountours(points);
 
 		if (cvError) {
 			error = new LavaError('Something went wrong detecting curves', cvError);
@@ -59,17 +59,17 @@
 {#if hasStores}
 {#key $imageStore}
 	<P5Transform bind:points on:error={(e) => (error = e.detail.error)} />
-{/key}
-	<canvas id="foregroundCanvasImage" height={$sizeStore.height * 2} width={$sizeStore.width * 2}></canvas>
-
 	<img
-		style="display:none"
-		height={$sizeStore.height * 2}
-		width={$sizeStore.width * 2}
+		style="display:none;"
+		height={$sizeStore.height}
+		width={$sizeStore.width}
 		id="foregroundImage"
 		src={$imageStore}
 		alt="background"
 	/>
+{/key}
+{:else}
+	<img id="foregroundImage" alt="background" />
 {/if}
 
 <ActionMenu>

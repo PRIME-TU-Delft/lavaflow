@@ -11,6 +11,8 @@ export default class Draggable {
 	too_close_to_other_target = false;
 	x: number;
 	y: number;
+	mappedX: number;
+	mappedY: number;
 	old_x: number;
 	old_y: number;
 	size: number;
@@ -35,6 +37,8 @@ export default class Draggable {
 	constructor(x: number, y: number, size: number, offsetX = 0, offsetY = 0) {
 		this.x = x;
 		this.y = y;
+		this.mappedX = 0
+		this.mappedY = 0
 		this.old_x = x;
 		this.old_y = y;
 		this.size = size;
@@ -106,7 +110,9 @@ export default class Draggable {
 		crater_distance?: number,
 		avoid_targets?: Draggable[],
 		target_distance?: number,
-		index?: number
+		index?: number,
+		imgWidth?: number,
+		imgHeight?: number
 	) {
 		if (p5.mouseIsPressed) this.pressed(p5);
 		if (!this.dragging) return;
@@ -116,6 +122,11 @@ export default class Draggable {
 
 		this.x = p5.mouseX + this.offsetX;
 		this.y = p5.mouseY + this.offsetY;
+
+		if (imgWidth && imgHeight) {
+			this.mappedX = this.x / p5.windowWidth * imgWidth
+			this.mappedY = this.y / p5.windowHeight * imgHeight
+		}
 
 		// Translate above the user's finger
 		this.translateForDragging(p5);
@@ -260,7 +271,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(255, 0, 0);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 		p5.rectMode(p5.CORNER);
@@ -310,7 +321,7 @@ export default class Draggable {
 			p5.fill(255, 0, 0);
 		}
 
-		p5.stroke(0);
+		p5.stroke(255, 0, 0);
 		p5.strokeWeight(STROKE_WIDTH);
 
 		p5.ellipse(this.x, this.y, markerSize);
@@ -329,7 +340,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(255, 0, 0);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 
@@ -357,7 +368,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(255, 0, 0);
 		p5.strokeWeight(STROKE_WIDTH * 2);
 		// cross is drawn using two thick lines
 
@@ -390,6 +401,8 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 */
 	pressed(p5: p5, incorporateTag?: boolean) {
+		console.log("Pressed!")
+
 		// Check if mouse is over this object when global mouse is pressed
 		let xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < this.x + this.size / 2;
 		const yBounded = p5.mouseY > this.y - this.size / 2 && p5.mouseY < this.y + this.size / 2;

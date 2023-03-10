@@ -9,6 +9,7 @@
 	import { Button, Chevron, Dropdown, DropdownItem } from 'flowbite-svelte';
 	import type { PageData } from './$types';
 	import CaptureMenu from './CaptureMenu.svelte';
+	import * as gm from 'gammacv'
 
 	export let data: PageData;
 
@@ -22,26 +23,62 @@
 		return camera?.label || 'Select other camera';
 	}
 
-	function gotoTransform(videoSource: HTMLVideoElement | undefined) {
+	async function gotoTransform(videoSource: HTMLVideoElement | undefined) {
 		loadingNextPage = true;
 
 		if (!videoSource) return;
 
 		// Create an atificial canvas element
 		const canvas = document.createElement('canvas');
-		const context = canvas.getContext('2d');
 		canvas.height = videoSource.videoHeight;
 		canvas.width = videoSource.videoWidth;
+		const context = canvas.getContext('2d');
 
 		// Take screenshot of video
-		if (context) context.drawImage(videoSource, 0, 0, canvas.width, canvas.height);
+		if (context) context.drawImage(videoSource, 0, 0, videoSource.videoWidth, videoSource.videoHeight);
+
 		const image = canvas.toDataURL('image/png');
+
+		// Transform the image (from imageStore) into a gammacv tensor
+		const gammacvInputTensor = await gm.imageTensorFromURL(image, "uint8", [videoSource.videoHeight, videoSource.videoWidth, 4])
+
+		// const cannyEdgesOperation = gm.cannyEdges(
+		// 	gm.sobelOperator(
+		// 		// gm.gaussianBlur(
+		// 			gm.norm(
+		// 				gm.erode(gammacvInputTensor, [5, 5])
+		// 			, "l2")
+		// 		// , 3, 1)
+		// 	), 0.25, 0.75
+		// )
+
+		const cannyEdgesOperation =
+			gm.adaptiveThreshold(
+				gm.erode(
+					gm.norm(gammacvInputTensor, "l2")
+				, [3, 3])
+			, 15, 20)
+
+		// const cannyEdgesOperation = gm.norm(gammacvInputTensor, "l2")
+
+		// Extract the tensor output
+		const gammacvOutputTensor: any = gm.tensorFrom(cannyEdgesOperation)
+
+		// Create and initialize the GammaCV session, to acquire GPU acceperation
+		const gammacvSession = new gm.Session()
+		gammacvSession.init(cannyEdgesOperation)
+
+		// Run the canny-edges operation
+		gammacvSession.runOp(cannyEdgesOperation, 0, gammacvOutputTensor);
+
+		gm.canvasFromTensor(canvas, gammacvOutputTensor)
+
+		imageStore.set(canvas.toDataURL('image/png'))
 
 		canvas.remove();
 
 		// Set image in (raw)image store
-		imageStore.set(image);
-		sizeStore.set({ width: canvas.width, height: canvas.height });
+		sizeStore.set({ width: videoSource.videoWidth, height: videoSource.videoHeight });
 
 		goto('/select-markers');
 	}
