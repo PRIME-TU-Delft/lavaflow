@@ -68,8 +68,6 @@
 		alt="background"
 	/>
 {/key}
-{:else}
-	<img id="foregroundImage" alt="background" />
 {/if}
 
 <ActionMenu>

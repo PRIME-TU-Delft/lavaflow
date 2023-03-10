@@ -2,7 +2,6 @@ import { goto } from '$app/navigation';
 import type Draggable from '$lib/data/draggable';
 import { contourLines } from '$lib/stores/contourLineStore';
 import sizeStore from '$lib/stores/sizeStore';
-import imageStore from '$lib/stores/imageStore';
 import cv from 'opencv-ts';
 import { get } from 'svelte/store';
 import { getCurves } from './open-cv/detectCurves';
@@ -13,7 +12,7 @@ import removePerspective from './open-cv/removePerspective';
  * @param points Draggable points that are the edges of the sub-image
  * @returns
  */
-export default async function imageToCountours(points: [Draggable, Draggable, Draggable, Draggable]) {
+export default function imageToCountours(points: [Draggable, Draggable, Draggable, Draggable]) {
 	const $sizeStore = get(sizeStore);
 	if (!$sizeStore.width || !$sizeStore.height)
 		return "No size found for the image. Please go back to the 'Capture' page and try again.";
