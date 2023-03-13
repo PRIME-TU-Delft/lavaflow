@@ -27,9 +27,7 @@
 
 <div class="h-full w-full">
 	<Canvas>
-		{#if $gltfStore?.gltf_url}
-			<Scene gltfModel={$gltfStore.gltf_url} />
-		{/if}
+		<Scene />
 	</Canvas>
 </div>
 
