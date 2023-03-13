@@ -53,11 +53,13 @@
 		// )
 
 		const cannyEdgesOperation =
-			gm.adaptiveThreshold(
-				gm.erode(
-					gm.norm(gammacvInputTensor, "l2")
-				, [3, 3])
-			, 15, 20)
+			gm.gaussianBlur(
+				gm.adaptiveThreshold(
+					gm.erode(
+						gm.norm(gammacvInputTensor, "l2")
+					, [3, 3])
+				, 10, 20)
+			, 3, 6)
 
 		// const cannyEdgesOperation = gm.norm(gammacvInputTensor, "l2")
 

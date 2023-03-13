@@ -110,9 +110,7 @@ export default class Draggable {
 		crater_distance?: number,
 		avoid_targets?: Draggable[],
 		target_distance?: number,
-		index?: number,
-		imgWidth?: number,
-		imgHeight?: number
+		index?: number
 	) {
 		if (p5.mouseIsPressed) this.pressed(p5);
 		if (!this.dragging) return;
@@ -122,11 +120,6 @@ export default class Draggable {
 
 		this.x = p5.mouseX + this.offsetX;
 		this.y = p5.mouseY + this.offsetY;
-
-		if (imgWidth && imgHeight) {
-			this.mappedX = this.x / p5.windowWidth * imgWidth
-			this.mappedY = this.y / p5.windowHeight * imgHeight
-		}
 
 		// Translate above the user's finger
 		this.translateForDragging(p5);
@@ -163,6 +156,12 @@ export default class Draggable {
 				}
 			}
 		}
+	}
+
+
+	updateMappedCoordinates(p5: p5, imgWidth: number, imgHeight: number) {
+		this.mappedX = this.x / p5.windowWidth * imgWidth
+		this.mappedY = this.y / p5.windowHeight * imgHeight
 	}
 
 	/**
@@ -401,7 +400,6 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 */
 	pressed(p5: p5, incorporateTag?: boolean) {
-		console.log("Pressed!")
 
 		// Check if mouse is over this object when global mouse is pressed
 		let xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < this.x + this.size / 2;

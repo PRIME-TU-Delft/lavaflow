@@ -2,10 +2,12 @@ import { goto } from '$app/navigation';
 import type Draggable from '$lib/data/draggable';
 import { contourLines } from '$lib/stores/contourLineStore';
 import sizeStore from '$lib/stores/sizeStore';
+import imageStore from '$lib/stores/imageStore';
 import cv from 'opencv-ts';
 import { get } from 'svelte/store';
 import { getCurves } from './open-cv/detectCurves';
-import removePerspective from './open-cv/removePerspective';
+import removePerspective, { removePerspectiveGammaCV } from './open-cv/removePerspective';
+import * as gm from 'gammacv'
 
 /**
  * takes the <img id="foregroundImage" /> and converts it to contour lines with hierarchy.
@@ -65,4 +67,45 @@ export default function imageToCountours(points: [Draggable, Draggable, Draggabl
 
 	result.delete();
 	mat.delete();
+}
+
+
+
+export async function extractSelectedArea(points: [Draggable, Draggable, Draggable, Draggable], canvas: HTMLCanvasElement) {
+	
+	const $sizeStore = get(sizeStore);
+	if (!$sizeStore.width || !$sizeStore.height)
+		return "No size found for the image. Please go back to the 'Capture' page and try again.";
+
+	const [width, height] = [$sizeStore.width, $sizeStore.height];
+
+	// Grab image from DOM
+	//const mat = cv.imread("foregroundImage");
+
+	// Fetch the marker coordinates of the draggable buttons
+	const markerCoords: number[] = [];
+	for (const p of points) {
+		markerCoords.push(p.mappedX);
+		markerCoords.push(p.mappedY);
+	}
+
+	// Apply the perspective transformation using the selected marker coords
+
+	const sourceTensor = await gm.imageTensorFromURL(get(imageStore), "uint8", [width, height, 4])
+
+	const result = removePerspectiveGammaCV(
+		sourceTensor,
+		markerCoords,
+		width,
+		height
+	)
+
+	//mat.delete()
+
+	console.log(result)
+
+	const context = canvas.getContext('2d')
+	gm.canvasFromTensor(canvas, sourceTensor)
+
+
 }

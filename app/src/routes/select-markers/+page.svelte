@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
@@ -13,7 +14,7 @@
 	import sizeStore from '$lib/stores/sizeStore';
 	import { mdiChevronRight, mdiHelp } from '@mdi/js';
 	import { Button } from 'flowbite-svelte';
-	import imageToCountours from './imageToContour';
+	import imageToCountours, { extractSelectedArea } from './imageToContour';
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
@@ -49,6 +50,24 @@
 
 		goto('/preview');
 	}
+
+	let perspectiveRemovedImage: HTMLCanvasElement;
+
+	function updatePerspectiveRemovedImage() {
+		console.log("Updating canvas")
+		if (points.length !== 4) {
+			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
+			return;
+		}
+		extractSelectedArea(points, perspectiveRemovedImage)
+	}
+
+	onMount(() => {
+		setInterval(
+			updatePerspectiveRemovedImage,
+			3000
+		)
+	})
 </script>
 
 <Menubar back="/capture" title="Select markers">
@@ -58,15 +77,20 @@
 
 {#if hasStores}
 {#key $imageStore}
-	<P5Transform bind:points on:error={(e) => (error = e.detail.error)} />
+	<P5Transform bind:points on:error={(e) => (error = e.detail.error)}/>
+
+	<canvas id="perspectiveRemovedImage"
+			style="position:absolute;width:100px;height:100px;top:200px;right:0;background:#0f0;"
+			bind:this={perspectiveRemovedImage} />
 	<img
-		style="display:none;"
+		style="position:absolute;width:100px;height:100px;top:500px;right:0;"
 		height={$sizeStore.height}
 		width={$sizeStore.width}
 		id="foregroundImage"
 		src={$imageStore}
 		alt="background"
 	/>
+	<canvas id="canvasOutput" />
 {/key}
 {/if}
 

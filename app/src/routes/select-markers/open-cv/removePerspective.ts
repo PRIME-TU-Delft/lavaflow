@@ -1,4 +1,6 @@
+import type { Tensor } from 'gammacv';
 import cv, { type Mat } from 'opencv-ts';
+import * as gm from 'gammacv'
 
 export default function removePerspective(
 	image: Mat,
@@ -10,6 +12,8 @@ export default function removePerspective(
 	const sourcePoints = cv.matFromArray(4, 2, cv.CV_32FC1, points);
 	const outputSize = [0, 0, width, 0, width, height, 0, height];
 	const outputPoints = cv.matFromArray(4, 2, cv.CV_32FC1, outputSize);
+
+	console.log(outputPoints)
 
 	// create the transformation matrix
 	const M = cv.getPerspectiveTransform(sourcePoints, outputPoints);
@@ -27,4 +31,24 @@ export default function removePerspective(
 	outputPoints.delete();
 
 	return result;
+}
+
+
+export function removePerspectiveGammaCV(
+	sourceTensor: Tensor,
+	points: number[],
+	width: number,
+	height: number
+) {
+
+	const targetTensor = new gm.Tensor('float32', [width, height, 4]);
+	gm.generateTransformMatrix(
+		new gm.Rect(points), // Rect on original image to be projected
+		[width, height], // Output dimensions
+		targetTensor, // Tensor to be filled
+	);
+	gm.perspectiveProjection(sourceTensor, targetTensor, [width, height, 4]);
+
+	return targetTensor
+
 }
