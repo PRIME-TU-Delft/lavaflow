@@ -7,14 +7,14 @@ import cv from 'opencv-ts';
 import { get } from 'svelte/store';
 import { getCurves } from './open-cv/detectCurves';
 import removePerspective, { removePerspectiveGammaCV } from './open-cv/removePerspective';
-import * as gm from 'gammacv'
+import * as gm from 'gammacv';
 
 /**
  * takes the <img id="foregroundImage" /> and converts it to contour lines with hierarchy.
  * @param points Draggable points that are the edges of the sub-image
  * @returns
  */
-export default function imageToCountours(points: [Draggable, Draggable, Draggable, Draggable]) {
+export function imageToCountours(points: [Draggable, Draggable, Draggable, Draggable]) {
 	const $sizeStore = get(sizeStore);
 	if (!$sizeStore.width || !$sizeStore.height)
 		return "No size found for the image. Please go back to the 'Capture' page and try again.";
@@ -22,7 +22,7 @@ export default function imageToCountours(points: [Draggable, Draggable, Draggabl
 	const [width, height] = [$sizeStore.width, $sizeStore.height];
 
 	// Grab image from DOM
-	const mat = cv.imread("foregroundImage");
+	const mat = cv.imread('foregroundImage');
 
 	// Fetch the marker coordinates of the draggable buttons
 	const markerCoords: number[] = [];
@@ -69,10 +69,10 @@ export default function imageToCountours(points: [Draggable, Draggable, Draggabl
 	mat.delete();
 }
 
-
-
-export async function extractSelectedArea(points: [Draggable, Draggable, Draggable, Draggable], canvas: HTMLCanvasElement) {
-	
+export async function extractSelectedArea(
+	points: [Draggable, Draggable, Draggable, Draggable],
+	canvas: HTMLCanvasElement
+) {
 	const $sizeStore = get(sizeStore);
 	if (!$sizeStore.width || !$sizeStore.height)
 		return "No size found for the image. Please go back to the 'Capture' page and try again.";
@@ -91,21 +91,14 @@ export async function extractSelectedArea(points: [Draggable, Draggable, Draggab
 
 	// Apply the perspective transformation using the selected marker coords
 
-	const sourceTensor = await gm.imageTensorFromURL(get(imageStore), "uint8", [width, height, 4])
+	const sourceTensor = await gm.imageTensorFromURL(get(imageStore), 'uint8', [width, height, 4]);
 
-	const result = removePerspectiveGammaCV(
-		sourceTensor,
-		markerCoords,
-		width,
-		height
-	)
+	const result = removePerspectiveGammaCV(sourceTensor, markerCoords, width, height);
 
 	//mat.delete()
 
-	console.log(result)
+	console.log(result);
 
-	const context = canvas.getContext('2d')
-	gm.canvasFromTensor(canvas, sourceTensor)
-
-
+	const context = canvas.getContext('2d');
+	gm.canvasFromTensor(canvas, sourceTensor);
 }

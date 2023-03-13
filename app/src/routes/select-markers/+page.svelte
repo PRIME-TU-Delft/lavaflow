@@ -5,7 +5,7 @@
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
 	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
-	import P5Transform from '$lib/components/p5/P5Transform.svelte';
+	import P5Transform from './P5Transform.svelte';
 	import type Draggable from '$lib/data/draggable';
 	import LavaError from '$lib/data/LavaError';
 	import { contourLines } from '$lib/stores/contourLineStore';
@@ -14,7 +14,7 @@
 	import sizeStore from '$lib/stores/sizeStore';
 	import { mdiChevronRight, mdiHelp } from '@mdi/js';
 	import { Button } from 'flowbite-svelte';
-	import imageToCountours, { extractSelectedArea } from './imageToContour';
+	import { imageToCountours, extractSelectedArea } from './imageToContour';
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
@@ -54,20 +54,17 @@
 	let perspectiveRemovedImage: HTMLCanvasElement;
 
 	function updatePerspectiveRemovedImage() {
-		console.log("Updating canvas")
+		console.log('Updating canvas');
 		if (points.length !== 4) {
 			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
 			return;
 		}
-		extractSelectedArea(points, perspectiveRemovedImage)
+		extractSelectedArea(points, perspectiveRemovedImage);
 	}
 
 	onMount(() => {
-		setInterval(
-			updatePerspectiveRemovedImage,
-			3000
-		)
-	})
+		setInterval(updatePerspectiveRemovedImage, 3000);
+	});
 </script>
 
 <Menubar back="/capture" title="Select markers">
@@ -76,22 +73,28 @@
 </Menubar>
 
 {#if hasStores}
-{#key $imageStore}
-	<P5Transform bind:points on:error={(e) => (error = e.detail.error)}/>
+	{#key $imageStore}
+		<P5Transform
+			perspectiveImageOutput={perspectiveRemovedImage}
+			bind:points
+			on:error={(e) => (error = e.detail.error)}
+		/>
 
-	<canvas id="perspectiveRemovedImage"
-			style="position:absolute;width:100px;height:100px;top:200px;right:0;background:#0f0;"
-			bind:this={perspectiveRemovedImage} />
-	<img
-		style="position:absolute;width:100px;height:100px;top:500px;right:0;"
-		height={$sizeStore.height}
-		width={$sizeStore.width}
-		id="foregroundImage"
-		src={$imageStore}
-		alt="background"
-	/>
-	<canvas id="canvasOutput" />
-{/key}
+		<canvas
+			id="perspectiveRemovedImage"
+			class="absolute top-20 right-0 h-40 w-40 bg-green-500 object-contain"
+			bind:this={perspectiveRemovedImage}
+		/>
+		<img
+			class="absolute top-64 right-0 h-40 w-40 bg-green-500 object-contain"
+			height={$sizeStore.height}
+			width={$sizeStore.width}
+			id="foregroundImage"
+			src={$imageStore}
+			alt="background"
+		/>
+		<canvas id="canvasOutput" />
+	{/key}
 {/if}
 
 <ActionMenu>
