@@ -18,6 +18,7 @@
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
+	let canvasUpdateInterval: NodeJS.Timer | null = null;
 
 	$: hasStores = !!($imageStore && $sizeStore.height && $sizeStore.width);
 
@@ -62,9 +63,7 @@
 		extractSelectedArea(points, perspectiveRemovedImage);
 	}
 
-	onMount(() => {
-		setInterval(updatePerspectiveRemovedImage, 3000);
-	});
+	$: (points && updatePerspectiveRemovedImage())
 </script>
 
 <Menubar back="/capture" title="Select markers">
@@ -79,7 +78,7 @@
 					on:error={(e) => (error = e.detail.error)}/>
 
 	<canvas id="perspectiveRemovedImage"
-			style="position:absolute;width:100px;height:100px;top:200px;right:0;background:#0f0;"
+			style="position:absolute;width:300px;height:300px;top:200px;right:0;background:#0f0;object-fit:contain;"
 			width=640
 			height=480
 			bind:this={perspectiveRemovedImage} />

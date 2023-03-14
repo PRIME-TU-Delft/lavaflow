@@ -41,14 +41,24 @@ export function removePerspectiveGammaCV(
 	height: number
 ) {
 
-	const targetTensor = new gm.Tensor('float32', [3, 1, 4]);
+	const tTransform = new gm.Tensor('float32', [3, 1, 4]);
 	gm.generateTransformMatrix(
-		new gm.Rect([10, 10, 100, 15, 100, 150, 15, 150]), // Rect on original image to be projected
+		new gm.Rect(points), // Rect on original image to be projected
 		[height, width], // Output dimensions
-		targetTensor, // Tensor to be filled
+		tTransform, // Tensor to be filled
 	);
-	gm.perspectiveProjection(sourceTensor, targetTensor, [height, width, 4]);
+	const operation = gm.perspectiveProjection(sourceTensor, tTransform, [height, width, 4]);
 
-	return targetTensor
+	const outputTensor = gm.tensorFrom(operation);
+	if (!outputTensor) return sourceTensor
+
+	// Create and initialize the GammaCV session, to acquire GPU acceperation
+	const gammacvSession = new gm.Session()
+	gammacvSession.init(operation)
+
+	// Run the canny-edges operation
+	gammacvSession.runOp(operation, 0, outputTensor);
+
+	return outputTensor
 
 }

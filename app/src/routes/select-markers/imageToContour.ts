@@ -98,8 +98,6 @@ export async function extractSelectedArea(
 
 	//mat.delete()
 
-	console.log(result);
-
-	const context = canvas.getContext('2d');
-	gm.canvasFromTensor(canvas, sourceTensor);
+	// const context = canvas.getContext('2d');
+	gm.canvasFromTensor(canvas, result);
 }

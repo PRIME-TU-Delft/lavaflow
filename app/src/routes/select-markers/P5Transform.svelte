@@ -117,7 +117,7 @@
 			for (let i = 0; i < points.length; i++) points[i].released();
 
 			if (perspectiveImageOutput && points.length === 4) {
-				extractSelectedArea(points, perspectiveImageOutput);
+				//extractSelectedArea(points, perspectiveImageOutput);
 			}
 		};
 	};
