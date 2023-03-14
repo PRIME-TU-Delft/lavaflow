@@ -41,13 +41,13 @@ export function removePerspectiveGammaCV(
 	height: number
 ) {
 
-	const targetTensor = new gm.Tensor('float32', [width, height, 4]);
+	const targetTensor = new gm.Tensor('float32', [3, 1, 4]);
 	gm.generateTransformMatrix(
-		new gm.Rect(points), // Rect on original image to be projected
-		[width, height], // Output dimensions
+		new gm.Rect([10, 10, 100, 15, 100, 150, 15, 150]), // Rect on original image to be projected
+		[height, width], // Output dimensions
 		targetTensor, // Tensor to be filled
 	);
-	gm.perspectiveProjection(sourceTensor, targetTensor, [width, height, 4]);
+	gm.perspectiveProjection(sourceTensor, targetTensor, [height, width, 4]);
 
 	return targetTensor
 

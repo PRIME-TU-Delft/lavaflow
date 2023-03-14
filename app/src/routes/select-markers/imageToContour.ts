@@ -91,7 +91,7 @@ export async function extractSelectedArea(points: [Draggable, Draggable, Draggab
 
 	// Apply the perspective transformation using the selected marker coords
 
-	const sourceTensor = await gm.imageTensorFromURL(get(imageStore), "uint8", [width, height, 4])
+	const sourceTensor = await gm.imageTensorFromURL(get(imageStore), "uint8", [height, width, 4])
 
 	const result = removePerspectiveGammaCV(
 		sourceTensor,

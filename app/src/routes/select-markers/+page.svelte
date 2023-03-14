@@ -81,6 +81,8 @@
 
 	<canvas id="perspectiveRemovedImage"
 			style="position:absolute;width:100px;height:100px;top:200px;right:0;background:#0f0;"
+			width=640
+			height=480
 			bind:this={perspectiveRemovedImage} />
 	<img
 		style="position:absolute;width:100px;height:100px;top:500px;right:0;"
