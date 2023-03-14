@@ -9,7 +9,7 @@
 	import { Button, Chevron, Dropdown, DropdownItem } from 'flowbite-svelte';
 	import type { PageData } from './$types';
 	import CaptureMenu from './CaptureMenu.svelte';
-	import * as gm from 'gammacv'
+	import * as gm from 'gammacv';
 
 	export let data: PageData;
 

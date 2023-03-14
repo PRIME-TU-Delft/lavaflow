@@ -61,7 +61,7 @@
 		}
 		type Draggbles = [Draggable, Draggable, Draggable, Draggable];
 
-		extractSelectedArea(points.slice() as Draggbles, perspectiveRemovedImage);
+		extractSelectedArea(points.slice() as Draggbles, perspectiveRemovedImage)
 	}
 </script>
 
@@ -80,7 +80,7 @@
 
 		<canvas
 			id="perspectiveRemovedImage"
-			class="absolute top-20 right-10 h-40 w-40 bg-red-500 object-cover"
+			class="absolute top-20 right-10 h-40 w-40 object-contain"
 			width="640"
 			height="480"
 			bind:this={perspectiveRemovedImage}

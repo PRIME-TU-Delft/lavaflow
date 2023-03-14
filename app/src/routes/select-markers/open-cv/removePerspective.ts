@@ -2,6 +2,8 @@ import type { Tensor } from 'gammacv';
 import cv, { type Mat } from 'opencv-ts';
 import * as gm from 'gammacv'
 
+const gammacvSession = new gm.Session()
+
 export default function removePerspective(
 	image: Mat,
 	points: number[],
@@ -53,7 +55,6 @@ export function removePerspectiveGammaCV(
 	if (!outputTensor) return sourceTensor
 
 	// Create and initialize the GammaCV session, to acquire GPU acceperation
-	const gammacvSession = new gm.Session()
 	gammacvSession.init(operation)
 
 	// Run the canny-edges operation

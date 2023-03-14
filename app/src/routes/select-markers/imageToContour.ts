@@ -96,8 +96,6 @@ export async function extractSelectedArea(
 
 	const result = removePerspectiveGammaCV(sourceTensor, markerCoords, width, height);
 
-	//mat.delete()
-
 	// const context = canvas.getContext('2d');
 	gm.canvasFromTensor(canvas, result);
 }
