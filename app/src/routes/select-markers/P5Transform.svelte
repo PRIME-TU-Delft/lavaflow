@@ -17,6 +17,7 @@
 	export let detectSize: number = 30;
 	export let markerSize: number = 10;
 	export let perspectiveImageOutput: HTMLCanvasElement;
+	export let onUpdate: () => void
 
 	const dispatch = createEventDispatcher();
 
@@ -106,6 +107,8 @@
 			points[1].drawRect(p5, markerSize * 1.5);
 			points[2].drawCross(p5, markerSize * 1.5);
 			points[3].drawTriangle(p5, markerSize * 1.5);
+
+			onUpdate()
 		};
 
 		// If the user presses/releases their mouse, signal this to all Draggable points

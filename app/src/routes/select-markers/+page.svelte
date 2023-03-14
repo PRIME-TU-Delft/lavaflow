@@ -62,8 +62,6 @@
 		}
 		extractSelectedArea(points, perspectiveRemovedImage);
 	}
-
-	$: (points && updatePerspectiveRemovedImage())
 </script>
 
 <Menubar back="/capture" title="Select markers">
@@ -75,6 +73,7 @@
 {#key $imageStore}
 	<P5Transform 	bind:points
 					perspectiveImageOutput={perspectiveRemovedImage}
+					onUpdate={updatePerspectiveRemovedImage}
 					on:error={(e) => (error = e.detail.error)}/>
 
 	<canvas id="perspectiveRemovedImage"
