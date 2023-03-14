@@ -8,13 +8,15 @@
 	import sizeStore from '$lib/stores/sizeStore';
 	import { createEventDispatcher } from 'svelte';
 	import type p5 from 'p5';
-	import P5 from './P5.svelte';
+	import P5 from '$lib/components/p5/P5.svelte';
 	import { get } from 'svelte/store';
+	import { extractSelectedArea } from './imageToContour';
 
 	export let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 
 	export let detectSize: number = 30;
 	export let markerSize: number = 10;
+	export let perspectiveImageOutput: HTMLCanvasElement;
 
 	const dispatch = createEventDispatcher();
 
@@ -42,7 +44,7 @@
 
 			const [width, height] = [p5.windowWidth, p5.windowHeight];
 
-			p5.pixelDensity(p5.displayDensity())
+			p5.pixelDensity(p5.displayDensity());
 			const cvs = p5.createCanvas(p5.windowWidth, p5.windowHeight);
 			cvs.id('p5-transform');
 
@@ -61,13 +63,13 @@
 		};
 
 		p5.windowResized = () => {
-			p5.resizeCanvas(p5.windowWidth, p5.windowHeight)
+			p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
 
-			points[0]?.setPosition(p5.windowWidth * 0.25, p5.windowHeight * 0.25)
-			points[1]?.setPosition(p5.windowWidth * 0.75, p5.windowHeight * 0.25)
-			points[2]?.setPosition(p5.windowWidth * 0.75, p5.windowHeight * 0.75)
-			points[3]?.setPosition(p5.windowWidth * 0.25, p5.windowHeight * 0.75)
-		}
+			points[0]?.setPosition(p5.windowWidth * 0.25, p5.windowHeight * 0.25);
+			points[1]?.setPosition(p5.windowWidth * 0.75, p5.windowHeight * 0.25);
+			points[2]?.setPosition(p5.windowWidth * 0.75, p5.windowHeight * 0.75);
+			points[3]?.setPosition(p5.windowWidth * 0.25, p5.windowHeight * 0.75);
+		};
 
 		/**
 		 * Draw line with p5 from point1 (p2) to point2 (p2)
@@ -80,8 +82,7 @@
 		}
 
 		p5.draw = () => {
-
-			p5.background(0, 0, 0)
+			p5.background(0, 0, 0);
 
 			const [width, height] = [p5.windowWidth, p5.windowHeight];
 
@@ -93,7 +94,7 @@
 			for (let i = 0; i < points.length; i++) {
 				points[i].update(p5); // update position
 				const $sizeStore = get(sizeStore);
-				points[i].updateMappedCoordinates(p5, $sizeStore.width, $sizeStore.height)
+				points[i].updateMappedCoordinates(p5, $sizeStore.width, $sizeStore.height);
 
 				p5.stroke(0, 255, 0);
 				drawLine(points[i], points[(i + 1) % points.length]); // draw line between points
@@ -114,6 +115,10 @@
 
 		p5.mouseReleased = () => {
 			for (let i = 0; i < points.length; i++) points[i].released();
+
+			if (perspectiveImageOutput && points.length === 4) {
+				extractSelectedArea(points, perspectiveImageOutput);
+			}
 		};
 	};
 </script>
