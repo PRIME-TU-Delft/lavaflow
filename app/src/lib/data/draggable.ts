@@ -37,8 +37,8 @@ export default class Draggable {
 	constructor(x: number, y: number, size: number, offsetX = 0, offsetY = 0) {
 		this.x = x;
 		this.y = y;
-		this.mappedX = 0
-		this.mappedY = 0
+		this.mappedX = 0;
+		this.mappedY = 0;
 		this.old_x = x;
 		this.old_y = y;
 		this.size = size;
@@ -158,10 +158,9 @@ export default class Draggable {
 		}
 	}
 
-
 	updateMappedCoordinates(p5: p5, imgWidth: number, imgHeight: number) {
-		this.mappedX = this.x / p5.windowWidth * imgWidth
-		this.mappedY = this.y / p5.windowHeight * imgHeight
+		this.mappedX = (this.x / p5.windowWidth) * imgWidth;
+		this.mappedY = (this.y / p5.windowHeight) * imgHeight;
 	}
 
 	/**
@@ -400,7 +399,6 @@ export default class Draggable {
 	 * @param p5 Instance of a p5 sketch
 	 */
 	pressed(p5: p5, incorporateTag?: boolean) {
-
 		// Check if mouse is over this object when global mouse is pressed
 		let xBounded = p5.mouseX > this.x - this.size / 2 && p5.mouseX < this.x + this.size / 2;
 		const yBounded = p5.mouseY > this.y - this.size / 2 && p5.mouseY < this.y + this.size / 2;
@@ -438,5 +436,9 @@ export default class Draggable {
 			this.too_close_to_crater = false;
 			this.too_close_to_other_target = false;
 		}
+	}
+
+	equal(other: Draggable) {
+		return this.x === other.x && this.y === other.y;
 	}
 }

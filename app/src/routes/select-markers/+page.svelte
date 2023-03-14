@@ -18,7 +18,6 @@
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
-	let canvasUpdateInterval: NodeJS.Timer | null = null;
 
 	$: hasStores = !!($imageStore && $sizeStore.height && $sizeStore.width);
 
@@ -60,7 +59,9 @@
 			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
 			return;
 		}
-		extractSelectedArea(points, perspectiveRemovedImage);
+		type Draggbles = [Draggable, Draggable, Draggable, Draggable];
+
+		extractSelectedArea(points.slice() as Draggbles, perspectiveRemovedImage);
 	}
 </script>
 
@@ -70,27 +71,30 @@
 </Menubar>
 
 {#if hasStores}
-{#key $imageStore}
-	<P5Transform 	bind:points
-					perspectiveImageOutput={perspectiveRemovedImage}
-					onUpdate={updatePerspectiveRemovedImage}
-					on:error={(e) => (error = e.detail.error)}/>
+	{#key $imageStore}
+		<P5Transform
+			on:pointsUpdated={updatePerspectiveRemovedImage}
+			bind:points
+			on:error={(e) => (error = e.detail.error)}
+		/>
 
-	<canvas id="perspectiveRemovedImage"
-			style="position:absolute;width:300px;height:300px;top:200px;right:0;background:#0f0;object-fit:contain;"
-			width=640
-			height=480
-			bind:this={perspectiveRemovedImage} />
-	<img
-		style="position:absolute;width:100px;height:100px;top:500px;right:0;"
-		height={$sizeStore.height}
-		width={$sizeStore.width}
-		id="foregroundImage"
-		src={$imageStore}
-		alt="background"
-	/>
-	<canvas id="canvasOutput" />
-{/key}
+		<canvas
+			id="perspectiveRemovedImage"
+			class="absolute top-20 right-10 h-40 w-40 bg-red-500 object-cover"
+			width="640"
+			height="480"
+			bind:this={perspectiveRemovedImage}
+		/>
+		<img
+			style="position:absolute;width:100px;height:100px;top:500px;right:0;"
+			height={$sizeStore.height}
+			width={$sizeStore.width}
+			id="foregroundImage"
+			src={$imageStore}
+			alt="background"
+		/>
+		<canvas id="canvasOutput" />
+	{/key}
 {/if}
 
 <ActionMenu>

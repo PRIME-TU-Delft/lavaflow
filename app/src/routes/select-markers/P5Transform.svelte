@@ -10,14 +10,11 @@
 	import type p5 from 'p5';
 	import P5 from '$lib/components/p5/P5.svelte';
 	import { get } from 'svelte/store';
-	import { extractSelectedArea } from './imageToContour';
 
 	export let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 
 	export let detectSize: number = 30;
 	export let markerSize: number = 10;
-	export let perspectiveImageOutput: HTMLCanvasElement;
-	export let onUpdate: () => void
 
 	const dispatch = createEventDispatcher();
 
@@ -28,6 +25,16 @@
 
 	let image: p5.Image;
 	let perspectiveImage: p5.Image;
+	let cachedPoints: Draggable[] = [];
+
+	function updateCachedPoints() {
+		if (points.length !== 4) return;
+
+		dispatch('pointsUpdated');
+		cachedPoints = points.map((p) => {
+			return new Draggable(p.x, p.y, detectSize);
+		});
+	}
 
 	const sketch = (p5: p5) => {
 		p5.preload = () => {
@@ -61,6 +68,8 @@
 			points[1].setInstruction('Drag me to the rectangle\non the paper.', 190, 40);
 			points[2].setInstruction('Drag me to the cross\non the paper.', 190, 40);
 			points[3].setInstruction('Drag me to the triangle\non the paper.', 190, 40);
+
+			updateCachedPoints();
 		};
 
 		p5.windowResized = () => {
@@ -70,6 +79,8 @@
 			points[1]?.setPosition(p5.windowWidth * 0.75, p5.windowHeight * 0.25);
 			points[2]?.setPosition(p5.windowWidth * 0.75, p5.windowHeight * 0.75);
 			points[3]?.setPosition(p5.windowWidth * 0.25, p5.windowHeight * 0.75);
+
+			updateCachedPoints();
 		};
 
 		/**
@@ -91,14 +102,24 @@
 				p5.image(image, 0, 0, width, height);
 			}
 
+			if (cachedPoints.length !== 4 && points.length === 4) {
+				updateCachedPoints();
+			}
+
 			// Render all Draggable points
 			for (let i = 0; i < points.length; i++) {
-				points[i].update(p5); // update position
+				const point = points[i];
+
+				point.update(p5); // update position
 				const $sizeStore = get(sizeStore);
-				points[i].updateMappedCoordinates(p5, $sizeStore.width, $sizeStore.height);
+				point.updateMappedCoordinates(p5, $sizeStore.width, $sizeStore.height);
+
+				if (!point.equal(cachedPoints[i])) {
+					updateCachedPoints();
+				}
 
 				p5.stroke(0, 255, 0);
-				drawLine(points[i], points[(i + 1) % points.length]); // draw line between points
+				drawLine(point, points[(i + 1) % points.length]); // draw line between points
 			}
 
 			if (points.length !== 4) return;
@@ -107,8 +128,6 @@
 			points[1].drawRect(p5, markerSize * 1.5);
 			points[2].drawCross(p5, markerSize * 1.5);
 			points[3].drawTriangle(p5, markerSize * 1.5);
-
-			onUpdate()
 		};
 
 		// If the user presses/releases their mouse, signal this to all Draggable points
@@ -118,10 +137,6 @@
 
 		p5.mouseReleased = () => {
 			for (let i = 0; i < points.length; i++) points[i].released();
-
-			if (perspectiveImageOutput && points.length === 4) {
-				//extractSelectedArea(points, perspectiveImageOutput);
-			}
 		};
 	};
 </script>
