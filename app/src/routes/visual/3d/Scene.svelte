@@ -31,9 +31,13 @@
 	/> -->
 
 	<T.Mesh
-		position={[altAndGrad.x - 50 * scale, altAndGrad.altitude / 2, altAndGrad.y - 50 * scale]}
+		position={[
+			altAndGrad.x - 50 * scale,
+			Math.max(altAndGrad.altitude, 1) / 2,
+			altAndGrad.y - 50 * scale
+		]}
 	>
-		<T.BoxGeometry args={[0.1, altAndGrad.altitude, 0.1]} />
+		<T.BoxGeometry args={[0.1, Math.max(altAndGrad.altitude, 1), 0.1]} />
 		<T.MeshBasicMaterial color="#444" />
 	</T.Mesh>
 {/each}
