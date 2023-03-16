@@ -49,7 +49,7 @@ jobs:
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.2
         with:
-          github_token: ${{ SECRETS.GITHUB_TOKEN }}
+          github-token: ${{ SECRETS.GITHUB_TOKEN }}
           publish-dir: svelte-app/build
           alias: deploy-preview-${{ github.event.number }}
         env:
