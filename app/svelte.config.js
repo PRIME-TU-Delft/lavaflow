@@ -1,8 +1,11 @@
-import preprocess from 'svelte-preprocess';
 import adapter from '@sveltejs/adapter-auto';
-import { preprocessThrelte } from '@threlte/preprocess';
+import netlifyAdapter from '@sveltejs/adapter-netlify';
 import { vitePreprocess } from '@sveltejs/kit/vite';
+import { preprocessThrelte } from '@threlte/preprocess';
+import preprocess from 'svelte-preprocess';
 import seqPreprocessor from 'svelte-sequential-preprocessor';
+
+console.log('Building for: ' + process.env.BUILD_ENV === 'netlify' ? 'Netlify' : 'NodeJS');
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -19,7 +22,7 @@ const config = {
 	]),
 
 	kit: {
-		adapter: adapter()
+		adapter: process.env.BUILD_ENV === 'netlify' ? netlifyAdapter() : adapter()
 	}
 };
 
