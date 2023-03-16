@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Lavaflow</title>
+		<link rel="icon" href="../primeLogo.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@200;400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+
+		<script>
+			function appHeight() {
+				const doc = document.documentElement;
+				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
+			}
+
+			window.addEventListener('resize', appHeight);
+			appHeight();
+		</script>
+
+		<meta http-equiv="content-security-policy" content="">
+		<link rel="modulepreload" href="../_app/immutable/entry/start.0af08e75.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/index.814eb393.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/singletons.c9a217b0.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/index.19c7aa8e.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/control.e7f5239e.js">
+		<link rel="modulepreload" href="../_app/immutable/entry/app.9180849b.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/preload-helper.41c905a7.js">
+	</head>
+	<body>
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_1s3l20s = {
+						env: {},
+						base: new URL("..", location).pathname.slice(0, -1),
+						element: document.currentScript.parentElement
+					};
+
+					Promise.all([
+						import("../_app/immutable/entry/start.0af08e75.js"),
+						import("../_app/immutable/entry/app.9180849b.js")
+					]).then(([kit, app]) => {
+						kit.start(app, __sveltekit_1s3l20s.element);
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
