@@ -1,5 +1,3 @@
 [build]
-  command = "yarn build"
+  command = "wasm-pack build ../wasm --target web && yarn build"
   publish = "build-netlify/"
-
-# This is to test out if netlify will deploy the build folder
