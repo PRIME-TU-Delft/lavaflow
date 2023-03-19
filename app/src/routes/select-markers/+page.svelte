@@ -14,26 +14,41 @@
 	import sizeStore from '$lib/stores/sizeStore';
 	import { mdiChevronRight, mdiHelp } from '@mdi/js';
 	import { Button } from 'flowbite-svelte';
-	import { imageToCountours, extractSelectedArea } from './imageToContour';
+	import { imageToContoursGammaCV, extractSelectedArea } from './imageToContour';
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
 
 	$: hasStores = !!($imageStore && $sizeStore.height && $sizeStore.width);
 
-	async function applySelection() {
-		if (points.length !== 4) {
-			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
+	// async function applySelection() {
+	// 	if (points.length !== 4) {
+	// 		error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
+	// 		return;
+	// 	}
+	// 	const cvError = await imageToCountours(points);
+
+	// 	if (cvError) {
+	// 		error = new LavaError('Something went wrong detecting curves', cvError);
+	// 		return;
+	// 	}
+
+	// 	error = null;
+	// }
+
+	function applySelection() {
+
+		// Update the perspective-image inside the rendered canvas
+		updatePerspectiveRemovedImage()
+
+		const opencvError = imageToContoursGammaCV(perspectiveRemovedImage)
+
+		if (opencvError) {
+			error = new LavaError("Something went wrong while detecting curves", opencvError);
 			return;
 		}
-		const cvError = await imageToCountours(points);
 
-		if (cvError) {
-			error = new LavaError('Something went wrong detecting curves', cvError);
-			return;
-		}
-
-		error = null;
+		error = null
 	}
 
 	function continueWithDefaultMap() {
@@ -81,12 +96,12 @@
 		<canvas
 			id="perspectiveRemovedImage"
 			class="absolute top-20 right-10 h-40 w-40 object-contain"
-			width="640"
-			height="480"
+			width="800"
+			height="800"
 			bind:this={perspectiveRemovedImage}
 		/>
 		<img
-			style="position:absolute;width:100px;height:100px;top:500px;right:0;"
+			style="display:none;position:absolute;width:100px;height:100px;top:500px;right:0;"
 			height={$sizeStore.height}
 			width={$sizeStore.width}
 			id="foregroundImage"

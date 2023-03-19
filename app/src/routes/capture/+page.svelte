@@ -42,36 +42,22 @@
 		// Transform the image (from imageStore) into a gammacv tensor
 		const gammacvInputTensor = await gm.imageTensorFromURL(image, "uint8", [videoSource.videoHeight, videoSource.videoWidth, 4])
 
-		// const cannyEdgesOperation = gm.cannyEdges(
-		// 	gm.sobelOperator(
-		// 		// gm.gaussianBlur(
-		// 			gm.norm(
-		// 				gm.erode(gammacvInputTensor, [5, 5])
-		// 			, "l2")
-		// 		// , 3, 1)
-		// 	), 0.25, 0.75
-		// )
-
-		const cannyEdgesOperation =
-			gm.gaussianBlur(
-				gm.adaptiveThreshold(
-					gm.erode(
-						gm.norm(gammacvInputTensor, "l2")
-					, [3, 3])
-				, 10, 20)
-			, 3, 6)
-
-		// const cannyEdgesOperation = gm.norm(gammacvInputTensor, "l2")
+		// Define the image processing pipeline
+		let pipeline = gm.norm(gammacvInputTensor, "l2")
+		pipeline = gm.erode(pipeline, [2, 2])
+		pipeline = gm.adaptiveThreshold(pipeline, 10, 20)
+		pipeline = gm.gaussianBlur(pipeline, 3, 1)
+		pipeline = gm.threshold(pipeline, 0.3)
 
 		// Extract the tensor output
-		const gammacvOutputTensor: any = gm.tensorFrom(cannyEdgesOperation)
+		const gammacvOutputTensor: any = gm.tensorFrom(pipeline)
 
 		// Create and initialize the GammaCV session, to acquire GPU acceperation
 		const gammacvSession = new gm.Session()
-		gammacvSession.init(cannyEdgesOperation)
+		gammacvSession.init(pipeline)
 
 		// Run the canny-edges operation
-		gammacvSession.runOp(cannyEdgesOperation, 0, gammacvOutputTensor);
+		gammacvSession.runOp(pipeline, 0, gammacvOutputTensor);
 
 		gm.canvasFromTensor(canvas, gammacvOutputTensor)
 
