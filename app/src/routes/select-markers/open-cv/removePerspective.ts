@@ -43,6 +43,27 @@ export function removePerspectiveGammaCV(
 	height: number
 ) {
 
+	// Apply a slight margin to the points to account for the overlap with the labels
+	// on paper.
+
+	const pointMargin = width/50;
+	
+	// Top-left
+	points[0] += pointMargin;
+	points[1] += pointMargin;
+
+	// Top-right
+	points[2] -= pointMargin;
+	points[3] += pointMargin;
+
+	// Bottom-right
+	points[4] -= pointMargin;
+	points[5] -= pointMargin;
+
+	// Bottom-left
+	points[6] += pointMargin;
+	points[7] -= pointMargin;
+
 	const tTransform = new gm.Tensor('float32', [3, 1, 4]);
 	gm.generateTransformMatrix(
 		new gm.Rect(points), // Rect on original image to be projected

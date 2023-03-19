@@ -43,10 +43,17 @@
 		const gammacvInputTensor = await gm.imageTensorFromURL(image, "uint8", [videoSource.videoHeight, videoSource.videoWidth, 4])
 
 		// Define the image processing pipeline
+
+		// Normalization: add contrast, make colors seem deeper
 		let pipeline = gm.norm(gammacvInputTensor, "l2")
+		// Erosion: erode into rectangles of shape 2x2 (best to see for yourself: https://gammacv.com/examples/erode)
 		pipeline = gm.erode(pipeline, [2, 2])
+		// Adaptive Threshold: Black/white - make pixels black if they pass the threshold 20 within a certain box of size 10
+		// (best to see for yourself: https://gammacv.com/examples/adaptive_threshold)
 		pipeline = gm.adaptiveThreshold(pipeline, 10, 20)
+		// Gaussian Blur: remove sharp edges
 		pipeline = gm.gaussianBlur(pipeline, 3, 1)
+		// Make the lines a bit thinner so the result from opencv's getContours is better
 		pipeline = gm.threshold(pipeline, 0.3)
 
 		// Extract the tensor output
