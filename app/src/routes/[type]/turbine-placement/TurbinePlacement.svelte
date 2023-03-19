@@ -41,34 +41,36 @@
 </script>
 
 {#if $contourLines?.curves}
-	<div style="height:100%" bind:clientHeight={winHeight} bind:clientWidth={winWidth}>
-		<!-- The overlay has the exact dimensions as the canvas and is the main source of interactivity -->
-		<div
-			bind:this={overlayEl}
-			style="aspect-ratio: {sWidth}/{sHeight};"
-			class="overlay"
-			class:tall={winWidth / winHeight >= sWidth / sHeight}
-			bind:clientHeight={cHeight}
-			bind:clientWidth={cWidth}
-			on:click={placeDom}
-			on:keydown={() => console.log('key')}
-		>
-			<!-- TODO: get crater location from store -->
+	{#key cHeight + cWidth}
+		<div style="height:100%" bind:clientHeight={winHeight} bind:clientWidth={winWidth}>
+			<!-- The overlay has the exact dimensions as the canvas and is the main source of interactivity -->
 			<div
-				on:click|stopPropagation
-				on:keydown|stopPropagation
-				class="crater"
-				style="--pos-y: {(410 * cHeight) / sHeight}px;
-								 --pos-x: {(670 * cWidth) / sWidth}px;"
+				bind:this={overlayEl}
+				style="aspect-ratio: {sWidth}/{sHeight};"
+				class="overlay"
+				class:tall={winWidth / winHeight >= sWidth / sHeight}
+				bind:clientHeight={cHeight}
+				bind:clientWidth={cWidth}
+				on:click={placeDom}
+				on:keydown={() => console.log('key')}
 			>
-				Crater
+				<!-- TODO: get crater location from store -->
+				<div
+					on:click|stopPropagation
+					on:keydown|stopPropagation
+					class="crater"
+					style="--pos-y: {(410 * cHeight) / sHeight}px;
+								 --pos-x: {(670 * cWidth) / sWidth}px;"
+				>
+					Crater
+				</div>
+
+				<Turbines sizeMult={[cHeight / sHeight, cWidth / sWidth]} />
 			</div>
 
-			<Turbines sizeMult={[cHeight / sHeight, cWidth / sWidth]} />
+			<P5PreviewCurves curves={$contourLines?.curves} />
 		</div>
-
-		<P5PreviewCurves curves={$contourLines?.curves} />
-	</div>
+	{/key}
 {/if}
 
 <style lang="postcss">
