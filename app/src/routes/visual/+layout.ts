@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { gltfStore } from '$lib/stores/gltfStore';
 import { redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import type { PageLoad } from './$types';
+import type { LayoutLoad } from './$types';
 
 export const load = (() => {
 	if (!browser) return {};
@@ -15,4 +15,4 @@ export const load = (() => {
 	}
 
 	return {};
-}) satisfies PageLoad;
+}) satisfies LayoutLoad;

@@ -4,7 +4,7 @@
 	import Scene from './Scene.svelte';
 </script>
 
-<VisualiseUi title="Visual 3d" baseUrl="/3d" let:showLava>
+<VisualiseUi title="Visual ar" baseUrl="/ar" let:showLava>
 	<Canvas>
 		<Scene {showLava} />
 	</Canvas>
