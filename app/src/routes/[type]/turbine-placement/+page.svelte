@@ -46,8 +46,8 @@
 			Click map to place {deltaTubines} more turbines
 		</ActionButton>
 	{:else}
-		<ActionButton href="/visual/{data.type}" icon={mdiChevronRight}
-			>Start eruption in {data.type}</ActionButton
-		>
+		<ActionButton href="/visual/{data.type}" icon={mdiChevronRight}>
+			Start eruption in {data.type}
+		</ActionButton>
 	{/if}
 </ActionMenu>

@@ -12,7 +12,6 @@ import { turbineLocations, craterLocation, type Turbine } from '$lib/stores/loca
 import { get } from 'svelte/store';
 
 import ApiSettings from '$lib/data/apiSettings';
-import type Draggable from '$lib/data/draggable';
 
 import init, * as wasm from 'wasm';
 
