@@ -3,25 +3,30 @@
 	import LavaError from '$lib/data/LavaError';
 
 	export let score: number | null = null;
-	let scoreTitle: string = 'You are a volcano god!';
+	let scoreMessage: string = 'You are a volcano god!';
 
 	$: {
 		if (score === null || score > 900) {
-			scoreTitle = 'You are a volcano god!';
+			scoreMessage = 'You are a volcano god!, you can bend the lava to your will';
 		} else if (score > 800) {
-			scoreTitle = 'You are a volcano master!';
+			scoreMessage = 'You are a volcano master!, you have the power of the volcano';
 		} else if (score > 700) {
-			scoreTitle = 'You are a volcano expert!';
+			scoreMessage = 'You are a volcano expert!, who should we call when you are gone?';
 		} else if (score > 600) {
-			scoreTitle = 'You are a volcano pro!';
+			scoreMessage =
+				'You are a volcano pro!, you know where people are safe and where they are not';
 		} else if (score > 500) {
-			scoreTitle = 'You are a volcano enthusiast!';
+			scoreMessage =
+				'You are a volcano enthusiast!, but you can do better by placing the tubines closer to the lava';
 		} else if (score > 400) {
-			scoreTitle = 'You are a volcano beginner!';
+			scoreMessage =
+				'You are a volcano beginner!, but you can do better by placing the tubines closer to the lava';
 		} else if (score > 300) {
-			scoreTitle = 'You are a volcano novice!';
-		} else if (score > 200) {
-			scoreTitle = 'You are a volcano rookie!';
+			scoreMessage =
+				'You are a volcano novice!, but you can do better by placing the tubines closer to the lava';
+		} else {
+			scoreMessage =
+				'You are a volcano rookie!, but you can do better by placing the tubines closer to the lava';
 		}
 	}
 </script>
@@ -29,7 +34,7 @@
 {#if score !== null}
 	<ErrorMessage
 		hasActions
-		error={new LavaError(scoreTitle, `You scored ${score}/1000 points`)}
+		error={new LavaError(`You scored ${score}/1000 points`, scoreMessage)}
 		on:dismiss
 	>
 		<slot />
