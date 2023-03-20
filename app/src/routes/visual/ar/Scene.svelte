@@ -3,10 +3,11 @@
 	import { turbineLocations } from '$lib/stores/locationStore';
 
 	export let rotation = 0;
-	export let scale: [number, number, number];
+	export let size: [number, number, number];
 	export let showLava: boolean = false;
+	export let scale = 0.5;
 
-	$: scaleString = scale.join(' ');
+	$: scaleString = size.map((x) => x * scale).join(' ');
 </script>
 
 {#if $gltfStore}

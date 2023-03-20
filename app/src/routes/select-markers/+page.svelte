@@ -18,22 +18,22 @@
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
+	let resetKey: number = 0;
 
 	$: hasStores = !!($imageStore && $sizeStore.height && $sizeStore.width);
 
 	function applySelection() {
-
 		// Update the perspective-image inside the rendered canvas
-		updatePerspectiveRemovedImage()
+		updatePerspectiveRemovedImage();
 
-		const opencvError = imageToContoursGammaCV(perspectiveRemovedImage)
+		const opencvError = imageToContoursGammaCV(perspectiveRemovedImage);
 
 		if (opencvError) {
-			error = new LavaError("Something went wrong while detecting curves", opencvError);
+			error = new LavaError('Something went wrong while detecting curves', opencvError);
 			return;
 		}
 
-		error = null
+		error = null;
 	}
 
 	function continueWithDefaultMap() {
@@ -51,6 +51,10 @@
 		goto('/preview');
 	}
 
+	function resetPoints() {
+		resetKey = Math.random();
+	}
+
 	let perspectiveRemovedImage: HTMLCanvasElement;
 
 	function updatePerspectiveRemovedImage() {
@@ -61,17 +65,16 @@
 		}
 		type Draggbles = [Draggable, Draggable, Draggable, Draggable];
 
-		extractSelectedArea(points.slice() as Draggbles, perspectiveRemovedImage)
+		extractSelectedArea(points.slice() as Draggbles, perspectiveRemovedImage);
 	}
 </script>
 
 <Menubar back="/capture" title="Select markers">
-	<!-- TODO: implement click -->
-	<Button outline color="red">Reset</Button>
+	<Button outline color="red" on:click={resetPoints}>Reset</Button>
 </Menubar>
 
 {#if hasStores}
-	{#key $imageStore}
+	{#key $imageStore + resetKey}
 		<P5Transform
 			on:pointsUpdated={updatePerspectiveRemovedImage}
 			bind:points
@@ -80,9 +83,9 @@
 
 		<canvas
 			id="perspectiveRemovedImage"
-			class="absolute top-20 right-10 h-40 w-40 object-contain"
-			width="800"
-			height="800"
+			class="absolute top-20 right-4 w-40 origin-top-right scale-150 border-2 border-red-500 object-contain"
+			width={$sizeStore.width}
+			height={$sizeStore.height}
 			bind:this={perspectiveRemovedImage}
 		/>
 		<img

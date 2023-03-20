@@ -12,7 +12,7 @@ import { removePerspectiveGammaCV } from './open-cv/removePerspective';
 /**
  * Loads the contents of the provided canvas into opencv. Opencv is then used to extract
  * the set of level-curves from this image, after which they are stored in the appropriate store.
- * 
+ *
  * @param canvas {HTMLCanvasElement} The canvas to extract the level-curves from.
  * @returns void
  */
@@ -54,7 +54,7 @@ export function imageToContoursGammaCV(canvas: HTMLCanvasElement) {
 /**
  * Warp the perspective of the image to match the area selected by the markers.
  * The provided canvas is then populated with the resulting image.
- * 
+ *
  * @param points {[-Draggable, Draggable, Draggable, Draggable]} Marker points
  * @param canvas {HTMLCanvasElement} The input canvas
  * @returns void
