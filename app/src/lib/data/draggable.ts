@@ -11,6 +11,8 @@ export default class Draggable {
 	too_close_to_other_target = false;
 	x: number;
 	y: number;
+	mappedX: number;
+	mappedY: number;
 	old_x: number;
 	old_y: number;
 	size: number;
@@ -35,6 +37,8 @@ export default class Draggable {
 	constructor(x: number, y: number, size: number, offsetX = 0, offsetY = 0) {
 		this.x = x;
 		this.y = y;
+		this.mappedX = 0;
+		this.mappedY = 0;
 		this.old_x = x;
 		this.old_y = y;
 		this.size = size;
@@ -154,6 +158,11 @@ export default class Draggable {
 		}
 	}
 
+	updateMappedCoordinates(p5: p5, imgWidth: number, imgHeight: number) {
+		this.mappedX = (this.x / p5.windowWidth) * imgWidth;
+		this.mappedY = (this.y / p5.windowHeight) * imgHeight;
+	}
+
 	/**
 	 * Moves the point to the input x and y coordinates
 	 *
@@ -260,7 +269,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 		p5.rectMode(p5.CORNER);
@@ -304,13 +313,13 @@ export default class Draggable {
 		// Draw a red color if this point is too close to one of the avoid_points
 		if (this.too_close_to_crater) {
 			this.displayWarningMessage(p5, 'Too close to the crater');
-			p5.fill(255, 0, 0);
+			p5.fill(220, 38, 38);
 		} else if (this.too_close_to_other_target) {
 			this.displayWarningMessage(p5, 'Too close to another turbine');
-			p5.fill(255, 0, 0);
+			p5.fill(220, 38, 38);
 		}
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.strokeWeight(STROKE_WIDTH);
 
 		p5.ellipse(this.x, this.y, markerSize);
@@ -329,7 +338,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 
@@ -357,7 +366,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.strokeWeight(STROKE_WIDTH * 2);
 		// cross is drawn using two thick lines
 
@@ -427,5 +436,9 @@ export default class Draggable {
 			this.too_close_to_crater = false;
 			this.too_close_to_other_target = false;
 		}
+	}
+
+	equal(other: Draggable) {
+		return this.x === other.x && this.y === other.y;
 	}
 }
