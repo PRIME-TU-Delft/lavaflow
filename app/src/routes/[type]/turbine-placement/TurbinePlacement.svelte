@@ -75,7 +75,8 @@
 
 <style lang="postcss">
 	.overlay {
-		@apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden;
+		--tw-shadow: 0 20px 25px 5px rgb(0 0 0 / 0.1), 0 -8px 10px 0 rgb(0 0 0 / 0.1) !important;
+		@apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden shadow-xl;
 	}
 
 	.overlay.tall {
