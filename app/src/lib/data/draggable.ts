@@ -269,7 +269,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(255, 0, 0);
+		p5.stroke(220, 38, 38);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 		p5.rectMode(p5.CORNER);
@@ -313,13 +313,13 @@ export default class Draggable {
 		// Draw a red color if this point is too close to one of the avoid_points
 		if (this.too_close_to_crater) {
 			this.displayWarningMessage(p5, 'Too close to the crater');
-			p5.fill(255, 0, 0);
+			p5.fill(220, 38, 38);
 		} else if (this.too_close_to_other_target) {
 			this.displayWarningMessage(p5, 'Too close to another turbine');
-			p5.fill(255, 0, 0);
+			p5.fill(220, 38, 38);
 		}
 
-		p5.stroke(255, 0, 0);
+		p5.stroke(220, 38, 38);
 		p5.strokeWeight(STROKE_WIDTH);
 
 		p5.ellipse(this.x, this.y, markerSize);
@@ -338,7 +338,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(255, 0, 0);
+		p5.stroke(220, 38, 38);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 
@@ -366,7 +366,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(255, 0, 0);
+		p5.stroke(220, 38, 38);
 		p5.strokeWeight(STROKE_WIDTH * 2);
 		// cross is drawn using two thick lines
 

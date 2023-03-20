@@ -24,7 +24,6 @@
 	}
 
 	let image: p5.Image;
-	let perspectiveImage: p5.Image;
 	let cachedPoints: Draggable[] = [];
 
 	function updateCachedPoints() {
@@ -118,8 +117,10 @@
 					updateCachedPoints();
 				}
 
-				p5.stroke(0, 255, 0);
+				p5.push();
+				p5.stroke(248, 113, 113);
 				drawLine(point, points[(i + 1) % points.length]); // draw line between points
+				p5.pop();
 			}
 
 			if (points.length !== 4) return;
