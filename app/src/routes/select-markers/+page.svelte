@@ -21,21 +21,6 @@
 
 	$: hasStores = !!($imageStore && $sizeStore.height && $sizeStore.width);
 
-	// async function applySelection() {
-	// 	if (points.length !== 4) {
-	// 		error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
-	// 		return;
-	// 	}
-	// 	const cvError = await imageToCountours(points);
-
-	// 	if (cvError) {
-	// 		error = new LavaError('Something went wrong detecting curves', cvError);
-	// 		return;
-	// 	}
-
-	// 	error = null;
-	// }
-
 	function applySelection() {
 
 		// Update the perspective-image inside the rendered canvas
