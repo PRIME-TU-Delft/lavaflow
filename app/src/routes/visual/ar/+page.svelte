@@ -3,7 +3,7 @@
 	import VisualiseUi from '../VisualiseUI.svelte';
 	import Scene from './Scene.svelte';
 
-	const scale = [0.05, 0.025, 0.05] as [number, number, number];
+	const scale = [0.025, 0.0125, 0.025] as [number, number, number];
 </script>
 
 <VisualiseUi title="Visual ar" baseUrl="/ar" let:showLava>
