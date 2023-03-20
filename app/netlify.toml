@@ -1,3 +1,0 @@
-[build]
-  command = "sh -c 'curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh' && wasm-pack build ../wasm --target web && yarn build"
-  publish = "build-netlify/"
