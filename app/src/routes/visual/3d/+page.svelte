@@ -14,12 +14,15 @@
 	$: deltaTubines = $difficultyStore.min_steam_turbines - $turbineLocations.length;
 
 	let eruptionScore: number | null = null;
-	let minimiseScore = false;
+	let minimiseScore = false; // score minimised takes up less space to show the 3d scene better
+
+	let showLava = false; // Is lava gltf visible
 
 	function startEruption() {
-		// TODO: add real eruption score
+		showLava = true;
 		minimiseScore = false;
-		eruptionScore = Math.floor(Math.random() * 1000);
+
+		eruptionScore = gltfStore.computePlayerPoints(1000);
 	}
 </script>
 
@@ -27,9 +30,7 @@
 
 <div class="h-full w-full">
 	<Canvas>
-		{#if $gltfStore?.gltf_url}
-			<Scene gltfModel={$gltfStore.gltf_url} />
-		{/if}
+		<Scene {showLava} />
 	</Canvas>
 </div>
 
@@ -43,7 +44,7 @@
 			Move turbines
 		</ActionButton>
 
-		<!-- TODO: @Rens will create svg for eruptio icon -->
+		<!-- TODO: @Rens will create svg for eruption icon -->
 		<ActionButton on:click={startEruption}>Start eruption</ActionButton>
 	{:else if !minimiseScore}
 		<EruptionScore score={eruptionScore} on:dismiss={() => (minimiseScore = true)}>
