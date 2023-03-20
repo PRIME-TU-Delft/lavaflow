@@ -3,7 +3,7 @@
 	import { turbineLocations } from '$lib/stores/locationStore';
 
 	export let rotation = 0;
-	export let size: [number, number, number];
+	export let size = [0.025, 0.0125, 0.025] as [number, number, number];
 	export let showLava: boolean = false;
 	export let scale = 0.5;
 

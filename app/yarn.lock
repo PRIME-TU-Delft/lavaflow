@@ -270,6 +270,19 @@
   resolved "https://registry.npmjs.org/@threlte/preprocess/-/preprocess-0.0.2.tgz"
   integrity sha512-Eb3u3nAEBSFpadQvCdeZKy0xE4kgnlmxeTxnzTsmvUJt5ZEadbMg1+/LXn0oAYgFO72YQ62CJ7WI4hmoQSpOeA==
 
+"@types/aframe@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@types/aframe/-/aframe-1.2.2.tgz#2b0fa0c21ca635db777404f5dde067150584df6b"
+  integrity sha512-gzDDsXHgXq5utNc/s7/5iIhuHzN1FI3HvBCtcxbwuJw02btqVzEoaCK/VeEWcmG8uJerUccvgWqSzQuoryFZNw==
+  dependencies:
+    "@types/animejs" "*"
+    "@types/three" "*"
+
+"@types/animejs@*":
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/@types/animejs/-/animejs-3.1.7.tgz#4d9b23fff04b52e755119625a6087e2bc024527a"
+  integrity sha512-kFSyjM+fLo3oE9noWEtUvF82ttN8fTrKohiEMIrSzEzEjnsCmtO0rBCUQBlSPEb2w8vfN+v4/Zo0tK21Bgmq4g==
+
 "@types/cookie@^0.5.1":
   version "0.5.1"
   resolved "https://registry.npmjs.org/@types/cookie/-/cookie-0.5.1.tgz"
@@ -307,7 +320,7 @@
   resolved "https://registry.npmjs.org/@types/semver/-/semver-7.3.13.tgz"
   integrity sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==
 
-"@types/three@^0.149.0":
+"@types/three@*", "@types/three@^0.149.0":
   version "0.149.0"
   resolved "https://registry.npmjs.org/@types/three/-/three-0.149.0.tgz"
   integrity sha512-fgNBm9LWc65ER/W0cvoXdC0iMy7Ke9e2CONmEr6Jt8sDSY3sw4DgOubZfmdZ747dkPhbQrgRQAWwDEr2S/7IEg==
