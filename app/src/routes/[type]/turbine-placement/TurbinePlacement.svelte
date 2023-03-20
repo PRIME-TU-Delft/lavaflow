@@ -1,9 +1,8 @@
 <script lang="ts">
 	import P5PreviewCurves from '$lib/components/p5/P5PreviewCurves.svelte';
 	import { contourLines } from '$lib/stores/contourLineStore';
-	import { turbineLocations } from '$lib/stores/locationStore';
+	import { turbineLocations, craterLocation } from '$lib/stores/locationStore';
 	import sizeStore from '$lib/stores/sizeStore';
-	// import { difficultyStore } from '$lib/stores/difficultyStore';
 	import Turbines from './Turbines.svelte';
 
 	let { height: sHeight, width: sWidth } = $sizeStore;
@@ -59,8 +58,8 @@
 					on:click|stopPropagation
 					on:keydown|stopPropagation
 					class="crater"
-					style="--pos-y: {(410 * cHeight) / sHeight}px;
-								 --pos-x: {(670 * cWidth) / sWidth}px;"
+					style="--pos-y: {($craterLocation[1] * cHeight) / sHeight}px;
+								 --pos-x: {($craterLocation[0] * cWidth) / sWidth}px;"
 				>
 					Crater
 				</div>
