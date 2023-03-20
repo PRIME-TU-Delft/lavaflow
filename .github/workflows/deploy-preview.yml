@@ -1,12 +1,12 @@
 on:
-  push:
-    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
   workflow_dispatch:
 
 
 jobs:
   deploy:
-    name: Build & deploy
+    name: Deploy preview
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,27 +28,30 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
-          cache-dependency-path: 'svelte-app/yarn.lock'
+          cache-dependency-path: 'app/yarn.lock'
 
       - name: Install wasm-pack
         run:  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Install node.js dependencies
-        working-directory: svelte-app
+        working-directory: app
         run: yarn install --frozen-lockfile
 
       - name: Build (Rust)
         run: wasm-pack -v build wasm --target web
 
       - name: Build (Svelte)
-        working-directory: svelte-app
+        working-directory: app
         run: |
           echo -e "${{ github.sha }}\n$(date)" > static/version.txt && \
           yarn build
 
-      - name: Deploy to GitHub pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1.2
         with:
-          github_token: ${{ SECRETS.GITHUB_TOKEN }}
-          publish_dir: svelte-app/build
-          cname: lava.ewi.tudelft.nl
+          github-token: ${{ SECRETS.GITHUB_TOKEN }}
+          publish-dir: app/build
+          alias: deploy-preview-${{ github.event.number }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ SECRETS.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ SECRETS.NETLIFY_SITE_ID }}
