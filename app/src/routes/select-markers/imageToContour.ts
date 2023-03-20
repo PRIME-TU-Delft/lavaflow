@@ -1,13 +1,13 @@
 import { goto } from '$app/navigation';
 import type Draggable from '$lib/data/draggable';
 import { contourLines } from '$lib/stores/contourLineStore';
-import sizeStore from '$lib/stores/sizeStore';
 import imageStore from '$lib/stores/imageStore';
+import sizeStore from '$lib/stores/sizeStore';
+import * as gm from 'gammacv';
 import cv from 'opencv-ts';
 import { get } from 'svelte/store';
 import { getCurves } from './open-cv/detectCurves';
-import removePerspective, { removePerspectiveGammaCV } from './open-cv/removePerspective';
-import * as gm from 'gammacv';
+import { removePerspectiveGammaCV } from './open-cv/removePerspective';
 
 /**
  * takes the <img id="foregroundImage" /> and converts it to contour lines with hierarchy.
@@ -70,9 +70,8 @@ import * as gm from 'gammacv';
 // }
 
 export function imageToContoursGammaCV(canvas: HTMLCanvasElement) {
-
 	// Transform the canvas content to an OpenCV Mat construct
-	const opencv_mat = cv.imread(canvas)
+	const opencv_mat = cv.imread(canvas);
 
 	try {
 		// Set contour line store to the detected contour lines with hierarchy
@@ -103,7 +102,6 @@ export function imageToContoursGammaCV(canvas: HTMLCanvasElement) {
 
 		return message as string;
 	}
-
 }
 
 export async function extractSelectedArea(
@@ -128,8 +126,7 @@ export async function extractSelectedArea(
 
 	// Apply the perspective transformation using the selected marker coords
 
-	const sourceTensor = await gm.imageTensorFromURL(get(imageStore), "uint8", [height, width, 4])
-
+	const sourceTensor = await gm.imageTensorFromURL(get(imageStore), 'uint8', [height, width, 4]);
 
 	const result = removePerspectiveGammaCV(sourceTensor, markerCoords, width, height);
 

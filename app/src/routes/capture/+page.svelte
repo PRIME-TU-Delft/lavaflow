@@ -7,9 +7,9 @@
 	import imageStore from '$lib/stores/imageStore';
 	import sizeStore from '$lib/stores/sizeStore';
 	import { Button, Chevron, Dropdown, DropdownItem } from 'flowbite-svelte';
+	import * as gm from 'gammacv';
 	import type { PageData } from './$types';
 	import CaptureMenu from './CaptureMenu.svelte';
-	import * as gm from 'gammacv';
 
 	export let data: PageData;
 
@@ -35,40 +35,45 @@
 		const context = canvas.getContext('2d');
 
 		// Take screenshot of video
-		if (context) context.drawImage(videoSource, 0, 0, videoSource.videoWidth, videoSource.videoHeight);
+		if (context)
+			context.drawImage(videoSource, 0, 0, videoSource.videoWidth, videoSource.videoHeight);
 
 		const image = canvas.toDataURL('image/png');
 
 		// Transform the image (from imageStore) into a gammacv tensor
-		const gammacvInputTensor = await gm.imageTensorFromURL(image, "uint8", [videoSource.videoHeight, videoSource.videoWidth, 4])
+		const gammacvInputTensor = await gm.imageTensorFromURL(image, 'uint8', [
+			videoSource.videoHeight,
+			videoSource.videoWidth,
+			4
+		]);
 
 		// Define the image processing pipeline
 
 		// Normalization: add contrast, make colors seem deeper
-		let pipeline = gm.norm(gammacvInputTensor, "l2")
+		let pipeline = gm.norm(gammacvInputTensor, 'l2');
 		// Erosion: erode into rectangles of shape 2x2 (best to see for yourself: https://gammacv.com/examples/erode)
-		pipeline = gm.erode(pipeline, [2, 2])
+		pipeline = gm.erode(pipeline, [2, 2]);
 		// Adaptive Threshold: Black/white - make pixels black if they pass the threshold 20 within a certain box of size 10
 		// (best to see for yourself: https://gammacv.com/examples/adaptive_threshold)
-		pipeline = gm.adaptiveThreshold(pipeline, 10, 20)
+		pipeline = gm.adaptiveThreshold(pipeline, 10, 20);
 		// Gaussian Blur: remove sharp edges
-		pipeline = gm.gaussianBlur(pipeline, 3, 1)
+		pipeline = gm.gaussianBlur(pipeline, 3, 1);
 		// Make the lines a bit thinner so the result from opencv's getContours is better
-		pipeline = gm.threshold(pipeline, 0.3)
+		pipeline = gm.threshold(pipeline, 0.3);
 
 		// Extract the tensor output
-		const gammacvOutputTensor: any = gm.tensorFrom(pipeline)
+		const gammacvOutputTensor: any = gm.tensorFrom(pipeline);
 
 		// Create and initialize the GammaCV session, to acquire GPU acceperation
-		const gammacvSession = new gm.Session()
-		gammacvSession.init(pipeline)
+		const gammacvSession = new gm.Session();
+		gammacvSession.init(pipeline);
 
 		// Run the canny-edges operation
 		gammacvSession.runOp(pipeline, 0, gammacvOutputTensor);
 
-		gm.canvasFromTensor(canvas, gammacvOutputTensor)
+		gm.canvasFromTensor(canvas, gammacvOutputTensor);
 
-		imageStore.set(canvas.toDataURL('image/png'))
+		imageStore.set(canvas.toDataURL('image/png'));
 
 		canvas.remove();
 

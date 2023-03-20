@@ -2,13 +2,13 @@
 	/**
 	 * Dragging marker over an image to transform it.
 	 */
+	import P5 from '$lib/components/p5/P5.svelte';
 	import Draggable from '$lib/data/draggable';
 	import LavaError from '$lib/data/LavaError';
 	import imageStore from '$lib/stores/imageStore';
 	import sizeStore from '$lib/stores/sizeStore';
-	import { createEventDispatcher } from 'svelte';
 	import type p5 from 'p5';
-	import P5 from '$lib/components/p5/P5.svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { get } from 'svelte/store';
 
 	export let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
