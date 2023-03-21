@@ -7,7 +7,6 @@
 	//img paths
 	const drawing = `${assets}/instructional-images/drawing/`;
 	const scanning = `${assets}/instructional-images/scanning/`;
-	const alt = 'instructional image';
 
 	export let drawingInstructions = [
 		{
@@ -88,12 +87,16 @@
 	<h1>Capture instructions</h1>
 	<Accordion class="not-prose">
 		<AccordionItem open>
-			<span class="not-prose" slot="header">Drawing</span>
+			<span slot="header">Drawing</span>
 
 			<div class="prose">
 				{#each drawingInstructions as instruction}
 					<div class="instruction">
-						<img class="h-80 w-full object-contain" src={instruction.imagepath} {alt} />
+						<img
+							class="h-80 w-full object-contain"
+							src={instruction.imagepath}
+							alt="instructional image for {instruction.title}"
+						/>
 						<h4 class="text-gray-900">{instruction.title}</h4>
 						<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
 							{instruction.description}
@@ -106,7 +109,11 @@
 			<span slot="header">Scanning</span>
 			{#each scanningInstructions as instruction}
 				<div class="instruction">
-					<img class="h-80 w-full object-contain" src={instruction.imagepath} {alt} />
+					<img
+						class="h-80 w-full object-contain"
+						src={instruction.imagepath}
+						alt="instructional image for {instruction.title}"
+					/>
 					<div class="text-gray-900">{instruction.title}</div>
 					<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">{instruction.description}</div>
 				</div>
