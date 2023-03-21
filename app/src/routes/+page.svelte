@@ -72,9 +72,9 @@
 			/>
 			<UserProfile name="Pauline Hengst" title="Developer: Model Construction and Model Graphics" />
 			<UserProfile
-				name="Julia van de Kris"
+				name="Julia van der Kris"
 				image="jvanderkris.jpg"
-				title="'Full-stack developer'"
+				title="Developer: WebAssembly/deployment and Model Generation"
 			/>
 			<UserProfile
 				name="Jonas van Marrewijk"
