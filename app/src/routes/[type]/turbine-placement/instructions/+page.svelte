@@ -39,7 +39,7 @@
 
 </script>
 
-<Section title="Capture instructions">
+<Section title="Instructions">
 	<Accordion>
 		<AccordionItem open>
 			<span slot="header">Turbine Placement</span>

@@ -32,7 +32,7 @@
 		},
 		{
 			title: 'Close your curves',
-			description: 'To avoid false readings, close your curves, dont leave any open-ended lines',
+			description: 'Dont draw any open ended line. Open ended lines will be ignored or misinterpreted.',
 			imagepath: drawing + "disconnected_line.svg"
 		},
 		{
@@ -57,13 +57,13 @@
 		{
 			title: 'A correct scan',
 			description:
-				'.....',
+				'Try to capture an image where your level curves are the focus of the image.',
 			imagepath: scanning + "correct.svg"
 		},
 		{
 			title: 'Orientation of the scan',
 			description:
-				'The orientation of your drawing in the camera feild highly infulences scanning. This example is not parallel, but will probably still work. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your drawing on a table instead of holding it. ',
+				'The orientation of your level curves in the camera field highly infulences scanning. This example is not parallel, but will probably still work. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your paper on a table instead of holding it. ',
 			imagepath: scanning + "correct_tilted.svg"
 		},
 		{
@@ -81,7 +81,7 @@
 		{
 			title: 'Shadows on page',
 			description:
-				'Level curves are hard to distinguish from the background in a low light setting. Try to use natural daylight or a propper ceiling light for the best results. Be careful of sharp or dark shadows on the drawing, as they might get interpreted as part of your drawing.',
+				'Level curves are hard to distinguish from the background in a low light setting. Try to use natural daylight or a proper ceiling light for the best results. Be wary of sharp or dark shadows on the drawing, as they might be interpreted as part of your drawing.',
 			imagepath: scanning + "shadow_on_page.svg"
 		}
 	];

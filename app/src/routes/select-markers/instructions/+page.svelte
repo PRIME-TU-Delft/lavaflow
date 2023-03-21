@@ -12,7 +12,7 @@
 		{
 			title: 'A correctly bordered drawing ',
 			description:
-				'Drag the shapes of the selection box to the shapes on the page. This will crop the image and apply transformations to compensate for any perspective. A preview of your transformed drawing can be seen at the top right of the \"dragging\" page.',
+				'Drag the shapes of the selection box to the shapes on the page. This will crop the image and apply transformations to compensate for any perspective. A preview of your transformed drawing can be seen at the top right of the \"marker selection\" page.',
 			imagepath: path + "correct.svg"
 		},
 		{
@@ -47,12 +47,12 @@
 		{
 			title: 'Check the preview',
 			description:
-				' A preview of your cropped and transformed drawing can be seen at the top right of the \"dragging\" page. If this shows that you are acidentally removing part of your image, or including things that are not part of your drawing, try adjusting the selection box.'
+				' A preview of your cropped and transformed drawing can be seen at the top right of the \"marker selection\" page. If it shows that you are accidentally removing part of your image or including things that are not part of your drawing, try adjusting the selection box untill this is no longer the case.'
 		},
 		{
-			title: 'General',
+			title: 'New capture',
 			description:
-				'If moving markers does not work, try taking a new picture.'
+				'If moving the corners of the selcetion box does not work, try taking a new picture.'
 		}
 	];
 </script>
