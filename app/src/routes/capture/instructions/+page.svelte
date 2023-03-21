@@ -1,40 +1,83 @@
 <script>
+	import { assets } from '$app/paths';
 	import LabeledButton from '$lib/components/LabeledButton.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import { mdiChevronRight } from '@mdi/js';
 	import { Accordion, AccordionItem, Button } from 'flowbite-svelte';
 
+	//img paths
+	const drawing = `${assets}/instructional-images/drawing/`;
+	const scanning = `${assets}/instructional-images/scanning/`;
+	const alt="instructional image"
+
+
 	export let drawingInstructions = [
 		{
-			title: 'Curves should have sufficient margin',
+			title: 'A correctly drawn set of level curves',
 			description:
-				'The curves should have sufficient margin between them, overlapping or close lines are hard to interpret'
+				'Be as creative as you like! Just make sure not to make any of the following mistakes',
+			imagepath: drawing + "correct.svg"
 		},
 		{
-			title: 'Drawing with dark pen',
+			title: 'Curves should not overlap',
 			description:
-				'To recognise your level curves, we prefer a dark and thick marker. Using a lighter pen will likely not work'
+				'The curves should have sufficient margin between them, overlapping or close lines are harder to interpret',
+			imagepath: drawing + "overlapping_lines.svg"	
+		},
+		{
+			title: 'Draw with a dark pen',
+			description:
+				'To recognise your level curves, we prefer a dark and thick marker. Using a lighter pen will likely not work',
+			imagepath: drawing + "line_visibility.svg"
 		},
 		{
 			title: 'Close your curves',
-			description: 'To avoid false readings, close your curves, dont leave any open-ended lines'
+			description: 'To avoid false readings, close your curves, dont leave any open-ended lines',
+			imagepath: drawing + "disconnected_line.svg"
+		},
+		{
+			title: 'Draw in the box',
+			description: 'To make the next step easier, do not draw outside to the square shown on the page',
+			imagepath: drawing + "out_of_box.svg"
+		},
+		{
+			title: 'Do not draw loose ends',
+			description: 'Try to keep your curves neat, as having dangling lines can lead to unintended behaviour.',
+			imagepath: drawing + "loose_ends.svg"
 		}
 	];
 
 	export let scanningInstructions = [
+		
+		{
+			title: 'A correct scan',
+			description:
+				'.....',
+			imagepath: scanning + "correct.svg"
+		},
+		{
+			title: 'Orientation of the scan',
+			description:
+				'The orientation of your drawing in the camera feild highly infulences scanning. This example is not parallel, but will probably still work. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your drawing on a table instead of holding it. ',
+			imagepath: scanning + "correct_tilted.svg"
+		},
 		{
 			title: 'Four corners visible',
-			description: 'To scan the level curves, we need to have the four corners visible'
+			description: 'To scan the level curves, we need to have the four corners visible', 
+			imagepath: scanning + "out_of_frame.svg"
 		},
 		{
 			title: 'Drawing should not be too far',
 			description:
-				'Scanning works best from a distance of 0.5 meters from the piece of paper. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your drawing on a table instead of holding it.'
+				'Scanning works best from a distance of 0.5 meters from the piece of paper. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your drawing on a table instead of holding it.',
+			imagepath: scanning + "page_too_small.svg"	
+
 		},
 		{
-			title: 'Proper lighting',
+			title: 'Shadows on page',
 			description:
-				'Level curves are hard to distinguish from the background in a low light setting. Try to use natural daylight or a propper ceiling light for the best results. Be careful of sharp or dark shadows on the drawing, as they might get interpreted as part of your drawing.'
+				'Level curves are hard to distinguish from the background in a low light setting. Try to use natural daylight or a propper ceiling light for the best results. Be careful of sharp or dark shadows on the drawing, as they might get interpreted as part of your drawing.',
+			imagepath: scanning + "shadow_on_page.svg"
 		}
 	];
 </script>
@@ -45,7 +88,8 @@
 			<span slot="header">Drawing</span>
 			{#each drawingInstructions as instruction}
 				<div class="instruction">
-					<div class="text-gray-900">{instruction.title}</div>
+					<img class="h-80 w-full object-contain" src={instruction.imagepath} {alt} />
+					<div class="text-gray-900">{instruction.title} </div>
 					<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">{instruction.description}</div>
 				</div>
 			{/each}
@@ -54,6 +98,7 @@
 			<span slot="header">Scanning</span>
 			{#each scanningInstructions as instruction}
 				<div class="instruction">
+					<img class="h-80 w-full object-contain" src={instruction.imagepath} {alt}/>
 					<div class="text-gray-900">{instruction.title}</div>
 					<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">{instruction.description}</div>
 				</div>
