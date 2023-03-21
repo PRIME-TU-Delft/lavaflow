@@ -1,6 +1,6 @@
-<div class="relative max-h-96">
+<div class="relative mx-auto max-h-96 max-w-6xl">
 	<img
-		class="h-full max-h-96 w-full rounded-bl-3xl rounded-br-3xl object-cover saturate-50"
+		class="h-full max-h-96 w-full object-cover saturate-50 lg:rounded-bl-3xl lg:rounded-br-3xl"
 		src="volcano.jpg"
 		alt="title artwork"
 	/>
