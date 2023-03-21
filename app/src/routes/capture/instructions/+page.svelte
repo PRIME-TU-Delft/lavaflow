@@ -8,7 +8,7 @@
 	//img paths
 	const drawing = `${assets}/instructional-images/drawing/`;
 	const scanning = `${assets}/instructional-images/scanning/`;
-	const alt="instructional image"
+	const alt="instructional image";
 
 
 	export let drawingInstructions = [
@@ -36,9 +36,14 @@
 			imagepath: drawing + "disconnected_line.svg"
 		},
 		{
+			title: '',
+			description: '',
+			imagepath: drawing + "out_of_box.svg"
+		},
+		{
 			title: 'Draw in the box',
 			description: 'To make the next step easier, do not draw outside to the square shown on the page',
-			imagepath: drawing + "out_of_box.svg"
+			imagepath: drawing + "correct_in_box.svg"
 		},
 		{
 			title: 'Do not draw loose ends',
