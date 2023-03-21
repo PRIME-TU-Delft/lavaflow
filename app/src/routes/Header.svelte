@@ -11,7 +11,7 @@
 		target="_blank"
 		class="link left-4"
 	>
-		<img class="h-20  w-36 object-contain" src="primeLogo.svg" alt="prime logo" />
+		<img class="h-20 w-36 object-contain" src="primeLogo.svg" alt="prime logo" />
 	</a>
 
 	<a href="https://www.tudelft.nl" rel="noopener noreferrer" target="_blank" class="link right-4">

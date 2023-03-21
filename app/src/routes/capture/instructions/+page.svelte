@@ -1,8 +1,7 @@
 <script>
 	import LabeledButton from '$lib/components/LabeledButton.svelte';
-	import Section from '$lib/components/Section.svelte';
 	import { mdiChevronRight } from '@mdi/js';
-	import { Accordion, AccordionItem, Button } from 'flowbite-svelte';
+	import { Accordion, AccordionItem } from 'flowbite-svelte';
 
 	export let drawingInstructions = [
 		{
@@ -39,16 +38,22 @@
 	];
 </script>
 
-<Section title="Capture instructions">
-	<Accordion>
+<div class="prose mx-auto mt-12 p-4">
+	<h1>Capture instructions</h1>
+	<Accordion class="not-prose">
 		<AccordionItem open>
-			<span slot="header">Drawing</span>
-			{#each drawingInstructions as instruction}
-				<div class="instruction">
-					<div class="text-gray-900">{instruction.title}</div>
-					<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">{instruction.description}</div>
-				</div>
-			{/each}
+			<span class="not-prose" slot="header">Drawing</span>
+
+			<div class="prose">
+				{#each drawingInstructions as instruction}
+					<div class="instruction">
+						<h4 class="text-gray-900">{instruction.title}</h4>
+						<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+							{instruction.description}
+						</div>
+					</div>
+				{/each}
+			</div>
 		</AccordionItem>
 		<AccordionItem>
 			<span slot="header">Scanning</span>
@@ -61,9 +66,9 @@
 		</AccordionItem>
 	</Accordion>
 
-	<div class="mt-2 flex justify-end">
+	<div class="not-prose mt-2 flex justify-end">
 		<a href="/capture">
 			<LabeledButton icon={mdiChevronRight}>Start scanning</LabeledButton>
 		</a>
 	</div>
-</Section>
+</div>

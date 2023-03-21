@@ -1,6 +1,5 @@
 <script>
 	import LabeledButton from '$lib/components/LabeledButton.svelte';
-	import Section from '$lib/components/Section.svelte';
 	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 	import { Accordion, AccordionItem } from 'flowbite-svelte';
 
@@ -22,8 +21,9 @@
 	];
 </script>
 
-<Section title="Capture instructions">
-	<Accordion>
+<div class="mx-auto p-4">
+	<h1>Capture instructions</h1>
+	<Accordion class="">
 		<AccordionItem open>
 			<span slot="header">Dragging</span>
 			{#each dragInstructions as instruction}
@@ -48,4 +48,4 @@
 		<LabeledButton outline href="/capture" iconPrefix={mdiChevronLeft}>Re-scan</LabeledButton>
 		<LabeledButton href="/select-markers" icon={mdiChevronRight}>Start selecting</LabeledButton>
 	</div>
-</Section>
+</div>

@@ -31,9 +31,9 @@
 
 	<div class="prose mx-auto mt-8 px-4">
 		<h2>Instructions:</h2>
-		<div class=" rounded-xl bg-red-100 p-4">
-			<!-- TODO: onclick -->
-			<LabeledButton icon={mdiDownload}>
+		<div class="not-prose rounded-xl bg-red-100 p-4">
+			<!-- TODO: create page print -->
+			<LabeledButton href="/print" outline icon={mdiDownload}>
 				<div slot="label">
 					Alongside this applet, a printable template was designed on which you can draw your
 					level-curves.
@@ -42,8 +42,8 @@
 			</LabeledButton>
 
 			{#if true}
-				<!-- TODO: onclick -->
-				<LabeledButton icon={mdiDownload}>
+				<!-- TODO: add dynamic link with firebase -->
+				<LabeledButton href="" outline icon={mdiDownload}>
 					<div class="mt-4" slot="label">
 						We have detected that your device does not support webXR natively. The app is usable,
 						however we would recommend you to download a special AR browser.
