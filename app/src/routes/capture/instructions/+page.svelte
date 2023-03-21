@@ -63,13 +63,13 @@
 		},
 		{
 			title: 'Four corners visible',
-			description: 'To scan the level curves, we need to have the four corners visible', 
+			description: 'To scan the level curves, we need to have the four corners of the page visible', 
 			imagepath: scanning + "out_of_frame.svg"
 		},
 		{
 			title: 'Drawing should not be too far',
 			description:
-				'Scanning works best from a distance of 0.5 meters from the piece of paper. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your drawing on a table instead of holding it.',
+				'Scanning works best from a distance of 0.5 meters from the piece of paper.',
 			imagepath: scanning + "page_too_small.svg"	
 
 		},
