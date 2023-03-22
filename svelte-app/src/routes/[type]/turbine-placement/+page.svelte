@@ -35,9 +35,6 @@
 		<ActionButton twClass="w-full" href="turbine-placement/instructions" secondary icon={mdiHelp}>
 			Instructions
 		</ActionButton>
-		<ActionButton twClass="w-full" href="turbine-placement/difficulty" secondary icon={mdiStairsUp}>
-			Difficulty
-		</ActionButton>
 	</ButtonGroup>
 
 	<!-- Navigation -->
