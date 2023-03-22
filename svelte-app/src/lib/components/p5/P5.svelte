@@ -67,4 +67,4 @@
 	});
 </script>
 
-<div use:ref style={parentDivStyle} />
+<div class="p5Canvas" use:ref style={parentDivStyle} />

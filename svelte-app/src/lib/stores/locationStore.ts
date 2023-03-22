@@ -5,77 +5,76 @@
  * This stores location data 😈
  */
 
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import Draggable from '$lib/data/draggable';
 
-type Vec2 = [number, number];
-
-/**
- * Factory for creating a target of crater location store
- * @returns location store with method subscribe, add and remove
- */
-// Get cache from local storage
-function convertToTargets(cachedTargets: Draggable[]): Draggable[] {
-	return cachedTargets.map((target) => {
-		const dragItem = new Draggable(target.x, target.y, target.size, target.offsetX, target.offsetY);
-
-		dragItem.enableSelection();
-		dragItem.deselect();
-
-		return dragItem;
-	});
+export interface Turbine {
+	x: number;
+	y: number;
+	index: string;
+	hasConfirmOpen: boolean;
 }
 
-function createLocationStore<T>(storageIndex: string, convertToLocation: (locations: T[]) => T[]) {
-	function getCache() {
-		// Get initial locations from the local storage
-		if (typeof window !== 'undefined') {
-			const cachedLocations = localStorage?.getItem(storageIndex);
+const CACHE_KEY_TURBINES = 'turbines';
+const CACHE_KEY_CRATER = 'crater';
 
-			try {
-				if (cachedLocations) {
-					const parsedLocations = JSON.parse(cachedLocations);
-					return convertToLocation(parsedLocations);
-				}
-			} catch (_) {
-				return [];
-			}
-		}
-		return [];
-	}
+function createLocationStore() {
+	const stored = browser ? localStorage?.getItem(CACHE_KEY_TURBINES) || '[]' : '[]';
+	const turbines = JSON.parse(stored) as Turbine[];
+	const hasTurbines = turbines?.length > 0;
+	console.log('hasTurbines', hasTurbines, turbines);
 
-	// Set cache to local storage
-	function setCache(locations: T[]) {
-		if (typeof window !== 'undefined') {
-			localStorage.setItem(storageIndex, JSON.stringify(locations));
-		}
-	}
-
-	const { subscribe, update, set } = writable<T[]>(getCache());
+	const { subscribe, set, update } = writable<Turbine[]>(hasTurbines ? turbines : []);
 
 	return {
 		subscribe,
-		clear: () => set([]),
-		set: (locations: T[]) => {
-			set(locations);
-			setCache(locations);
+		add: (turbine: Turbine) => {
+			update((ts) => [...ts, turbine]);
 		},
-		add: (location: T) =>
-			update((oldLocations) => {
-				// append new location to the end of the array
-				const newLocations = [...oldLocations, location];
-				setCache(newLocations);
-				return newLocations;
-			}),
-		remove: (index: number) =>
-			update((oldLocations) => {
-				// remove location at index
-				const newLocations = oldLocations.filter((_, i) => i !== index);
-				setCache(newLocations);
-				return newLocations;
-			})
+		remove: (index: string) => {
+			update((ts) => ts.filter((t) => t.index !== index));
+		},
+		toggleOpen: (index: string) => {
+			update((ts) =>
+				ts.map((t) => {
+					if (t.index === index) {
+						t.hasConfirmOpen = !t.hasConfirmOpen;
+					}
+					return t;
+				})
+			);
+		},
+		closeAll: () => {
+			update((ts) => {
+				if (!ts.length) return ts;
+
+				return ts.map((t) => {
+					t.hasConfirmOpen = false;
+					return t;
+				});
+			});
+		},
+		clear: () => {
+			console.log('clear');
+			set([]);
+		}
 	};
 }
 
-export const targetLocations = createLocationStore<Draggable>('targets', convertToTargets);
-export const craterLocations = createLocationStore<Vec2>('craters', (ls) => ls);
+type Vec2 = [number, number];
+function createCraterStore() {
+	const stored = browser ? localStorage?.getItem(CACHE_KEY_CRATER) || '{}' : '{}';
+	const crater = JSON.parse(stored) as Vec2;
+
+	return writable<Vec2>(crater ?? [0, 0]);
+}
+
+export const turbineLocations = createLocationStore();
+export const craterLocation = createCraterStore();
+
+turbineLocations.subscribe((value) => {
+	if (browser) localStorage?.setItem(CACHE_KEY_TURBINES, JSON.stringify(value));
+});
+craterLocation.subscribe((value) => {
+	if (browser) localStorage?.setItem(CACHE_KEY_CRATER, JSON.stringify(value));
+});

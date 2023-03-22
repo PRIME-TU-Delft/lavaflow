@@ -7,4 +7,4 @@
 
 import { writable } from 'svelte/store';
 
-export const rawImage = writable<string>();
+export default writable<string>();
