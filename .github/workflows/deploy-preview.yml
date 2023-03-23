@@ -28,20 +28,20 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
-          cache-dependency-path: 'app/yarn.lock'
+          cache-dependency-path: 'svelte-app/yarn.lock'
 
       - name: Install wasm-pack
         run:  curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
       - name: Install node.js dependencies
-        working-directory: app
+        working-directory: svelte-app
         run: yarn install --frozen-lockfile
 
       - name: Build (Rust)
         run: wasm-pack -v build wasm --target web
 
       - name: Build (Svelte)
-        working-directory: app
+        working-directory: svelte-app
         run: |
           echo -e "${{ github.sha }}\n$(date)" > static/version.txt && \
           yarn build
@@ -50,7 +50,7 @@ jobs:
         uses: nwtgck/actions-netlify@v1.2
         with:
           github-token: ${{ SECRETS.GITHUB_TOKEN }}
-          publish-dir: app/build
+          publish-dir: svelte-app/build
           alias: deploy-preview-${{ github.event.number }}
         env:
           NETLIFY_AUTH_TOKEN: ${{ SECRETS.NETLIFY_TOKEN }}

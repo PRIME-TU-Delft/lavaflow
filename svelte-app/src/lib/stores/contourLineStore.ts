@@ -6,7 +6,7 @@
  */
 
 import { writable } from 'svelte/store';
-import { targetLocations } from '$lib/stores/locationStore';
+import { turbineLocations } from '$lib/stores/locationStore';
 
 export type CurveTree = {
 	curves: [number, number][][];
@@ -32,7 +32,7 @@ function contourLineStore() {
 			localStorage.setItem('contourlines', JSON.stringify(curveTree));
 
 			set(curveTree);
-			targetLocations.clear();
+			turbineLocations.clear();
 			setup = true;
 		},
 		clear: () => {

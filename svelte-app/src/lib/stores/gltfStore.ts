@@ -7,14 +7,11 @@
 
 import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
-import { craterLocations } from '$lib/stores/locationStore';
 import { difficultyStore } from '$lib/stores/difficultyStore';
-import { targetLocations } from '$lib/stores/locationStore';
-import { debugMode } from '$lib/stores/debugStore';
+import { turbineLocations, craterLocation, type Turbine } from '$lib/stores/locationStore';
 import { get } from 'svelte/store';
 
 import ApiSettings from '$lib/data/apiSettings';
-import type Draggable from '$lib/data/draggable';
 
 import init, * as wasm from 'wasm';
 
@@ -47,13 +44,12 @@ function radToDeg(radians: number) {
 }
 
 function adjustAlititude(altAndgrad: AltitudeGradientPair) {
-	let altitude = altAndgrad.altitude;
+	function maxGradient() {
+		// Take a small modifier that will increase the altitude by a fraction of the largest absolute gradient
+		return altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
+	}
 
-	// Take a small modifier that will increase the altitude by a fraction of the largest absolute gradient
-	altitude += 1 * altAndgrad.gradient.map((g) => Math.abs(g)).reduce((a, b) => Math.max(a, b));
-
-	// Increment by 1 to prevent the altitude from being under the model
-	return altitude * 1.07;
+	return (altAndgrad.altitude + maxGradient()) * 1.07;
 }
 
 export function gltfStringToUrl(gltf: string): string {
@@ -82,6 +78,7 @@ function createGltfStore() {
 			if (!isSetup) {
 				await init();
 				isSetup = true;
+				console.log('initialized wasm');
 			}
 
 			innerWindowSize = curveTree.size;
@@ -130,21 +127,27 @@ function createGltfStore() {
 			]);
 
 			// (re-)set the crater locations
-			craterLocations.set(model.craters);
+			craterLocation.set(model.craters[0]);
 
 			// set the gltf store to the gltf string
 			set(model);
 		},
-		getAlitituteAndGradient: (marker: Draggable, noAdjustAxis = false): AltitudeGradientPair => {
+		getAlitituteAndGradient: (
+			marker: Turbine,
+			scale = 1,
+			adjustAxis = true
+		): AltitudeGradientPair => {
 			if (!api) return { x: 0, y: 0, altitude: 0, gradient: [0, 0, 0] };
 
 			let [adjustedX, adjustedY] = [marker.x, marker.y];
 
-			if (!noAdjustAxis) {
+			if (adjustAxis) {
 				// Rust creates a 100*100 grid, so we need to convert the marker coordinates to this grid
-				adjustedX = (marker.x / innerWindowSize.width) * 100;
-				adjustedY = (marker.y / innerWindowSize.height) * 100;
+				adjustedX = Math.abs((marker.x * 100 * scale) / innerWindowSize.width);
+				adjustedY = Math.abs((marker.y * 100 * scale) / innerWindowSize.height);
 			}
+
+			console.log({ adjustedX, adjustedY });
 
 			// ask api to get altitude and gradient for a certain point
 			const altitudeGradientPair = api
@@ -157,6 +160,8 @@ function createGltfStore() {
 			// Apply modifier to altitude
 			altitudeGradientPair.altitude = adjustAlititude(altitudeGradientPair);
 
+			console.log({ altitudeGradientPair });
+
 			return altitudeGradientPair;
 		},
 		computePlayerPoints: (max_points_total: number) => {
@@ -168,7 +173,7 @@ function createGltfStore() {
 			return api.compute_player_points(
 				new wasm.LavaPathTurbineInput({
 					lava_paths: model.lava_paths,
-					turbines: get(targetLocations).map((l) => [(l.x / width) * 100, (l.y / height) * 100]),
+					turbines: get(turbineLocations).map((l) => [(l.x / width) * 100, (l.y / height) * 100]),
 					max_lava_distance: get(difficultyStore).max_lava_distance,
 					max_points_total: max_points_total
 				})

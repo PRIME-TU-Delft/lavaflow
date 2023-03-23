@@ -11,15 +11,17 @@ export default class Draggable {
 	too_close_to_other_target = false;
 	x: number;
 	y: number;
+	mappedX: number;
+	mappedY: number;
 	old_x: number;
 	old_y: number;
 	size: number;
 	offsetX: number;
 	offsetY: number;
-	instruction: string = '';
-	instruction_width: number = -1;
-	instruction_height: number = -1;
-	instruction_show_initially: boolean = false;
+	instruction = '';
+	instruction_width = -1;
+	instruction_height = -1;
+	instruction_show_initially = false;
 
 	/**
 	 * Initialize a draggable marker at a given position
@@ -35,11 +37,17 @@ export default class Draggable {
 	constructor(x: number, y: number, size: number, offsetX = 0, offsetY = 0) {
 		this.x = x;
 		this.y = y;
+		this.mappedX = 0;
+		this.mappedY = 0;
 		this.old_x = x;
 		this.old_y = y;
 		this.size = size;
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
+	}
+
+	clone() {
+		return new Draggable(this.x, this.y, this.size, this.offsetX, this.offsetY);
 	}
 
 	/**
@@ -150,6 +158,11 @@ export default class Draggable {
 		}
 	}
 
+	updateMappedCoordinates(p5: p5, imgWidth: number, imgHeight: number) {
+		this.mappedX = (this.x / p5.windowWidth) * imgWidth;
+		this.mappedY = (this.y / p5.windowHeight) * imgHeight;
+	}
+
 	/**
 	 * Moves the point to the input x and y coordinates
 	 *
@@ -205,16 +218,21 @@ export default class Draggable {
 				box_height = this.instruction_height;
 			}
 
+			p5.push();
 			p5.strokeWeight(0.5);
 			p5.stroke(0);
 			p5.fill(200);
 			p5.rectMode(p5.CENTER);
 			p5.rect(this.x, this.y - markerSize / 2 - 25, box_width, box_height);
+			p5.pop();
 
+			p5.push();
+			p5.strokeWeight(0);
 			p5.fill(0);
 			p5.textAlign(p5.CENTER);
-			p5.textSize(15);
+			p5.textSize(markerSize);
 			p5.text(this.instruction, this.x, this.y - 40);
+			p5.pop();
 		}
 	}
 
@@ -251,7 +269,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 		p5.rectMode(p5.CORNER);
@@ -295,13 +313,13 @@ export default class Draggable {
 		// Draw a red color if this point is too close to one of the avoid_points
 		if (this.too_close_to_crater) {
 			this.displayWarningMessage(p5, 'Too close to the crater');
-			p5.fill(255, 0, 0);
+			p5.fill(220, 38, 38);
 		} else if (this.too_close_to_other_target) {
 			this.displayWarningMessage(p5, 'Too close to another turbine');
-			p5.fill(255, 0, 0);
+			p5.fill(220, 38, 38);
 		}
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.strokeWeight(STROKE_WIDTH);
 
 		p5.ellipse(this.x, this.y, markerSize);
@@ -320,7 +338,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.fill(255);
 		p5.strokeWeight(STROKE_WIDTH);
 
@@ -348,7 +366,7 @@ export default class Draggable {
 
 		this.drawInstruction(p5, markerSize);
 
-		p5.stroke(0);
+		p5.stroke(220, 38, 38);
 		p5.strokeWeight(STROKE_WIDTH * 2);
 		// cross is drawn using two thick lines
 
@@ -418,5 +436,9 @@ export default class Draggable {
 			this.too_close_to_crater = false;
 			this.too_close_to_other_target = false;
 		}
+	}
+
+	equal(other: Draggable) {
+		return this.x === other.x && this.y === other.y;
 	}
 }

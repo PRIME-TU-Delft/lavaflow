@@ -1,13 +1,11 @@
 .DS_Store
 node_modules
 /build
+/build-*
 /.svelte-kit
 /package
 .env
 .env.*
 !.env.example
-.vercel
-.output
-coverage/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

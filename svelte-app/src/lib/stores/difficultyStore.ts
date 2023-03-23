@@ -6,45 +6,31 @@
  */
 
 import { writable } from 'svelte/store';
-import { type DifficultyLevel, difficulty_modes } from '$lib/data/difficultyModes';
+import { DifficultyLevel, difficulty_modes } from '$lib/data/difficultyModes';
+import { browser } from '$app/environment';
 
-// Lava distance functions for every difficulty level
+const CACHE_KEY = 'difficulty';
 
 /**
  *  Factory for creating a difficultyStore
  * @returns target store with method subscribe, add and remove
  */
 function createDifficultyStore() {
-	const { subscribe, set } = writable<DifficultyLevel>();
-
-	if (typeof window !== 'undefined') {
-		const localDifficultyLevels = localStorage?.getItem('level');
-
-		if (localDifficultyLevels) {
-			try {
-				set(JSON.parse(localDifficultyLevels) as DifficultyLevel);
-			} catch (_) {
-				set(difficulty_modes[0]);
-			}
-		} else {
-			set(difficulty_modes[0]);
-		}
-	}
+	const { subscribe, set, update } = writable(difficulty_modes[0]);
 
 	return {
 		subscribe,
 		set: (level: DifficultyLevel) => {
-			cacheDifficultyStore(level);
 			set(level);
 		},
+		update: () => update((l) => l),
 		clear: () => {
 			set(difficulty_modes[0]);
 		}
 	};
 }
 export const difficultyStore = createDifficultyStore();
-export function cacheDifficultyStore(level: DifficultyLevel) {
-	if (typeof window !== 'undefined') {
-		localStorage.setItem('level', JSON.stringify(level));
-	}
-}
+
+difficultyStore.subscribe((value) => {
+	if (browser) localStorage?.setItem(CACHE_KEY, JSON.stringify(value));
+});
