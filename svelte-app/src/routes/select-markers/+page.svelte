@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
@@ -38,7 +37,7 @@
 
 	function continueWithDefaultMap() {
 		const { curves, hierarchy } = { curves: hc_curves, hierarchy: hc_hierarchy };
-		const [hc_width, hc_height] = [800, 667];
+		const [hc_width, hc_height] = [1000, 800];
 
 		contourLines.setup({
 			curves,

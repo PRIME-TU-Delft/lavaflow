@@ -4,6 +4,7 @@
 	import { Icon } from 'mdi-svelte-ts';
 
 	export let loading = false;
+	export let disabled = false;
 </script>
 
 <div class="flex w-full items-center justify-around gap-4 bg-red-50 p-10 md:rounded-lg md:p-4 ">
@@ -16,7 +17,7 @@
 			<Spinner class="h-8 w-8" color="red" />
 		</Button>
 	{:else}
-		<Button class="!p-4" outline color="red" on:click>
+		<Button {disabled} class="!p-4" outline color="red" on:click>
 			<Icon path={mdiCamera} size={2} />
 		</Button>
 	{/if}

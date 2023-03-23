@@ -26,7 +26,15 @@
 	async function gotoTransform(videoSource: HTMLVideoElement | undefined) {
 		loadingNextPage = true;
 
-		if (!videoSource) return;
+		if (
+			!videoSource ||
+			!videoSource.srcObject ||
+			!videoSource.videoWidth ||
+			!videoSource.videoHeight
+		) {
+			loadingNextPage = false;
+			return;
+		}
 
 		// Create an atificial canvas element
 		const canvas = document.createElement('canvas');
@@ -104,6 +112,7 @@
 		{/if}
 
 		<CaptureMenu
+			disabled={videoSource == null}
 			loading={!data.error && loadingNextPage}
 			on:click={() => gotoTransform(videoSource)}
 		/>
