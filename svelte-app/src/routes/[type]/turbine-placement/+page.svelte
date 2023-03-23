@@ -4,7 +4,7 @@
 	import Menubar from '$lib/components/Menubar.svelte';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { turbineLocations } from '$lib/stores/locationStore';
-	import { mdiChevronRight, mdiHelp, mdiReload, mdiStairsUp } from '@mdi/js';
+	import { mdiChevronRight, mdiHelp, mdiReload } from '@mdi/js';
 	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
 	import type { PageData } from './$types';

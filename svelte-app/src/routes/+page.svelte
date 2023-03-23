@@ -3,8 +3,15 @@
 	import LabeledButton from '$lib/components/LabeledButton.svelte';
 	import VStack from '$lib/components/VStack.svelte';
 	import { mdiChevronDoubleRight, mdiDownload } from '@mdi/js';
+	import { onMount } from 'svelte';
 	import Header from './Header.svelte';
 	import UserProfile from './UserProfile.svelte';
+
+	onMount(() => {
+		if (localStorage) {
+			localStorage.clear();
+		}
+	});
 </script>
 
 <Header />

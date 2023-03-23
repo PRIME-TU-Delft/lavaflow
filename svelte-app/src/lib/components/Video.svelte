@@ -60,8 +60,8 @@
 </script>
 
 {#if loading}
-	<div class="h-full w-full grid items-center text-center">
-		<div class="prose mx-auto lg:prose-xl">
+	<div class="grid h-full w-full items-center text-center">
+		<div class="prose lg:prose-xl mx-auto">
 			<h2>Loading video...</h2>
 
 			{#if true || (error && error.includes('Permission denied'))}

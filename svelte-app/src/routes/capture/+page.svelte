@@ -8,6 +8,7 @@
 	import sizeStore from '$lib/stores/sizeStore';
 	import { Button, Chevron, Dropdown, DropdownItem } from 'flowbite-svelte';
 	import * as gm from 'gammacv';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import CaptureMenu from './CaptureMenu.svelte';
 
@@ -37,7 +38,7 @@
 		}
 
 		// Create an atificial canvas element
-		const canvas = document.createElement('canvas');
+		const canvas = document.createElement('canvas') as unknown as HTMLCanvasElement;
 		canvas.height = videoSource.videoHeight;
 		canvas.width = videoSource.videoWidth;
 		const context = canvas.getContext('2d');
@@ -90,6 +91,12 @@
 
 		goto('/select-markers');
 	}
+
+	onMount(() => {
+		if (localStorage) {
+			localStorage.clear();
+		}
+	});
 </script>
 
 <Video bind:deviceId let:cameraOptions let:videoSource>
