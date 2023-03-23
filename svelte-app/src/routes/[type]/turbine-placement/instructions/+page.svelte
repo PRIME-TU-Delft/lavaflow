@@ -1,58 +1,57 @@
-<script>
+<script lang="ts">
 	import { assets } from '$app/paths';
-	import LabeledButton from '$lib/components/LabeledButton.svelte';
+	import ActionButton from '$lib/components/ActionButton.svelte';
+	import ActionMenu from '$lib/components/ActionMenu.svelte';
 	import { mdiChevronRight } from '@mdi/js';
-	import { Accordion, AccordionItem } from 'flowbite-svelte';
+	import { Timeline, TimelineItem } from 'flowbite-svelte';
+	import type { PageData } from './$types';
 
 	const path = `${assets}/instructional-images/turbine-placement/`;
 
+	export let data: PageData;
+
 	export let dragInstructions = [
 		{
-			title: '',
-			description: '',
-			imagepath: path + 'click_for_turbine.svg'
-		},
-		{
-			title: 'Click to add a turbine',
-			description:
-				'Click on a turbine to remove it.',
-			imagepath: path + 'click_result.svg'
+			title: 'Click on an empty place to add a turbine',
+			description: 'Click on a turbine again to remove it.',
+			imagepath: [path + 'click_for_turbine.svg', path + 'click_result.svg']
 		},
 		{
 			title: 'A turbine cannot be placed near a crater',
 			description: '',
-			imagepath: path + 'click_crater_radius.svg'
+			imagepath: [path + 'click_crater_radius.svg']
 		},
 		{
 			title: 'A turbine cannot be placed near another turbine',
 			description: '',
-			imagepath: path + 'click_turbine_radius.svg'
+			imagepath: [path + 'click_turbine_radius.svg']
 		}
 	];
 </script>
 
-<div class="prose mx-auto mt-12 p-4">
-	<h1>Turbine placement</h1>
-	<Accordion class="not-prose">
-		<AccordionItem open>
-			<span slot="header">Turbine Placement</span>
-			{#each dragInstructions as instruction}
-				<div class="instruction">
-					<img
-						class="h-80 w-full object-contain"
-						src={instruction.imagepath}
-						alt="instructional image for {instruction.title}"
-					/>
-					<div class="text-gray-900">{instruction.title}</div>
-					<div class="mb-4 text-sm text-gray-500 dark:text-gray-400">{instruction.description}</div>
-				</div>
-			{/each}
-		</AccordionItem>
-	</Accordion>
+<div class="prose mx-auto my-16 p-4">
+	<h2>Turbine placement instructions</h2>
+	<Timeline>
+		{#each dragInstructions as instruction}
+			<TimelineItem title={instruction.title}>
+				<div class="prose">
+					<p>{instruction.description}</p>
 
-	<div class="not-prose mt-2 flex justify-end gap-4">
-		<LabeledButton href="/ar/turbine-placement" icon={mdiChevronRight}>
-			Place turbines
-		</LabeledButton>
-	</div>
+					{#each instruction.imagepath as src, index}
+						<img
+							class="h-80 w-full object-contain"
+							{src}
+							alt="instructional image for {instruction.title} {index}"
+						/>
+					{/each}
+				</div>
+			</TimelineItem>
+		{/each}
+	</Timeline>
 </div>
+
+<ActionMenu>
+	<ActionButton href="/{data.type}/turbine-placement" icon={mdiChevronRight}>
+		Place turbines
+	</ActionButton>
+</ActionMenu>
