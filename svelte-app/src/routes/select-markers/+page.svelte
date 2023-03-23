@@ -19,6 +19,8 @@
 	let error: LavaError | null = null;
 	let resetKey: number = 0;
 
+	let perspectiveRemovedImage: HTMLCanvasElement;
+
 	$: hasStores = !!($imageStore && $sizeStore.height && $sizeStore.width);
 
 	function applySelection() {
@@ -54,9 +56,9 @@
 		resetKey = Math.random();
 	}
 
-	let perspectiveRemovedImage: HTMLCanvasElement;
-
 	function updatePerspectiveRemovedImage() {
+		if (!perspectiveRemovedImage) return;
+
 		console.log('Updating canvas');
 		if (points.length !== 4) {
 			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');

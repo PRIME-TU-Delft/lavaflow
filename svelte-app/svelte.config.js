@@ -19,7 +19,10 @@ const config = {
 	]),
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		prerender: {
+			entries: ['*', '/3d/turbine-placement', '/ar/turbine-placement', '/3d/turbine-placement/difficulty', '/3d/turbine-placement/instructions', '/ar/turbine-placement/difficulty', '/ar/turbine-placement/instructions']
+		}
 	}
 };
 

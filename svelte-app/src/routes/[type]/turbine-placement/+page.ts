@@ -1,6 +1,8 @@
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
+export const ssr = false;
+
 export const load = (({ params }) => {
 	const validTypes = new Set(['3d', 'ar', 'web-xr']);
 
