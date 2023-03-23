@@ -50,7 +50,7 @@ jobs:
         uses: nwtgck/actions-netlify@v1.2
         with:
           github-token: ${{ SECRETS.GITHUB_TOKEN }}
-          publish-dir: app/build
+          publish-dir: svelte-app/build
           alias: deploy-preview-${{ github.event.number }}
         env:
           NETLIFY_AUTH_TOKEN: ${{ SECRETS.NETLIFY_TOKEN }}
