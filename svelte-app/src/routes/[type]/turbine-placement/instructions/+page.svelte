@@ -15,17 +15,17 @@
 		{
 			title: 'Click to add a turbine',
 			description:
-				'The amount of turbines you can place is determined by the difficulty level. Click on a turbine to remove it.',
+				'Click on a turbine to remove it.',
 			imagepath: path + 'click_result.svg'
 		},
 		{
-			title: 'A turbine cannot be placed near to a crater',
-			description: 'The radius around the crater is determined by the difficulty level.',
+			title: 'A turbine cannot be placed near a crater',
+			description: '',
 			imagepath: path + 'click_crater_radius.svg'
 		},
 		{
-			title: 'A turbine cannot be placed near to another turbine',
-			description: 'The radius around the turbines is determined by the difficulty level.',
+			title: 'A turbine cannot be placed near another turbine',
+			description: '',
 			imagepath: path + 'click_turbine_radius.svg'
 		}
 	];

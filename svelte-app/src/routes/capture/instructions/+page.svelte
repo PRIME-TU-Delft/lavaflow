@@ -1,6 +1,10 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { assets } from '$app/paths';
 	import LabeledButton from '$lib/components/LabeledButton.svelte';
+	import { contourLines } from '$lib/stores/contourLineStore';
+	import { hc_curves, hc_hierarchy } from '$lib/stores/hardCoded';
+	import sizeStore from '$lib/stores/sizeStore';
 	import { mdiChevronRight } from '@mdi/js';
 	import { Accordion, AccordionItem } from 'flowbite-svelte';
 
@@ -41,7 +45,7 @@
 		{
 			title: 'Draw in the box',
 			description:
-				'To make the next step easier, do not draw outside to the square shown on the page',
+				'To make the next step easier, do not draw outside of the square shown on the page',
 			imagepath: drawing + 'correct_in_box.svg'
 		},
 		{
@@ -61,7 +65,7 @@
 		{
 			title: 'Orientation of the scan',
 			description:
-				'The orientation of your level curves in the camera field highly infulences scanning. This example is not parallel, but will probably still work. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your paper on a table instead of holding it. ',
+				'The orientation of your level curves in the camera field highly influences scanning. This example is not parallel, but will probably still work. For best the best result try to scan the paper as close to parallel as possible. This is easiest if you put your paper on a table instead of holding it. ',
 			imagepath: scanning + 'correct_tilted.svg'
 		},
 		{
@@ -81,6 +85,23 @@
 			imagepath: scanning + 'shadow_on_page.svg'
 		}
 	];
+
+
+	function continueWithDefaultMap() {
+		const { curves, hierarchy } = { curves: hc_curves, hierarchy: hc_hierarchy };
+		const [hc_width, hc_height] = [1000, 800];
+
+		contourLines.setup({
+			curves,
+			hierarchy,
+			size: { width: hc_width, height: hc_height }
+		});
+
+		sizeStore.set({ width: hc_width, height: hc_height });
+
+		goto('/preview');
+	}
+	
 </script>
 
 <div class="prose mx-auto mt-12 p-4">
@@ -126,4 +147,11 @@
 			<LabeledButton icon={mdiChevronRight}>Start scanning</LabeledButton>
 		</a>
 	</div>
+
+	<div class="not-prose mt-2 flex justify-end">
+		<a href="/preview">
+			<LabeledButton icon={mdiChevronRight} on:click={continueWithDefaultMap} >Start with prescanned image</LabeledButton >
+		</a>
+	</div>
+
 </div>
