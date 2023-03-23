@@ -86,7 +86,6 @@
 		}
 	];
 
-
 	function continueWithDefaultMap() {
 		const { curves, hierarchy } = { curves: hc_curves, hierarchy: hc_hierarchy };
 		const [hc_width, hc_height] = [1000, 800];
@@ -101,7 +100,6 @@
 
 		goto('/preview');
 	}
-	
 </script>
 
 <div class="prose mx-auto mt-12 p-4">
@@ -142,16 +140,13 @@
 		</AccordionItem>
 	</Accordion>
 
-	<div class="not-prose mt-2 flex justify-end">
+	<div class="not-prose mt-2 flex flex-wrap justify-end gap-4">
+		<LabeledButton outline icon={mdiChevronRight} on:click={continueWithDefaultMap}>
+			Start with prescanned image
+		</LabeledButton>
+
 		<a href="/capture">
 			<LabeledButton icon={mdiChevronRight}>Start scanning</LabeledButton>
 		</a>
 	</div>
-
-	<div class="not-prose mt-2 flex justify-end">
-		<a href="/preview">
-			<LabeledButton icon={mdiChevronRight} on:click={continueWithDefaultMap} >Start with prescanned image</LabeledButton >
-		</a>
-	</div>
-
 </div>
