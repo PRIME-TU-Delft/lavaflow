@@ -3,52 +3,124 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Lavaflow</title>
-		<link rel="icon" href="/primeLogo.svg" />
+		<link rel="icon" href="./favicon.png" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@200;400;600;700&display=swap"
 			rel="stylesheet"
 		/>
-		<meta
-			name="viewport"
-			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-		/>
-
-		<script>
-			function appHeight() {
-				const doc = document.documentElement;
-				doc.style.setProperty('--vh', 'min(' + window.innerHeight + 'px, 100vh)');
-			}
-
-			window.addEventListener('resize', appHeight);
-			appHeight();
-		</script>
-
+		<meta name="viewport" content="width=device-width" />
 		<meta http-equiv="content-security-policy" content="">
-		<link rel="modulepreload" href="/_app/immutable/entry/start.e7d842c0.js">
-		<link rel="modulepreload" href="/_app/immutable/chunks/index.814eb393.js">
-		<link rel="modulepreload" href="/_app/immutable/chunks/singletons.ef067215.js">
-		<link rel="modulepreload" href="/_app/immutable/chunks/index.19c7aa8e.js">
-		<link rel="modulepreload" href="/_app/immutable/chunks/control.e7f5239e.js">
-		<link rel="modulepreload" href="/_app/immutable/entry/app.e070ca99.js">
-		<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper.41c905a7.js">
+		<link href="./_app/immutable/assets/_layout.56b6de16.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/_page.d0ec3b31.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/Preview.48481de8.css" rel="stylesheet">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/start.d8bed5e9.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/index.057f4a85.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/singletons.b3636914.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/index.dcb26441.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/paths.5965c43a.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/control.e7f5239e.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/app.ee4d7452.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/preload-helper.41c905a7.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/_layout.svelte.9e743317.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/_page.svelte.e599ec83.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/ActionButton.1b02aa5e.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/Preview.svelte_svelte_type_style_lang.fcda0ea2.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/Spinner.c841ed5c.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/LabeledButton.c34aae47.mjs">
 	</head>
-	<body>
+	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
+
+
+<div class="relative mx-auto max-h-96 max-w-6xl"><img class="h-full max-h-96 w-full object-cover saturate-50 lg:rounded-bl-3xl lg:rounded-br-3xl" src="volcano.jpg" alt="title artwork">
+
+	<a href="https://www.tudelft.nl/ewi/over-de-faculteit/afdelingen/applied-mathematics/studeren/prime" rel="noopener noreferrer" target="_blank" class="link left-4 svelte-1a7yed9"><img class="h-20 w-36 object-contain" src="primeLogo.svg" alt="prime logo"></a>
+
+	<a href="https://www.tudelft.nl" rel="noopener noreferrer" target="_blank" class="link right-4 svelte-1a7yed9"><img class="h-20 w-36 object-contain" src="TU_P5_white.png" alt="TU Delft logo"></a>
+
+	<div class="title absolute top-1/2 w-full text-center text-5xl font-bold text-white svelte-1a7yed9">AR: Lava Flow
+	</div>
+</div>
+
+<div class="flex flex-col gap-4"><div class="prose mx-auto mt-12 p-8">The climate crisis is upon us! Lava tends to very precisely follow the steepest downwards
+		direction, when it flows down the hills of a volcano. Its intense heat makes for a great
+		opportunity to generate electricity for nearby cities. Your job is to predict where the lava
+		will flow and place steam turbines on its paths. The steam turbines generate higher amounts of
+		electricity as the lava reaches closer. Save the world by using this amazing sustainable
+		energy-source!
+
+		<div class="mt-4 flex justify-end"><a href="/capture/instructions" class="text-center font-medium focus:ring-4 focus:outline-none inline-flex items-center justify-center px-5 py-2.5 text-sm text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900 rounded-lg flex items-center justify-between !p-4  no-underline">Start lava app
+			
+
+		<svg viewBox="0 0 24 24" style="--color: currentColor; --size: 1rem; --rotate: 0deg; --scaleV: 1; --scaleH: 1; --spin-duration: 0s;" class="svelte-16wxomu"><g class="svelte-16wxomu"><path d="M5.59,7.41L7,6L13,12L7,18L5.59,16.59L10.17,12L5.59,7.41M11.59,7.41L13,6L19,12L13,18L11.59,16.59L16.17,12L11.59,7.41Z"></path></g></svg></a></div></div>
+
+	<div class="prose mx-auto mt-8 px-4"><h2>Instructions:</h2>
+		<div class="not-prose rounded-xl bg-red-100 p-4"><div><div class="my-2 text-sm text-zinc-800"><div slot="label">Alongside this applet, a printable template was designed on which you can draw your
+					level-curves.
+				</div></div>
+
+	
+	<a href="/Template.pdf" class="text-center font-medium focus:ring-4 focus:outline-none inline-flex items-center justify-center px-5 py-2.5 text-sm text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 rounded-lg"><p class="flex items-center gap-2">
+
+			Download template
+			
+
+			<svg viewBox="0 0 24 24" style="--color: currentColor; --size: 1rem; --rotate: 0deg; --scaleV: 1; --scaleH: 1; --spin-duration: 0s;" class="svelte-16wxomu"><g class="svelte-16wxomu"><path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"></path></g></svg></p></a></div>
+
+			<div><div class="my-2 text-sm text-zinc-800"><div class="mt-4" slot="label">We have detected that your device does not support webXR natively. The app is usable,
+						however we would recommend you to download a special AR browser.
+					</div></div>
+
+	
+	<a href="https://apps.apple.com/nl/app/webxr-viewer/id1295998056" class="text-center font-medium focus:ring-4 focus:outline-none inline-flex items-center justify-center px-5 py-2.5 text-sm text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 rounded-lg"><p class="flex items-center gap-2">
+
+			Download webXR browser
+				
+
+			<svg viewBox="0 0 24 24" style="--color: currentColor; --size: 1rem; --rotate: 0deg; --scaleV: 1; --scaleH: 1; --spin-duration: 0s;" class="svelte-16wxomu"><g class="svelte-16wxomu"><path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"></path></g></svg></p></a></div></div></div>
+
+	<div class="prose mx-auto mt-12 mb-12 rounded-xl border-2 border-red-200 p-4"><h2>Credits</h2>
+
+		<div class=""><div class="flex gap-4 "><img class="h-16 w-16 rounded-full object-cover" src="/profile-images/adebruijn.jpeg" alt="profile for Abel de Bruijn">
+	<div><h4>Abel de Bruijn</h4>
+		<p>Developer: User Interface and Augmented Reality</p></div></div>
+			<div class="flex gap-4 "><img class="h-16 w-16 rounded-full object-cover" src="/profile-images/rdur.jpeg" alt="profile for Rens Dur">
+	<div><h4>Rens Dur</h4>
+		<p>Developer: Model Construction and Image Recognition</p></div></div>
+			<div class="flex gap-4 "><img class="h-16 w-16 rounded-full object-cover" src="/profile-images/default.jpeg" alt="profile for Pauline Hengst">
+	<div><h4>Pauline Hengst</h4>
+		<p>Developer: Model Construction and Model Graphics</p></div></div>
+			<div class="flex gap-4 "><img class="h-16 w-16 rounded-full object-cover" src="/profile-images/jvanderkris.jpg" alt="profile for Julia van der Kris">
+	<div><h4>Julia van der Kris</h4>
+		<p>Developer: WebAssembly/deployment and Model Generation</p></div></div>
+			<div class="flex gap-4 "><img class="h-16 w-16 rounded-full object-cover" src="/profile-images/jvanmarrewijk.jpeg" alt="profile for Jonas van Marrewijk">
+	<div><h4>Jonas van Marrewijk</h4>
+		<p>Developer: Image Recognition</p></div></div></div></div></div>
+
+
+			
 			<script>
 				{
-					__sveltekit_1va6c2e = {
+					__sveltekit_1sreqqa = {
 						env: {},
-						base: "",
+						assets: new URL(".", location.href).pathname.replace(/^\/$/, ''),
 						element: document.currentScript.parentElement
 					};
 
+					const data = [{"type":"data","data":null,"uses":{}},null];
+
 					Promise.all([
-						import("/_app/immutable/entry/start.e7d842c0.js"),
-						import("/_app/immutable/entry/app.e070ca99.js")
+						import("./_app/immutable/entry/start.d8bed5e9.mjs"),
+						import("./_app/immutable/entry/app.ee4d7452.mjs")
 					]).then(([kit, app]) => {
-						kit.start(app, __sveltekit_1va6c2e.element);
+						kit.start(app, __sveltekit_1sreqqa.element, {
+							node_ids: [0, 3],
+							data,
+							form: null,
+							error: null
+						});
 					});
 				}
 			</script>

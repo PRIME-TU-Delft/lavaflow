@@ -1,0 +1,1 @@
+import{g as o}from"./gltfStore.f8a48ec6.mjs";import{r}from"./index.1a78022b.mjs";import{J as t}from"./index.057f4a85.mjs";const l=()=>{if(!t(o)?.gltf_url){const e=encodeURIComponent("Gltf file is not loaded");throw r(307,`/preview?error=${e}`)}return{}},i=Object.freeze(Object.defineProperty({__proto__:null,load:l},Symbol.toStringTag,{value:"Module"}));export{i as _,l};

@@ -1,0 +1,1 @@
+import{e as t}from"./index.1a78022b.mjs";const o=!1,r=({params:e})=>{if(new Set(["3d","ar","web-xr"]).has(e.type))return e;throw t(404,e.type+" is not a valid type")},l=Object.freeze(Object.defineProperty({__proto__:null,load:r,ssr:o},Symbol.toStringTag,{value:"Module"}));export{l as _,r as l,o as s};
