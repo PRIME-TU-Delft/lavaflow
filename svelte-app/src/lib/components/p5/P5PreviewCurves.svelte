@@ -17,7 +17,6 @@
 				return;
 			}
 
-			console.log({ width, height });
 			p5.createCanvas(width, height);
 
 			curves.forEach((layer) => {

@@ -19,6 +19,8 @@
 	}
 
 	function placeDom(e: MouseEvent) {
+		offset = overlayEl?.getBoundingClientRect();
+
 		const x = (e.x - offset.left) / (cWidth / sWidth);
 		const y = (e.y - offset.top) / (cHeight / sHeight);
 
@@ -30,7 +32,10 @@
 		}
 
 		// TODO: throw error
-		if ($turbineLocations.length >= 10) return;
+		if ($turbineLocations.length >= 10) {
+			console.log('cannot place more than 10 turbines');
+			return;
+		}
 
 		// TODO: throw error | Check if turbine is at valid place
 		if (x < 20 || x > sWidth - 20 || y < 20 || y > sHeight - 20) return;
