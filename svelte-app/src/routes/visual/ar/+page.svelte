@@ -16,7 +16,7 @@
 	}
 </script>
 
-<VisualiseUi title="Visual ar" {baseUrl} let:showLava>
+<VisualiseUi title="Visual AR" {baseUrl} let:showLava>
 	<a-scene
 		bind:this={sceneEl}
 		vr-mode-ui="enterVRButton: #myEnterVRButton; enterARButton: #myEnterARButton"

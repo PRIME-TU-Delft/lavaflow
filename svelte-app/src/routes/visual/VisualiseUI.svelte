@@ -42,7 +42,6 @@
 				Place turbines
 			</ActionButton>
 
-			<!-- TODO: @Rens will create svg for eruption icon -->
 			<ActionButton on:click={startEruption}>Start eruption</ActionButton>
 		{:else if !minimiseScore}
 			<EruptionScore score={eruptionScore} on:dismiss={() => (minimiseScore = true)}>
@@ -53,7 +52,7 @@
 			<ButtonGroup class="mt-4 w-full">
 				<ActionButton twClass="w-full" href={'/capure'}>Rescan volcano</ActionButton>
 				<ActionButton twClass="w-full" secondary href="{baseUrl}/turbine-placement">
-					Move
+					Move turbines
 				</ActionButton>
 			</ButtonGroup>
 		{/if}

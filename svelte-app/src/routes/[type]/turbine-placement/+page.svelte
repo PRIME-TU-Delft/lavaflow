@@ -20,7 +20,7 @@
 </script>
 
 <Menubar back="/visual/{data.type}" title="Turbine placement">
-	<div slot="backTitle">Back to {data.type}</div>
+	<div slot="backTitle">Back to {data.type.toUpperCase()}</div>
 	<Button class="flex items-center gap-2" outline color="red" on:click={resetTurbines}>
 		<Icon path={mdiReload} />
 		Reset turbines
@@ -44,7 +44,7 @@
 		</ActionButton>
 	{:else}
 		<ActionButton href="/visual/{data.type}" icon={mdiChevronRight}>
-			Start eruption in {data.type}
+			Go to eruption in {data.type.toUpperCase()}
 		</ActionButton>
 	{/if}
 </ActionMenu>

@@ -46,7 +46,7 @@
 	{/if}
 
 	<ActionButton loading={!gltfLoaded} secondary href="/visual/3d">
-		Show in 3d model
+		Show in 3D model
 		<div slot="loading">Loading contour lines</div>
 	</ActionButton>
 
