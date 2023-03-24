@@ -1,12 +1,9 @@
 <script lang="ts">
-	import ActionButton from '$lib/components/ActionButton.svelte';
-	import ActionMenu from '$lib/components/ActionMenu.svelte';
-	import { mdiChevronRight, mdiClose } from '@mdi/js';
 	import 'aframe';
+	import type { Scene as AScene } from 'aframe';
 	import { Button } from 'flowbite-svelte';
 	import VisualiseUi from '../VisualiseUI.svelte';
 	import Scene from './Scene.svelte';
-	import type { Scene as AScene } from 'aframe';
 
 	let scale = 2;
 	let sceneEl: AScene;

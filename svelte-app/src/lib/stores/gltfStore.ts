@@ -132,7 +132,7 @@ function createGltfStore() {
 			// set the gltf store to the gltf string
 			set(model);
 		},
-		getAlitituteAndGradient: (
+		getAltitudeAndGradient: (
 			marker: Turbine,
 			scale = 1,
 			adjustAxis = true

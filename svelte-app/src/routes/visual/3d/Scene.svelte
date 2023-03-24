@@ -4,11 +4,29 @@
 	import { Vector3 } from 'three';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
-	import { turbineLocations } from '$lib/stores/locationStore';
+	import { turbineLocations, type Turbine } from '$lib/stores/locationStore';
 
 	export let showLava = false;
 
 	const scale = 0.05;
+
+	/**
+	 * Convert a Turbine object to an AltitudeAndGradient object, and scale to correct proportions
+	 * @param t - Turbine object
+	 */
+	function getAltAndGrad(t: Turbine) {
+		const altAndGrad = gltfStore.getAltitudeAndGradient(t);
+
+		altAndGrad.x *= scale;
+		altAndGrad.x -= 50 * scale;
+
+		altAndGrad.y *= scale;
+		altAndGrad.y -= 50 * scale;
+
+		altAndGrad.altitude *= scale;
+
+		return altAndGrad;
+	}
 </script>
 
 <PerspectiveCamera position={new Vector3(10, 20, 10)} fov={25}>
@@ -29,17 +47,17 @@
 	/>
 {/if}
 
-{#each $turbineLocations.map((l) => gltfStore.getAlitituteAndGradient(l, scale)) as altAndGrad}
-	<T.Mesh
-		position={[
-			altAndGrad.x - 50 * scale,
-			Math.max(altAndGrad.altitude * 5 + 0.5, 1) / 2,
-			altAndGrad.y - 50 * scale
-		]}
-	>
-		<T.BoxGeometry args={[0.1, Math.max(altAndGrad.altitude * 5 + 0.5, 1), 0.1]} />
+{#each $turbineLocations.map(getAltAndGrad) as altAndGrad}
+	<T.Mesh position={[altAndGrad.x, altAndGrad.altitude / 2, altAndGrad.y]}>
+		<T.BoxGeometry args={[0.1, altAndGrad.altitude, 0.1]} />
 		<T.MeshBasicMaterial color="#444" />
 	</T.Mesh>
+
+	<GLTF
+		position={new Vector3(altAndGrad.x, altAndGrad.altitude, altAndGrad.y)}
+		scale={scale * 0.2}
+		url="/steam_turbine.glb"
+	/>
 {/each}
 
 <T.Mesh receiveShadow rotation.x={-Math.PI / 2}>

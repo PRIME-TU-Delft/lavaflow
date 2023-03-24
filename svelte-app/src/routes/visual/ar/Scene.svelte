@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { gltfStore } from '$lib/stores/gltfStore';
-	import { turbineLocations } from '$lib/stores/locationStore';
+	import { turbineLocations, type Turbine } from '$lib/stores/locationStore';
 
 	export let rotation = 0;
 	export let size = [0.025, 0.0125, 0.025] as [number, number, number];
@@ -8,6 +8,10 @@
 	export let scale = 0.5;
 
 	$: scaleString = size.map((x) => x * scale).join(' ');
+
+	function getAltAndGrad(l: Turbine) {
+		return gltfStore.getAltitudeAndGradient(l);
+	}
 </script>
 
 {#if $gltfStore}
@@ -32,14 +36,13 @@
 				<!--LAVA gltf model-->
 				<a-entity gltf-model="url({$gltfStore.lava_gltf_url})" />
 			{/if}
-
 			<!----------------------------------------------------------------
 			--       		        	TARGETS				                					  --
 			--                                                              --
 			-- Loop over each target location. First each          					--
 			-- Draggable item is converted to an AltitudeAndGradient Object --
 			------------------------------------------------------------------>
-			{#each $turbineLocations.map((l) => gltfStore.getAlitituteAndGradient(l)) as altAndGrad}
+			{#each $turbineLocations.map(getAltAndGrad) as altAndGrad}
 				<a-entity
 					gltf-model="url(/steam_turbine.glb)"
 					scale="0.1 0.2 0.1"
@@ -50,10 +53,10 @@
 				<a-box
 					width="1.4"
 					depth="2.5"
-					height={altAndGrad.altitude / 2}
+					height={altAndGrad.altitude}
 					position="{altAndGrad.x} {altAndGrad.altitude / 2} {altAndGrad.y + 0.15}"
 					color="#444"
-					scale="1 2 1"
+					scale="1 1 1"
 				/>
 			{/each}
 		</a-entity>
