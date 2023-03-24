@@ -84,7 +84,7 @@
 
 		<canvas
 			id="perspectiveRemovedImage"
-			class="absolute top-20 right-4 w-40 origin-top-right scale-150 border-2 border-red-500 object-contain"
+			class="absolute top-20 right-4 w-40 origin-top-right scale-150 border-2 border-red-500"
 			width={$sizeStore.width}
 			height={$sizeStore.height}
 			bind:this={perspectiveRemovedImage}
@@ -117,3 +117,19 @@
 		Apply selection
 	</ActionButton>
 </ActionMenu>
+
+
+<style>
+
+	canvas#perspectiveRemovedImage {
+		width: 150px;
+		height: 150px;
+	}
+	
+	@media (max-width: 750px) {
+		canvas#perspectiveRemovedImage {
+			height: 60px;
+		}
+
+	}
+</style>
