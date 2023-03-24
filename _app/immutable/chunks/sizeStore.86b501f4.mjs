@@ -1,1 +1,0 @@
-import{w as e}from"./index.dcb26441.mjs";const t="size",o="{}",r=localStorage?.getItem(t)||o,i=JSON.parse(r),a=e(i??{width:800,height:667});a.subscribe(s=>{localStorage?.setItem(t,JSON.stringify(s))});export{a as s};
