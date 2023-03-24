@@ -64,7 +64,7 @@
 		pipeline = gm.erode(pipeline, [2, 2]);
 		// Adaptive Threshold: Black/white - make pixels black if they pass the threshold 20 within a certain box of size 10
 		// (best to see for yourself: https://gammacv.com/examples/adaptive_threshold)
-		pipeline = gm.adaptiveThreshold(pipeline, 10, 20);
+		pipeline = gm.adaptiveThreshold(pipeline, 10, 35);
 		// Gaussian Blur: remove sharp edges
 		pipeline = gm.gaussianBlur(pipeline, 3, 1);
 		// Make the lines a bit thinner so the result from opencv's getContours is better

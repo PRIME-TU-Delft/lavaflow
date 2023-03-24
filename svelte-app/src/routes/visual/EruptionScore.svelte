@@ -17,16 +17,16 @@
 				'You are a volcano pro!, you know where people are safe and where they are not';
 		} else if (score > 500) {
 			scoreMessage =
-				'You are a volcano enthusiast!, but you can do better by placing the tubines closer to the lava';
+				'You are a volcano enthusiast! You can do better by placing the tubines closer to the lava';
 		} else if (score > 400) {
 			scoreMessage =
-				'You are a volcano beginner!, but you can do better by placing the tubines closer to the lava';
+				'You are a volcano beginner! You can do better by placing the tubines closer to the lava';
 		} else if (score > 300) {
 			scoreMessage =
-				'You are a volcano novice!, but you can do better by placing the tubines closer to the lava';
+				'You are a volcano novice! You can do better by placing the tubines closer to the lava';
 		} else {
 			scoreMessage =
-				'You are a volcano rookie!, but you can do better by placing the tubines closer to the lava';
+				'You are a volcano rookie! You can do better by placing the tubines closer to the lava';
 		}
 	}
 </script>
