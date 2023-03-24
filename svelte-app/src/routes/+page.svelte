@@ -14,6 +14,21 @@
 	});
 </script>
 
+<div class="logo-container">
+	<a
+		href="https://www.tudelft.nl/ewi/over-de-faculteit/afdelingen/applied-mathematics/studeren/prime"
+		rel="noopener noreferrer"
+		target="_blank"
+		class="link left-4"
+	>
+		<img class="logo-left" src="PRIME logo tekst met symbolen web.png" alt="prime logo" />
+	</a>
+
+	<a href="https://www.tudelft.nl" rel="noopener noreferrer" target="_blank" class="link right-4">
+		<img class="logo-right" src="TU Delft logo uitgelijnd web.png" alt="TU Delft logo" />
+	</a>
+</div>
+
 <Header />
 
 <VStack>
@@ -86,8 +101,73 @@
 			<UserProfile
 				name="Jonas van Marrewijk"
 				image="jvanmarrewijk.jpeg"
-				title="Developer: Image Recognition"
+				title="Developer emeritus: Image Recognition"
 			/>
 		</div>
 	</div>
 </VStack>
+
+
+<style>
+	.logo-container {
+		position: absolute;
+		left: 50vw;
+		top: 0.5rem;
+
+		transform: translateX(-50%);
+		-webkit-transform: translateX(-50%);
+
+		width: 67rem;
+		height: 6rem;
+
+		z-index: 5;
+	}
+
+	.logo-container img.logo-left {
+		position: absolute;
+		left: 0;
+		top: 0;
+
+		height: 100%;
+	}
+
+	.logo-container img.logo-right {
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		height: 100%;
+	}
+
+	@media (max-width: 1130px) {
+		.logo-container {
+			position: relative;
+			left: 50vw;
+			top: 0.5rem;
+
+			transform: translateX(-50%);
+			-webkit-transform: translateX(-50%);
+
+			width: 95vw;
+			height: 4rem;
+
+			z-index: 5;
+		}
+
+		.logo-container img.logo-left {
+			position: absolute;
+			left: 0;
+			top: 0;
+
+			height: 90%;
+		}
+
+		.logo-container img.logo-right {
+			position: absolute;
+			right: 0;
+			top: 0;
+
+			height: 90%;
+		}
+	}
+</style>
