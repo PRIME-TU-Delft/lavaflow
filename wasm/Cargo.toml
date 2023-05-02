@@ -2,15 +2,10 @@
 name = "wasm"
 version = "0.1.0"
 authors = [
-	"Abel de Bruijn <a.debruijn-3@student.tudelft.nl>",
-	"Jonas van Marrewijk <j.vanmarrewijk-2@student.tudelft.nl>",
-	"Julia van der Kris <julia@jlia.dev>",
-	"Rens Dur <r.c.m.dur@student.tudelft.nl>",
-	"Pauline Hengst <p.f.hengst@student.tudelft.nl>"
+	"Abel de Bruijn <a.debruijn-3@student.tudelft.nl>"
 ]
 license = "MIT"
-description = "WebAssembly part of the LavaFlow webapp"
-repository = "https://gitlab.ewi.tudelft.nl/cse2000-software-project/2021-2022-q4/cluster-01/group1c/ar-for-education"
+description = "WebAssembly part"
 edition = "2021"
 
 [lib]

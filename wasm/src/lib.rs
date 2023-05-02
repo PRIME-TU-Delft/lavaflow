@@ -12,3 +12,8 @@ mod gltf_conversion;
 extern "C" {
 	fn alert(s: &str);
 }
+
+#[wasm_bindgen]
+pub fn greet() {
+	alert("Hello, lava-path-finder!");
+}
