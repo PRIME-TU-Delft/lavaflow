@@ -11,14 +11,6 @@
 </div>
 
 <style lang="postcss">
-	.link {
-		@apply absolute  top-4 z-10 rounded transition-colors md:bg-slate-500/10 md:p-4;
-	}
-
-	.link:hover {
-		@apply md:bg-slate-500/50;
-	}
-
 	.title {
 		font-family: 'Roboto Slab';
 	}
