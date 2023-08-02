@@ -6,7 +6,6 @@
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { turbineLocations } from '$lib/stores/locationStore';
 	import { mdiChevronRight } from '@mdi/js';
-	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import EruptionScore from './EruptionScore.svelte';
 
 	$: deltaTubines = $difficultyStore.min_steam_turbines - $turbineLocations.length;
@@ -45,16 +44,16 @@
 			<ActionButton on:click={startEruption}>Start eruption</ActionButton>
 		{:else if !minimiseScore}
 			<EruptionScore score={eruptionScore} on:dismiss={() => (minimiseScore = true)}>
-				<Button color="red" href="/capture" outline>Rescan volcano</Button>
-				<Button color="red" href="{baseUrl}/turbine-placement" outline>Place turbines</Button>
+				<ActionButton href="/capture" secondary>Rescan volcano</ActionButton>
+				<ActionButton href="{baseUrl}/turbine-placement" secondary>Place turbines</ActionButton>
 			</EruptionScore>
 		{:else}
-			<ButtonGroup class="mt-4 w-full">
+			<div class="mt-4 w-full join">
 				<ActionButton twClass="w-full" href={'/capure'}>Rescan volcano</ActionButton>
 				<ActionButton twClass="w-full" secondary href="{baseUrl}/turbine-placement">
 					Move turbines
 				</ActionButton>
-			</ButtonGroup>
+			</div>
 		{/if}
 	</ActionMenu>
 </div>

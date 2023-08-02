@@ -3,7 +3,6 @@
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
 	import { mdiChevronRight } from '@mdi/js';
-	import { Timeline, TimelineItem } from 'flowbite-svelte';
 	import type { PageData } from './$types';
 
 	const path = `${assets}/instructional-images/turbine-placement/`;
@@ -31,7 +30,7 @@
 
 <div class="prose mx-auto my-16 p-4">
 	<h2>Turbine placement instructions</h2>
-	<Timeline>
+	<!-- <Timeline>
 		{#each dragInstructions as instruction}
 			<TimelineItem title={instruction.title}>
 				<div class="prose">
@@ -47,7 +46,7 @@
 				</div>
 			</TimelineItem>
 		{/each}
-	</Timeline>
+	</Timeline> -->
 </div>
 
 <ActionMenu>

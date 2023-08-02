@@ -1,11 +1,11 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import type { UserConfig } from 'vite';
+import { defineConfig } from 'vite';
 import wasmPack from 'vite-plugin-wasm-pack';
 
-const config: UserConfig = {
+export default defineConfig({
 	plugins: [wasmPack(['../wasm']), sveltekit()],
 	ssr: {
-		noExternal: ['three', 'troika-three-text']
+		noExternal: ['three']
 	},
 	optimizeDeps: {
 		exclude: ['../wasm']
@@ -13,6 +13,4 @@ const config: UserConfig = {
 	build: {
 		target: 'es2020'
 	} // TODO: Ask @juliavdkris for more info why es2020 is needed
-};
-
-export default config;
+});

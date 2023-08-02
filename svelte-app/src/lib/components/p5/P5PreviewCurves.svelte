@@ -2,9 +2,9 @@
 	/**
 	 * Dragging marker over an image to transform it.
 	 */
-	import P5 from './P5.svelte';
-	import type p5 from 'p5';
 	import sizeStore from '$lib/stores/sizeStore';
+	import type p5 from 'p5';
+	import P5 from './P5.svelte';
 
 	export let curves: [number, number][][];
 
@@ -18,6 +18,7 @@
 			}
 
 			p5.createCanvas(width, height);
+			p5.background(255);
 
 			curves.forEach((layer) => {
 				// Add text to the contour: "index (index of parent)"

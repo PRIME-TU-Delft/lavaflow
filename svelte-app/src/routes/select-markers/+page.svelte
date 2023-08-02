@@ -2,18 +2,16 @@
 	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
-	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
-	import P5Transform from './P5Transform.svelte';
-	import type Draggable from '$lib/data/draggable';
 	import LavaError from '$lib/data/LavaError';
+	import type Draggable from '$lib/data/draggable';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
 	import { contourLines } from '$lib/stores/contourLineStore';
-	import { hc_curves, hc_hierarchy } from '$lib/stores/hardCoded';
 	import imageStore from '$lib/stores/imageStore';
 	import sizeStore from '$lib/stores/sizeStore';
 	import { mdiChevronRight, mdiHelp } from '@mdi/js';
-	import { Button } from 'flowbite-svelte';
-	import { imageToContoursGammaCV, extractSelectedArea } from './imageToContour';
+	import P5Transform from './P5Transform.svelte';
+	import { extractSelectedArea, imageToContoursGammaCV } from './imageToContour';
 
 	let points: [Draggable, Draggable, Draggable, Draggable] | [] = [];
 	let error: LavaError | null = null;
@@ -61,7 +59,7 @@
 
 		console.log('Updating canvas');
 		if (points.length !== 4) {
-			error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
+			// TODO: error = new LavaError('Please select 4 points', 'You need to select 4 points to continue');
 			return;
 		}
 		type Draggbles = [Draggable, Draggable, Draggable, Draggable];
@@ -71,7 +69,7 @@
 </script>
 
 <Menubar back="/capture" title="Select markers">
-	<Button outline color="red" on:click={resetPoints}>Reset</Button>
+	<ActionButton secondary on:click={resetPoints}>Reset</ActionButton>
 </Menubar>
 
 {#if hasStores}
@@ -102,15 +100,17 @@
 {/if}
 
 <ActionMenu>
-	{#if error}
+	<!-- {#if error}
+        TODO: Show error message
 		<ErrorMessage {error} hasActions on:dismiss={() => (error = null)}>
 			<Button class="w-full" outline color="red" href="capture">Rescan image</Button>
 			<Button class="w-full grow" outline color="red" on:click={continueWithDefaultMap}>
 				Continue with pre-build contours
 			</Button>
 		</ErrorMessage>
-	{/if}
+	{/if} -->
 	<ActionButton secondary href="/select-markers/instructions" icon={mdiHelp}>
+		<!-- TODO: fix instructions -->
 		Show instruction
 	</ActionButton>
 	<ActionButton disabled={!hasStores} icon={mdiChevronRight} on:click={applySelection}>
@@ -118,18 +118,15 @@
 	</ActionButton>
 </ActionMenu>
 
-
 <style>
-
 	canvas#perspectiveRemovedImage {
 		width: 150px;
 		height: 150px;
 	}
-	
+
 	@media (max-width: 750px) {
 		canvas#perspectiveRemovedImage {
 			height: 60px;
 		}
-
 	}
 </style>

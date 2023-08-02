@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config}*/
 const config = {
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',
@@ -7,9 +8,7 @@ const config = {
 	theme: {
 		extend: {}
 	},
-
-	plugins: [require('flowbite/plugin'), require('@tailwindcss/typography')],
-	darkMode: 'class'
+	plugins: [require('@tailwindcss/typography'), require('daisyui')]
 };
 
 module.exports = config;

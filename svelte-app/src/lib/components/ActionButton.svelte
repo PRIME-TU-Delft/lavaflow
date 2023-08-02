@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Button, Spinner } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
+	import LabeledButton from './LabeledButton.svelte';
 
 	export let icon = '';
 	export let loading = false;
@@ -11,23 +11,16 @@
 </script>
 
 {#if loading}
-	<Button outline={secondary} class="flex items-center justify-between !p-4" color="red">
-		<Spinner />
+	<LabeledButton outline={secondary}>
+		<span class="loading loading-spinner loading-md" />
 		<slot name="loading">Loading...</slot>
-	</Button>
+	</LabeledButton>
 {:else}
-	<Button
-		{href}
-		outline={secondary}
-		{disabled}
-		class="flex items-center justify-between !p-4 {secondary ? 'bg-red-50/80' : ''} {twClass}"
-		on:click
-		color="red"
-	>
+	<LabeledButton {twClass} {href} outline={secondary} {disabled} on:click>
 		<slot />
 
 		{#if icon}
 			<Icon path={icon} />
 		{/if}
-	</Button>
+	</LabeledButton>
 {/if}

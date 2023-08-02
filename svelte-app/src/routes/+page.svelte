@@ -41,11 +41,7 @@
 		energy-source!
 
 		<div class="mt-4 flex justify-end">
-			<ActionButton
-				twClass="no-underline"
-				href="/capture/instructions"
-				icon={mdiChevronDoubleRight}
-			>
+			<ActionButton twClass="no-underline" href="/capture" icon={mdiChevronDoubleRight}>
 				Start lava app
 			</ActionButton>
 		</div>
@@ -106,7 +102,6 @@
 		</div>
 	</div>
 </VStack>
-
 
 <style>
 	.logo-container {

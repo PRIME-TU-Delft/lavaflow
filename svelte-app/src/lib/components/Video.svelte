@@ -62,10 +62,12 @@
 {#if loading}
 	<div class="grid h-full w-full items-center text-center">
 		<div class="prose lg:prose-xl mx-auto">
-			<h2>Loading video...</h2>
+			<h2>Loading video camera...</h2>
 
-			{#if true || (error && error.includes('Permission denied'))}
+			{#if error && error.includes('Permission denied')}
 				The browser is unable to access the camera, try re-enabling the camera and reload
+			{:else if error}
+				{error}
 			{/if}
 		</div>
 	</div>

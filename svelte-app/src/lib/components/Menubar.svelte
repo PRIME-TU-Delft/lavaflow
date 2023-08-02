@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { mdiChevronLeft } from '@mdi/js';
-	import { Button } from 'flowbite-svelte';
-	import { Icon } from 'mdi-svelte-ts';
+	import LabeledButton from './LabeledButton.svelte';
 
 	export let title = '';
 	export let back = '';
@@ -10,10 +9,9 @@
 <nav class="fixed top-0 left-0 z-10 flex w-full items-center justify-between bg-red-50 p-4">
 	<div class="flex items-center gap-4">
 		{#if back}
-			<Button class="flex items-center gap-2 !p-2" href={back} outline color="red">
-				<Icon path={mdiChevronLeft} />
+			<LabeledButton iconPrefix={mdiChevronLeft} href={back} outline>
 				<slot name="backTitle" />
-			</Button>
+			</LabeledButton>
 		{/if}
 
 		{#if title}

@@ -2,16 +2,12 @@
 	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
-	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import P5PreviewCurves from '$lib/components/p5/P5PreviewCurves.svelte';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { onMount } from 'svelte';
-	import type { PageData } from './$types';
-
-	export let data: PageData;
 
 	let gltfLoaded = false;
 	let webXRSupport = false;
@@ -41,9 +37,9 @@
 {/key}
 
 <ActionMenu>
-	{#if data.error}
+	<!-- TODO: Do propper error handling {#if data.error}
 		<ErrorMessage error={data.error} on:dismiss={() => goto('/preview')} />
-	{/if}
+	{/if} -->
 
 	<ActionButton loading={!gltfLoaded} secondary href="/visual/3d">
 		Show in 3D model
