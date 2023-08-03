@@ -6,13 +6,23 @@
 	export let icon: string = '';
 	export let outline: boolean = false;
 	export let disabled: boolean = false;
+	export let secondary: boolean = false;
+	export let fullwidth: boolean = false;
 	export let twClass: string = '';
 	export let id: string = '';
 
 	$: classes = twMerge('btn btn-primary flex items-center justify-center gap-2', twClass);
 </script>
 
-<button {id} class={classes} class:btn-outline={outline} {disabled} on:click>
+<button
+	{id}
+	class={classes}
+	class:btn-outline={outline}
+	class:btn-secondary={secondary}
+	class:w-full={fullwidth}
+	{disabled}
+	on:click
+>
 	{#if iconPrefix}
 		<Icon path={iconPrefix} />
 	{/if}

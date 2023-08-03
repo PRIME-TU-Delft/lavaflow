@@ -41,7 +41,7 @@
 		<ErrorMessage error={data.error} on:dismiss={() => goto('/preview')} />
 	{/if} -->
 
-	<ActionButton loading={!gltfLoaded} secondary href="/visual/3d">
+	<ActionButton loading={!gltfLoaded} fullwidth secondary href="/visual/3d">
 		Show in 3D model
 		<div slot="loading">Loading contour lines</div>
 	</ActionButton>
@@ -49,7 +49,7 @@
 	{#if !gltfLoaded}
 		<!-- Filled with no content -->
 	{:else if webXRSupport}
-		<ActionButton loading={!gltfLoaded} href="/visual/ar">
+		<ActionButton fullwidth twClass="w-full" loading={!gltfLoaded} href="/visual/ar">
 			Show in AR {'(Recommended)'}
 		</ActionButton>
 	{:else}

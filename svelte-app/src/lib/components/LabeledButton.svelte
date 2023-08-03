@@ -6,6 +6,8 @@
 	export let href: string = '';
 	export let outline: boolean = false;
 	export let disabled: boolean = false;
+	export let fullwidth: boolean = false;
+	export let secondary: boolean = false;
 	export let twClass: string = '';
 </script>
 
@@ -17,13 +19,13 @@
 	{/if}
 
 	{#if href}
-		<a class="no-underline" href={'' + href}>
-			<Button {iconPrefix} {icon} {outline} {disabled} {twClass} on:click>
+		<a class="no-underline" class:w-full={fullwidth} href={'' + href}>
+			<Button {secondary} {iconPrefix} {icon} {outline} {disabled} {twClass} on:click>
 				<slot />
 			</Button>
 		</a>
 	{:else}
-		<Button {iconPrefix} {icon} {outline} {disabled} {twClass} on:click>
+		<Button {secondary} {iconPrefix} {icon} {outline} {disabled} {twClass} on:click>
 			<slot />
 		</Button>
 	{/if}

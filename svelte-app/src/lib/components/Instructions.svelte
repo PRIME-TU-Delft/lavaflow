@@ -29,7 +29,7 @@
 </script>
 
 <input bind:this={drawerToggle} id="my-drawer" type="checkbox" class="drawer-toggle" />
-<div class="drawer-content">
+<div class="drawer-content h-full">
 	<slot />
 </div>
 
@@ -67,7 +67,7 @@
 
 		<li>
 			<div class="join">
-				<Button twClass="btn-secondary" on:click={closeNextTime}>Close and hide next time</Button>
+				<Button secondary on:click={closeNextTime}>Close and hide next time</Button>
 				<label for="my-drawer" class="drawer-button btn btn-primary flex flex-nowrap">
 					<span>Close</span>
 				</label>

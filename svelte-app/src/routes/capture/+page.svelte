@@ -11,6 +11,8 @@
 	import CaptureMenu from './CaptureMenu.svelte';
 	import Instructions from '$lib/components/Instructions.svelte';
 	import { drawingInstructions, scanningInstructions } from './instructions';
+	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
+	import { contourLines } from '$lib/stores/contourLineStore';
 
 	let width: number;
 	let height: number;
@@ -116,7 +118,25 @@
 		start(id);
 	}
 
+	function continueWithDefaultMap() {
+		console.log('continueWithDefaultMap');
+		const { curves, hierarchy } = { curves: hc_curves, hierarchy: hc_hierarchy };
+		const [hc_width, hc_height] = [1000, 800];
+		contourLines.setup({
+			curves,
+			hierarchy,
+			size: { width: hc_width, height: hc_height }
+		});
+		sizeStore.set({ width: hc_width, height: hc_height });
+		goto('/preview');
+	}
+
 	async function gotoTransform(videoSource: HTMLVideoElement | undefined) {
+		console.log('gotoTransform');
+		continueWithDefaultMap();
+		return;
+		// TODO: Do actual capture
+
 		loadingNextPage = true;
 
 		if (

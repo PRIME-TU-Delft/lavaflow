@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Icon } from 'mdi-svelte-ts';
-	import LabeledButton from './LabeledButton.svelte';
+	import Button from './Button.svelte';
 
 	export let icon = '';
 	export let loading = false;
@@ -8,15 +7,24 @@
 	export let disabled = false;
 	export let href = '';
 	export let twClass = '';
+	export let fullwidth = false;
 </script>
 
 {#if loading}
-	<LabeledButton outline={secondary}>
-		<span class="loading loading-spinner loading-md" />
-		<slot name="loading">Loading...</slot>
-	</LabeledButton>
+	<Button {fullwidth} {secondary}>
+		<div class="flex gap-2 items-center">
+			<span class="loading loading-spinner loading-md" />
+			<slot name="loading">Loading...</slot>
+		</div>
+	</Button>
+{:else if href}
+	<a class="no-underline" {href}>
+		<Button {fullwidth} {twClass} {icon} {secondary} {disabled}>
+			<slot />
+		</Button>
+	</a>
 {:else}
-	<LabeledButton {twClass} {href} {icon} outline={secondary} {disabled} on:click>
+	<Button {fullwidth} {twClass} {icon} {secondary} {disabled} on:click>
 		<slot />
-	</LabeledButton>
+	</Button>
 {/if}

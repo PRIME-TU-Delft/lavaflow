@@ -25,7 +25,7 @@
 </script>
 
 {#if loaded}
-	<div in:fade>
+	<div class="h-full" in:fade>
 		<slot />
 	</div>
 {/if}
