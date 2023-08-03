@@ -33,24 +33,26 @@
 		<slot name="arActions" />
 
 		{#if deltaTubines > 0}
-			<ActionButton href="{baseUrl}/turbine-placement" icon={mdiChevronRight}>
-				Place {deltaTubines} more turbines
+			<ActionButton href="{baseUrl}/turbine-placement" icon={mdiChevronRight} fullwidth>
+				Place {deltaTubines} more turbine{deltaTubines > 1 ? 's' : ''}
 			</ActionButton>
 		{:else if !eruptionScore}
-			<ActionButton secondary href="{baseUrl}/turbine-placement" icon={mdiChevronRight}>
-				Place turbines
+			<ActionButton secondary href="{baseUrl}/turbine-placement" icon={mdiChevronRight} fullwidth>
+				Move turbines
 			</ActionButton>
 
-			<ActionButton on:click={startEruption}>Start eruption</ActionButton>
+			<ActionButton on:click={startEruption} fullwidth>Start eruption</ActionButton>
 		{:else if !minimiseScore}
 			<EruptionScore score={eruptionScore} on:dismiss={() => (minimiseScore = true)}>
-				<ActionButton href="/capture" secondary>Rescan volcano</ActionButton>
-				<ActionButton href="{baseUrl}/turbine-placement" secondary>Place turbines</ActionButton>
+				<ActionButton href="/capture" secondary fullwidth>Rescan volcano</ActionButton>
+				<ActionButton href="{baseUrl}/turbine-placement" secondary fullwidth>
+					Move turbines
+				</ActionButton>
 			</EruptionScore>
 		{:else}
 			<div class="mt-4 w-full join">
-				<ActionButton twClass="w-full" href={'/capure'}>Rescan volcano</ActionButton>
-				<ActionButton twClass="w-full" secondary href="{baseUrl}/turbine-placement">
+				<ActionButton twClass="w-full" href={'/capure'} fullwidth>Rescan volcano</ActionButton>
+				<ActionButton twClass="w-full" secondary href="{baseUrl}/turbine-placement" fullwidth>
 					Move turbines
 				</ActionButton>
 			</div>

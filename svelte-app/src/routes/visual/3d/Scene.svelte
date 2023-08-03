@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
 	import { GLTF, OrbitControls } from '@threlte/extras';
-	import { Vector3 } from 'three';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { turbineLocations, type Turbine } from '$lib/stores/locationStore';
@@ -29,12 +28,12 @@
 	}
 </script>
 
-<T.PerspectiveCamera position={[10, 10, 10]} fov={25}>
+<T.PerspectiveCamera position={[10, 5, 10]} fov={25} makeDefault>
 	<OrbitControls
 		maxPolarAngle={Math.PI / 2}
 		minDistance={4}
 		maxDistance={40}
-		target={[0, 1.5, 0]}
+		target={[0, 0.5, 0]}
 	/>
 </T.PerspectiveCamera>
 
