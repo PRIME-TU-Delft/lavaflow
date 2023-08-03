@@ -50,6 +50,10 @@
 </VisualiseUI>
 
 <style>
+	:global(html, body, :root, [data-theme]) {
+		background: transparent;
+	}
+
 	:global(#overlay:xr-overlay .enterAR) {
 		display: none !important;
 	}
