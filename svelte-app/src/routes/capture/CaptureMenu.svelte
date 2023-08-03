@@ -1,18 +1,16 @@
 <script>
 	import ActionButton from '$lib/components/ActionButton.svelte';
-	import { mdiHelp, mdiCamera } from '@mdi/js';
+	import { mdiCamera, mdiHelp } from '@mdi/js';
 	import { Icon } from 'mdi-svelte-ts';
 
 	export let loading = false;
 </script>
 
 <div class="flex w-full items-center justify-around gap-4 bg-red-50 p-10 md:rounded-lg md:p-4">
-	<ActionButton secondary>
+	<label for="my-drawer" class="drawer-button btn btn-outline btn-primary">
 		<!-- Page content here -->
-		<label for="my-drawer" class="drawer-button">
-			<Icon path={mdiHelp} />
-		</label>
-	</ActionButton>
+		<Icon path={mdiHelp} />
+	</label>
 
 	<ActionButton {loading} on:click>
 		<Icon path={mdiCamera} size={2} />

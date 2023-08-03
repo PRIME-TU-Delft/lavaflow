@@ -17,7 +17,7 @@
 	{/if}
 
 	{#if href}
-		<a href={'' + href}>
+		<a class="no-underline" href={'' + href}>
 			<Button {iconPrefix} {icon} {outline} {disabled} {twClass} on:click>
 				<slot />
 			</Button>

@@ -16,11 +16,7 @@
 		<slot name="loading">Loading...</slot>
 	</LabeledButton>
 {:else}
-	<LabeledButton {twClass} {href} outline={secondary} {disabled} on:click>
+	<LabeledButton {twClass} {href} {icon} outline={secondary} {disabled} on:click>
 		<slot />
-
-		{#if icon}
-			<Icon path={icon} />
-		{/if}
 	</LabeledButton>
 {/if}

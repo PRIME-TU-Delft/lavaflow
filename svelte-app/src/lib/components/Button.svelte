@@ -9,19 +9,21 @@
 	export let twClass: string = '';
 	export let id: string = '';
 
-	$: classes = twMerge('btn btn-primary', twClass);
+	$: classes = twMerge('btn btn-primary flex items-center justify-center gap-2', twClass);
 </script>
 
 <button {id} class={classes} class:btn-outline={outline} {disabled} on:click>
-	<div class="flex items-center gap-2">
-		{#if iconPrefix}
-			<Icon path={iconPrefix} />
-		{/if}
+	{#if iconPrefix}
+		<Icon path={iconPrefix} />
+	{/if}
 
-		<slot />
+	{#if $$slots.default}
+		<div>
+			<slot />
+		</div>
+	{/if}
 
-		{#if icon}
-			<Icon path={icon} />
-		{/if}
-	</div>
+	{#if icon}
+		<Icon path={icon} />
+	{/if}
 </button>

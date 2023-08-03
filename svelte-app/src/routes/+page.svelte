@@ -58,6 +58,7 @@
 				Download template
 			</LabeledButton>
 
+			<!-- TODO: fix this condition -->
 			{#if true}
 				<LabeledButton
 					href="https://apps.apple.com/nl/app/webxr-viewer/id1295998056"

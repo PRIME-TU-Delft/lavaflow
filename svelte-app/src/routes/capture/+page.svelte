@@ -9,13 +9,16 @@
 	import * as gm from 'gammacv';
 	import { onDestroy, onMount } from 'svelte';
 	import CaptureMenu from './CaptureMenu.svelte';
+	import Instructions from '$lib/components/Instructions.svelte';
+	import { drawingInstructions, scanningInstructions } from './instructions';
 
 	let width: number;
 	let height: number;
+	let deviceId: string;
+
 	let stream: gm.CaptureVideo;
 	let canvasProcessed: HTMLCanvasElement;
 	let session: gm.Session;
-	let deviceId: string;
 
 	let loadingNextPage: boolean = false;
 
@@ -102,7 +105,6 @@
 		const output = gm.tensorFrom(pipeline); // allocate output tensor
 		if (!output) return;
 		tick(input, output, pipeline);
-
 		document.body.children[0].appendChild(canvasProcessed);
 		canvasProcessed.style.position = 'absolute';
 		canvasProcessed.style.top = '0';
@@ -194,26 +196,32 @@
 
 <svelte:window bind:innerHeight={height} bind:innerWidth={width} />
 
-<Video bind:deviceId let:cameraOptions let:videoSource>
-	<Menubar back="./" title="Capture">
-		{#if cameraOptions.length > 0}
-			<Dropdown title={deviceId || 'Select other camera'}>
-				{#each cameraOptions as camera}
-					<li>
-						<button on:click={() => setCameraId(camera.label)}>{camera.label}<button /></button>
-					</li>
-				{/each}
-			</Dropdown>
-		{/if}
-	</Menubar>
+<Instructions
+	title="Capture instructions"
+	instructions={{
+		'Drawing instructions': drawingInstructions,
+		'Scanning instructions': scanningInstructions
+	}}
+>
+	<Video bind:deviceId let:cameraOptions let:videoSource>
+		<Menubar back="./" title="Capture">
+			{#if cameraOptions.length > 0}
+				<Dropdown title={deviceId || 'Select other camera'}>
+					{#each cameraOptions as camera}
+						<li>
+							<button on:click={() => setCameraId(camera.label)}>{camera.label}<button /></button>
+						</li>
+					{/each}
+				</Dropdown>
+			{/if}
+		</Menubar>
 
-	<!-- <Instructions instructions={{ drawingInstructions, scanningInstructions }} /> -->
+		<ActionMenu>
+			{#if width && height}
+				<button on:click={() => start(deviceId)}>Start capture</button>
+			{/if}
 
-	<ActionMenu>
-		{#if width && height}
-			<button on:click={() => start(deviceId)}>Start capture</button>
-		{/if}
-
-		<CaptureMenu loading={loadingNextPage} on:click={() => gotoTransform(videoSource)} />
-	</ActionMenu>
-</Video>
+			<CaptureMenu loading={loadingNextPage} on:click={() => gotoTransform(videoSource)} />
+		</ActionMenu>
+	</Video>
+</Instructions>

@@ -1,23 +1,35 @@
 <script lang="ts">
 	import { mdiChevronLeft } from '@mdi/js';
-	import LabeledButton from './LabeledButton.svelte';
+	import Button from './Button.svelte';
 
 	export let title = '';
 	export let back = '';
 </script>
 
-<nav class="fixed top-0 left-0 z-10 flex w-full items-center justify-between bg-red-50 p-4">
-	<div class="flex items-center gap-4">
-		{#if back}
-			<LabeledButton iconPrefix={mdiChevronLeft} href={back} outline>
-				<slot name="backTitle" />
-			</LabeledButton>
-		{/if}
+<svelte:head>
+	<title>Lava flow: {title}</title>
+</svelte:head>
 
+<div class="navbar bg-base-100 absolute top-0">
+	<div class="flex-1 flex gap-4">
+		{#if back}
+			<a href={back}>
+				<Button twClass="btn-sm" iconPrefix={mdiChevronLeft} outline>
+					{#if $$slots.backTitle}
+						<slot name="backTitle" />
+					{:else}
+						Back
+					{/if}
+				</Button>
+			</a>
+		{/if}
 		{#if title}
-			<h1 class="text-xl text-red-900">{title}</h1>
+			<div class="flex-1">
+				<h1 class="text-xl text-secondary">{title}</h1>
+			</div>
 		{/if}
 	</div>
-
-	<slot />
-</nav>
+	<div class="flex-none">
+		<slot />
+	</div>
+</div>

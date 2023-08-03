@@ -5,6 +5,23 @@ const config = {
 		'./node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}'
 	],
 
+	daisyui: {
+		themes: [
+			{
+				dark: {
+					...require("daisyui/src/theming/themes")["[data-theme=dark]"],
+					"primary": "#e11d48",
+					"secondary": "#fda4af",
+				},
+				light: {
+					...require("daisyui/src/theming/themes")["[data-theme=light]"],
+					"primary": "#e11d48",
+					"secondary": "#fda4af",
+				},
+			},
+		],
+	},
+
 	theme: {
 		extend: {}
 	},
