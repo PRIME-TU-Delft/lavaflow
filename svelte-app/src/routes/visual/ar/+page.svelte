@@ -29,18 +29,23 @@
 	</a-scene>
 
 	<div slot="arActions">
-		<div class="flex gap-2">
+		<div class="flex gap-2 bg-white/70 backdrop:blur-lg p-2 rounded no-touch">
 			<div>Rotate:</div>
 			<input type="range" min="-200" max="200" bind:value={rotate} class="range range-primary" />
 		</div>
 
 		<div class="hidden" id="myEnterVRButton">Open vr</div>
 
-		<Button twClass="enterAR w-full" on:click={() => (scale = 0.5)} id="myEnterARButton">
+		<Button
+			twClass="enterAR w-full mt-2"
+			on:click={() => (scale = 0.5)}
+			id="myEnterARButton"
+			fullwidth
+		>
 			Enter AR Mode
 		</Button>
 
-		<Button twClass="closeAR hidden w-full" on:click={closeAR}>Close AR Mode</Button>
+		<Button twClass="closeAR hidden w-full mt-2" on:click={closeAR} fullwidth>Close AR Mode</Button>
 	</div>
 </VisualiseUI>
 

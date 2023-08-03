@@ -10,7 +10,7 @@
 	<title>Lava flow: {title}</title>
 </svelte:head>
 
-<div class="navbar bg-base-100 absolute top-0 z-40">
+<div class="navbar bg-base-100 absolute top-0 z-40 no-touch">
 	<div class="flex-1 flex gap-4">
 		{#if back}
 			<a href={back}>

@@ -43,7 +43,7 @@
 
 	<ActionButton loading={!gltfLoaded} fullwidth secondary href="/visual/3d">
 		Show in 3D model
-		<div slot="loading">Loading contour lines</div>
+		<div slot="loading">Calculating 3d model</div>
 	</ActionButton>
 
 	{#if !gltfLoaded}
@@ -53,7 +53,7 @@
 			Show in AR {'(Recommended)'}
 		</ActionButton>
 	{:else}
-		<ActionButton loading={!gltfLoaded} href="/visual/ar">
+		<ActionButton loading={!gltfLoaded} href="/visual/ar" fullwidth>
 			Show in AR {'(no official support)'}
 		</ActionButton>
 	{/if}

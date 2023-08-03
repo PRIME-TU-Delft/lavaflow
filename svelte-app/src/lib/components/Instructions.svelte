@@ -38,11 +38,11 @@
 	<ul
 		class="menu z-50 flex-nowrap p-4 md:w-96 h-full overflow-x-hidden overflow-y-auto bg-base-200 text-base-content"
 	>
-		<li class="prose">
+		<div>
 			{#each Object.entries(instructions) as [title, instructionList]}
-				<h2 class="menu-title text-2xl">{title}</h2>
+				<li class="menu-title text-2xl">{title}</li>
 
-				<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-8">
 					{#each instructionList as instruction, idx}
 						<div class="card card-compact max-w-xl bg-base-300 shadow-xl">
 							<div class="card-body">
@@ -63,15 +63,14 @@
 					{/each}
 				</div>
 			{/each}
-		</li>
+		</div>
 
-		<li>
-			<div class="join">
-				<Button secondary on:click={closeNextTime}>Close and hide next time</Button>
-				<label for="my-drawer" class="drawer-button btn btn-primary flex flex-nowrap">
-					<span>Close</span>
-				</label>
-			</div>
+		<Button twClass="mt-8" secondary on:click={closeNextTime}>Close and hide next time</Button>
+
+		<li class="mt-4">
+			<label for="my-drawer" class="drawer-button btn btn-primary flex flex-nowrap">
+				<span>Close</span>
+			</label>
 		</li>
 	</ul>
 </div>
