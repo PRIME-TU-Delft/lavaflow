@@ -1,18 +1,30 @@
 <script lang="ts">
 	import Video from '$lib/components/Video.svelte';
+	import Menubar from '$lib/components/Menubar.svelte';
+
 	import * as gm from 'gammacv';
+	import Dropdown from '$lib/components/Dropdown.svelte';
 
 	let height: number; // window height
 	let width: number; // window width
 
 	let deviceId: string; // Id that references the current camera
 	let session: gm.Session; // GammaCV session
+	let linesSession: gm.Session; // GammaCV session, specifically for the lines
 	let stream: gm.CaptureVideo; // Video stream
-	let bw_pipeline: gm.Operation;
+	let bwPipeline: gm.Operation;
+	let linesPipeline: gm.Operation;
 
 	let tickLoop: number;
 
-	let linesCanvas: HTMLCanvasElement; // Canvas element to hold the lines
+	let linesCanvasEl: HTMLCanvasElement; // Canvas element to hold the lines
+	let outputCanvasEl: HTMLCanvasElement; // Canvas element to hold the output
+
+	const params = {
+		D_COEF: 2.0,
+		LAYERS: 2,
+		LINE_COUNT: 10
+	};
 
 	function getPipeline(input: gm.Tensor<gm.TensorDataView>) {
 		// Normalization: add contrast, make colors seem deeper
@@ -30,13 +42,69 @@
 		return pipeline;
 	}
 
+	function getLinesPipeline(input: gm.Tensor<gm.TensorDataView>) {
+		const params = {
+			D_COEF: 2.0,
+			LAYERS: 2,
+			LINE_COUNT: 10
+		};
+
+		let pipeline = gm.grayscale(input);
+		pipeline = gm.downsample(pipeline, params.D_COEF);
+		pipeline = gm.gaussianBlur(pipeline, 3, 3);
+		pipeline = gm.sobelOperator(pipeline);
+		pipeline = gm.cannyEdges(pipeline, 0.25, 0.75);
+		pipeline = gm.pcLines(pipeline, params.LAYERS, 2, 2);
+		return pipeline;
+	}
+
+	function drawLines(
+		input: gm.Tensor<gm.TensorDataView>,
+		output: gm.Tensor<gm.TensorDataView>,
+		canvasProcessed: HTMLCanvasElement
+	) {
+		let lines = [];
+
+		for (let i = 0; i < output.size / 4; i += 1) {
+			const y = Math.floor(i / output.shape[1]);
+			const x = i - y * output.shape[1];
+			const value = output.get(y, x, 0);
+			const x0 = output.get(y, x, 1);
+			const y0 = output.get(y, x, 2);
+
+			if (value > 0.0) {
+				lines.push([value, x0, y0]);
+			}
+		}
+
+		// Sort the lines from best to worst and pick the first LINE_COUNT lines
+		lines = lines.sort((b, a) => a[0] - b[0]);
+		lines = lines.slice(0, params.LINE_COUNT);
+
+		const lineContext = new gm.Line();
+
+		const maxP = Math.max(input.shape[0], input.shape[1]);
+		for (let i = 0; i < lines.length; i += 1) {
+			lineContext.fromParallelCoords(
+				lines[i][1] * params.D_COEF,
+				lines[i][2] * params.D_COEF,
+				input.shape[1],
+				input.shape[0],
+				maxP,
+				maxP / 2
+			);
+
+			gm.canvasDrawLine(canvasProcessed, lineContext, 'rgba(0, 255, 0, 1.0)');
+		}
+	}
+
 	function tick(
 		input: gm.Tensor<gm.TensorDataView>,
 		canvas: HTMLCanvasElement,
-		previewContext: CanvasRenderingContext2D,
+		contexts: CanvasRenderingContext2D[],
 		frame: number = 0
 	) {
-		tickLoop = requestAnimationFrame(() => tick(input, canvas, previewContext, frame + 1));
+		tickLoop = requestAnimationFrame(() => tick(input, canvas, contexts, frame + 1));
 
 		//
 		// Part 1: Transform to BW image
@@ -44,55 +112,100 @@
 		stream.getImageBuffer(input);
 
 		// Create an output tensor
-		const gammacvOutputTensor = gm.tensorFrom(bw_pipeline);
+		const gammacvOutputTensor = gm.tensorFrom(bwPipeline);
 
 		// Guard against null of gammacvOutputTensor
 		if (!gammacvOutputTensor) return;
 
 		// Run the pipeline on this session
-		session.runOp(bw_pipeline, frame, gammacvOutputTensor);
+		session.runOp(bwPipeline, frame, gammacvOutputTensor);
 
 		// Fill the provided canvas with the output of this operation
 		gm.canvasFromTensor(canvas, gammacvOutputTensor);
 
-		previewContext.drawImage(canvas, 0, 0, width, height);
+		contexts[0].drawImage(canvas, 0, 0, width, height);
 
 		//
 		// Part 2: Display the lines that are extracted by GammaCV
 		//
+
+		const gammacvLinesTensor = gm.tensorFrom(linesPipeline);
+
+		if (!gammacvLinesTensor) return;
+
+		// gm.tensorClone(gammacvOutputTensor, gammacvLinesTensor);
+
+		// Run the pipeline on this session
+		linesSession.runOp(linesPipeline, frame, gammacvLinesTensor);
+
+		// Fill the right canvas with the output of this operation
+		gm.canvasFromTensor(canvas, gammacvLinesTensor);
+
+		contexts[1].drawImage(canvas, 0, 0, width, height);
+
+		drawLines(gammacvOutputTensor, gammacvLinesTensor, linesCanvasEl);
 	}
 
 	function start(previewCanvas: HTMLCanvasElement, deviceId?: string) {
+		if (!previewCanvas) return;
 		if (!session) session = new gm.Session();
+		if (!linesSession) linesSession = new gm.Session();
 		if (tickLoop) cancelAnimationFrame(tickLoop);
 
 		stream = new gm.CaptureVideo(width, height);
 		stream.start(deviceId);
 
 		const input = new gm.Tensor('uint8', [height, width, 4]);
-		bw_pipeline = getPipeline(input); // define bw pipeline
-		session.init(bw_pipeline); // initialize bw pipeline
+		bwPipeline = getPipeline(input); // define bw pipeline
+		linesPipeline = getLinesPipeline(input);
+
+		// Initialise the sessions
+		session.init(bwPipeline); // initialize bw pipeline
+		linesSession.init(linesPipeline);
 
 		const canvas = gm.canvasCreate(width, height);
 
-		const previewContext = previewCanvas.getContext('2d');
+		const context0 = previewCanvas.getContext('2d');
+		const context1 = linesCanvasEl.getContext('2d');
 
-		if (!previewContext) return;
+		if (!context0 || !context1) return;
 
-		tick(input, canvas, previewContext);
+		tick(input, canvas, [context0, context1]);
 
 		canvas.remove();
+	}
+
+	function setCameraId(label: string) {
+		deviceId = label;
+
+		if (stream) stream.stop();
+
+		start(outputCanvasEl, deviceId);
 	}
 </script>
 
 <svelte:window bind:innerHeight={height} bind:innerWidth={width} />
 
 <Video bind:deviceId let:cameraOptions let:videoSource>
+	<Menubar title="Document detection">
+		{#if cameraOptions.length > 1}
+			<Dropdown title={deviceId || 'Select other camera'}>
+				{#each cameraOptions as camera}
+					<li>
+						<button on:click={() => setCameraId(camera.label)}>{camera.label}<button /></button>
+					</li>
+				{/each}
+			</Dropdown>
+		{/if}
+	</Menubar>
+
 	{cameraOptions.map((c) => c.label)}
 
 	<!-- Lines canvas -->
-	<canvas {width} {height} bind:this={linesCanvas} />
+	<canvas {width} {height} bind:this={linesCanvasEl} />
 
 	<!-- Output canvas -->
-	<canvas {width} {height} use:start={deviceId} />
+	{#if linesCanvasEl}
+		<canvas {width} {height} bind:this={outputCanvasEl} use:start={deviceId} />
+	{/if}
 </Video>
