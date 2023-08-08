@@ -26,6 +26,8 @@
 		try {
 			stream = await navigator.mediaDevices.getUserMedia({ video: constraints });
 
+			// TODO: set stream id to deviceId
+
 			loading = false;
 			error = '';
 		} catch (err) {
@@ -36,6 +38,7 @@
 	$: {
 		if (stream && videoSource && videoSource.paused) {
 			videoSource.srcObject = stream;
+
 			videoSource.play();
 		}
 	}
@@ -85,5 +88,5 @@
 		bind:this={videoSource}
 	/>
 
-	<slot {cameraOptions} {videoSource} />
+	<slot {cameraOptions} {videoSource} {stream} />
 {/if}

@@ -22,6 +22,8 @@
 	let canvasProcessed: HTMLCanvasElement;
 	let session: gm.Session;
 
+	let previewCanvasEl: HTMLCanvasElement;
+
 	let loadingNextPage: boolean = false;
 
 	const params = {
@@ -40,6 +42,22 @@
 		return pipeline;
 	}
 
+	function BW_pipeline(input: gm.Tensor<gm.TensorDataView>) {
+		// Normalization: add contrast, make colors seem deeper
+		let pipeline = gm.norm(input, 'l2');
+		// Erosion: erode into rectangles of shape 2x2 (best to see for yourself: https://gammacv.com/examples/erode)
+		pipeline = gm.erode(pipeline, [2, 2]);
+		// Adaptive Threshold: Black/white - make pixels black if they pass the threshold 20 within a certain box of size 10
+		// (best to see for yourself: https://gammacv.com/examples/adaptive_threshold)
+		pipeline = gm.adaptiveThreshold(pipeline, 10, 35);
+		// Gaussian Blur: remove sharp edges
+		pipeline = gm.gaussianBlur(pipeline, 3, 1);
+		// Make the lines a bit thinner so the result from opencv's getContours is better
+		pipeline = gm.threshold(pipeline, 0.3);
+
+		return pipeline;
+	}
+
 	const tick = (
 		input: gm.Tensor<gm.TensorDataView>,
 		output: gm.Tensor<gm.TensorDataView>,
@@ -50,18 +68,30 @@
 		// Read current in to the tensor
 		stream.getImageBuffer(input);
 
-		let lines = [];
-		const maxP = Math.max(input.shape[0], input.shape[1]);
+		// Retrieve the BW pipeline and use the input-tensor we just retrieved
+		const bw_pipeline = BW_pipeline(input);
 
-		const lineContext = new gm.Line();
-
+		// Clear the canvas
 		gm.canvasClear(canvasProcessed);
 
+		// Initialise the gm session with this pipeline
+		session.init(bw_pipeline);
+
 		// finaly run operation on GPU and then write result in to output tensor
-		session.runOp(pipeline, frame, output);
+		session.runOp(bw_pipeline, frame, output);
+
+		// Extract the tensor output
+		const gammacvOutputTensor: any = gm.tensorFrom(bw_pipeline);
 
 		// draw result into canvas
-		gm.canvasFromTensor(canvasProcessed, output);
+		gm.canvasFromTensor(canvasProcessed, gammacvOutputTensor);
+
+		// Draw this output to the canvas
+		// gm.canvasFromTensor(previewCanvasEl, gammacvOutputTensor);
+
+		return;
+
+		let lines = [];
 
 		for (let i = 0; i < output.size / 4; i += 1) {
 			const y = Math.floor(i / output.shape[1]);
@@ -75,9 +105,13 @@
 			}
 		}
 
+		// Sort the lines from best to worst and pick the first LINE_COUNT lines
 		lines = lines.sort((b, a) => a[0] - b[0]);
 		lines = lines.slice(0, params.LINE_COUNT);
 
+		const lineContext = new gm.Line();
+
+		const maxP = Math.max(input.shape[0], input.shape[1]);
 		for (let i = 0; i < lines.length; i += 1) {
 			lineContext.fromParallelCoords(
 				lines[i][1] * params.D_COEF,
@@ -90,6 +124,10 @@
 
 			gm.canvasDrawLine(canvasProcessed, lineContext, 'rgba(0, 255, 0, 1.0)');
 		}
+
+		const bwPipeline = BW_pipeline(input);
+		session.runOp(pipeline, 0, output);
+		gm.canvasFromTensor(previewCanvasEl, output);
 
 		// if we would like to recalculated we need a frame update
 		// frame += 1;
@@ -106,11 +144,16 @@
 		session.init(pipeline); // initialize pipeline
 		const output = gm.tensorFrom(pipeline); // allocate output tensor
 		if (!output) return;
+
 		tick(input, output, pipeline);
-		document.body.children[0].appendChild(canvasProcessed);
-		canvasProcessed.style.position = 'absolute';
-		canvasProcessed.style.top = '0';
-		canvasProcessed.style.left = '0';
+
+		document.body.appendChild(canvasProcessed);
+		canvasProcessed.classList.add('canvasProcessed');
+		// canvasProcessed.style.position = 'absolute';
+		// canvasProcessed.style.top = '0';
+		// canvasProcessed.style.position = 'absolute';
+		// canvasProcessed.style.top = '0';
+		// canvasProcessed.style.left = '0';
 	}
 
 	function setCameraId(id: string) {
@@ -133,8 +176,6 @@
 
 	async function gotoTransform(videoSource: HTMLVideoElement | undefined) {
 		console.log('gotoTransform');
-		continueWithDefaultMap();
-		return;
 		// TODO: Do actual capture
 
 		loadingNextPage = true;
@@ -206,6 +247,8 @@
 
 	onMount(() => {
 		session = new gm.Session();
+
+		start();
 	});
 
 	onDestroy(() => {
@@ -224,6 +267,8 @@
 	}}
 >
 	<Video bind:deviceId let:cameraOptions let:videoSource>
+		<canvas bind:this={previewCanvasEl} />
+
 		<Menubar back="./" title="Capture">
 			{#if cameraOptions.length > 0}
 				<Dropdown title={deviceId || 'Select other camera'}>
