@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { AmbientLight, OrbitControls, PerspectiveCamera, T } from '@threlte/core';
-	import { GLTF } from '@threlte/extras';
-	import { Vector3 } from 'three';
+	import { T } from '@threlte/core';
+	import { GLTF, OrbitControls } from '@threlte/extras';
 
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { turbineLocations, type Turbine } from '$lib/stores/locationStore';
@@ -29,34 +28,35 @@
 	}
 </script>
 
-<PerspectiveCamera position={new Vector3(10, 10, 10)} fov={25}>
-	<OrbitControls maxPolarAngle={Math.PI / 2} minDistance={4} maxDistance={40} target={{ y: 1.5 }} />
-</PerspectiveCamera>
+<T.PerspectiveCamera position={[10, 5, 10]} fov={25} makeDefault>
+	<OrbitControls
+		maxPolarAngle={Math.PI / 2}
+		minDistance={4}
+		maxDistance={40}
+		target={[0, 0.5, 0]}
+	/>
+</T.PerspectiveCamera>
 
-<AmbientLight />
+<T.AmbientLight />
 
 <T.Group scale={[1, 0.5, 1]}>
 	{#if $gltfStore.gltf_url}
-		<GLTF position={new Vector3(-50 * scale, 0, -50 * scale)} {scale} url={$gltfStore.gltf_url} />
+		<GLTF position={[-50 * scale, 0, -50 * scale]} {scale} url={$gltfStore.gltf_url} />
 	{/if}
 
 	{#if showLava && $gltfStore.lava_gltf_url}
-		<GLTF
-			position={new Vector3(-50 * scale, 0, -50 * scale)}
-			{scale}
-			url={$gltfStore.lava_gltf_url}
-		/>
+		<GLTF position={[-50 * scale, 0, -50 * scale]} {scale} url={$gltfStore.lava_gltf_url} />
 	{/if}
 
 	{#each $turbineLocations.map(getAltAndGrad) as altAndGrad}
 		<T.Mesh position={[altAndGrad.x, altAndGrad.altitude / 2, altAndGrad.y]}>
 			<T.BoxGeometry args={[0.15, altAndGrad.altitude, 0.15]} />
-			<T.MeshBasicMaterial color="#444" />
+			<T.MeshBasicMaterial color={[70, 70, 70]} />
 		</T.Mesh>
 
 		<GLTF
-			position={new Vector3(altAndGrad.x, altAndGrad.altitude, altAndGrad.y)}
-			scale={new Vector3(scale * 0.2, scale * 0.4, scale * 0.2)}
+			position={[altAndGrad.x, altAndGrad.altitude, altAndGrad.y]}
+			scale={[scale * 0.2, scale * 0.4, scale * 0.2]}
 			url="/steam_turbine.glb"
 		/>
 	{/each}
@@ -64,5 +64,5 @@
 
 <T.Mesh receiveShadow rotation.x={-Math.PI / 2}>
 	<T.CircleGeometry args={[5, 72]} />
-	<T.MeshStandardMaterial color="rgb(30,15,20)" transparent opacity={0.1} />
+	<T.MeshStandardMaterial color={[30, 15, 20]} transparent opacity={0.1} />
 </T.Mesh>

@@ -6,7 +6,6 @@
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { turbineLocations } from '$lib/stores/locationStore';
 	import { mdiChevronRight } from '@mdi/js';
-	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import EruptionScore from './EruptionScore.svelte';
 
 	$: deltaTubines = $difficultyStore.min_steam_turbines - $turbineLocations.length;
@@ -34,27 +33,29 @@
 		<slot name="arActions" />
 
 		{#if deltaTubines > 0}
-			<ActionButton href="{baseUrl}/turbine-placement" icon={mdiChevronRight}>
-				Place {deltaTubines} more turbines
+			<ActionButton href="{baseUrl}/turbine-placement" icon={mdiChevronRight} fullwidth>
+				Place {deltaTubines} more turbine{deltaTubines > 1 ? 's' : ''}
 			</ActionButton>
 		{:else if !eruptionScore}
-			<ActionButton secondary href="{baseUrl}/turbine-placement" icon={mdiChevronRight}>
-				Place turbines
+			<ActionButton secondary href="{baseUrl}/turbine-placement" icon={mdiChevronRight} fullwidth>
+				Move turbines
 			</ActionButton>
 
-			<ActionButton on:click={startEruption}>Start eruption</ActionButton>
+			<ActionButton on:click={startEruption} fullwidth>Start eruption</ActionButton>
 		{:else if !minimiseScore}
 			<EruptionScore score={eruptionScore} on:dismiss={() => (minimiseScore = true)}>
-				<Button color="red" href="/capture" outline>Rescan volcano</Button>
-				<Button color="red" href="{baseUrl}/turbine-placement" outline>Place turbines</Button>
-			</EruptionScore>
-		{:else}
-			<ButtonGroup class="mt-4 w-full">
-				<ActionButton twClass="w-full" href={'/capure'}>Rescan volcano</ActionButton>
-				<ActionButton twClass="w-full" secondary href="{baseUrl}/turbine-placement">
+				<ActionButton href="/capture" secondary fullwidth>Rescan volcano</ActionButton>
+				<ActionButton href="{baseUrl}/turbine-placement" secondary fullwidth>
 					Move turbines
 				</ActionButton>
-			</ButtonGroup>
+			</EruptionScore>
+		{:else}
+			<div class="mt-4 w-full join">
+				<ActionButton twClass="w-full" href={'/capure'} fullwidth>Rescan volcano</ActionButton>
+				<ActionButton twClass="w-full" secondary href="{baseUrl}/turbine-placement" fullwidth>
+					Move turbines
+				</ActionButton>
+			</div>
 		{/if}
 	</ActionMenu>
 </div>

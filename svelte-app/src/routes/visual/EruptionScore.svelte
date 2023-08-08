@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
-	import LavaError from '$lib/data/LavaError';
+	// import ErrorMessage from '$lib/components/ErrorMessage.svelte';
+	// import LavaError from '$lib/data/LavaError';
 
 	export let score: number | null = null;
 	let scoreMessage: string = 'You are a volcano god!';
@@ -31,7 +31,7 @@
 	}
 </script>
 
-{#if score !== null}
+<!-- TODO: handle error: {#if score !== null}
 	<ErrorMessage
 		hasActions
 		error={new LavaError(`You scored ${score}/1000 points`, scoreMessage)}
@@ -39,4 +39,4 @@
 	>
 		<slot />
 	</ErrorMessage>
-{/if}
+{/if} -->

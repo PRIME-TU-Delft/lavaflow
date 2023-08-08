@@ -1,11 +1,12 @@
 <script lang="ts">
 	import 'aframe';
 	import type { Scene as AScene } from 'aframe';
-	import { Button } from 'flowbite-svelte';
-	import VisualiseUi from '../VisualiseUI.svelte';
+	import VisualiseUI from '../VisualiseUI.svelte';
 	import Scene from './Scene.svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	let scale = 2;
+	let rotate = 0;
 	let sceneEl: AScene;
 
 	const baseUrl = '/ar';
@@ -16,29 +17,43 @@
 	}
 </script>
 
-<VisualiseUi title="Visual AR" {baseUrl} let:showLava>
+<VisualiseUI title="Visual AR" {baseUrl} let:showLava>
 	<a-scene
 		bind:this={sceneEl}
 		vr-mode-ui="enterVRButton: #myEnterVRButton; enterARButton: #myEnterARButton"
 		webxr="optionalFeatures: dom-overlay; overlayElement: #overlay;"
 	>
-		<Scene {scale} {showLava} />
+		<Scene rotation={rotate} {scale} {showLava} />
 
 		<a-camera position="0 3 3" />
 	</a-scene>
 
 	<div slot="arActions">
+		<div class="flex gap-2 bg-white/70 backdrop:blur-lg p-2 rounded no-touch">
+			<div>Rotate:</div>
+			<input type="range" min="-200" max="200" bind:value={rotate} class="range range-primary" />
+		</div>
+
 		<div class="hidden" id="myEnterVRButton">Open vr</div>
 
-		<Button class="enterAR w-full" on:click={() => (scale = 0.5)} color="red" id="myEnterARButton">
+		<Button
+			twClass="enterAR w-full mt-2"
+			on:click={() => (scale = 0.5)}
+			id="myEnterARButton"
+			fullwidth
+		>
 			Enter AR Mode
 		</Button>
 
-		<Button class="closeAR hidden w-full" on:click={closeAR} color="red">Close AR Mode</Button>
+		<Button twClass="closeAR hidden w-full mt-2" on:click={closeAR} fullwidth>Close AR Mode</Button>
 	</div>
-</VisualiseUi>
+</VisualiseUI>
 
 <style>
+	:global(html, body, :root, [data-theme]) {
+		background: transparent;
+	}
+
 	:global(#overlay:xr-overlay .enterAR) {
 		display: none !important;
 	}

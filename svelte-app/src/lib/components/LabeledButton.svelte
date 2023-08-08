@@ -1,11 +1,14 @@
 <script lang="ts">
-	import { Button } from 'flowbite-svelte';
-	import { Icon } from 'mdi-svelte-ts';
+	import Button from './Button.svelte';
 
 	export let iconPrefix: string = '';
 	export let icon: string = '';
 	export let href: string = '';
 	export let outline: boolean = false;
+	export let disabled: boolean = false;
+	export let fullwidth: boolean = false;
+	export let secondary: boolean = false;
+	export let twClass: string = '';
 </script>
 
 <div>
@@ -15,18 +18,15 @@
 		</div>
 	{/if}
 
-	<!-- TODO: implement own button -->
-	<Button {href} {outline} color="red" on:click>
-		<p class="flex items-center gap-2">
-			{#if iconPrefix}
-				<Icon path={iconPrefix} />
-			{/if}
-
+	{#if href}
+		<a class="no-underline" class:w-full={fullwidth} href={'' + href}>
+			<Button {secondary} {iconPrefix} {icon} {outline} {disabled} {twClass} on:click>
+				<slot />
+			</Button>
+		</a>
+	{:else}
+		<Button {secondary} {iconPrefix} {icon} {outline} {disabled} {twClass} on:click>
 			<slot />
-
-			{#if icon}
-				<Icon path={icon} />
-			{/if}
-		</p>
-	</Button>
+		</Button>
+	{/if}
 </div>

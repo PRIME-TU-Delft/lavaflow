@@ -4,7 +4,7 @@
 	export let title: string;
 </script>
 
-<div class="flex gap-4 ">
+<div class="flex gap-4">
 	<img
 		class="h-16 w-16 rounded-full object-cover"
 		src="/profile-images/{image}"

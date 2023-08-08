@@ -19,7 +19,7 @@
 </script>
 
 {#each $turbineLocations || [] as turbine, index}
-	<div
+	<button
 		on:click|stopPropagation={() => toggleDelete(turbine)}
 		on:keydown={() => toggleDelete(turbine)}
 		class="turbine"
@@ -40,7 +40,7 @@
 				</button>
 			</div>
 		{/if}
-	</div>
+	</button>
 {/each}
 
 <style lang="postcss">

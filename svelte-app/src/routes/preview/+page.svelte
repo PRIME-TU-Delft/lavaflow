@@ -2,16 +2,12 @@
 	import { goto } from '$app/navigation';
 	import ActionButton from '$lib/components/ActionButton.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
-	import ErrorMessage from '$lib/components/ErrorMessage.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import P5PreviewCurves from '$lib/components/p5/P5PreviewCurves.svelte';
 	import { contourLines } from '$lib/stores/contourLineStore';
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { gltfStore } from '$lib/stores/gltfStore';
 	import { onMount } from 'svelte';
-	import type { PageData } from './$types';
-
-	export let data: PageData;
 
 	let gltfLoaded = false;
 	let webXRSupport = false;
@@ -41,23 +37,23 @@
 {/key}
 
 <ActionMenu>
-	{#if data.error}
+	<!-- TODO: Do propper error handling {#if data.error}
 		<ErrorMessage error={data.error} on:dismiss={() => goto('/preview')} />
-	{/if}
+	{/if} -->
 
-	<ActionButton loading={!gltfLoaded} secondary href="/visual/3d">
+	<ActionButton loading={!gltfLoaded} fullwidth secondary href="/visual/3d">
 		Show in 3D model
-		<div slot="loading">Loading contour lines</div>
+		<div slot="loading">Calculating 3d model</div>
 	</ActionButton>
 
 	{#if !gltfLoaded}
 		<!-- Filled with no content -->
 	{:else if webXRSupport}
-		<ActionButton loading={!gltfLoaded} href="/visual/ar">
+		<ActionButton fullwidth twClass="w-full" loading={!gltfLoaded} href="/visual/ar">
 			Show in AR {'(Recommended)'}
 		</ActionButton>
 	{:else}
-		<ActionButton loading={!gltfLoaded} href="/visual/ar">
+		<ActionButton loading={!gltfLoaded} href="/visual/ar" fullwidth>
 			Show in AR {'(no official support)'}
 		</ActionButton>
 	{/if}

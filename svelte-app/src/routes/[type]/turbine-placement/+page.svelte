@@ -5,10 +5,10 @@
 	import { difficultyStore } from '$lib/stores/difficultyStore';
 	import { turbineLocations } from '$lib/stores/locationStore';
 	import { mdiChevronRight, mdiHelp, mdiReload } from '@mdi/js';
-	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
 	import type { PageData } from './$types';
 	import TurbinePlacement from './TurbinePlacement.svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	export let data: PageData;
 
@@ -21,21 +21,18 @@
 
 <Menubar back="/visual/{data.type}" title="Turbine placement">
 	<div slot="backTitle">Back to {data.type.toUpperCase()}</div>
-	<Button class="flex items-center gap-2" outline color="red" on:click={resetTurbines}>
-		<Icon path={mdiReload} />
-		Reset turbines
-	</Button>
+	<Button iconPrefix={mdiReload} outline on:click={resetTurbines}>Reset turbines</Button>
 </Menubar>
 
 <TurbinePlacement />
 
 <ActionMenu>
 	<!-- Instructions and difficulty selection -->
-	<ButtonGroup>
+	<div class="join">
 		<ActionButton twClass="w-full" href="turbine-placement/instructions" secondary icon={mdiHelp}>
 			Instructions
 		</ActionButton>
-	</ButtonGroup>
+	</div>
 
 	<!-- Navigation -->
 	{#if deltaTubines > 0}

@@ -41,11 +41,7 @@
 		energy-source!
 
 		<div class="mt-4 flex justify-end">
-			<ActionButton
-				twClass="no-underline"
-				href="/capture/instructions"
-				icon={mdiChevronDoubleRight}
-			>
+			<ActionButton twClass="no-underline" href="/capture" icon={mdiChevronDoubleRight}>
 				Start lava app
 			</ActionButton>
 		</div>
@@ -62,6 +58,7 @@
 				Download template
 			</LabeledButton>
 
+			<!-- TODO: fix this condition -->
 			{#if true}
 				<LabeledButton
 					href="https://apps.apple.com/nl/app/webxr-viewer/id1295998056"
@@ -106,7 +103,6 @@
 		</div>
 	</div>
 </VStack>
-
 
 <style>
 	.logo-container {
