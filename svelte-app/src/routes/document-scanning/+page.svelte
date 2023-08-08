@@ -5,7 +5,7 @@
 	import * as gm from 'gammacv';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 
-	import cv from 'opencv-ts';
+	import cv2 from 'opencv-ts';
 
 	let height: number; // window height
 	let width: number; // window width
@@ -43,21 +43,25 @@
 
 	function documentDetectionWithOpenCv(canvas: HTMLCanvasElement) {
 		// Create an OpenCv matrix from the contents of the canvas
-		const img = cv.imread(canvas);
+		const img = cv2.imread(canvas);
 
-		const kernel = cv.matFromArray(5, 5, cv.CV_32FC1, ones(5 * 5));
-		cv.morphologyEx(
-			img,
-			img,
-			cv.MORPH_CLOSE,
-			kernel,
-			new cv.Point(0, 0),
-			3,
-			cv.BORDER_DEFAULT,
-			new cv.Scalar(0)
-		);
+		// let step1 = new cv2.Mat();
+		// const kernel = cv2.matFromArray(5, 5, cv2.CV_32FC1, ones(5 * 5));
+		// cv2.morphologyEx(
+		// 	img,
+		// 	step1,
+		// 	cv2.MORPH_CLOSE,
+		// 	kernel,
+		// 	new cv2.Point(0, 0),
+		// 	3,
+		// 	cv2.BORDER_DEFAULT,
+		// 	new cv2.Scalar(0)
+		// );
 
-		cv.imshow(canvas, img);
+		const gray = new cv2.Mat(); // create empty image for holding the grayscale image
+		cv2.cvtColor(img, gray, cv2.COLOR_RGBA2GRAY, 0); // convert image to grayscale
+
+		cv2.imshow(canvas, gray);
 	}
 
 	function getPipeline(input: gm.Tensor<gm.TensorDataView>) {
@@ -185,10 +189,12 @@
 		// if (!session) session = new gm.Session();
 		// if (!linesSession) linesSession = new gm.Session();
 		// if (tickLoop) cancelAnimationFrame(tickLoop);
+
 		// stream = new gm.CaptureVideo(width, height);
 		// stream.start(deviceId);
-		// const context1 = linesCanvasEl.getContext('2d');
-		// context1?.drawImage(videoSource, 0, 0, width, height);
+		const context1 = linesCanvasEl.getContext('2d');
+		context1?.drawImage(videoSource, 0, 0, width, height);
+
 		// const input = new gm.Tensor('uint8', [height, width, 4]);
 		// bwPipeline = getDocumentDetectionPipeline(input); // define bw pipeline
 		// linesPipeline = getLinesPipeline(input);
@@ -201,7 +207,8 @@
 		// if (!context0 || !context1) return;
 		// tick(input, canvas, [context0, context1]);
 		// canvas.remove();
-		// documentDetectionWithOpenCv(linesCanvasEl);
+
+		documentDetectionWithOpenCv(linesCanvasEl);
 	}
 
 	function setCameraId(label: string) {
