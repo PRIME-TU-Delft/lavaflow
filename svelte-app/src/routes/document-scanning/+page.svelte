@@ -5,6 +5,8 @@
 	import * as gm from 'gammacv';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 
+	import cv from 'opencv-ts';
+
 	let height: number; // window height
 	let width: number; // window width
 
@@ -14,6 +16,8 @@
 	let stream: gm.CaptureVideo; // Video stream
 	let bwPipeline: gm.Operation;
 	let linesPipeline: gm.Operation;
+
+	let videoSource: HTMLVideoElement;
 
 	let tickLoop: number;
 
@@ -26,6 +30,36 @@
 		LINE_COUNT: 10
 	};
 
+	// Helper function: ones
+	function ones(num: number) {
+		let result = [];
+
+		for (let i = 0; i < num; i++) {
+			result.push(1);
+		}
+
+		return result;
+	}
+
+	function documentDetectionWithOpenCv(canvas: HTMLCanvasElement) {
+		// Create an OpenCv matrix from the contents of the canvas
+		const img = cv.imread(canvas);
+
+		const kernel = cv.matFromArray(5, 5, cv.CV_32FC1, ones(5 * 5));
+		cv.morphologyEx(
+			img,
+			img,
+			cv.MORPH_CLOSE,
+			kernel,
+			new cv.Point(0, 0),
+			3,
+			cv.BORDER_DEFAULT,
+			new cv.Scalar(0)
+		);
+
+		cv.imshow(canvas, img);
+	}
+
 	function getPipeline(input: gm.Tensor<gm.TensorDataView>) {
 		// Normalization: add contrast, make colors seem deeper
 		let pipeline = gm.norm(input, 'l2');
@@ -37,7 +71,7 @@
 		// Gaussian Blur: remove sharp edges
 		pipeline = gm.gaussianBlur(pipeline, 3, 1);
 		// Make the lines a bit thinner so the result from opencv's getContours is better
-		pipeline = gm.threshold(pipeline, 0.3);
+		pipeline = gm.adaptiveThreshold(pipeline, 1);
 
 		return pipeline;
 	}
@@ -129,50 +163,45 @@
 		// Part 2: Display the lines that are extracted by GammaCV
 		//
 
-		const gammacvLinesTensor = gm.tensorFrom(linesPipeline);
+		// const gammacvLinesTensor = gm.tensorFrom(linesPipeline);
 
-		if (!gammacvLinesTensor) return;
+		// if (!gammacvLinesTensor) return;
 
-		// gm.tensorClone(gammacvOutputTensor, gammacvLinesTensor);
+		// // gm.tensorClone(gammacvOutputTensor, gammacvLinesTensor);
 
-		// Run the pipeline on this session
-		linesSession.runOp(linesPipeline, frame, gammacvLinesTensor);
+		// // Run the pipeline on this session
+		// linesSession.runOp(linesPipeline, frame, gammacvLinesTensor);
 
-		// Fill the right canvas with the output of this operation
-		gm.canvasFromTensor(canvas, gammacvLinesTensor);
+		// // Fill the right canvas with the output of this operation
+		// gm.canvasFromTensor(canvas, gammacvLinesTensor);
 
-		contexts[1].drawImage(canvas, 0, 0, width, height);
+		// contexts[1].drawImage(canvas, 0, 0, width, height);
 
-		drawLines(gammacvOutputTensor, gammacvLinesTensor, linesCanvasEl);
+		// drawLines(gammacvOutputTensor, gammacvLinesTensor, linesCanvasEl);
 	}
 
 	function start(previewCanvas: HTMLCanvasElement, deviceId?: string) {
-		if (!previewCanvas) return;
-		if (!session) session = new gm.Session();
-		if (!linesSession) linesSession = new gm.Session();
-		if (tickLoop) cancelAnimationFrame(tickLoop);
-
-		stream = new gm.CaptureVideo(width, height);
-		stream.start(deviceId);
-
-		const input = new gm.Tensor('uint8', [height, width, 4]);
-		bwPipeline = getPipeline(input); // define bw pipeline
-		linesPipeline = getLinesPipeline(input);
-
-		// Initialise the sessions
-		session.init(bwPipeline); // initialize bw pipeline
-		linesSession.init(linesPipeline);
-
-		const canvas = gm.canvasCreate(width, height);
-
-		const context0 = previewCanvas.getContext('2d');
-		const context1 = linesCanvasEl.getContext('2d');
-
-		if (!context0 || !context1) return;
-
-		tick(input, canvas, [context0, context1]);
-
-		canvas.remove();
+		// if (!previewCanvas) return;
+		// if (!session) session = new gm.Session();
+		// if (!linesSession) linesSession = new gm.Session();
+		// if (tickLoop) cancelAnimationFrame(tickLoop);
+		// stream = new gm.CaptureVideo(width, height);
+		// stream.start(deviceId);
+		// const context1 = linesCanvasEl.getContext('2d');
+		// context1?.drawImage(videoSource, 0, 0, width, height);
+		// const input = new gm.Tensor('uint8', [height, width, 4]);
+		// bwPipeline = getDocumentDetectionPipeline(input); // define bw pipeline
+		// linesPipeline = getLinesPipeline(input);
+		// // Initialise the sessions
+		// session.init(bwPipeline); // initialize bw pipeline
+		// linesSession.init(linesPipeline);
+		// const canvas = gm.canvasCreate(width, height);
+		// const context0 = previewCanvas.getContext('2d');
+		// const context1 = linesCanvasEl.getContext('2d');
+		// if (!context0 || !context1) return;
+		// tick(input, canvas, [context0, context1]);
+		// canvas.remove();
+		// documentDetectionWithOpenCv(linesCanvasEl);
 	}
 
 	function setCameraId(label: string) {
@@ -186,7 +215,7 @@
 
 <svelte:window bind:innerHeight={height} bind:innerWidth={width} />
 
-<Video bind:deviceId let:cameraOptions let:videoSource>
+<Video bind:deviceId let:cameraOptions bind:videoSource>
 	<Menubar title="Document detection">
 		{#if cameraOptions.length > 1}
 			<Dropdown title={deviceId || 'Select other camera'}>

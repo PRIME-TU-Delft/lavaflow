@@ -7,7 +7,7 @@
 	let loading = true;
 	let error: string;
 	let cameraOptions: MediaDeviceInfo[] = [];
-	let videoSource: HTMLVideoElement | undefined = undefined;
+	export let videoSource: HTMLVideoElement | undefined = undefined;
 
 	/**
 	 * Obtain all video cameras on device and set the stream
