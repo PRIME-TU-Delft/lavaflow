@@ -3,6 +3,7 @@
 	import Menubar from '$lib/components/Menubar.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import * as gm from 'gammacv';
+	import { onDestroy } from 'svelte';
 
 	let height: number; // window height
 	let width: number; // window width
@@ -22,16 +23,9 @@
 		LINE_COUNT: 10
 	};
 
-	// Helper function: ones and zeros
-	function ones(num: number) {
-		return Array.from({ length: num }).map(() => 1);
-	}
+	function documentDetection(canvas: HTMLCanvasElement, frame: number = 0) {
+		if (!canvas) return;
 
-	function zeros(num: number) {
-		return Array.from({ length: num }).map(() => 0);
-	}
-
-	async function documentDetection(canvas: HTMLCanvasElement, frame: number = 0) {
 		// Read the data from the stream
 		let tensor = new gm.Tensor('uint8', [height, width, 4]);
 		gmStream.getImageBuffer(tensor);
@@ -43,11 +37,13 @@
 		// Normalisation
 		pipeline = gm.gaussianBlur(pipeline, 10, 10);
 		pipeline = gm.norm(pipeline, 'l2');
-		pipeline = gm.threshold(pipeline, 0.3, 0);
+		pipeline = gm.threshold(pipeline, 0.5, 0);
 		// pipeline = gm.colorSegmentation(pipeline, 2);
 
 		// Extract the tensor output
-		const pipelineTensor: any = gm.tensorFrom(pipeline);
+		const pipelineTensor = gm.tensorFrom(pipeline);
+
+		if (!pipelineTensor) return;
 
 		// Create and initialize the GammaCV session, to acquire GPU acceperation
 		gmSession.init(pipeline);
@@ -70,6 +66,8 @@
 		deviceId?: string,
 		videoSource?: HTMLVideoElement
 	) {
+		if (tickLoop) return;
+
 		// Setup the GM stream
 		gmStream = new gm.CaptureVideo(width, height);
 		gmStream.start(deviceId);
@@ -92,6 +90,10 @@
 
 		start(linesCanvasEl, deviceId);
 	}
+
+	onDestroy(() => {
+		if (tickLoop) cancelAnimationFrame(tickLoop);
+	});
 
 	$: if (videoSource) {
 		console.log('loaded');
