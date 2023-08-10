@@ -188,9 +188,11 @@ function createGltfStore() {
 			if (!model) return
 
 			console.log(model.gltf_url)
+			const path = model.gltf_url.split("/").slice(0, -1).join("/")
+			console.log(path)
 
 			// TODO: split url to payh / file name
-			const loader = new GLTFLoader().setPath('blob:http://localhost:5173/');
+			const loader = new GLTFLoader().setPath(path + "/");
 			loader.load(model.gltf_url.split("/").at(-1) ?? "", async function (gltf) {
 
 				const exporter = new USDZExporter();

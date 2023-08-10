@@ -12,13 +12,13 @@
 		{$gltfStore.gltf_url}
 		{$gltfStore.usdz_url}
 		{#if $gltfStore.usdz_url}
-			<a id="link" rel="ar" href={$gltfStore.usdz_url}>{$gltfStore.usdz_url}</a>
+			<a id="link" rel="ar" href={$gltfStore.usdz_url}>{$gltfStore.usdz_url + '.usdz'}</a>
 			<a
 				class="btn btn-secondary w-full"
 				id="link"
 				rel="ar"
 				href={$gltfStore.usdz_url}
-				download={$gltfStore.usdz_url}
+				download={$gltfStore.usdz_url + '.usdz'}
 			>
 				QuickLook
 			</a>
