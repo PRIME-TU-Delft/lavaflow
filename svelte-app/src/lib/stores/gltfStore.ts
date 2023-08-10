@@ -9,6 +9,8 @@ import { writable } from 'svelte/store';
 import type { CurveTree } from '$lib/stores/contourLineStore';
 import { difficultyStore } from '$lib/stores/difficultyStore';
 import { turbineLocations, craterLocation, type Turbine } from '$lib/stores/locationStore';
+import { USDZExporter } from 'three/examples/jsm/exporters/USDZExporter';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { get } from 'svelte/store';
 
 import ApiSettings from '$lib/data/apiSettings';
@@ -24,6 +26,7 @@ export interface Model {
 	lava_gltf_url: string;
 	lava_paths: Vec3[][];
 	craters: Vec2[];
+	usdz_url: string;
 }
 
 export interface AltitudeGradientPair {
@@ -103,7 +106,7 @@ function createGltfStore() {
 				/*	Catmull Clark Iterations */ 1,
 				/*			Lava Path Length */ 20,
 				/*		   Lava Path Forking */ lava_path_forking,
-				/*		Smoothing Operations */ [
+				/*		Smoothing Operations */[
 					new wasm.SmoothingOperationApplySmoothToLayer(0, 0.3, 5, 1, false),
 					new wasm.SmoothingOperationApplySmoothToMiddleLayers(0.7, 3, 5, false),
 					new wasm.SmoothingOperationIncreaseAltitudeForMountainTops(0.25, true),
@@ -178,6 +181,21 @@ function createGltfStore() {
 					max_points_total: max_points_total
 				})
 			);
+		},
+
+		getUSDZ: () => {
+			if (!model) return
+
+			// TODO: split url to payh / file name
+			const loader = new GLTFLoader().setPath(model.gltf_url);
+			loader.load('DamagedHelmet.gltf', async function (gltf) {
+
+				const exporter = new USDZExporter();
+				const arraybuffer = await exporter.parse(gltf.scene);
+				const blob = new Blob([arraybuffer], { type: 'application/octet-stream' });
+
+				model.usdz_url = URL.createObjectURL(blob);
+			});
 		}
 	};
 }
