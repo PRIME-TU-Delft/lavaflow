@@ -2,7 +2,7 @@
 	import Video from '$lib/components/Video.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
-	import cv from 'opencv-ts';
+	import cv2 from 'opencv-ts';
 
 	let height: number; // window height
 	let width: number; // window width
@@ -18,7 +18,7 @@
 		LINE_COUNT: 10
 	};
 
-	// Helper function: ones
+	// Helper function: ones and zeros
 	function ones(num: number) {
 		return Array.from({ length: num }).map(() => 1);
 	}
@@ -29,32 +29,57 @@
 
 	function documentDetectionWithOpenCv(canvas: HTMLCanvasElement) {
 		// Create an OpenCv matrix from the contents of the canvas
-		let img = cv.imread(canvas);
+		let img = cv2.imread(canvas);
 
 		// Step 1 - Remove details while keeping the edges
-		let step1 = new cv.Mat();
-		const kernel = cv.matFromArray(5, 5, cv.CV_32FC1, ones(5 * 5));
-		cv.morphologyEx(
+		const kernel = cv2.matFromArray(5, 5, cv2.CV_32FC1, ones(5 * 5));
+		cv2.morphologyEx(
 			img,
-			step1,
-			cv.MORPH_CLOSE,
+			img,
+			cv2.MORPH_CLOSE,
 			kernel,
-			new cv.Point(0, 0),
+			new cv2.Point(0, 0),
 			3,
-			cv.BORDER_DEFAULT,
-			new cv.Scalar(0)
+			cv2.BORDER_DEFAULT,
+			new cv2.Scalar(0)
 		);
 
 		// Step 2 - The Magic of GrabCut
-		const mask = cv.matFromArray(width, height, cv.CV_8U, zeros(width * height)); // mask = np.zeros(img.shape[:2],np.uint8)
-		const bgdModel = cv.matFromArray(1, 65, cv.CV_64F, zeros(65)); // bgdModel = np.zeros((1,65),np.float64)
-		const fgdModel = cv.matFromArray(1, 65, cv.CV_64F, zeros(65)); // fgdModel = np.zeros((1,65),np.float64)
-		const rect = new cv.Rect(20, 20, height - 20, width - 20); // rect = (20,20,img.shape[1]-20,img.shape[0]-20)
-		// cv.grabCut(step1, mask, rect, bgdModel, fgdModel, 5, cv.GC_INIT_WITH_RECT); // cv2.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
-		// mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
-		// img = img*mask2[:,:,np.newaxis]
+		const mask = cv2.matFromArray(width, height, cv2.CV_8U, zeros(width * height)); // mask = np.zeros(img.shape[:2],np.uint8)
+		const bgdModel = cv2.matFromArray(1, 65, cv2.CV_64F, zeros(65)); // bgdModel = np.zeros((1,65),np.float64)
+		const fgdModel = cv2.matFromArray(1, 65, cv2.CV_64F, zeros(65)); // fgdModel = np.zeros((1,65),np.float64)
+		const rect = new cv2.Rect(20, 20, width - 40, height - 40); // rect = (20,20,img.shape[1]-20,img.shape[0]-20)
+		cv2.grabCut(img, mask, rect, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_RECT); // cv2.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
 
-		cv.imshow(canvas, step1);
+		//
+		// Draw the foreground after grabCut
+		//
+
+		// For every pixel in the Mat
+		for (let i = 0; i < img.rows; i++) {
+			for (let j = 0; j < img.cols; j++) {
+				// If the pixel value in 'mask' is either 0 or 2
+				if (mask.ucharPtr(i, j)[0] == 0 || mask.ucharPtr(i, j)[0] == 2) {
+					img.ucharPtr(i, j)[0] = 0;
+					img.ucharPtr(i, j)[1] = 0;
+					img.ucharPtr(i, j)[2] = 0;
+				}
+			}
+		}
+
+		// Draw the grab rectangle
+		const whiteColor = new cv2.Scalar(0, 0, 255);
+		const point1 = new cv2.Point(rect.x, rect.y);
+		const point2 = new cv2.Point(rect.x + rect.width, rect.y + rect.height);
+		cv2.rectangle(img, point1, point2, whiteColor);
+
+		cv2.imshow(canvas, img);
+
+		// Delete all objects
+		img.delete();
+		mask.delete();
+		bgdModel.delete();
+		fgdModel.delete();
 	}
 
 	/** Recursive function that runs each frame */
@@ -73,18 +98,18 @@
 			return console.error('No context or video source', context1, videoSource);
 
 		context1.drawImage(videoSource, 0, 0, width, height);
-		documentDetectionWithOpenCv(linesCanvasEl);
+		documentDetectionWithOpenCv(previewCanvas);
 	}
 
 	function setCameraId(label: string) {
 		deviceId = label;
 
-		start(linesCanvasEl, deviceId);
+		// start(linesCanvasEl, deviceId);
 	}
 
 	$: if (videoSource) {
 		console.log('loaded');
-		start(linesCanvasEl, deviceId, videoSource);
+		// start(linesCanvasEl, deviceId, videoSource);
 	}
 </script>
 
