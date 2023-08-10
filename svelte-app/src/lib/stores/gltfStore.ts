@@ -66,7 +66,7 @@ export function gltfStringToUrl(gltf: string): string {
  * @returns target store with method subscribe, add and remove
  */
 function createGltfStore() {
-	const { subscribe, set } = writable<Model>();
+	const { subscribe, set, update } = writable<Model>();
 	let api: wasm.ModelConstructionApi;
 	let innerWindowSize: { width: number; height: number };
 
@@ -76,6 +76,7 @@ function createGltfStore() {
 	return {
 		subscribe,
 		set,
+		update,
 		setup: async (curveTree: CurveTree, lava_path_forking: number) => {
 			// if wasm is not yet setup, do so
 			if (!isSetup) {
@@ -186,15 +187,23 @@ function createGltfStore() {
 		getUSDZ: () => {
 			if (!model) return
 
+			console.log(model.gltf_url)
+
 			// TODO: split url to payh / file name
-			const loader = new GLTFLoader().setPath(model.gltf_url);
-			loader.load('DamagedHelmet.gltf', async function (gltf) {
+			const loader = new GLTFLoader().setPath('blob:http://localhost:5173/');
+			loader.load(model.gltf_url.split("/").at(-1) ?? "", async function (gltf) {
 
 				const exporter = new USDZExporter();
 				const arraybuffer = await exporter.parse(gltf.scene);
 				const blob = new Blob([arraybuffer], { type: 'application/octet-stream' });
 
 				model.usdz_url = URL.createObjectURL(blob);
+				console.log("model", { model }, model.usdz_url)
+
+				gltfStore.update((model) => {
+					model.usdz_url = model.usdz_url;
+					return model;
+				})
 			});
 		}
 	};
