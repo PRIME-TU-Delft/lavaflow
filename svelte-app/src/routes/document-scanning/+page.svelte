@@ -18,9 +18,9 @@
 	let gmSession: gm.Session;
 
 	const params = {
-		D_COEF: 2.0,
+		D_COEF: 1.0,
 		LAYERS: 2,
-		LINE_COUNT: 10
+		LINE_COUNT: 100
 	};
 
 	function documentDetection(canvas: HTMLCanvasElement, frame: number = 0) {
@@ -28,68 +28,66 @@
 
 		gm.canvasClear(canvas);
 
-		// Read the data from the stream
-		let tensor = new gm.Tensor('uint8', [height, width, 4]);
-		gmStream.getImageBuffer(tensor);
-
 		// Define the image processing pipeline
-		let lines = [];
-		const maxP = Math.max(tensor.shape[0], tensor.shape[1]);
+		// Read the data from the stream
+		let input = new gm.Tensor('uint8', [height, width, 4]);
+		gmStream.getImageBuffer(input);
 
-		// Dilation
-		let pipeline = gm.dilate(tensor, [20, 20]);
-		// Normalisation
-		pipeline = gm.gaussianBlur(pipeline, 10, 10);
-		pipeline = gm.norm(pipeline, 'l2');
-		pipeline = gm.threshold(pipeline, 0.5, 0);
+		let lines = [];
+		const maxP = Math.max(input.shape[0], input.shape[1]);
+		const lineContext = new gm.Line();
+
+		// // Dilation
+		// let pipeline = gm.dilate(tensor, [20, 20]);
+		// // Normalisation
+		// pipeline = gm.gaussianBlur(pipeline, 10, 10);
+		// pipeline = gm.norm(pipeline, 'l2');
+		// pipeline = gm.threshold(pipeline, 0.5, 0);
+		let pipeline = gm.pcLines(input, params.LAYERS, 2, 2);
 
 		// Extract the tensor output
-		const visualOutputTensor = gm.tensorFrom(pipeline);
-
-		if (!visualOutputTensor) return;
+		const output = gm.tensorFrom(pipeline);
+		if (!output) return;
 
 		// Create and initialize the GammaCV session, to acquire GPU acceperation
 		gmSession.init(pipeline);
-		gmSession.runOp(pipeline, frame, visualOutputTensor);
+		gmSession.runOp(pipeline, frame, output);
 
 		// Draw this black/white result to the canvas
-		gm.canvasFromTensor(canvas, visualOutputTensor);
+		gm.canvasFromTensor(canvas, output);
 
 		// Add one last operation to the pipeline
-		pipeline = gm.pcLines(pipeline, params.LAYERS, 2, 2);
-		const linesOutputTensor = gm.tensorFrom(pipeline);
-		if (!linesOutputTensor) return;
+		// let pipeline = createPipeline();
+		// pipeline = gm.pcLines(pipeline, params.LAYERS, 2, 2);
 
-		gmSession.init(pipeline);
-		gmSession.runOp(pipeline, frame, linesOutputTensor);
+		// const linesOutputTensor = gm.tensorFrom(pipeline);
+		// if (!linesOutputTensor) return;
+
+		// gmSession.init(pipeline);
+		// gmSession.runOp(pipeline, frame, linesOutputTensor);
 
 		// Extract the lines
-
-		for (let i = 0; i < linesOutputTensor.size / 4; i += 1) {
-			const y = Math.floor(i / linesOutputTensor.shape[1]);
-			const x = i - y * linesOutputTensor.shape[1];
-			const value = linesOutputTensor.get(y, x, 0);
-			const x0 = linesOutputTensor.get(y, x, 1);
-			const y0 = linesOutputTensor.get(y, x, 2);
+		for (let i = 0; i < output.size / 4; i += 1) {
+			const y = Math.floor(i / output.shape[1]);
+			const x = i - y * output.shape[1];
+			const value = output.get(y, x, 0);
+			const x0 = output.get(y, x, 1);
+			const y0 = output.get(y, x, 2);
 
 			if (value > 0.0) {
 				lines.push([value, x0, y0]);
 			}
 		}
 
-		// Sort the lines and keep only the best lines
 		lines = lines.sort((b, a) => a[0] - b[0]);
 		lines = lines.slice(0, params.LINE_COUNT);
-
-		// Draw the lines on the canvas
-		const lineContext = new gm.Line();
 
 		for (let i = 0; i < lines.length; i += 1) {
 			lineContext.fromParallelCoords(
 				lines[i][1] * params.D_COEF,
 				lines[i][2] * params.D_COEF,
-				tensor.shape[1],
-				tensor.shape[0],
+				input.shape[1],
+				input.shape[0],
 				maxP,
 				maxP / 2
 			);
