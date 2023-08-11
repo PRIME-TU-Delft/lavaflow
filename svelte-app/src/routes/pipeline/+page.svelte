@@ -7,7 +7,6 @@
 	let tickLoop: number;
 
 	let outputCanvas: HTMLCanvasElement;
-	let canvasProcessed: HTMLCanvasElement;
 
 	let gmStream: gm.CaptureVideo;
 	let gmSession: gm.Session;
@@ -17,6 +16,7 @@
 		// pipeline = gm.downsample(pipeline, 2);
 		pipeline = gm.gaussianBlur(pipeline, 4, 4);
 		pipeline = gm.cannyEdges(pipeline, 0.25, 0.75);
+		// pipeline = gm.pcLines(pipeline, 2, 2, 2);
 		return pipeline;
 	}
 
@@ -27,13 +27,11 @@
 		frame = 0
 	) {
 		gmStream.getImageBuffer(input);
-
 		gmSession.runOp(pipeline, frame, output);
 
-		// Clear the canvas
-		gm.canvasClear(outputCanvas);
-
-		gm.canvasFromTensor(outputCanvas, output);
+		if (outputCanvas) {
+			gm.canvasFromTensor(outputCanvas, output);
+		}
 		tickLoop = requestAnimationFrame(() => tick(input, output, pipeline, frame + 1));
 	}
 
@@ -60,17 +58,9 @@
 		if (!gmSession) gmSession = new gm.Session();
 
 		gmStream = new gm.CaptureVideo(width, height);
-
-		canvasProcessed = gm.canvasCreate(width, height);
-
-		const ctx = outputCanvas.getContext('2d');
-		if (!ctx) return;
-
-		// Draw image from canvasProcessed to outputCanvas
-		ctx.drawImage(canvasProcessed, 0, 0, width, height);
 	});
 
-	$: outputCanvas && start();
+	$: outputCanvas && width && height && start();
 </script>
 
 <svelte:window bind:innerHeight={height} bind:innerWidth={width} />
