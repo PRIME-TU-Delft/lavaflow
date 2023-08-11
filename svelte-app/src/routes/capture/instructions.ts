@@ -3,7 +3,7 @@ import { assets } from '$app/paths';
 const drawing = `${assets}/instructional-images/drawing/`;
 const scanning = `${assets}/instructional-images/scanning/`;
 
-export let drawingInstructions = [
+export const drawingInstructions = [
 	{
 		title: 'A correctly drawn set of level curves',
 		description:
@@ -42,7 +42,7 @@ export let drawingInstructions = [
 	}
 ];
 
-export let scanningInstructions = [
+export const scanningInstructions = [
 	{
 		title: 'A correct scan',
 		description: 'Try to capture an image where your level curves are the focus of the image.',

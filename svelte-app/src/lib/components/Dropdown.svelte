@@ -1,5 +1,7 @@
 <script lang="ts">
-	export let items: string[] = [];
+	type T = $$Generic;
+
+	export let items: T[] = [];
 	export let title: string = 'Click';
 </script>
 
