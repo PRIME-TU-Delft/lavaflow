@@ -169,11 +169,101 @@
 		} while (numberOfMerges > 0);
 
 		// Choose the four points with the largest base
-		points = points.sort((b, a) => a[2] - b[2]).slice(0, 4);
+		let intersections: [number, number][] = points
+			.sort((b, a) => a[2] - b[2])
+			.slice(0, 4)
+			.map((a) => a.slice(0, 2) as [number, number]);
 
-		for (let i = 0; i < points.length; i++) {
-			gm.canvasDrawCircle(outputCanvas, [points[i][0], points[i][1]], 10, 'rgba(0, 0, 255, 1.0)');
+		for (let i = 0; i < intersections.length; i++) {
+			gm.canvasDrawCircle(
+				outputCanvas,
+				[intersections[i][0], intersections[i][1]],
+				10,
+				'rgba(0, 0, 255, 1.0)'
+			);
 		}
+
+		//
+		// PLACING THE RIGHT POINT IN THE RIGHT CORNER
+		//
+
+		let defaultBorderOffsetX = input.shape[1] / 4;
+		let defaultBorderOffsetY = input.shape[0] / 4;
+
+		let defaultTopLeft: [number, number] = [defaultBorderOffsetX, defaultBorderOffsetY];
+		let defaultTopRight: [number, number] = [
+			input.shape[1] - defaultBorderOffsetX,
+			defaultBorderOffsetY
+		];
+		let defaultBottomLeft: [number, number] = [
+			defaultBorderOffsetX,
+			input.shape[0] - defaultBorderOffsetY
+		];
+		let defaultBottomRight: [number, number] = [
+			input.shape[1] - defaultBorderOffsetX,
+			input.shape[0] - defaultBorderOffsetY
+		];
+
+		let defaults: [number, number][] = [
+			defaultTopLeft,
+			defaultTopRight,
+			defaultBottomLeft,
+			defaultBottomRight
+		];
+
+		function minimize(
+			prop: (x: number, y: number) => number,
+			pts: [number, number][]
+		): [number, number] {
+			let min = prop(pts[0][0], pts[0][1]);
+			let minArg = pts[0];
+
+			for (let p of pts) {
+				if (prop(p[0], p[1]) < min) {
+					min = prop(p[0], p[1]);
+					minArg = p;
+				}
+			}
+
+			return minArg;
+		}
+
+		// Top left is the point with smallest x and y
+		let topLeft = minimize(
+			(x: number, y: number) => {
+				return x * y;
+			},
+			[...intersections, ...defaults]
+		);
+
+		// Top right is the point with largest x and smallest y
+		let topRight = minimize(
+			(x: number, y: number) => {
+				return (1 / x) * y;
+			},
+			[...intersections, ...defaults]
+		);
+
+		// Bottom left is the point with smallest x and largest y
+		let bottomLeft = minimize(
+			(x: number, y: number) => {
+				return (x * 1) / y;
+			},
+			[...intersections, ...defaults]
+		);
+
+		// Bottom right is the point with largest x and largest y
+		let bottomRight = minimize(
+			(x: number, y: number) => {
+				return ((1 / x) * 1) / y;
+			},
+			[...intersections, ...defaults]
+		);
+
+		gm.canvasDrawCircle(outputCanvas, topLeft, 12, 'rgba(255, 0, 255, 1.0)');
+		gm.canvasDrawCircle(outputCanvas, topRight, 12, 'rgba(255, 0, 255, 1.0)');
+		gm.canvasDrawCircle(outputCanvas, bottomLeft, 12, 'rgba(255, 0, 255, 1.0)');
+		gm.canvasDrawCircle(outputCanvas, bottomRight, 12, 'rgba(255, 0, 255, 1.0)');
 	}
 
 	/**
