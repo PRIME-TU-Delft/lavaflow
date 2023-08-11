@@ -12,10 +12,10 @@
 		id="dropdown"
 		class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
 	>
-		<slot>
-			{#each items as item}
+		{#each items as item, index}
+			<slot {item} {index}>
 				<li>{item}</li>
-			{/each}
-		</slot>
+			</slot>
+		{/each}
 	</ul>
 </div>
