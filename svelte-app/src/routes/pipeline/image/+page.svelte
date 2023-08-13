@@ -187,23 +187,28 @@
 		// PLACING THE RIGHT POINT IN THE RIGHT CORNER
 		//
 
-		let defaultBorderOffsetX = input.shape[1] / 4;
-		let defaultBorderOffsetY = input.shape[0] / 4;
+		const canvasWidth = input.shape[1];
+		const canvasHeight = input.shape[0];
+
+		// Start by introducing a default marker in each corner
+		let defaultBorderOffsetX = canvasWidth / 4;
+		let defaultBorderOffsetY = canvasHeight / 4;
 
 		let defaultTopLeft: [number, number] = [defaultBorderOffsetX, defaultBorderOffsetY];
 		let defaultTopRight: [number, number] = [
-			input.shape[1] - defaultBorderOffsetX,
+			canvasWidth - defaultBorderOffsetX,
 			defaultBorderOffsetY
 		];
 		let defaultBottomLeft: [number, number] = [
 			defaultBorderOffsetX,
-			input.shape[0] - defaultBorderOffsetY
+			canvasHeight - defaultBorderOffsetY
 		];
 		let defaultBottomRight: [number, number] = [
-			input.shape[1] - defaultBorderOffsetX,
-			input.shape[0] - defaultBorderOffsetY
+			canvasWidth - defaultBorderOffsetX,
+			canvasHeight - defaultBorderOffsetY
 		];
 
+		// Group the defaults together in an array
 		let defaults: [number, number][] = [
 			defaultTopLeft,
 			defaultTopRight,
@@ -211,55 +216,90 @@
 			defaultBottomRight
 		];
 
+		// Method that performs argmin on a certain given property
 		function minimize(
 			prop: (x: number, y: number) => number,
-			pts: [number, number][]
+			pts: [number, number][],
+			inclusionRequirement: (x: number, y: number) => boolean = (x, y) => true,
+			fallback?: [number, number]
 		): [number, number] {
-			let min = prop(pts[0][0], pts[0][1]);
-			let minArg = pts[0];
+			let min: number | undefined = undefined;
+			let minArg: [number, number] | undefined = undefined;
 
 			for (let p of pts) {
-				if (prop(p[0], p[1]) < min) {
+				if ((min == undefined || prop(p[0], p[1]) < min) && inclusionRequirement(p[0], p[1])) {
 					min = prop(p[0], p[1]);
 					minArg = p;
 				}
+			}
+
+			// Since we allow posing additional inclusion requirements, it's possible we don't find
+			// any point with minimal property. In that case, minArg = undefined.
+			if (minArg == undefined) {
+				// If this case arises and the user has not specified a fallback, throw an error
+				if (!fallback) {
+					throw new Error(
+						'When posing additional inclusion requirements, it is mandatory to include a fallback'
+					);
+				}
+
+				minArg = fallback;
 			}
 
 			return minArg;
 		}
 
 		// Top left is the point with smallest x and y
+		// Find the marker closest to the top-left corner from all found intersections and the defaults
 		let topLeft = minimize(
 			(x: number, y: number) => {
 				return x * y;
 			},
-			[...intersections, ...defaults]
+			[...intersections, ...defaults],
+			// Pose an additional requirement that the marker has to be in the top left quadrant
+			(x: number, y: number) => x <= canvasWidth / 2 && y <= canvasHeight / 2,
+			defaultTopLeft
 		);
 
 		// Top right is the point with largest x and smallest y
+		// Find the marker closest to the top-right corner from all found intersections and the defaults,
+		// exclude the marker we just assigned top-left!
 		let topRight = minimize(
 			(x: number, y: number) => {
 				return (1 / x) * y;
 			},
-			[...intersections, ...defaults].filter((a) => a != topLeft)
+			[...intersections, ...defaults].filter((a) => a != topLeft),
+			// Pose an additional requirement that the marker has to be in the top right quadrant
+			(x: number, y: number) => x >= canvasWidth / 2 && y <= canvasHeight / 2,
+			defaultTopRight
 		);
 
 		// Bottom left is the point with smallest x and largest y
+		// Find the marker closest to the bottom-left corner from all found intersections and the defaults
+		// exclude any markers we just assigned!
 		let bottomLeft = minimize(
 			(x: number, y: number) => {
 				return (x * 1) / y;
 			},
-			[...intersections, ...defaults].filter((a) => a != topLeft && a != topRight)
+			[...intersections, ...defaults].filter((a) => a != topLeft && a != topRight),
+			// Pose an additional requirement that the marker has to be in the top left quadrant
+			(x: number, y: number) => x <= canvasWidth / 2 && y >= canvasHeight / 2,
+			defaultBottomLeft
 		);
 
 		// Bottom right is the point with largest x and largest y
+		// Find the marker closest to the bottom-right corner from all found intersections and the defaults
+		// exclude any markers we just assigned!
 		let bottomRight = minimize(
 			(x: number, y: number) => {
 				return ((1 / x) * 1) / y;
 			},
 			[...intersections, ...defaults].filter(
 				(a) => a != topLeft && a != topRight && a != bottomLeft
-			)
+			),
+			// Pose an additional requirement that the marker has to be in the top left quadrant
+			(x: number, y: number) => x >= canvasWidth / 2 && y >= canvasHeight / 2,
+			defaultBottomRight
 		);
 
 		gm.canvasDrawCircle(outputCanvas, topLeft, 12, 'rgba(255, 0, 255, 1.0)');
