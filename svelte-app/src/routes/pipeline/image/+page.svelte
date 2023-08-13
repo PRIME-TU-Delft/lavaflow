@@ -171,7 +171,7 @@
 		// Choose the four points with the largest base
 		let intersections: [number, number][] = points
 			.sort((b, a) => a[2] - b[2])
-			.slice(0, 4)
+			// .slice(0, 4)
 			.map((a) => a.slice(0, 2) as [number, number]);
 
 		for (let i = 0; i < intersections.length; i++) {
@@ -241,7 +241,7 @@
 			(x: number, y: number) => {
 				return (1 / x) * y;
 			},
-			[...intersections, ...defaults]
+			[...intersections, ...defaults].filter((a) => a != topLeft)
 		);
 
 		// Bottom left is the point with smallest x and largest y
@@ -249,7 +249,7 @@
 			(x: number, y: number) => {
 				return (x * 1) / y;
 			},
-			[...intersections, ...defaults]
+			[...intersections, ...defaults].filter((a) => a != topLeft && a != topRight)
 		);
 
 		// Bottom right is the point with largest x and largest y
@@ -257,7 +257,9 @@
 			(x: number, y: number) => {
 				return ((1 / x) * 1) / y;
 			},
-			[...intersections, ...defaults]
+			[...intersections, ...defaults].filter(
+				(a) => a != topLeft && a != topRight && a != bottomLeft
+			)
 		);
 
 		gm.canvasDrawCircle(outputCanvas, topLeft, 12, 'rgba(255, 0, 255, 1.0)');
