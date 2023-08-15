@@ -4,6 +4,7 @@
 	import { mdiReplay } from '@mdi/js';
 	import * as gm from 'gammacv';
 	import { onMount } from 'svelte';
+	import P5Overlay from './p5/P5Overlay.svelte';
 
 	import image_url0 from './IMG_8155.jpeg';
 	import image_url1 from './IMG_8156.jpeg';
@@ -394,8 +395,13 @@
 	{/if}
 </div>
 
+<!-- P5 Overlay -->
+<div class="absolute left-0 top-0 z-9">
+	<P5Overlay bind:width bind:height />
+</div>
+
 <!-- Canvas with lines -->
-<canvas style="position: absolute; top: 0;" {width} {height} bind:this={outputCanvas} />
+<canvas class="absolute left-o top-0 z-5" {width} {height} bind:this={outputCanvas} />
 
 <!-- Preview of the benchmark image -->
 <!-- <img class="absolute top-0 right-0 h-64" alt="original" src={images[image_name]} /> -->
