@@ -59,6 +59,7 @@ export default class SnapMember {
 
     /**
      * P5 method: draw
+     * > Override this method if you want to give this member another shape
      * @param p5 - p5 instance
      */
     public draw(p5: p5): void {

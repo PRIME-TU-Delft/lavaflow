@@ -15,10 +15,32 @@ export default class SnapCorner extends SnapMember {
 
     }
 
-
     reposition(edge: SnapEdge | SnapCenter, corner: SnapCorner) {
         this.pos.x = corner.pos.x + 2 * (edge.pos.x - corner.pos.x);
         this.pos.y = corner.pos.y + 2 * (edge.pos.y - corner.pos.y);
+    }
+
+
+    public override draw(p5: p5): void {
+
+        p5.stroke(51);
+
+        if (this.isDragged) {
+            p5.fill(51);
+        } else {
+            p5.fill(250);
+        }
+
+        p5.ellipse(this.pos.x, this.pos.y, 10, 10);
+
+    }
+
+    protected override mousePressIsWithinContainer(p5: p5): boolean {
+        const dx = p5.mouseX - this.pos.x;
+        const dy = p5.mouseY - this.pos.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        return dist < 50;
     }
 
 

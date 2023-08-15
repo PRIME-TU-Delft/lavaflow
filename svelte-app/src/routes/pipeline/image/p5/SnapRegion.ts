@@ -52,7 +52,7 @@ export default class SnapRegion {
 
 
         // Group them in the members container
-        this.members = [...Object.values(this.corners), ...Object.values(this.edges), this.center];
+        this.members = [...Object.values(this.edges), ...Object.values(this.corners), this.center];
 
         // For the edges and center, some additional setup is required
         this.edges.top.dragAlong(this.corners.topLeft, this.corners.topRight);
@@ -61,8 +61,6 @@ export default class SnapRegion {
         this.edges.bottom.dragAlong(this.corners.bottomLeft, this.corners.bottomRight);
 
         this.center.dragAlong(...this.members.filter(a => a != this.center));
-
-        console.log(this.center.dragAlongMembers)
 
     }
 
@@ -86,7 +84,7 @@ export default class SnapRegion {
 
         // Translucent material that covers the entire region
         p5.noStroke();
-        p5.fill(150, 200, 50, 100);
+        p5.fill(229, 112, 89, 50);
 
         p5.beginShape();
         for (const corner of Object.values(this.corners)) {
