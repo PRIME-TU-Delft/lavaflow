@@ -50,9 +50,31 @@ export default class SnapRegion {
 
         this.center = new SnapCenter(p5, "center", this.corners.topLeft, this.corners.topRight, this.corners.bottomRight, this.corners.bottomLeft);
 
+
         // Group them in the members container
         this.members = [...Object.values(this.corners), ...Object.values(this.edges), this.center];
 
+        // For the edges and center, some additional setup is required
+        this.edges.top.dragAlong(this.corners.topLeft, this.corners.topRight);
+        this.edges.left.dragAlong(this.corners.topLeft, this.corners.bottomLeft);
+        this.edges.right.dragAlong(this.corners.topRight, this.corners.bottomRight);
+        this.edges.bottom.dragAlong(this.corners.bottomLeft, this.corners.bottomRight);
+
+        this.center.dragAlong(...this.members.filter(a => a != this.center));
+
+        console.log(this.center.dragAlongMembers)
+
+    }
+
+
+
+    private updateEdgesBetweenAllCorners() {
+        this.edges.top.reposition(this.corners.topLeft, this.corners.topRight);
+        this.edges.left.reposition(this.corners.topLeft, this.corners.bottomLeft);
+        this.edges.right.reposition(this.corners.topRight, this.corners.bottomRight);
+        this.edges.bottom.reposition(this.corners.bottomLeft, this.corners.bottomRight);
+
+        this.center.reposition(this.corners.topLeft, this.corners.topRight, this.corners.bottomLeft, this.corners.bottomRight);
     }
 
 
@@ -84,65 +106,9 @@ export default class SnapRegion {
 
 
         // If any members are being dragged, handle their effect on other members
+        // Address members with a shorter name, for ease of reading
+        this.updateEdgesBetweenAllCorners();
 
-
-        // Update the position of all nine members, to ensure an updated grid
-        // when the user is dragging one of the members
-        // this.corners.topLeft.reposition(this.edges.left, this.corners.bottomLeft);
-        // this.corners.bottomLeft.reposition(this.edges.bottom, this.corners.bottomRight);
-
-        // this.edges.top.reposition(this.corners.topLeft, this.corners.topRight);
-        // this.edges.left.reposition(this.corners.topLeft, this.corners.bottomLeft);
-        // this.edges.right.reposition(this.corners.topRight, this.corners.bottomRight);
-        // this.edges.bottom.reposition(this.corners.bottomLeft, this.corners.bottomRight);
-
-        // this.center.reposition(this.corners.topLeft, this.corners.topRight, this.corners.bottomRight, this.corners.bottomLeft);
-
-        if (this.corners.topLeft.isDragged) {
-            this.center.reposition(this.corners.topLeft, this.corners.topRight, this.corners.bottomRight, this.corners.bottomLeft);
-            this.edges.top.reposition(this.corners.topLeft, this.corners.topRight);
-            this.edges.left.reposition(this.corners.topLeft, this.corners.bottomLeft);
-        }
-
-        else if (this.corners.topRight.isDragged) {
-            this.center.reposition(this.corners.topLeft, this.corners.topRight, this.corners.bottomRight, this.corners.bottomLeft);
-            this.edges.top.reposition(this.corners.topLeft, this.corners.topRight);
-            this.edges.right.reposition(this.corners.topRight, this.corners.bottomRight);
-        }
-
-        else if (this.corners.bottomLeft.isDragged) {
-            this.center.reposition(this.corners.topLeft, this.corners.topRight, this.corners.bottomRight, this.corners.bottomLeft);
-            this.edges.bottom.reposition(this.corners.bottomLeft, this.corners.bottomRight);
-            this.edges.left.reposition(this.corners.topLeft, this.corners.bottomLeft);
-        }
-
-        else if (this.corners.bottomRight.isDragged) {
-            this.center.reposition(this.corners.topLeft, this.corners.topRight, this.corners.bottomRight, this.corners.bottomLeft);
-            this.edges.bottom.reposition(this.corners.bottomLeft, this.corners.bottomRight);
-            this.edges.right.reposition(this.corners.topRight, this.corners.bottomRight);
-        }
-
-        else if (this.edges.top.isDragged) {
-            this.center.repositionWithEdges(this.edges.top, this.edges.bottom);
-            this.corners.topLeft.reposition(this.center, this.corners.bottomRight);
-            this.corners.topRight.reposition(this.center, this.corners.bottomLeft);
-        }
-
-        // else if (this.edges.left.isDragged) {
-
-        // }
-
-        // else if (this.edges.right.isDragged) {
-
-        // }
-
-        // else if (this.edges.bottom.isDragged) {
-
-        // }
-
-        // else if (this.center.isDragged) {
-
-        // }
 
     }
 

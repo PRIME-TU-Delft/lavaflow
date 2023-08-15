@@ -14,6 +14,9 @@ export default class SnapMember {
     // On Drag callback
     dragCallback: (p5: p5, id: string) => void;
 
+    // Other members that should be dragged along with this member
+    dragAlongMembers: SnapMember[];
+
     // State trackers
     isDragged: boolean;
 
@@ -31,8 +34,19 @@ export default class SnapMember {
             this.dragCallback = () => { return };
         }
 
+        // By default, members don't drag along any neighbours
+        this.dragAlongMembers = [];
+
         this.isDragged = false;
 
+    }
+
+    /**
+     * Method: attach another member to drag along with this one.
+     * @param other - Member to drag along
+     */
+    dragAlong(...others: SnapMember[]) {
+        this.dragAlongMembers.push(...others);
     }
 
     /**
@@ -98,6 +112,11 @@ export default class SnapMember {
         // Check if the press was inside the container of this member
         if (this.mousePressIsWithinContainer(p5)) {
             this.isDragged = true;
+
+            for (const member of this.dragAlongMembers) {
+                member.dPos.x = member.pos.x - this.pos.x;
+                member.dPos.y = member.pos.y - this.pos.y;
+            }
         }
 
     }
@@ -117,6 +136,12 @@ export default class SnapMember {
                 this.pos.x = p5.mouseX;
                 this.pos.y = p5.mouseY;
                 this.dragCallback(p5, this.id);
+
+                // Drag along any members
+                for (const member of this.dragAlongMembers) {
+                    member.pos.x = this.pos.x + member.dPos.x;
+                    member.pos.y = this.pos.y + member.dPos.y;
+                }
             }
         }
 
