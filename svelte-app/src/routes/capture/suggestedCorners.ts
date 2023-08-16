@@ -1,6 +1,6 @@
 import * as gm from 'gammacv';
 
-type Vector2D = { x: number, y: number };
+export type Vector2D = { x: number, y: number };
 export type Corners = { topLeft: Vector2D, topRight: Vector2D, bottomLeft: Vector2D, bottomRight: Vector2D }
 type DefualtCorners = { defaultTopLeft: Vector2D, defaultTopRight: Vector2D, defaultBottomLeft: Vector2D, defaultBottomRight: Vector2D }
 

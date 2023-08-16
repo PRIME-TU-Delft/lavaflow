@@ -27,7 +27,7 @@ export async function videoToTensor(videoSource: HTMLVideoElement | undefined, c
     const input = await gm.imageTensorFromURL(imageUrl, 'uint8', [height, width, 4], true); // convert image to tensor
 
     if (!input) throw new Error('Could not get input tensor');
-    return input
+    return { input, imageUrl };
 }
 
 /**

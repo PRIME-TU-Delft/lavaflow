@@ -9,8 +9,12 @@
 	import CaptureMenu from './CaptureMenu.svelte';
 	import { handleCapture, videoToTensor } from './handleCapture';
 	import { drawingInstructions, scanningInstructions } from './instructions';
+	import imageStore from '$lib/stores/imageStore';
+	import { goto } from '$app/navigation';
 
 	let deviceId: string; // camera id
+	let deviceName: string; // camera name
+
 	let width: number;
 	let height: number;
 	let loadingNextPage = false;
@@ -21,8 +25,9 @@
 	/**
 	 * Change the camera id
 	 */
-	function setCameraId(label: any): any {
-		throw new Error('Function not implemented.');
+	function setCameraId(device: MediaDeviceInfo): void {
+		deviceId = device.deviceId;
+		deviceName = device.label;
 	}
 
 	/**
@@ -33,15 +38,23 @@
 	 */
 	async function capture(videoSource: HTMLVideoElement | undefined) {
 		try {
+			loadingNextPage = true;
 			// 1. Get image url from video
-			const input = await videoToTensor(videoSource, outputCanvas);
+			const { input, imageUrl } = await videoToTensor(videoSource, outputCanvas);
 
+			// 2. Extract corners from image
 			const corners = handleCapture(input, gmSession, outputCanvas);
 
-			// TODO: send corners to backend
+			// 3. Set to image store
+			imageStore.set({ imageUrl, corners, imagePerpotions: { width, height } });
+
+			// 4. Redirect to next page
+			goto('./crop');
+			loadingNextPage = false;
 		} catch (error) {
 			// TODO: proper error handling
 			console.error(error);
+			loadingNextPage = false;
 		}
 	}
 
@@ -65,10 +78,16 @@
 		<Menubar back="./" title="Capture">
 			<!-- If more than one camera are available, display a dropdown to allow the user to choose -->
 			{#if cameraOptions.length > 1}
-				<Dropdown items={cameraOptions} title={deviceId || 'Select other camera'} let:item={camera}>
-					<li>
-						<button on:click={() => setCameraId(camera.label)}>{camera.label}<button /></button>
-					</li>
+				<Dropdown
+					items={cameraOptions}
+					title={deviceName || 'Select other camera'}
+					let:item={camera}
+				>
+					{#if camera.deviceId != deviceId}
+						<li>
+							<button on:click={() => setCameraId(camera)}>{camera.label}</button>
+						</li>
+					{/if}
 				</Dropdown>
 			{/if}
 		</Menubar>
