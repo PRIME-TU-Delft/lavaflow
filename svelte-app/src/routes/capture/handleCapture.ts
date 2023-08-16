@@ -1,36 +1,42 @@
 import * as gm from 'gammacv';
 import getPipeline from './pipeline';
-import getSuggestedCorners from './suggestedCorners';
+import { suggestedCorners } from './suggestedCorners';
 
-function videoToImageUrl(videoSource: HTMLVideoElement, canvas: HTMLCanvasElement, width: number, height: number) {
+export { type Corners, defualtCorners } from './suggestedCorners';
+
+/**
+ * Convert video feed to tensor (via a capture of a video frame in a canvas)
+ * @param videoSource - HTMLVideoElement
+ * @param canvas - HTMLCanvasElement
+ * @param width - width of the video
+ * @param height - height of the video
+ * @returns 
+ */
+export async function videoToTensor(videoSource: HTMLVideoElement | undefined, canvas: HTMLCanvasElement) {
+    if (!videoSource) throw new Error('Video source is undefined');
+    const width = videoSource.videoWidth;
+    const height = videoSource.videoHeight;
+
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext('2d');
-    if (!context) return;
+    if (!context) throw new Error('Could not get canvas context');
 
-    context.drawImage(videoSource, 0, 0, width, height);
+    context.drawImage(videoSource, 0, 0, width, height); // draw video frame to canvas
+    const imageUrl = canvas.toDataURL('image/png'); // convert canvas to image
+    const input = await gm.imageTensorFromURL(imageUrl, 'uint8', [height, width, 4], true); // convert image to tensor
 
-    return canvas.toDataURL('image/png');
+    if (!input) throw new Error('Could not get input tensor');
+    return input
 }
 
 /**
  * Exposed function to handle capture of a video frame and process it with GammaCV.
- * 
- * @param videoSource HTMLVideoElement - used to get image url from video
- * @param canvas HTMLCanvasElement - used to get image url from video
+ * @param input gm.Tensor - input tensor
  * @param width number - width of the window
  * @param height number - height of the window
  */
-export default async function handleCapture(videoSource: HTMLVideoElement | undefined, canvas: HTMLCanvasElement, width: number, height: number, gmSession: gm.Session) {
-    if (!videoSource) throw new Error('Video source is undefined');
-
-    // 1. Get image url from video
-    const imageUrl = videoToImageUrl(videoSource, canvas, width, height)
-    if (!imageUrl) throw new Error('Could not get image url from video');
-
-    // 2. Get image tensor from url
-    const input = await gm.imageTensorFromURL(imageUrl, 'uint8', [height, width, 4], true);
-
+export function handleCapture(input: gm.Tensor, gmSession: gm.Session, debugCanvas?: HTMLCanvasElement) {
     // 3. Define pipeline, initialize pipeline, allocate output tensor
     const pipeline = getPipeline(input); // Define pipeline
     gmSession.init(pipeline); // initialize pipeline
@@ -40,7 +46,7 @@ export default async function handleCapture(videoSource: HTMLVideoElement | unde
     // 4. run pipeline
     gmSession.runOp(pipeline, 0, output);
 
-    return getSuggestedCorners();
+    return suggestedCorners(input, output, debugCanvas);
 }
 
 

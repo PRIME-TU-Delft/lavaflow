@@ -7,6 +7,7 @@ import SnapCorner from "./SnapCorner"
 import SnapEdge from "./SnapEdge";
 import SnapCenter from "./SnapCenter";
 import type SnapMember from './SnapMember';
+import type { Corners } from '../../../capture/suggestedCorners';
 
 
 export default class SnapRegion {
@@ -31,14 +32,19 @@ export default class SnapRegion {
     // Group all SnapMembers in an array for easy operation
     members: SnapMember[];
 
-    constructor(p5: p5, width: number, height: number) {
+    constructor(p5: p5, width: number, height: number, suggestedCorners?: Corners) {
+
+        const topLeftCorner = suggestedCorners?.topLeft || { x: width / 4, y: height / 4 };
+        const topRightCorner = suggestedCorners?.topRight || { x: (width / 4) * 3, y: height / 4 };
+        const bottomRightCorner = suggestedCorners?.bottomRight || { x: (width / 4) * 3, y: (height / 4) * 3 };
+        const bottomLeftCorner = suggestedCorners?.bottomLeft || { x: width / 4, y: (height / 4) * 3 };
 
         // Initialise all the members
         this.corners = {
-            topLeft: new SnapCorner(p5, "topLeft", width / 4, height / 4),
-            topRight: new SnapCorner(p5, "topRight", (width / 4) * 3, height / 4),
-            bottomRight: new SnapCorner(p5, "bottomRight", (width / 4) * 3, (height / 4) * 3),
-            bottomLeft: new SnapCorner(p5, "bottomLeft", width / 4, (height / 4) * 3)
+            topLeft: new SnapCorner(p5, "topLeft", topLeftCorner),
+            topRight: new SnapCorner(p5, "topRight", topRightCorner),
+            bottomRight: new SnapCorner(p5, "bottomRight", bottomRightCorner),
+            bottomLeft: new SnapCorner(p5, "bottomLeft", bottomLeftCorner)
         };
 
         this.edges = {

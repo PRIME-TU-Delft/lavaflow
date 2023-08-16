@@ -9,9 +9,9 @@ import type SnapCenter from './SnapCenter';
 
 export default class SnapCorner extends SnapMember {
 
-    constructor(p5: p5, id: string, x: number, y: number) {
+    constructor(p5: p5, id: string, vec: { x: number, y: number }) {
 
-        super(p5, id, x, y);
+        super(p5, id, vec.x, vec.y);
 
     }
 

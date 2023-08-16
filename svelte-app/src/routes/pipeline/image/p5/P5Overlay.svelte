@@ -2,9 +2,12 @@
 	import P5 from '$lib/components/p5/P5.svelte';
 	import type p5 from 'p5';
 	import SnapRegion from './SnapRegion';
+	import type { Corners } from '../../../capture/suggestedCorners';
 
 	export let width: number = 100;
 	export let height: number = 100;
+	export let suggestedCorners: Corners;
+
 	let oldWidth: number = 100;
 	let oldHeight: number = 100;
 
@@ -21,7 +24,7 @@
 			p5Canvas.id('p5-overlay');
 			p5.pixelDensity(p5.displayDensity());
 
-			snapRegion = new SnapRegion(p5, width, height);
+			snapRegion = new SnapRegion(p5, width, height, suggestedCorners);
 
 			oldWidth = width;
 			oldHeight = height;
@@ -67,4 +70,6 @@
 	}
 </script>
 
-<P5 {sketch} />
+{#key suggestedCorners}
+	<P5 {sketch} />
+{/key}

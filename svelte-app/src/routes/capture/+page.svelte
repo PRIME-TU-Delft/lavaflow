@@ -1,22 +1,19 @@
 <script lang="ts">
-	import Instructions from '$lib/components/Instructions.svelte';
-	import Video from '$lib/components/Video.svelte';
-	import Menubar from '$lib/components/Menubar.svelte';
-	import Dropdown from '$lib/components/Dropdown.svelte';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
-	import CaptureMenu from './CaptureMenu.svelte';
-	import { drawingInstructions, scanningInstructions } from './instructions';
-	import { onMount } from 'svelte';
-	import { PARAMS, calculateIntersectionPoints } from './line_intersections';
-	import handleCapture from './handleCapture';
+	import Dropdown from '$lib/components/Dropdown.svelte';
+	import Instructions from '$lib/components/Instructions.svelte';
+	import Menubar from '$lib/components/Menubar.svelte';
+	import Video from '$lib/components/Video.svelte';
 	import * as gm from 'gammacv';
+	import { onMount } from 'svelte';
+	import CaptureMenu from './CaptureMenu.svelte';
+	import { handleCapture, videoToTensor } from './handleCapture';
+	import { drawingInstructions, scanningInstructions } from './instructions';
 
 	let deviceId: string; // camera id
 	let width: number;
 	let height: number;
 	let loadingNextPage = false;
-
-	let tickLoop: number;
 
 	let outputCanvas: HTMLCanvasElement;
 	let gmSession: gm.Session; // GammaCV session
@@ -34,9 +31,14 @@
 	 * Otherwise, an error is displayed
 	 * @param videoSource
 	 */
-	function capture(videoSource: HTMLVideoElement | undefined) {
+	async function capture(videoSource: HTMLVideoElement | undefined) {
 		try {
-			handleCapture(videoSource, outputCanvas, width, height, gmSession);
+			// 1. Get image url from video
+			const input = await videoToTensor(videoSource, outputCanvas);
+
+			const corners = handleCapture(input, gmSession, outputCanvas);
+
+			// TODO: send corners to backend
 		} catch (error) {
 			// TODO: proper error handling
 			console.error(error);
