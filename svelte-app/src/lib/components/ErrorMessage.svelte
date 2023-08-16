@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type LavaError from '$lib/data/LavaError';
 	import { mdiClose } from '@mdi/js';
-	import { Button, ButtonGroup } from 'flowbite-svelte';
 	import { Icon } from 'mdi-svelte-ts';
 	import { createEventDispatcher } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import Button from './Button.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -22,7 +22,7 @@
 		<p class="w-auto overflow-hidden text-ellipsis whitespace-nowrap font-bold text-red-900">
 			{error.title}
 		</p>
-		<Button outline class="!p-2" color="red" on:click={dismiss}>
+		<Button outline twClass="!p-2" on:click={dismiss}>
 			<Icon path={mdiClose} />
 		</Button>
 	</div>
@@ -30,8 +30,8 @@
 	<p class="mt-1 text-red-800">{error.message}</p>
 
 	{#if hasActions}
-		<ButtonGroup class="mt-4 w-full">
+		<div class="mt-4 w-full join">
 			<slot />
-		</ButtonGroup>
+		</div>
 	{/if}
 </div>
