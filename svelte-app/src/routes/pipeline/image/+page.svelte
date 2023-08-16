@@ -138,8 +138,10 @@
 			for (let i = 0; i < points.length; i++) {
 				if (points[i][3] == false) continue;
 
-				for (let j = 0; j < points.length; j++) {
+				for (let j = i; j < points.length; j++) {
 					if (i == j) continue;
+
+					if (points[j][3] == false) continue;
 
 					// If these points lie closely enough together and are not part of another cluster thusfar
 					// Merge them and add them to the new generation
@@ -167,6 +169,8 @@
 			}
 
 			points = pointsNextGen;
+
+			console.log(points.length);
 		} while (numberOfMerges > 0);
 
 		// Choose the four points with the largest base

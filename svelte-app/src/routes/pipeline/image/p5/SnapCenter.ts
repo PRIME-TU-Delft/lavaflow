@@ -31,7 +31,7 @@ export default class SnapCenter extends SnapMember {
             p5.fill(250, 100);
         }
 
-        p5.ellipse(this.pos.x, this.pos.y, 20, 20);
+        p5.ellipse(this.pos.x, this.pos.y, 30, 30);
 
     }
 

@@ -23,6 +23,7 @@ export default class SnapEdge extends SnapMember {
 
 
     public override draw(p5: p5): void {
+        const CORNER_RADIUS = 10;
 
         // Declare variable to keep track of rotation angle
         let angle = 0;
@@ -53,7 +54,7 @@ export default class SnapEdge extends SnapMember {
         p5.rotate(angle);
 
         p5.rectMode(p5.CENTER);
-        p5.rect(0, 0, 50, 10);
+        p5.rect(0, 0, 60, 20, CORNER_RADIUS, CORNER_RADIUS, CORNER_RADIUS, CORNER_RADIUS);
 
         p5.rotate(-angle);
         p5.translate(-this.pos.x, -this.pos.y);
@@ -66,7 +67,7 @@ export default class SnapEdge extends SnapMember {
         const dy = p5.mouseY - this.pos.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        return dist < 50;
+        return dist < 70;
     }
 
 

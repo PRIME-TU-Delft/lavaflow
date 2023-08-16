@@ -116,8 +116,16 @@ export default class SnapRegion {
      */
     mousePressed(p5: p5) {
         // Simply pass on the message to the members
-        for (const member of this.members) {
-            member.mousePressed(p5);
+        for (const member of Object.values(this.corners)) {
+            if (member.mousePressed(p5)) {
+                return;
+            }
+        }
+
+        for (const member of [...Object.values(this.edges), this.center]) {
+            if (member.mousePressed(p5)) {
+                return;
+            }
         }
     }
 
@@ -141,6 +149,18 @@ export default class SnapRegion {
         for (const member of this.members) {
             member.mouseReleased(p5);
         }
+    }
+
+    /**
+     * p5 method: resize
+     * @param p5 - p5 instance
+     */
+    resize(p5: p5, oldWidth: number, oldHeight: number) {
+
+        for (const member of Object.values(this.corners)) {
+            member.resize(p5, oldWidth, oldHeight);
+        }
+
     }
 
 

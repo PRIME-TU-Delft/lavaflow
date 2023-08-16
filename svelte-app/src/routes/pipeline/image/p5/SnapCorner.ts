@@ -31,7 +31,7 @@ export default class SnapCorner extends SnapMember {
             p5.fill(250);
         }
 
-        p5.ellipse(this.pos.x, this.pos.y, 10, 10);
+        p5.ellipse(this.pos.x, this.pos.y, 20, 20);
 
     }
 
@@ -41,6 +41,17 @@ export default class SnapCorner extends SnapMember {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         return dist < 50;
+    }
+
+    /**
+     * p5 method: resize
+     * @param p5 - p5 instance
+     */
+    resize(p5: p5, oldWidth: number, oldHeight: number) {
+
+        this.pos.x = (this.pos.x / oldWidth) * p5.width;
+        this.pos.y = (this.pos.y / oldHeight) * p5.height;
+
     }
 
 

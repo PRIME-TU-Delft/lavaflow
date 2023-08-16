@@ -108,7 +108,7 @@ export default class SnapMember {
      * p5 method: mousePressed
      * @param p5 - p5 instance
      */
-    public mousePressed(p5: p5): void {
+    public mousePressed(p5: p5): boolean {
 
         // Check if the press was inside the container of this member
         if (this.mousePressIsWithinContainer(p5)) {
@@ -118,7 +118,13 @@ export default class SnapMember {
                 member.dPos.x = member.pos.x - this.pos.x;
                 member.dPos.y = member.pos.y - this.pos.y;
             }
+
+            // Return true, indicating that this member was selected
+            return true;
         }
+
+        // Return false, indicating that this member wasn't selected
+        return false;
 
     }
 
@@ -131,11 +137,29 @@ export default class SnapMember {
         if (this.isDragged) {
             // This member was clicked and dragged, call the activator
             if (this.onDrag(p5)) {
+
+                let mx = p5.mouseX;
+                let my = p5.mouseY;
+
+                // If the mouse is outside the canvas, reset it to the edge
+                if (mx <= 20) {
+                    mx = 20;
+                } else if (mx >= p5.width - 20) {
+                    mx = p5.width - 20;
+                }
+
+                if (my <= 20) {
+                    my = 20;
+                } else if (my >= p5.height - 20) {
+                    my = p5.height - 20;
+                }
+
                 // If the function returns true, perform the default actions:
-                this.dPos.x = p5.mouseX - this.pos.x;
-                this.dPos.y = p5.mouseY - this.pos.y;
-                this.pos.x = p5.mouseX;
-                this.pos.y = p5.mouseY;
+                this.dPos.x = mx - this.pos.x;
+                this.dPos.y = my - this.pos.y;
+                this.pos.x = mx;
+                this.pos.y = my;
+
                 this.dragCallback(p5, this.id);
 
                 // Drag along any members

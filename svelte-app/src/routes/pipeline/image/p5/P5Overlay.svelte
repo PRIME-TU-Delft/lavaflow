@@ -5,6 +5,8 @@
 
 	export let width: number = 100;
 	export let height: number = 100;
+	let oldWidth: number = 100;
+	let oldHeight: number = 100;
 
 	let p5Canvas: p5.Renderer;
 	let snapRegion: SnapRegion;
@@ -20,6 +22,9 @@
 			p5.pixelDensity(p5.displayDensity());
 
 			snapRegion = new SnapRegion(p5, width, height);
+
+			oldWidth = width;
+			oldHeight = height;
 		};
 
 		// Draw
@@ -33,21 +38,31 @@
 			snapRegion.mousePressed(p5);
 
 			// Prevent default behaviour
-			return false;
+			return true;
 		};
 
 		p5.mouseDragged = () => {
 			snapRegion.mouseDragged(p5);
 
 			// Prevent default behaviour.
-			return false;
+			return true;
 		};
 
 		p5.mouseReleased = () => {
 			snapRegion.mouseReleased(p5);
 
 			// Prevent default behaviour.
-			return false;
+			return true;
+		};
+
+		p5.windowResized = () => {
+			p5.resizeCanvas(width, height);
+			p5.pixelDensity(p5.displayDensity());
+
+			snapRegion.resize(p5, oldWidth, oldHeight);
+
+			oldWidth = width;
+			oldHeight = height;
 		};
 	}
 </script>
