@@ -14,7 +14,7 @@ import type { Corners } from '../../routes/capture/suggestedCorners';
 // data is used in all subsequent pages.
 type CapturedImage = {
     imageUrl: string,
-    imagePerpotions: { width: number, height: number },
+    imageProportions: { width: number, height: number },
     corners: Corners
 }
 

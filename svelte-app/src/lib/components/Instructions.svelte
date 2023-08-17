@@ -10,7 +10,7 @@
 	interface Instruction {
 		title: string;
 		description: string;
-		imagepath: string[];
+		imagepath?: string[];
 	}
 
 	function closeNextTime() {
@@ -50,15 +50,17 @@
 								<p>{instruction.description}</p>
 							</div>
 
-							{#each instruction.imagepath as src, index}
-								<figure class="bg-white m-0">
-									<img
-										class="h-80 w-full object-contain"
-										{src}
-										alt="instructional image for {instruction.title} {index}"
-									/>
-								</figure>
-							{/each}
+							{#if instruction?.imagepath}
+								{#each instruction.imagepath as src, index}
+									<figure class="bg-white m-0">
+										<img
+											class="h-80 w-full object-contain"
+											{src}
+											alt="instructional image for {instruction.title} {index}"
+										/>
+									</figure>
+								{/each}
+							{/if}
 						</div>
 					{/each}
 				</div>

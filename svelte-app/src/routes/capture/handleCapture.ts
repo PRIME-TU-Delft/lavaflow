@@ -12,10 +12,8 @@ export { type Corners, defualtCorners } from './suggestedCorners';
  * @param height - height of the video
  * @returns 
  */
-export async function videoToTensor(videoSource: HTMLVideoElement | undefined, canvas: HTMLCanvasElement) {
+export async function videoToTensor(videoSource: HTMLVideoElement | undefined, canvas: HTMLCanvasElement, width: number, height: number) {
     if (!videoSource) throw new Error('Video source is undefined');
-    const width = videoSource.videoWidth;
-    const height = videoSource.videoHeight;
 
     canvas.width = width;
     canvas.height = height;

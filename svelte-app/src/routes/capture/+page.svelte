@@ -40,13 +40,13 @@
 		try {
 			loadingNextPage = true;
 			// 1. Get image url from video
-			const { input, imageUrl } = await videoToTensor(videoSource, outputCanvas);
+			const { input, imageUrl } = await videoToTensor(videoSource, outputCanvas, width, height);
 
 			// 2. Extract corners from image
-			const corners = handleCapture(input, gmSession, outputCanvas);
+			const corners = handleCapture(input, gmSession);
 
 			// 3. Set to image store
-			imageStore.set({ imageUrl, corners, imagePerpotions: { width, height } });
+			imageStore.set({ imageUrl, corners, imageProportions: { width, height } });
 
 			// 4. Redirect to next page
 			goto('./crop');
