@@ -12,7 +12,7 @@ import type { Corners } from '../../routes/capture/suggestedCorners';
 // This store has place for the image that the user capture, as well as the four corner-coordinates
 // that were calculated by the edge-detection algorithm. This store is filled in 'capture' and its
 // data is used in all subsequent pages.
-type CapturedImage = {
+export type CapturedImage = {
     imageUrl: string,
     imageProportions: { width: number, height: number },
     corners: Corners

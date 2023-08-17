@@ -93,9 +93,18 @@ export default class SnapRegion {
         p5.fill(229, 112, 89, 50);
 
         p5.beginShape();
-        for (const corner of Object.values(this.corners)) {
+
+        p5.vertex(0, 0);
+        p5.vertex(p5.width, 0);
+        p5.vertex(p5.width, p5.height);
+        p5.vertex(0, p5.height);
+
+        p5.beginContour();
+        for (const corner of Object.values(this.corners).reverse()) {
             p5.vertex(corner.pos.x, corner.pos.y);
         }
+        p5.endContour();
+
         p5.endShape(p5.CLOSE);
 
         // Draw all the members

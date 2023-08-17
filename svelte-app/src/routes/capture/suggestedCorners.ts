@@ -188,8 +188,8 @@ export function defualtCorners(input: gm.Tensor): DefualtCorners {
     const canvasHeight = input.shape[0];
 
     // Start by introducing a default marker in each corner
-    let defaultBorderOffsetX = canvasWidth / 4;
-    let defaultBorderOffsetY = canvasHeight / 4;
+    let defaultBorderOffsetX = canvasWidth / 8;
+    let defaultBorderOffsetY = canvasHeight / 8;
 
     let defaultTopLeft = { x: defaultBorderOffsetX, y: defaultBorderOffsetY };
     let defaultTopRight = { x: canvasWidth - defaultBorderOffsetX, y: defaultBorderOffsetY };
@@ -209,7 +209,7 @@ function getCorners(input: gm.Tensor, intersections: Vector2D[], debugCanvas?: H
     // Find the marker closest to the top-left corner from all found intersections and the defaults
     let topLeft = minimize(
         (x: number, y: number) => {
-            return x * y;
+            return (canvasWidth / 2 - x) * (canvasHeight / 2 - y);
         },
         [...intersections, ...defaultValues],
         // Pose an additional requirement that the marker has to be in the top left quadrant
@@ -222,7 +222,7 @@ function getCorners(input: gm.Tensor, intersections: Vector2D[], debugCanvas?: H
     // exclude the marker we just assigned top-left!
     let topRight = minimize(
         (x: number, y: number) => {
-            return (1 / x) * y;
+            return (x - canvasWidth / 2) * (canvasHeight / 2 - y);
         },
         [...intersections, ...defaultValues].filter((a) => a != topLeft),
         // Pose an additional requirement that the marker has to be in the top right quadrant
@@ -235,7 +235,7 @@ function getCorners(input: gm.Tensor, intersections: Vector2D[], debugCanvas?: H
     // exclude any markers we just assigned!
     let bottomLeft = minimize(
         (x: number, y: number) => {
-            return (x * 1) / y;
+            return (canvasWidth / 2 - x) * (y - canvasHeight / 2);
         },
         [...intersections, ...defaultValues].filter((a) => a != topLeft && a != topRight),
         // Pose an additional requirement that the marker has to be in the top left quadrant
@@ -248,7 +248,7 @@ function getCorners(input: gm.Tensor, intersections: Vector2D[], debugCanvas?: H
     // exclude any markers we just assigned!
     let bottomRight = minimize(
         (x: number, y: number) => {
-            return ((1 / x) * 1) / y;
+            return (x - canvasWidth / 2) * (y - canvasHeight / 2);
         },
         [...intersections, ...defaultValues].filter(
             (a) => a != topLeft && a != topRight && a != bottomLeft
