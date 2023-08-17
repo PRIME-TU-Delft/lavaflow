@@ -54,7 +54,7 @@
 	}}
 >
 	<!-- P5 Overlay -->
-	<div class="absolute left-0 top-0 z-10 no-touch">
+	<div class="absolute left-0 top-0 z-10 no-touch select-none">
 		{#if $imageStore?.corners}
 			{@const { width, height } = $imageStore.imageProportions}
 			<P5Overlay {width} {height} bind:suggestedCorners={$imageStore.corners} />
