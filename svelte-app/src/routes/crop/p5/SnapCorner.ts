@@ -35,6 +35,10 @@ export default class SnapCorner extends SnapMember {
 
     }
 
+    toVector(): { x: number, y: number } {
+        return { x: this.pos.x, y: this.pos.y };
+    }
+
     protected override mousePressIsWithinContainer(p5: p5): boolean {
         const dx = p5.mouseX - this.pos.x;
         const dy = p5.mouseY - this.pos.y;

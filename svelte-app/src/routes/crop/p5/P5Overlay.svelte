@@ -14,6 +14,17 @@
 	let p5Canvas: p5.Renderer;
 	let snapRegion: SnapRegion;
 
+	/**
+	 * Updates the suggested corners in the store.
+	 */
+	function updateSuggestedCorners() {
+		const corners = snapRegion.corners;
+		suggestedCorners.topLeft = corners.topLeft.toVector();
+		suggestedCorners.topRight = corners.topRight.toVector();
+		suggestedCorners.bottomLeft = corners.bottomLeft.toVector();
+		suggestedCorners.bottomRight = corners.bottomRight.toVector();
+	}
+
 	function sketch(p5: p5) {
 		// Preload
 		p5.preload = () => {};
@@ -54,6 +65,8 @@
 		p5.mouseReleased = () => {
 			snapRegion.mouseReleased(p5);
 
+			updateSuggestedCorners();
+
 			// Prevent default behaviour.
 			return true;
 		};
@@ -63,6 +76,7 @@
 			p5.pixelDensity(p5.displayDensity());
 
 			snapRegion.resize(p5, oldWidth, oldHeight);
+			updateSuggestedCorners();
 
 			oldWidth = width;
 			oldHeight = height;
@@ -70,6 +84,4 @@
 	}
 </script>
 
-{#key suggestedCorners}
-	<P5 {sketch} />
-{/key}
+<P5 {sketch} />

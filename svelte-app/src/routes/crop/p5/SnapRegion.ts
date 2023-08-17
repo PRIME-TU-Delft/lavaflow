@@ -7,7 +7,7 @@ import SnapCorner from "./SnapCorner"
 import SnapEdge from "./SnapEdge";
 import SnapCenter from "./SnapCenter";
 import type SnapMember from './SnapMember';
-import type { Corners } from '../../../capture/suggestedCorners';
+import type { Corners } from '../../capture/suggestedCorners';
 
 
 export default class SnapRegion {
