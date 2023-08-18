@@ -10,8 +10,9 @@
 	import * as gm from 'gammacv';
 	import { Icon } from 'mdi-svelte-ts';
 	import { onMount } from 'svelte';
-	import { extractSelectedArea } from './extractSelectedArea';
+	import { extractSelectedArea } from './gamma-cv/extractSelectedArea';
 	import { dragInstructions, posErrorInstructions } from './instructions';
+	import { imageToContoursGammaCV } from './open-cv/imageToContours';
 	import P5Overlay from './p5/P5Overlay.svelte';
 
 	let width: number; // Width of the window
@@ -21,20 +22,24 @@
 
 	async function handleCrop() {
 		// 1. Transform image with corners
-		const transformedCanvas = await extractSelectedArea($imageStore, gmSession);
+		const perspectiveRemovedTensor = await extractSelectedArea($imageStore, gmSession);
 
-		transformedCanvas.classList.add('w-full', 'h-full', 'absolute', 'left-0', 'top-0', 'z-10');
-
-		// 1.5. Show preview of transformed image
-		document.body.appendChild(transformedCanvas);
-
-		transformedCanvas.onclick = () => {
-			transformedCanvas.remove();
+		// 2.5. Show preview of transformed image
+		perspectiveRemovedTensor.classList.add('w-64', 'h-64', 'absolute', 'right-4', 'top-20', 'z-10');
+		document.body.appendChild(perspectiveRemovedTensor);
+		perspectiveRemovedTensor.onclick = () => {
+			perspectiveRemovedTensor.remove();
 		};
 
-		// 2. Extract contours from image
-		// 3. Save to store
+		// 3. Extract contours from image and save them to the store
+		const opencvError = imageToContoursGammaCV(perspectiveRemovedTensor);
+		if (opencvError) return console.log(opencvError);
+		// TODO: handle error
+
 		// 4. Redirect to preview page
+		goto('./preview');
+
+		// perspectiveRemovedCanvas.remove();
 	}
 
 	onMount(() => {
