@@ -90,7 +90,7 @@ export default class SnapRegion {
 
         // Translucent material that covers the entire region
         p5.noStroke();
-        p5.fill(229, 112, 89, 50);
+        p5.fill(229, 112, 89, 100);
 
         p5.beginShape();
 
