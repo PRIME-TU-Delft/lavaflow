@@ -44,6 +44,7 @@
 		"@threlte/extras": "^5.0.1",
 		"aframe": "^1.4.2",
 		"gammacv": "^0.5.3",
+		"imagetracerjs": "^1.2.6",
 		"mdi-svelte-ts": "^1.0.0",
 		"opencv-ts": "^1.3.6",
 		"p5": "^1.7.0",

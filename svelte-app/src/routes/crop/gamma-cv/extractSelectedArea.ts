@@ -1,7 +1,7 @@
 import type { CapturedImage } from "$lib/stores/imageStore";
-import type { Corners } from "../../capture/suggestedCorners";
 import * as gm from 'gammacv';
-import { preProcessTensor } from "./preProcessCurves";
+import type { Corners } from "../../capture/suggestedCorners";
+import { applyBlackAndWhiteFilterGammaCV } from "./blackWhiteExtractions";
 
 /**
  * Turns a GammaCV Corners object into a Rect object.
@@ -89,11 +89,12 @@ export async function extractSelectedArea(
 
     // Apply the perspective transformation using the selected corner marker coords
     const sourceTensor = await gm.imageTensorFromURL(imageUrl, 'uint8', [height, width, 4]);
-    const resultTensor = removePerspectiveGammaCV(sourceTensor, corners, width, height, gmSession);
+    const perspectiveTensor = removePerspectiveGammaCV(sourceTensor, corners, width, height, gmSession);
+    const resultTensor = applyBlackAndWhiteFilterGammaCV(perspectiveTensor, gmSession);
 
-    const preProcessedTensor = preProcessTensor(resultTensor, canvas, gmSession);
+    // const preProcessedTensor = preProcessTensor(resultTensor, canvas, gmSession);
 
-    gm.canvasFromTensor(canvas, preProcessedTensor);
+    gm.canvasFromTensor(canvas, resultTensor);
 
     return canvas;
 }

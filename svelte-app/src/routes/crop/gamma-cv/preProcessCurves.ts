@@ -11,7 +11,7 @@ function BW_pipeline(input: gm.Tensor<gm.TensorDataView>) {
     // Gaussian Blur: remove sharp edges
     pipeline = gm.gaussianBlur(pipeline, 3, 1);
     // Make the lines a bit thinner so the result from opencv's getContours is better
-    pipeline = gm.threshold(pipeline, 0.3);
+    pipeline = gm.threshold(pipeline, 0.4);
 
     return pipeline;
 }

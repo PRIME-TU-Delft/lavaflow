@@ -22,17 +22,17 @@
 
 	async function handleCrop() {
 		// 1. Transform image with corners
-		const perspectiveRemovedTensor = await extractSelectedArea($imageStore, gmSession);
+		const perspectiveRemovedCanvas = await extractSelectedArea($imageStore, gmSession);
 
 		// 2.5. Show preview of transformed image
-		perspectiveRemovedTensor.classList.add('w-64', 'h-64', 'absolute', 'right-4', 'top-20', 'z-10');
-		document.body.appendChild(perspectiveRemovedTensor);
-		perspectiveRemovedTensor.onclick = () => {
-			perspectiveRemovedTensor.remove();
+		perspectiveRemovedCanvas.classList.add('w-64', 'h-64', 'absolute', 'right-4', 'top-20', 'z-10');
+		document.body.appendChild(perspectiveRemovedCanvas);
+		perspectiveRemovedCanvas.onclick = () => {
+			perspectiveRemovedCanvas.remove();
 		};
 
 		// 3. Extract contours from image and save them to the store
-		const opencvError = imageToContoursGammaCV(perspectiveRemovedTensor);
+		const opencvError = imageToContoursGammaCV(perspectiveRemovedCanvas);
 		if (opencvError) return console.log(opencvError);
 		// TODO: handle error
 
