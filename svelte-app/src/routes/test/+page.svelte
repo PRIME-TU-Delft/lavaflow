@@ -4,42 +4,14 @@
 	import image1 from './image.png';
 	import image2 from './image2.png';
 	import image3 from './image3.png';
-	import inverseKernel from './inverseKernel.glsl?raw';
-	import sharpenKernel from './sharpenKernel.glsl?raw';
-	import ImageTracer from 'imagetracerjs';
-
-	function inverse(previous: gm.InputType) {
-		const width = previous.shape[1];
-		const height = previous.shape[0];
-
-		return new gm.RegisterOperation('inverse')
-			.Input('tSrc', 'uint8')
-			.Output('uint8')
-			.SetShapeFn(() => [height, width, 4])
-			.LoadChunk('pickValue')
-			.GLSLKernel(inverseKernel)
-			.Compile({ tSrc: previous });
-	}
+	import { imageToContoursGammaCV } from '../crop/open-cv/imageToContours';
+	import { contourLines } from '$lib/stores/contourLineStore';
 
 	let images = {
 		'image1.png': image1,
 		'image2.png': image2,
 		'image3.png': image3
 	};
-
-	function sharpen(previous: gm.InputType, factor: number) {
-		const width = previous.shape[1];
-		const height = previous.shape[0];
-
-		return new gm.RegisterOperation('sharpen')
-			.Input('tSrc', 'uint8')
-			.Constant('SHARPEN_FACTOR', factor)
-			.Output('uint8')
-			.SetShapeFn(() => [height, width, 4])
-			.LoadChunk('pickValue')
-			.GLSLKernel(sharpenKernel)
-			.Compile({ tSrc: previous });
-	}
 
 	let image_name: keyof typeof images = 'image3.png';
 	let outputCanvas: HTMLCanvasElement;
@@ -51,14 +23,8 @@
 		// Normalization: add contrast, make colors seem deeper
 		let pipeline = gm.grayscale(input);
 		pipeline = gm.erode(pipeline, [10, 10]);
-
 		pipeline = gm.gaussianBlur(pipeline, 3, 1);
-		pipeline = gm.sobelOperator(pipeline);
-		pipeline = gm.cannyEdges(pipeline, 0.25, 0.75);
-		pipeline = gm.gaussianBlur(pipeline, 3, 3);
-		pipeline = inverse(pipeline);
-		pipeline = gm.gaussianBlur(pipeline, 3, 3);
-		pipeline = gm.threshold(pipeline, 0.9, 1);
+		pipeline = gm.threshold(pipeline, 0.75);
 
 		// pipeline = sharpen(pipeline, 32);
 
@@ -85,8 +51,16 @@
 		return outputTensor;
 	}
 
+	function imageToContours(outputCanvas: HTMLCanvasElement) {
+		console.log(outputCanvas.width);
+		const contourError = imageToContoursGammaCV(outputCanvas);
+		if (contourError) return console.log(contourError);
+
+		console.log('done', $contourLines);
+	}
+
 	onMount(async () => {
-		const sessions = new gm.Session();
+		const session = new gm.Session();
 
 		const input = await gm.imageTensorFromURL(
 			images[image_name as keyof typeof images],
@@ -95,13 +69,11 @@
 			true
 		);
 
-		ImageTracer.imageToSVG(images[image_name as keyof typeof images], (svgstr: string) => {
-			console.log(svgstr);
-		});
+		const resultTensor = preProcessTensor(input, outputCanvas, session);
 
-		const resultTensor = preProcessTensor(input, outputCanvas, new gm.Session());
+		await gm.canvasFromTensor(outputCanvas, resultTensor);
 
-		gm.canvasFromTensor(outputCanvas, resultTensor);
+		requestAnimationFrame(() => imageToContours(outputCanvas));
 	});
 </script>
 
