@@ -4,6 +4,9 @@
 
 import type p5 from 'p5';
 
+/**
+ * This class represents a member of the crop area. It is used to resize the crop area.
+ */
 export default class SnapMember {
 
     id: string;

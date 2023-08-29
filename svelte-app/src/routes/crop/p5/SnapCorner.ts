@@ -7,6 +7,9 @@ import SnapMember from './SnapMember';
 import type SnapEdge from './SnapEdge';
 import type SnapCenter from './SnapCenter';
 
+/**
+ * This class represents the corners of the crop area. It is used to resize the crop area.
+ */
 export default class SnapCorner extends SnapMember {
 
     constructor(p5: p5, id: string, vec: { x: number, y: number }) {

@@ -1,3 +1,4 @@
+// Kernel for inverting the colors of an image
 vec4 operation(float y, float x) {
   vec4 data = pickValue_tSrc(y, x);
 

@@ -3,9 +3,12 @@
  */
 
 import type p5 from 'p5';
-import SnapMember from './SnapMember';
 import type SnapCorner from './SnapCorner';
+import SnapMember from './SnapMember';
 
+/**
+ * This class represents the edges of the crop area. It is used to resize the crop area.
+ */
 export default class SnapEdge extends SnapMember {
 
     constructor(p5: p5, id: string, a: SnapCorner, b: SnapCorner) {

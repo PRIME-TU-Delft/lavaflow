@@ -2,7 +2,7 @@ import { contourLines } from '$lib/stores/contourLineStore';
 import { matCVToContourHierarchy, getCurvesFromContourHierarchy, detectCurvesFromCanvas } from './detectCurves';
 
 /**
- * Draws the provided curves on the provided canvas.
+ * Draws debug lines curves on the provided canvas.
  * @param canvas Debug canvas
  * @param curves Curves to draw
  */

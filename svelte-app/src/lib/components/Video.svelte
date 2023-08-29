@@ -26,7 +26,7 @@
 		try {
 			stream = await navigator.mediaDevices.getUserMedia({ video: constraints });
 
-			// TODO: set stream id to deviceId
+			deviceId = stream.getVideoTracks()[0].getSettings().deviceId || '';
 
 			loading = false;
 			error = '';
