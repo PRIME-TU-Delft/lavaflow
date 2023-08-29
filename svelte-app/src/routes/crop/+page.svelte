@@ -61,12 +61,12 @@
 	<!-- P5 Overlay -->
 	<div class="absolute left-0 top-0 z-10 no-touch select-none">
 		{#if $imageStore?.corners}
-			<!-- {@const { width, height } = $imageStore.imageProportions} -->
-			<P5Overlay bind:width bind:height bind:suggestedCorners={$imageStore.corners} />
+			<P5Overlay bind:width bind:height suggestedCorners={$imageStore.corners} />
 		{/if}
 	</div>
 
-	{#if $imageStore?.corners}
+	{#if $imageStore?.imageUrl}
+		<!-- Fallback image to show the most recent image captured -->
 		<img class="w-full h-full" alt="captured figure" src={$imageStore?.imageUrl} />
 	{/if}
 

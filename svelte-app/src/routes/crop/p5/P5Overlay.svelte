@@ -1,8 +1,9 @@
 <script lang="ts">
 	import P5 from '$lib/components/p5/P5.svelte';
+	import imageStore from '$lib/stores/imageStore';
 	import type p5 from 'p5';
-	import SnapRegion from './SnapRegion';
 	import type { Corners } from '../../capture/suggestedCorners';
+	import SnapRegion from './SnapRegion';
 
 	export let width: number = 100;
 	export let height: number = 100;
@@ -23,6 +24,11 @@
 		suggestedCorners.topRight = corners.topRight.toVector();
 		suggestedCorners.bottomLeft = corners.bottomLeft.toVector();
 		suggestedCorners.bottomRight = corners.bottomRight.toVector();
+
+		imageStore.update((store) => {
+			store.corners = suggestedCorners;
+			return store;
+		});
 	}
 
 	function sketch(p5: p5) {
@@ -84,4 +90,6 @@
 	}
 </script>
 
-<P5 {sketch} />
+{#key $imageStore.imageUrl}
+	<P5 {sketch} />
+{/key}
