@@ -8,7 +8,6 @@
 
 <div class="flex w-full items-center justify-around gap-4 bg-red-50 p-10 md:rounded-lg md:p-4">
 	<label for="my-drawer" class="drawer-button btn btn-outline btn-primary">
-		<!-- Page content here -->
 		<Icon path={mdiHelp} />
 	</label>
 

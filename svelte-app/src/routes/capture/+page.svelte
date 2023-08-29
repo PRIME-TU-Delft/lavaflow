@@ -1,216 +1,65 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import ActionMenu from '$lib/components/ActionMenu.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
+	import Instructions from '$lib/components/Instructions.svelte';
 	import Menubar from '$lib/components/Menubar.svelte';
 	import Video from '$lib/components/Video.svelte';
-	import imageStore from '$lib/stores/imageStore';
-	import sizeStore from '$lib/stores/sizeStore';
 	import * as gm from 'gammacv';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import CaptureMenu from './CaptureMenu.svelte';
-	import Instructions from '$lib/components/Instructions.svelte';
+	import { handleCapture, videoToTensor } from './handleCapture';
 	import { drawingInstructions, scanningInstructions } from './instructions';
-	import { hc_curves, hc_hierarchy } from '$lib/data/hardCoded';
-	import { contourLines } from '$lib/stores/contourLineStore';
+	import imageStore from '$lib/stores/imageStore';
+	import { goto } from '$app/navigation';
+
+	let deviceId: string; // camera id
+	let deviceName: string; // camera name
 
 	let width: number;
 	let height: number;
-	let deviceId: string;
+	let loadingNextPage = false;
 
-	let stream: gm.CaptureVideo;
-	let canvasProcessed: HTMLCanvasElement;
-	let session: gm.Session;
+	let outputCanvas: HTMLCanvasElement;
+	let gmSession: gm.Session; // GammaCV session
 
-	let loadingNextPage: boolean = false;
-
-	const params = {
-		D_COEF: 2.0,
-		LAYERS: 2,
-		LINE_COUNT: 10
-	};
-
-	function getPipeline(input: gm.Tensor<gm.TensorDataView>) {
-		let pipeline = gm.grayscale(input);
-		pipeline = gm.downsample(pipeline, params.D_COEF);
-		pipeline = gm.gaussianBlur(pipeline, 3, 3);
-		pipeline = gm.sobelOperator(pipeline);
-		pipeline = gm.cannyEdges(pipeline, 0.25, 0.75);
-		pipeline = gm.pcLines(pipeline, params.LAYERS, 2, 2);
-		return pipeline;
+	/**
+	 * Change the camera id
+	 */
+	function setCameraId(device: MediaDeviceInfo): void {
+		deviceId = device.deviceId;
+		deviceName = device.label;
 	}
 
-	const tick = (
-		input: gm.Tensor<gm.TensorDataView>,
-		output: gm.Tensor<gm.TensorDataView>,
-		pipeline: gm.Operation,
-		frame: number = 0
-	) => {
-		requestAnimationFrame(() => tick(input, output, pipeline, frame + 1));
-		// Read current in to the tensor
-		stream.getImageBuffer(input);
+	/**
+	 * Handle capture if the user clicks on the capture button
+	 * If the capture is successful, the user is redirected to the next page
+	 * Otherwise, an error is displayed
+	 * @param videoSource
+	 */
+	async function capture(videoSource: HTMLVideoElement | undefined) {
+		try {
+			loadingNextPage = true;
+			// 1. Get image url from video
+			const { input, imageUrl } = await videoToTensor(videoSource, outputCanvas, width, height);
 
-		let lines = [];
-		const maxP = Math.max(input.shape[0], input.shape[1]);
+			// 2. Extract corners from image
+			const corners = handleCapture(input, gmSession);
 
-		const lineContext = new gm.Line();
+			// 3. Set to image store
+			imageStore.set({ imageUrl, corners, imageProportions: { width, height } });
 
-		gm.canvasClear(canvasProcessed);
-
-		// finaly run operation on GPU and then write result in to output tensor
-		session.runOp(pipeline, frame, output);
-
-		// draw result into canvas
-		gm.canvasFromTensor(canvasProcessed, output);
-
-		for (let i = 0; i < output.size / 4; i += 1) {
-			const y = Math.floor(i / output.shape[1]);
-			const x = i - y * output.shape[1];
-			const value = output.get(y, x, 0);
-			const x0 = output.get(y, x, 1);
-			const y0 = output.get(y, x, 2);
-
-			if (value > 0.0) {
-				lines.push([value, x0, y0]);
-			}
-		}
-
-		lines = lines.sort((b, a) => a[0] - b[0]);
-		lines = lines.slice(0, params.LINE_COUNT);
-
-		for (let i = 0; i < lines.length; i += 1) {
-			lineContext.fromParallelCoords(
-				lines[i][1] * params.D_COEF,
-				lines[i][2] * params.D_COEF,
-				input.shape[1],
-				input.shape[0],
-				maxP,
-				maxP / 2
-			);
-
-			gm.canvasDrawLine(canvasProcessed, lineContext, 'rgba(0, 255, 0, 1.0)');
-		}
-
-		// if we would like to recalculated we need a frame update
-		// frame += 1;
-	};
-
-	function start(devideId?: string) {
-		stream = new gm.CaptureVideo(width, height);
-		stream.start(devideId);
-		canvasProcessed = gm.canvasCreate(width, height);
-		canvasProcessed.getContext('2d', { willReadFrequently: true });
-		// allocate memeory for storing a frame and calculations output
-		const input = new gm.Tensor('uint8', [height, width, 4]);
-		let pipeline = getPipeline(input); // define pipeline
-		session.init(pipeline); // initialize pipeline
-		const output = gm.tensorFrom(pipeline); // allocate output tensor
-		if (!output) return;
-		tick(input, output, pipeline);
-		document.body.children[0].appendChild(canvasProcessed);
-		canvasProcessed.style.position = 'absolute';
-		canvasProcessed.style.top = '0';
-		canvasProcessed.style.left = '0';
-	}
-
-	function setCameraId(id: string) {
-		deviceId = id;
-		start(id);
-	}
-
-	function continueWithDefaultMap() {
-		console.log('continueWithDefaultMap');
-		const { curves, hierarchy } = { curves: hc_curves, hierarchy: hc_hierarchy };
-		const [hc_width, hc_height] = [1000, 800];
-		contourLines.setup({
-			curves,
-			hierarchy,
-			size: { width: hc_width, height: hc_height }
-		});
-		sizeStore.set({ width: hc_width, height: hc_height });
-		goto('/preview');
-	}
-
-	async function gotoTransform(videoSource: HTMLVideoElement | undefined) {
-		console.log('gotoTransform');
-		continueWithDefaultMap();
-		return;
-		// TODO: Do actual capture
-
-		loadingNextPage = true;
-
-		if (
-			!videoSource ||
-			!videoSource.srcObject ||
-			!videoSource.videoWidth ||
-			!videoSource.videoHeight
-		) {
+			// 4. Redirect to next page
+			goto('./crop');
 			loadingNextPage = false;
-			return;
+		} catch (error) {
+			// TODO: proper error handling
+			console.error(error);
+			loadingNextPage = false;
 		}
-
-		// Create an atificial canvas element
-		const canvas = document.createElement('canvas') as unknown as HTMLCanvasElement;
-		canvas.height = videoSource.videoHeight;
-		canvas.width = videoSource.videoWidth;
-		const context = canvas.getContext('2d');
-
-		// Take screenshot of video
-		if (context)
-			context.drawImage(videoSource, 0, 0, videoSource.videoWidth, videoSource.videoHeight);
-
-		const image = canvas.toDataURL('image/png');
-
-		// Transform the image (from imageStore) into a gammacv tensor
-		const gammacvInputTensor = await gm.imageTensorFromURL(image, 'uint8', [
-			videoSource.videoHeight,
-			videoSource.videoWidth,
-			4
-		]);
-
-		// Define the image processing pipeline
-
-		// Normalization: add contrast, make colors seem deeper
-		let pipeline = gm.norm(gammacvInputTensor, 'l2');
-		// Erosion: erode into rectangles of shape 2x2 (best to see for yourself: https://gammacv.com/examples/erode)
-		pipeline = gm.erode(pipeline, [2, 2]);
-		// Adaptive Threshold: Black/white - make pixels black if they pass the threshold 20 within a certain box of size 10
-		// (best to see for yourself: https://gammacv.com/examples/adaptive_threshold)
-		pipeline = gm.adaptiveThreshold(pipeline, 10, 35);
-		// Gaussian Blur: remove sharp edges
-		pipeline = gm.gaussianBlur(pipeline, 3, 1);
-		// Make the lines a bit thinner so the result from opencv's getContours is better
-		pipeline = gm.threshold(pipeline, 0.3);
-
-		// Extract the tensor output
-		const gammacvOutputTensor: any = gm.tensorFrom(pipeline);
-
-		// Create and initialize the GammaCV session, to acquire GPU acceperation
-		const gammacvSession = new gm.Session();
-		gammacvSession.init(pipeline);
-
-		// Run the canny-edges operation
-		gammacvSession.runOp(pipeline, 0, gammacvOutputTensor);
-
-		gm.canvasFromTensor(canvas, gammacvOutputTensor);
-
-		imageStore.set(canvas.toDataURL('image/png'));
-
-		canvas.remove();
-
-		// Set image in (raw)image store
-		sizeStore.set({ width: videoSource.videoWidth, height: videoSource.videoHeight });
-
-		goto('/select-markers');
 	}
 
 	onMount(() => {
-		session = new gm.Session();
-	});
-
-	onDestroy(() => {
-		if (stream) stream.stop();
-		if (canvasProcessed) canvasProcessed.remove();
+		if (!gmSession) gmSession = new gm.Session(); // Setup the GM session
 	});
 </script>
 
@@ -224,24 +73,27 @@
 	}}
 >
 	<Video bind:deviceId let:cameraOptions let:videoSource>
+		<canvas style="position: absolute; top: 0;" {width} {height} bind:this={outputCanvas} />
+
 		<Menubar back="./" title="Capture">
-			{#if cameraOptions.length > 0}
-				<Dropdown title={deviceId || 'Select other camera'}>
-					{#each cameraOptions as camera}
+			<!-- If more than one camera are available, display a dropdown to allow the user to choose -->
+			{#if cameraOptions.length > 1}
+				<Dropdown
+					items={cameraOptions}
+					title={deviceName || 'Select other camera'}
+					let:item={camera}
+				>
+					{#if camera.deviceId != deviceId}
 						<li>
-							<button on:click={() => setCameraId(camera.label)}>{camera.label}<button /></button>
+							<button on:click={() => setCameraId(camera)}>{camera.label}</button>
 						</li>
-					{/each}
+					{/if}
 				</Dropdown>
 			{/if}
 		</Menubar>
 
 		<ActionMenu>
-			{#if width && height}
-				<button on:click={() => start(deviceId)}>Start capture</button>
-			{/if}
-
-			<CaptureMenu loading={loadingNextPage} on:click={() => gotoTransform(videoSource)} />
+			<CaptureMenu loading={loadingNextPage} on:click={() => capture(videoSource)} />
 		</ActionMenu>
 	</Video>
 </Instructions>
