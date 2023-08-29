@@ -1,5 +1,8 @@
 import cv, { type MatVector, type Mat } from 'opencv-ts';
 
+const MIN_CONTOUR_LENGTH = 300;
+
+
 type Curves = number[];
 export type ContourTree = { [key: number]: Curves[] };
 export type ContourTreeObject = {
@@ -94,13 +97,13 @@ function filterTree(contoursHierarchy: ContourTree) {
     // 1. Remove all contours that are not part of the tree (hierarchy value -1)
     delete contoursHierarchy["-1"];
 
-    // 2. Remove all contours that are too short (less than 3 points )
+    // 2. Remove all contours that are too short (less than (MIN_CONTOUR_LENGTH / 2) points )
     // 3. Remove all contours that have an odd number of points (OpenCV returns a flat array of x,y coordinates, so every contour should have an even number of points)
     Object.keys(contoursHierarchy).forEach((key) => {
         const keyNum = parseInt(key);
 
         if (key in contoursHierarchy && keyNum >= 0) {
-            contoursHierarchy[keyNum] = contoursHierarchy[keyNum].filter((contour) => contour.length >= 6 && contour.length % 2 == 0);
+            contoursHierarchy[keyNum] = contoursHierarchy[keyNum].filter((contour) => contour.length >= MIN_CONTOUR_LENGTH && contour.length % 2 == 0);
         }
     })
 
@@ -145,8 +148,22 @@ export function getCurvesFromContourHierarchy(contoursHierarchy: ContourTree): C
     // remove the double contours caused by detecting both the inside and the outside of each line
     removeDoubleContours(contoursHierarchy);
 
-    const curves = Object.values(contoursHierarchy).flat();
-    const hierarchy = Object.keys(contoursHierarchy).map((key) => parseInt(key));
+    const curves: Curves[] = []
+    const hierarchy: number[] = []
+
+    console.log(contoursHierarchy);
+
+
+    for (const [hierarchyStr, curveList] of Object.entries(contoursHierarchy)) {
+
+        for (const curve of curveList) {
+            hierarchy.push(parseInt(hierarchyStr));
+            curves.push(curve);
+        }
+    }
+
+    // const curves = Object.values(contoursHierarchy).flat();
+    // const hierarchy = Object.keys(contoursHierarchy).map((key) => parseInt(key));
 
     return { curves, hierarchy };
 }

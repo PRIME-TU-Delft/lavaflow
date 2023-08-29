@@ -46,6 +46,7 @@ export async function imageToContoursGammaCV(canvas: HTMLCanvasElement, debug = 
 
         if (debug) {
             debugContours(canvas, curves);
+            console.log(curves, hierarchy);
         }
 
         for (const curve of curves) {
