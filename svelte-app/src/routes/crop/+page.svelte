@@ -32,7 +32,7 @@
 		};
 
 		// 3. Extract contours from image and save them to the store
-		const opencvError = imageToContoursGammaCV(perspectiveRemovedCanvas);
+		const opencvError = await imageToContoursGammaCV(perspectiveRemovedCanvas);
 		if (opencvError) return console.log(opencvError);
 		// TODO: handle error
 
