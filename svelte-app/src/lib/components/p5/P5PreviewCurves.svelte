@@ -12,8 +12,13 @@
 		p5.setup = () => {
 			const [width, height] = [$sizeStore?.width, $sizeStore?.height];
 
-			if (!curves || curves.length === 0 || !width || !height) {
-				console.log("No curves or size available. Can't draw.");
+			if (!curves || curves.length === 0) {
+				console.error('Curve-data cannot be found');
+				return;
+			}
+
+			if (!width || !height) {
+				console.error('Curve-dimensions cannot be found');
 				return;
 			}
 
