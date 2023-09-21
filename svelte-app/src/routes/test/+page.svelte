@@ -1,103 +1,69 @@
 <script lang="ts">
-	import P5 from '$lib/components/p5/P5.svelte';
-	import type p5 from 'p5';
-	import image from './image.png?url';
+	import * as d3 from 'd3';
+	import { onMount } from 'svelte';
 
-	let width: number;
-	let height: number;
+	let width = 960;
+	let height = 500;
+	const scale = 80;
+	const q = 6; // The level of detail, e.g., sample every 6 pixels in x and y.
 
-	let p5Canvas: p5.Renderer;
-	let img: p5.Image;
+	let svgEl: SVGSVGElement;
+	let gEl: SVGGElement;
 
-	const GRID_SIZE = 25;
+	const thresholds = Array.from({ length: 2 }, (_, i) => (i - 6) / 5);
 
-	function drawGrid(p5: p5) {
-		p5.stroke(255, 0, 0, 50);
-		for (let i = 0; i < width; i += GRID_SIZE) {
-			p5.line(i, 0, i, height);
-		}
+	function createGrid() {
+		const x0 = -q / 2,
+			x1 = width + q;
+		const y0 = -q / 2,
+			y1 = height + q;
 
-		for (let i = 0; i < height; i += GRID_SIZE) {
-			p5.line(0, i, width, i);
-		}
+		// const n = Math.ceil((x1 - x0) / q);
+		// const m = Math.ceil((y1 - y0) / q);
+		const n = 43;
+		const m = 43;
+		const data: number[] = dataRaw.flat();
+
+		return { data, n, m };
 	}
 
-	function drawBand(p5: p5, bands: [number, number][][]) {
-		p5.stroke(255, 0, 0);
-		p5.strokeWeight(2);
-		p5.noFill();
-		for (const countour of bands) {
-			p5.beginShape();
-			for (const [y, x] of countour) {
-				console.log(x, y);
-				p5.vertex(x * 25, y * 25);
-			}
-			p5.endShape();
-		}
+	const grid = createGrid();
+
+	function handleZoom(e: any) {
+		d3.select('svg g').attr('transform', e.transform);
 	}
 
-	function drawDots(p5: p5) {
-		const data: number[][] = [];
+	const zoomProtocol = d3
+		.zoom<SVGSVGElement, unknown>()
+		.scaleExtent([1 / 3, 3])
+		.on('zoom', handleZoom);
 
-		for (let i = 0; i < width; i += GRID_SIZE) {
-			let row: number[] = [];
+	onMount(() => {
+		let path = d3.geoPath();
 
-			for (let j = 0; j < height; j += GRID_SIZE) {
-				let avg_black = 0;
+		const contours: d3.ContourMultiPolygon[] = [];
+		for (const v of thresholds) {
+			let contour = d3.contours().size([grid.n, grid.m]).contour(grid.data, v);
 
-				for (let x = 0; x < GRID_SIZE; x += 5) {
-					for (let y = 0; y < GRID_SIZE; y += 5) {
-						const c = p5.get(i + x, j + y);
-						if (c[0] == 0) avg_black++;
-					}
-				}
+			contour.coordinates = contour.coordinates.map((coords) => {
+				return coords.map((c) => c.map(([x, y]) => [x * scale, y * scale]));
+				// 	coords.map((c) => c.map(([x, y]) => [x * 1000, y * 1000]));
+				// 	console.log({ coords });
+				// 	return coords;
+			});
+			console.log(contour);
 
-				avg_black /= 25;
+			contours.push(contour);
 
-				row.push(avg_black);
-
-				p5.arc(i + GRID_SIZE / 2, j + GRID_SIZE / 2, 5, 5, 0, 2 * Math.PI);
-				p5.fill(255 * avg_black, 255 - 255 * avg_black, 0);
-			}
-
-			data.push(row);
+			// path(contour);
 		}
 
-		const lowerBound = 0.33;
-		const upperBound = 1;
+		d3.select(svgEl).call(zoomProtocol);
 
-		const bandWidth = upperBound - lowerBound;
-		const bands: [number, number][][] = MarchingSquaresJS.isoBands(data, lowerBound, bandWidth);
-
-		console.log(data);
-		console.log(bands);
-		drawBand(p5, bands);
-	}
-
-	function sketch(p5: p5) {
-		// Preload
-		p5.preload = () => {
-			img = p5.loadImage(image);
-		};
-
-		// Setup
-		p5.setup = () => {
-			p5Canvas = p5.createCanvas(width, height);
-			p5Canvas.id('p5-overlay');
-			p5.pixelDensity(p5.displayDensity());
-
-			p5.noLoop();
-			p5.image(img, 0, 0, width, height);
-
-			drawGrid(p5);
-
-			drawDots(p5);
-		};
-	}
+		d3.select(gEl).selectAll('path').data(contours).enter().append('path').attr('d', d3.geoPath());
+	});
 </script>
 
-<svelte:window bind:innerHeight={height} bind:innerWidth={width} />
-
-{#if height && width}
-	<P5 {sketch} />
-{/if}
+<svg bind:this={svgEl} {width} {height}>
+	<g style="stroke-width: 0.01px" bind:this={gEl} />
+</svg>
