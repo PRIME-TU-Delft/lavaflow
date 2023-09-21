@@ -11,22 +11,22 @@
 			rel="stylesheet"
 		/>
 		<meta name="viewport" content="width=device-width" />
-		<meta http-equiv="content-security-policy" content="">
-		<link href="./_app/immutable/assets/_layout.2e3194f0.css" rel="stylesheet">
-		<link href="./_app/immutable/assets/_page.0ffbc214.css" rel="stylesheet">
+		
+		<link href="./_app/immutable/assets/0.9b314737.css" rel="stylesheet">
+		<link href="./_app/immutable/assets/3.0ffbc214.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Preview.48481de8.css" rel="stylesheet">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/start.9d4fc3bc.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/index.525666b8.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/singletons.82d63fc8.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/index.b231765a.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/paths.1b555b68.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/control.e7f5239e.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/app.9f7120f4.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/preload-helper.41c905a7.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/_layout.svelte.f963cdd8.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/entry/_page.svelte.de674706.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/ActionButton.b6436ad5.mjs">
-		<link rel="preload" as="script" crossorigin="anonymous" href="./_app/immutable/chunks/Preview.svelte_svelte_type_style_lang.069820c8.mjs">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.7644488b.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.9fac37f0.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.598fe895.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.204dd160.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/paths.ee165dda.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/control.f5b05b5f.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.132382cc.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/preload-helper.a4192956.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.a0f8a326.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/3.d0193de9.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/ActionButton.e9d49ffd.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/Preview.svelte_svelte_type_style_lang.e14d1918.js">
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
@@ -101,19 +101,20 @@
 			
 			<script>
 				{
-					__sveltekit_178hbkn = {
-						env: {},
-						assets: new URL(".", location.href).pathname.replace(/^\/$/, ''),
-						element: document.currentScript.parentElement
+					__sveltekit_uulwoj = {
+						base: new URL(".", location).pathname.slice(0, -1),
+						env: {}
 					};
+
+					const element = document.currentScript.parentElement;
 
 					const data = [{"type":"data","data":null,"uses":{}},null];
 
 					Promise.all([
-						import("./_app/immutable/entry/start.9d4fc3bc.mjs"),
-						import("./_app/immutable/entry/app.9f7120f4.mjs")
+						import("./_app/immutable/entry/start.7644488b.js"),
+						import("./_app/immutable/entry/app.132382cc.js")
 					]).then(([kit, app]) => {
-						kit.start(app, __sveltekit_178hbkn.element, {
+						kit.start(app, element, {
 							node_ids: [0, 3],
 							data,
 							form: null,
