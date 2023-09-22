@@ -1,4 +1,4 @@
-use contour_isobands::{Band, ContourBuilder};
+use contour_isobands::{polygons, Band, ContourBuilder};
 use geojson::{FeatureCollection, GeoJson};
 use miette::{miette, Result};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
@@ -34,7 +34,10 @@ pub fn contours(data: JsValue) -> Result<String, JsValue> {
 		.contours(&data_flat, &[0., 0.3, 1.])
 		.map_err(|e| miette!("Error in contour detection").context(e.to_string()).to_string())?;
 
-	// So far, we've grouped the
+	// So far, we've grouped the points into contours.
+	// Now, we need to give the contours a hierarchy
+
+	// let interior_contours: Vec<(geojson::Value, Vec<geojson::Value>)> = contours.into_iter().map(|band| band.geometry.0.into_iter().map(|polygon| polygon.into_inner())).collect();
 
 	Ok(to_json(&contours))
 }
