@@ -3,10 +3,12 @@ mod model_construction;
 mod objects;
 mod surface_subdivision;
 mod utils;
-use wasm_bindgen::prelude::*;
 mod api;
 mod api_helper_fns;
 mod gltf_conversion;
+mod contours;
+
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
