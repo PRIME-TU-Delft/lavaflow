@@ -12,8 +12,9 @@
 	import { onMount } from 'svelte';
 	import { extractSelectedArea } from './gamma-cv/extractSelectedArea';
 	import { dragInstructions, posErrorInstructions } from './instructions';
-	import { imageToContoursGammaCV } from './open-cv/imageToContours';
 	import P5Overlay from './p5/P5Overlay.svelte';
+	import { imageToGrid } from './imageToGrid';
+	import init, * as wasm from 'wasm';
 
 	let width: number; // Width of the window
 	let height: number; // Height of the window
@@ -31,13 +32,17 @@
 			perspectiveRemovedCanvas.remove();
 		};
 
-		// 3. Extract contours from image and save them to the store
-		const opencvError = await imageToContoursGammaCV(perspectiveRemovedCanvas);
-		if (opencvError) return console.log(opencvError);
-		// TODO: handle error
+		// 3. Convert canvas to grid of points
+		const data = imageToGrid(perspectiveRemovedCanvas);
+
+		await init();
+
+		const geoJSON = wasm.contours(data);
+
+		console.log(geoJSON);
 
 		// 4. Redirect to preview page
-		goto('./preview');
+		// goto('./preview');
 
 		// perspectiveRemovedCanvas.remove();
 	}
