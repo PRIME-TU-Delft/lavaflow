@@ -33,6 +33,32 @@
 
 <VStack>
 	<div class="prose mx-auto mt-12 p-8">
+		<p>
+			This Lava application is an experiment conducted by PRIME to provide first-year students with
+			a tangible understanding of directional derivatives in the field.
+		</p>
+
+		<p>
+			In both physical and digital maps, contour lines are used to represent elevation on a
+			2-dimensional surface. These lines form bands that indicate areas of constant elevation.
+		</p>
+
+		<p>
+			The application consists of two steps. In the first part, we encourage students to unleash
+			their creativity and draw their own contour lines. These lines are then transformed into a
+			3-dimensional mountain. In the second step, students are tasked with placing turbines in
+			locations they believe will be affected by lava flowing from the mountain's highest point.
+			Students can collaborate and position turbines in different areas to maximise their score.
+		</p>
+
+		<p>
+			Lava naturally follows the steepest slope (or the largest directional derivative) downwards.
+			Placing turbines along the path with the greatest downward slope therefore yields the highest
+			possible score. The complexity of the game can be adjusted by the students themselves, as
+			drawing more intricate mountains will result in more challenging predictions of the slopes.
+		</p>
+	</div>
+	<div class="prose mx-auto mt-12 p-8">
 		The climate crisis is upon us! Lava tends to very precisely follow the steepest downwards
 		direction, when it flows down the hills of a volcano. Its intense heat makes for a great
 		opportunity to generate electricity for nearby cities. Your job is to predict where the lava
@@ -106,7 +132,6 @@
 		</div>
 	</div>
 </VStack>
-
 
 <style>
 	.logo-container {
