@@ -15,16 +15,16 @@
 		<link href="./_app/immutable/assets/0.9b314737.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/3.0ffbc214.css" rel="stylesheet">
 		<link href="./_app/immutable/assets/Preview.48481de8.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/entry/start.7644488b.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.a484b297.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index.9fac37f0.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.598fe895.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/singletons.a090bbb6.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index.204dd160.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/paths.ee165dda.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/paths.d61a56cf.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/control.f5b05b5f.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.132382cc.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.23880eee.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/preload-helper.a4192956.js">
 		<link rel="modulepreload" href="./_app/immutable/nodes/0.a0f8a326.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/3.d0193de9.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/3.7d4aee03.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/ActionButton.e9d49ffd.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/Preview.svelte_svelte_type_style_lang.e14d1918.js">
 	</head>
@@ -42,7 +42,27 @@
 	</div>
 </div>
 
-<div class="flex flex-col gap-4"><div class="prose mx-auto mt-12 p-8">The climate crisis is upon us! Lava tends to very precisely follow the steepest downwards
+<div class="flex flex-col gap-4"><div class="prose mx-auto mt-12 p-8"><p>This Lava application is an experiment conducted by PRIME to provide first-year students with
+			a tangible understanding of directional derivatives in the field.
+		</p>
+
+		<p>In both physical and digital maps, contour lines are used to represent elevation on a
+			2-dimensional surface. These lines form bands that indicate areas of constant elevation.
+		</p>
+
+		<p>The application consists of two steps. In the first part, we encourage students to unleash
+			their creativity and draw their own contour lines. These lines are then transformed into a
+			3-dimensional mountain. In the second step, students are tasked with placing turbines in
+			locations they believe will be affected by lava flowing from the mountain&#39;s highest point.
+			Students can collaborate and position turbines in different areas to maximise their score.
+		</p>
+
+		<p>Lava naturally follows the steepest slope (or the largest directional derivative) downwards.
+			Placing turbines along the path with the greatest downward slope therefore yields the highest
+			possible score. The complexity of the game can be adjusted by the students themselves, as
+			drawing more intricate mountains will result in more challenging predictions of the slopes.
+		</p></div>
+	<div class="prose mx-auto mt-12 p-8">The climate crisis is upon us! Lava tends to very precisely follow the steepest downwards
 		direction, when it flows down the hills of a volcano. Its intense heat makes for a great
 		opportunity to generate electricity for nearby cities. Your job is to predict where the lava
 		will flow and place steam turbines on its paths. The steam turbines generate higher amounts of
@@ -101,7 +121,7 @@
 			
 			<script>
 				{
-					__sveltekit_uulwoj = {
+					__sveltekit_17hmsag = {
 						base: new URL(".", location).pathname.slice(0, -1),
 						env: {}
 					};
@@ -111,8 +131,8 @@
 					const data = [{"type":"data","data":null,"uses":{}},null];
 
 					Promise.all([
-						import("./_app/immutable/entry/start.7644488b.js"),
-						import("./_app/immutable/entry/app.132382cc.js")
+						import("./_app/immutable/entry/start.a484b297.js"),
+						import("./_app/immutable/entry/app.23880eee.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 3],
