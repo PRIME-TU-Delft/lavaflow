@@ -3,15 +3,10 @@ use geo::{Area, Contains, Polygon};
 use miette::{miette, Result};
 
 
-pub struct ContourHierarchy {
-	nodes: Vec<ContourHierarchyNode>,
-	roots: Vec<usize>
-}
-
 #[derive(PartialEq)]
-struct ContourHierarchyNode {
-	contour: Polygon,
-	children: Vec<usize>,
+pub struct ContourHierarchy {
+	contour: Option<Polygon>,
+	children: Vec<ContourHierarchy>,
 }
 
 
@@ -66,23 +61,27 @@ fn hierarchy(polygons: Vec<Polygon>) -> Result<ContourHierarchy> {
 	// TODO: ^ cache computed areas during sort?
 	// Can't use sort_by_cached_key because f64 doesn't implement Ord :(
 
-	let mut hierarchy = ContourHierarchy {
-		nodes: polygons.into_iter().map(|polygon| ContourHierarchyNode {
-			contour: polygon,
-			children: Vec::new()
-		}).collect(),
-		roots: Vec::new()
+	let mut root = ContourHierarchy {
+		contour: None,
+		children: Vec::new(),
 	};
 
-	for i in 0..hierarchy.nodes.len() {
-		let mut iter = hierarchy.nodes.iter_mut().skip(i);
-		let node = iter.next().unwrap();  // Can unwrap, since loop bounds ensure safe indices
-		let parent = iter.find(|other| other.contour.contains(&node.contour));
+	let mut nodes: Vec<_> = polygons.into_iter().map(|polygon| ContourHierarchy {
+		contour: Some(polygon),
+		children: Vec::new()
+	}).collect();
+
+	while let Some(node) = nodes.pop() {
+		let parent = nodes.iter_mut().find(|other| {
+			let node_contour = node.contour.as_ref().unwrap();
+			let other_contour = other.contour.as_ref().unwrap();
+			*other != &node && other_contour.contains(node_contour)
+		});
 		match parent {
-			Some(parent) => parent.children.push(i),
-			None => hierarchy.roots.push(i),
+			Some(parent) => parent.children.push(node),
+			None => root.children.push(node),
 		}
 	}
 
-	Ok(hierarchy)
+	Ok(root)
 }
