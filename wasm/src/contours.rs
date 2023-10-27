@@ -3,13 +3,19 @@ use geo::{Area, Contains, Polygon};
 use miette::{miette, Result};
 
 
-pub struct ContourHierarchy {
+pub struct ContourHierarchy<'a> {
+	nodes: Vec<ContourHierarchyNode<'a>>,
+	roots: Vec<&'a mut ContourHierarchyNode<'a>>
+}
+
+#[derive(PartialEq)]
+struct ContourHierarchyNode<'a> {
 	contour: Polygon,
-	children: Vec<ContourHierarchy>,
+	children: Vec<&'a mut ContourHierarchyNode<'a>>,
 }
 
 
-pub fn pipeline(data: Vec<Vec<f64>>) -> Result<ContourHierarchy> {
+pub fn pipeline<'a>(data: Vec<Vec<f64>>) -> Result<ContourHierarchy<'a>> {
 	let bands = contours(data)?;
 	let band = bands.last()
 		.ok_or(miette!("No contours detected in drawing"))?;
@@ -48,36 +54,40 @@ fn contours(data: Vec<Vec<f64>>) -> Result<Vec<Band>> {
 
 
 /// Builds a topological hierarchy of polygons
-fn hierarchy(polygons: Vec<Polygon>) -> Result<ContourHierarchy> {
+/// Algorithm outline:
+/// Sort polygons by area, ascending
+/// For each polygon:
+///     Find the first (smallest) polygon that contains it, this is the parent
+///     Add node as child of parent
+///     OR: if no node found, add it as a root node to the hierarchy struct
+fn hierarchy<'a>(polygons: Vec<Polygon>) -> Result<ContourHierarchy<'a>> {
 	let mut polygons = polygons.to_vec();
 	polygons.sort_by(|a, b| a.unsigned_area().total_cmp(&b.unsigned_area()));
 	// TODO: ^ cache computed areas during sort?
 	// Can't use sort_by_cached_key because f64 doesn't implement Ord :(
 
-	let mut root = ContourHierarchy {
-		contour: polygons.first().ok_or(miette!("No polygons in contour"))?.clone(),
-		children: vec![],
+	let mut hierarchy = ContourHierarchy {
+		nodes: polygons.into_iter().map(|polygon| ContourHierarchyNode {
+			contour: polygon,
+			children: Vec::new()
+		}).collect(),
+		roots: Vec::new()
 	};
 
-	for polygon in polygons.iter().skip(1) {
-		assert!(root.contour.contains(polygon.exterior()), "Polygon is not contained in root contour");
-		let mut parent = &mut root;
 
-		// Recursively find the deepest polygon that contains the current polygon
-		while !parent.children.is_empty() {
-			let child = parent.children.iter_mut()
-				.filter(|child| child.contour.contains(polygon.exterior()))
-				.last()
-				.ok_or(miette!("Polygon is not contained in any children"))?;
-			parent = child;
+	for i in 0..hierarchy.nodes.len() {
+		let (left, right) = hierarchy.nodes[i..].split_at_mut(1);  // Splits `hierarchy.nodes` into two mutable slices, the first containing the current node, the second containing all the nodes after it
+		let node = left.first_mut().unwrap();  // `left` always has at least one item, unless `hierarchy.nodes` is empty (in which case the contents of this loop would not run)
+
+		// Find the first (smallest) polygon that contains it, this is the parent
+		let parent = right.iter_mut().find(|other| *other != node && other.contour.contains(&node.contour));
+		if let Some(parent) = parent {
+			parent.children.push(node);
 		}
-
-		// Found a leaf node, add the polygon as a child
-		parent.children.push(ContourHierarchy {
-			contour: polygon.clone(),
-			children: vec![],
-		});
+		else {
+			hierarchy.roots.push(node);
+		}
 	}
 
-	Ok(root)
+	todo!()
 }
