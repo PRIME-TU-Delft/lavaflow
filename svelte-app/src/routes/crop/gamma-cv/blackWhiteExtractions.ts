@@ -1,13 +1,25 @@
 import * as gm from 'gammacv';
-function BW_pipeline(input: gm.Tensor<gm.TensorDataView>) {
-    const height = input.shape[0];
-    const width = input.shape[1];
+import whiteBalanceKernel from "./whiteBalance.glsl?raw"
 
+function whiteBalance(input: gm.Operation | gm.Tensor) {
+    const [HEIGHT, WIDTH] = input.shape;
+
+    return new gm.RegisterOperation("whiteBalance")
+        .Input("tSrc", "uint8")
+        .Output("uint8")
+        .SetShapeFn(() => [HEIGHT, WIDTH, 4])
+        .LoadChunk("pickValue")
+        .GLSLKernel(whiteBalanceKernel)
+        .Compile({ tSrc: input });
+}
+
+function BW_pipeline(input: gm.Tensor<gm.TensorDataView>) {
     // Normalization: add contrast, make colors seem deeper
     let pipeline = gm.grayscale(input);
     pipeline = gm.erode(pipeline, [10, 10]);
     pipeline = gm.gaussianBlur(pipeline, 3, 1);
-    pipeline = gm.threshold(pipeline, 0.75);
+    pipeline = whiteBalance(pipeline);
+    pipeline = gm.adaptiveThreshold(pipeline, 200, 0.95);
 
     return pipeline;
 }
